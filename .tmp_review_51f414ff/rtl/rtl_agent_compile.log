@@ -1,0 +1,16 @@
+backend/workflows/51f414ff-9b5c-4f21-8a55-c7792a69faa8/rtl/adaptive_aero_control_top.v:61: error: Unknown module type: adaptive_aero_control_registers
+backend/workflows/51f414ff-9b5c-4f21-8a55-c7792a69faa8/rtl/adaptive_aero_control_top.v:82: error: Unknown module type: adaptive_aero_control_transport
+backend/workflows/51f414ff-9b5c-4f21-8a55-c7792a69faa8/rtl/adaptive_aero_control_top.v:108: error: Unknown module type: adaptive_aero_control_safety
+4 error(s) during elaboration.
+*** These modules were missing:
+        adaptive_aero_control_registers referenced 1 times.
+        adaptive_aero_control_safety referenced 1 times.
+        adaptive_aero_control_transport referenced 1 times.
+***
+
+Issues:
+❌ Required memory macro instance mismatch: expected exactly one 'fpga_bram_history_wrapper u_history_bram(...)', found 0. memory_macros[] is authoritative; do not substitute a wrapper, behavioral model, or invented module name.
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

@@ -1,6 +1,0 @@
-{
-  "status": "blocked",
-  "reason": "inferred_memory_macro_requires_real_macro_collateral",
-  "inferred_memory_array_count": 4,
-  "inferred_memory_bit_count": 10240
-}

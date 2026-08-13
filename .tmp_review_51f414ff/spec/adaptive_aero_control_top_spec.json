@@ -1,0 +1,748 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "Single-clock FPGA synthesizable adaptive active-aerodynamics control shell that exchanges compact 128-bit request/response packets with an external model service, exposes a small 8-bit address/32-bit data control register window, validates and de-packetizes inbound responses, enforces sequence/age/watchdog safety, clamps and rate-limits actuator recommendations, and drives only bounded scalar actuator commands with deterministic fallback behavior. The RTL does not implement the surrogate model; it only forwards requests, receives responses, and applies local safety policy before actuator drive-out.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "rst_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "All logic is single-clock and synchronous to clk.",
+      "Reset is active-low and synchronously deasserted in the RTL contract.",
+      "The external service is responsible only for model inference; the RTL is responsible for packet transport, validation, and local safety enforcement.",
+      "The 128-bit streams carry opaque packets with fields sufficient for request/response sequencing, age, flags, handle, and compact command metadata.",
+      "No large payload or tensor storage is implemented as flip-flops; any optional telemetry/history storage must be mapped to native FPGA block RAM through a technology-neutral memory wrapper if used.",
+      "No surrogate prediction constants or assumed aerodynamic outputs are encoded in the RTL contract."
+    ]
+  },
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [
+    {
+      "name": "fpga_bram_history_wrapper",
+      "kind": "fpga_bram",
+      "depth": 64,
+      "data_width": 32,
+      "addr_width": 6,
+      "instance_name": "u_history_bram",
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "we",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "requires_mbist": false
+    }
+  ],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level adaptive aero control shell containing transport packetization/depacketization, configuration register window, safety policy, fallback state machine, and bounded actuator output generation. The top module owns the external stream interfaces, the register interface, and the actuator outputs. It forwards compact outbound request packets to an external reference service and accepts compact inbound response packets for validation and safe command acceptance.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "cmd_in_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cmd_in_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "cmd_in_data",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "cmd_out_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "cmd_out_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cmd_out_data",
+          "direction": "output",
+          "width": 128
+        },
+        {
+          "name": "cfg_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "cfg_wdata",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "cfg_rdata",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "cfg_we",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cfg_re",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_flags",
+          "direction": "output",
+          "width": 16
+        }
+      ],
+      "functionality": "Accepts 128-bit inbound packets carrying validated model responses or control/ack packets, performs depacketization and packet validity checks, maintains request sequencing and response age tracking, applies timeout and stale-data rejection, clamps and optionally rate-limits the accepted actuator recommendation, and exposes a deterministic safe fallback actuator command when the external service is unavailable, stale, duplicate, out-of-order, or otherwise invalid. Generates 128-bit outbound request packets from configuration state, latest accepted control inputs, and current request sequence counter, with proper valid/ready backpressure. Provides a compact register window for programming enable, fallback command, clamp limits, rate limit, timeout threshold, stale threshold, debug counters, and latched status/fault indicators.",
+      "responsibilities": [
+        "Own the top-level packet transport interfaces for outbound request and inbound response streams.",
+        "Maintain a monotonically increasing request sequence counter and last accepted response sequence.",
+        "Pack request descriptors from configuration registers and latest control inputs into 128-bit outbound packets.",
+        "Unpack inbound response packets and extract candidate actuator command, sequence, age, flags, and handle metadata.",
+        "Reject duplicate, out-of-order, stale, malformed, or timed-out responses.",
+        "Apply clamp limits and optional rate limiting before committing actuator output.",
+        "Drive deterministic safe fallback actuator command on reset, timeout, stale data, invalid packet, or fault conditions.",
+        "Expose latched status flags and counters through the register window.",
+        "Use only compact scalar actuator outputs; no tensor, mesh, or large payload ports are exposed."
+      ],
+      "submodules": [
+        {
+          "name": "adaptive_aero_control_transport",
+          "description": "Handles packet formatting, outbound request issuance, inbound response depacketization, sequence comparison, age tracking, duplicate/out-of-order detection, and handshake management for the external external-model service transport.",
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": 1,
+              "active_low": true
+            },
+            {
+              "name": "cmd_in_valid",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "cmd_in_ready",
+              "direction": "output",
+              "width": 1
+            },
+            {
+              "name": "cmd_in_data",
+              "direction": "input",
+              "width": 128
+            },
+            {
+              "name": "cmd_out_valid",
+              "direction": "output",
+              "width": 1
+            },
+            {
+              "name": "cmd_out_ready",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "cmd_out_data",
+              "direction": "output",
+              "width": 128
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "cfg_stale_threshold",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "request_seq_out",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "last_accepted_seq_out",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "response_candidate_cmd",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "response_seq",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "response_age",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "response_valid",
+              "direction": "output",
+              "width": 1
+            },
+            {
+              "name": "response_duplicate",
+              "direction": "output",
+              "width": 1
+            },
+            {
+              "name": "response_out_of_order",
+              "direction": "output",
+              "width": 1
+            },
+            {
+              "name": "response_stale",
+              "direction": "output",
+              "width": 1
+            },
+            {
+              "name": "request_issued_pulse",
+              "direction": "output",
+              "width": 1
+            },
+            {
+              "name": "response_received_pulse",
+              "direction": "output",
+              "width": 1
+            },
+            {
+              "name": "status_flags_in",
+              "direction": "input",
+              "width": 16
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_safety",
+          "description": "Applies clamping, optional rate limiting, timeout/fallback policy, latched status accumulation, and bounded actuator command generation.",
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": 1,
+              "active_low": true
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "cfg_safe_cmd",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "cfg_cmd_min",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "cfg_cmd_max",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "cfg_rate_limit_en",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "cfg_rate_limit_step",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "cfg_stale_threshold",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "response_candidate_cmd",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "response_seq",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "response_age",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "response_valid",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "response_duplicate",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "response_out_of_order",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "response_stale",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "request_issued_pulse",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "response_received_pulse",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "status_flags_in",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "actuator_cmd",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "actuator_cmd_valid",
+              "direction": "output",
+              "width": 1
+            },
+            {
+              "name": "status_flags",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "fault_counters",
+              "direction": "output",
+              "width": 32
+            },
+            {
+              "name": "debug_counters",
+              "direction": "output",
+              "width": 32
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_registers",
+          "description": "Implements the compact 8-bit address/32-bit data register window for configuration, status, and counter readback. Captures writes atomically per address and returns latched telemetry.",
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "rst_n",
+              "direction": "input",
+              "width": 1,
+              "active_low": true
+            },
+            {
+              "name": "cfg_addr",
+              "direction": "input",
+              "width": 8
+            },
+            {
+              "name": "cfg_wdata",
+              "direction": "input",
+              "width": 32
+            },
+            {
+              "name": "cfg_rdata",
+              "direction": "output",
+              "width": 32
+            },
+            {
+              "name": "cfg_we",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "cfg_re",
+              "direction": "input",
+              "width": 1
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": 1
+            },
+            {
+              "name": "cfg_safe_cmd",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "cfg_cmd_min",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "cfg_cmd_max",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "cfg_rate_limit_en",
+              "direction": "output",
+              "width": 1
+            },
+            {
+              "name": "cfg_rate_limit_step",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "cfg_timeout_threshold",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "cfg_stale_threshold",
+              "direction": "output",
+              "width": 16
+            },
+            {
+              "name": "status_flags_in",
+              "direction": "input",
+              "width": 16
+            },
+            {
+              "name": "fault_counters_in",
+              "direction": "input",
+              "width": 32
+            },
+            {
+              "name": "debug_counters_in",
+              "direction": "input",
+              "width": 32
+            }
+          ]
+        }
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v",
+      "must_drive": [],
+      "must_receive": [],
+      "must_not_drive": [],
+      "reset_behavior": "",
+      "behavior_rules": []
+    },
+    "modules": []
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_control_top.clk"
+      ],
+      "description": "Top-level port clk connected to matching child module port(s)."
+    },
+    {
+      "top_port": "rst_n",
+      "connected_to": [
+        "adaptive_aero_control_top.rst_n"
+      ],
+      "description": "Top-level port rst_n connected to matching child module port(s)."
+    },
+    {
+      "top_port": "cmd_in_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.cmd_in_valid"
+      ],
+      "description": "Top-level port cmd_in_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "cmd_in_ready",
+      "connected_to": [
+        "adaptive_aero_control_top.cmd_in_ready"
+      ],
+      "description": "Top-level port cmd_in_ready connected to matching child module port(s)."
+    },
+    {
+      "top_port": "cmd_in_data",
+      "connected_to": [
+        "adaptive_aero_control_top.cmd_in_data"
+      ],
+      "description": "Top-level port cmd_in_data connected to matching child module port(s)."
+    },
+    {
+      "top_port": "cmd_out_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.cmd_out_valid"
+      ],
+      "description": "Top-level port cmd_out_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "cmd_out_ready",
+      "connected_to": [
+        "adaptive_aero_control_top.cmd_out_ready"
+      ],
+      "description": "Top-level port cmd_out_ready connected to matching child module port(s)."
+    },
+    {
+      "top_port": "cmd_out_data",
+      "connected_to": [
+        "adaptive_aero_control_top.cmd_out_data"
+      ],
+      "description": "Top-level port cmd_out_data connected to matching child module port(s)."
+    },
+    {
+      "top_port": "cfg_addr",
+      "connected_to": [
+        "adaptive_aero_control_top.cfg_addr"
+      ],
+      "description": "Top-level port cfg_addr connected to matching child module port(s)."
+    },
+    {
+      "top_port": "cfg_wdata",
+      "connected_to": [
+        "adaptive_aero_control_top.cfg_wdata"
+      ],
+      "description": "Top-level port cfg_wdata connected to matching child module port(s)."
+    },
+    {
+      "top_port": "cfg_rdata",
+      "connected_to": [
+        "adaptive_aero_control_top.cfg_rdata"
+      ],
+      "description": "Top-level port cfg_rdata connected to matching child module port(s)."
+    },
+    {
+      "top_port": "cfg_we",
+      "connected_to": [
+        "adaptive_aero_control_top.cfg_we"
+      ],
+      "description": "Top-level port cfg_we connected to matching child module port(s)."
+    },
+    {
+      "top_port": "cfg_re",
+      "connected_to": [
+        "adaptive_aero_control_top.cfg_re"
+      ],
+      "description": "Top-level port cfg_re connected to matching child module port(s)."
+    },
+    {
+      "top_port": "actuator_cmd",
+      "connected_to": [
+        "adaptive_aero_control_top.actuator_cmd"
+      ],
+      "description": "Top-level port actuator_cmd connected to matching child module port(s)."
+    },
+    {
+      "top_port": "actuator_cmd_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.actuator_cmd_valid"
+      ],
+      "description": "Top-level port actuator_cmd_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "status_flags",
+      "connected_to": [
+        "adaptive_aero_control_top.status_flags"
+      ],
+      "description": "Top-level port status_flags connected to matching child module port(s)."
+    }
+  ],
+  "inter_module_signals": [],
+  "signal_ownership": [
+    {
+      "signal": "cmd_in_ready",
+      "owner": "adaptive_aero_control_top.cmd_in_ready"
+    },
+    {
+      "signal": "cmd_out_valid",
+      "owner": "adaptive_aero_control_top.cmd_out_valid"
+    },
+    {
+      "signal": "cmd_out_data",
+      "owner": "adaptive_aero_control_top.cmd_out_data"
+    },
+    {
+      "signal": "cfg_rdata",
+      "owner": "adaptive_aero_control_top.cfg_rdata"
+    },
+    {
+      "signal": "actuator_cmd",
+      "owner": "adaptive_aero_control_top.actuator_cmd"
+    },
+    {
+      "signal": "actuator_cmd_valid",
+      "owner": "adaptive_aero_control_top.actuator_cmd_valid"
+    },
+    {
+      "signal": "status_flags",
+      "owner": "adaptive_aero_control_top.status_flags"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "minimal",
+    "registers": [
+      {
+        "name": "CTRL_ENABLE",
+        "address": "0x00",
+        "width": 1,
+        "access": "rw",
+        "reset_value": "0x0",
+        "description": "Global enable for transport and safety operation."
+      },
+      {
+        "name": "SAFE_CMD",
+        "address": "0x04",
+        "width": 16,
+        "access": "rw",
+        "reset_value": "0x0000",
+        "description": "Deterministic safe fallback actuator command."
+      },
+      {
+        "name": "CMD_MIN",
+        "address": "0x08",
+        "width": 16,
+        "access": "rw",
+        "reset_value": "0x0000",
+        "description": "Minimum actuator command clamp."
+      },
+      {
+        "name": "CMD_MAX",
+        "address": "0x0C",
+        "width": 16,
+        "access": "rw",
+        "reset_value": "0x7FFF",
+        "description": "Maximum actuator command clamp."
+      },
+      {
+        "name": "RATE_LIMIT_EN",
+        "address": "0x10",
+        "width": 1,
+        "access": "rw",
+        "reset_value": "0x0",
+        "description": "Enable step-rate limiting."
+      },
+      {
+        "name": "RATE_LIMIT_STEP",
+        "address": "0x14",
+        "width": 16,
+        "access": "rw",
+        "reset_value": "0x0001",
+        "description": "Maximum per-update step magnitude."
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD",
+        "address": "0x18",
+        "width": 16,
+        "access": "rw",
+        "reset_value": "0x00FF",
+        "description": "Watchdog timeout threshold."
+      },
+      {
+        "name": "STALE_THRESHOLD",
+        "address": "0x1C",
+        "width": 16,
+        "access": "rw",
+        "reset_value": "0x0008",
+        "description": "Maximum acceptable packet age before stale rejection."
+      },
+      {
+        "name": "STATUS_FLAGS",
+        "address": "0x20",
+        "width": 16,
+        "access": "ro",
+        "reset_value": "0x0000",
+        "description": "Latched status flags including issued request, received response, clamp, timeout, stale-drop, duplicate-drop, out-of-order-drop, and fallback-engaged indicators."
+      },
+      {
+        "name": "FAULT_COUNTERS",
+        "address": "0x24",
+        "width": 32,
+        "access": "ro",
+        "reset_value": "0x00000000",
+        "description": "Latched fault/event counters."
+      },
+      {
+        "name": "DEBUG_COUNTERS",
+        "address": "0x28",
+        "width": 32,
+        "access": "ro",
+        "reset_value": "0x00000000",
+        "description": "Latched debug counters for request/response and safety events."
+      }
+    ]
+  }
+}

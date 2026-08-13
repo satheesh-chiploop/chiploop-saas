@@ -1,0 +1,220 @@
+module adaptive_aero_control_top (
+    clk,
+    rst_n,
+    cmd_in_valid,
+    cmd_in_ready,
+    cmd_in_data,
+    cmd_out_valid,
+    cmd_out_ready,
+    cmd_out_data,
+    cfg_addr,
+    cfg_wdata,
+    cfg_rdata,
+    cfg_we,
+    cfg_re,
+    actuator_cmd,
+    actuator_cmd_valid,
+    status_flags
+);
+    input clk;
+    input rst_n;
+    input cmd_in_valid;
+    output cmd_in_ready;
+    input [127:0] cmd_in_data;
+    output cmd_out_valid;
+    input cmd_out_ready;
+    output [127:0] cmd_out_data;
+    input [7:0] cfg_addr;
+    input [31:0] cfg_wdata;
+    output [31:0] cfg_rdata;
+    input cfg_we;
+    input cfg_re;
+    output [15:0] actuator_cmd;
+    output actuator_cmd_valid;
+    output [15:0] status_flags;
+    reg cmd_in_ready_r;
+    reg cmd_out_valid_r;
+    reg [127:0] cmd_out_data_r;
+    reg [31:0] cfg_rdata_r;
+    reg [15:0] actuator_cmd_r;
+    reg actuator_cmd_valid_r;
+    reg [15:0] status_flags_r;
+    reg cfg_enable;
+    reg [15:0] cfg_safe_cmd;
+    reg [15:0] cfg_cmd_min;
+    reg [15:0] cfg_cmd_max;
+    reg cfg_rate_limit_en;
+    reg [15:0] cfg_rate_limit_step;
+    reg [15:0] cfg_timeout_threshold;
+    reg [15:0] cfg_stale_threshold;
+
+    reg [15:0] request_seq_reg;
+    reg [15:0] last_accepted_seq_reg;
+    reg [15:0] response_candidate_cmd_reg;
+    reg [15:0] response_seq_reg;
+    reg [15:0] response_age_reg;
+    reg response_valid_reg;
+    reg response_duplicate_reg;
+    reg response_out_of_order_reg;
+    reg response_stale_reg;
+    reg request_issued_pulse_reg;
+    reg response_received_pulse_reg;
+    reg [15:0] transport_status_flags_reg;
+
+    reg [15:0] safety_status_flags_reg;
+    reg [31:0] fault_counters_reg;
+    reg [31:0] debug_counters_reg;
+
+    reg history_csb;
+    reg history_we;
+    reg [5:0] history_addr;
+    reg [31:0] history_din;
+    wire [31:0] history_dout;
+
+    assign cmd_in_ready = cmd_in_ready_r;
+    assign cmd_out_valid = cmd_out_valid_r;
+    assign cmd_out_data = cmd_out_data_r;
+    assign cfg_rdata = cfg_rdata_r;
+    assign actuator_cmd = actuator_cmd_r;
+    assign actuator_cmd_valid = actuator_cmd_valid_r;
+    assign status_flags = status_flags_r;
+
+    fpga_bram_history_wrapper u_history_bram (
+        .clk(clk),
+        .csb(history_csb),
+        .we(history_we),
+        .addr(history_addr),
+        .din(history_din),
+        .dout(history_dout)
+    );
+
+    always @(*) begin
+        cmd_in_ready_r = 1'b1;
+        cfg_rdata_r = 32'h00000000;
+        history_csb = 1'b1;
+        history_we = 1'b0;
+        history_addr = 6'd0;
+        history_din = 32'd0;
+        if (cfg_re) begin
+            case (cfg_addr)
+                8'h00: cfg_rdata_r = {31'd0, cfg_enable};
+                8'h01: cfg_rdata_r = {16'd0, cfg_safe_cmd};
+                8'h02: cfg_rdata_r = {16'd0, cfg_cmd_min};
+                8'h03: cfg_rdata_r = {16'd0, cfg_cmd_max};
+                8'h04: cfg_rdata_r = {31'd0, cfg_rate_limit_en};
+                8'h05: cfg_rdata_r = {16'd0, cfg_rate_limit_step};
+                8'h06: cfg_rdata_r = {16'd0, cfg_timeout_threshold};
+                8'h07: cfg_rdata_r = {16'd0, cfg_stale_threshold};
+                8'h08: cfg_rdata_r = {16'd0, request_seq_reg};
+                8'h09: cfg_rdata_r = {16'd0, last_accepted_seq_reg};
+                8'h0A: cfg_rdata_r = {16'd0, response_candidate_cmd_reg};
+                8'h0B: cfg_rdata_r = {16'd0, response_seq_reg};
+                8'h0C: cfg_rdata_r = {16'd0, response_age_reg};
+                8'h0D: cfg_rdata_r = {31'd0, response_valid_reg};
+                8'h0E: cfg_rdata_r = {31'd0, response_duplicate_reg};
+                8'h0F: cfg_rdata_r = {31'd0, response_out_of_order_reg};
+                8'h10: cfg_rdata_r = {31'd0, response_stale_reg};
+                8'h11: cfg_rdata_r = {16'd0, transport_status_flags_reg};
+                8'h12: cfg_rdata_r = fault_counters_reg;
+                8'h13: cfg_rdata_r = debug_counters_reg;
+                8'h14: cfg_rdata_r = {16'd0, safety_status_flags_reg};
+                default: cfg_rdata_r = 32'h00000000;
+            endcase
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cfg_enable <= 1'b0;
+            cfg_safe_cmd <= 16'd0;
+            cfg_cmd_min <= 16'd0;
+            cfg_cmd_max <= 16'hffff;
+            cfg_rate_limit_en <= 1'b0;
+            cfg_rate_limit_step <= 16'd1;
+            cfg_timeout_threshold <= 16'd0;
+            cfg_stale_threshold <= 16'd0;
+            request_seq_reg <= 16'd0;
+            last_accepted_seq_reg <= 16'd0;
+            response_candidate_cmd_reg <= 16'd0;
+            response_seq_reg <= 16'd0;
+            response_age_reg <= 16'd0;
+            response_valid_reg <= 1'b0;
+            response_duplicate_reg <= 1'b0;
+            response_out_of_order_reg <= 1'b0;
+            response_stale_reg <= 1'b0;
+            request_issued_pulse_reg <= 1'b0;
+            response_received_pulse_reg <= 1'b0;
+            transport_status_flags_reg <= 16'd0;
+            safety_status_flags_reg <= 16'd0;
+            fault_counters_reg <= 32'd0;
+            debug_counters_reg <= 32'd0;
+            actuator_cmd_r <= 16'd0;
+            actuator_cmd_valid_r <= 1'b0;
+            status_flags_r <= 16'd0;
+            cmd_out_valid_r <= 1'b0;
+            cmd_out_data_r <= 128'd0;
+        end else begin
+            if (cfg_we) begin
+                case (cfg_addr)
+                    8'h00: cfg_enable <= cfg_wdata[0];
+                    8'h01: cfg_safe_cmd <= cfg_wdata[15:0];
+                    8'h02: cfg_cmd_min <= cfg_wdata[15:0];
+                    8'h03: cfg_cmd_max <= cfg_wdata[15:0];
+                    8'h04: cfg_rate_limit_en <= cfg_wdata[0];
+                    8'h05: cfg_rate_limit_step <= cfg_wdata[15:0];
+                    8'h06: cfg_timeout_threshold <= cfg_wdata[15:0];
+                    8'h07: cfg_stale_threshold <= cfg_wdata[15:0];
+                    8'h08: request_seq_reg <= cfg_wdata[15:0];
+                    8'h09: last_accepted_seq_reg <= cfg_wdata[15:0];
+                    8'h0A: response_candidate_cmd_reg <= cfg_wdata[15:0];
+                    8'h0B: response_seq_reg <= cfg_wdata[15:0];
+                    8'h0C: response_age_reg <= cfg_wdata[15:0];
+                    8'h0D: response_valid_reg <= cfg_wdata[0];
+                    8'h0E: response_duplicate_reg <= cfg_wdata[0];
+                    8'h0F: response_out_of_order_reg <= cfg_wdata[0];
+                    8'h10: response_stale_reg <= cfg_wdata[0];
+                    8'h11: transport_status_flags_reg <= cfg_wdata[15:0];
+                    8'h12: fault_counters_reg <= cfg_wdata;
+                    8'h13: debug_counters_reg <= cfg_wdata;
+                    8'h14: safety_status_flags_reg <= cfg_wdata[15:0];
+                    default: begin end
+                endcase
+            end
+            if (cmd_out_valid_r && cmd_out_ready) begin
+                cmd_out_valid_r <= 1'b0;
+            end
+            if (cmd_in_valid && cmd_in_ready_r) begin
+                request_seq_reg <= request_seq_reg + 16'd1;
+                response_candidate_cmd_reg <= cmd_in_data[15:0];
+                response_seq_reg <= cmd_in_data[31:16];
+                response_age_reg <= cmd_in_data[47:32];
+                response_valid_reg <= cmd_in_data[48];
+                response_duplicate_reg <= cmd_in_data[49];
+                response_out_of_order_reg <= cmd_in_data[50];
+                response_stale_reg <= cmd_in_data[51];
+                request_issued_pulse_reg <= 1'b1;
+                response_received_pulse_reg <= cmd_in_data[48];
+                transport_status_flags_reg <= {cmd_in_data[63:52], 4'd0};
+                cmd_out_valid_r <= 1'b1;
+                cmd_out_data_r <= {request_seq_reg, last_accepted_seq_reg, cfg_safe_cmd, cfg_cmd_min, cfg_cmd_max, cfg_rate_limit_step, cfg_timeout_threshold, cfg_stale_threshold};
+            end else begin
+                request_issued_pulse_reg <= 1'b0;
+                response_received_pulse_reg <= 1'b0;
+            end
+            if (response_valid_reg && !response_duplicate_reg && !response_out_of_order_reg && !response_stale_reg && cfg_enable) begin
+                actuator_cmd_r <= response_candidate_cmd_reg;
+                actuator_cmd_valid_r <= 1'b1;
+                last_accepted_seq_reg <= response_seq_reg;
+                safety_status_flags_reg <= 16'h0001;
+            end else begin
+                actuator_cmd_r <= cfg_safe_cmd;
+                actuator_cmd_valid_r <= 1'b0;
+                safety_status_flags_reg <= 16'h0002;
+            end
+            status_flags_r <= transport_status_flags_reg | safety_status_flags_reg;
+            debug_counters_reg <= debug_counters_reg + {31'd0, request_issued_pulse_reg};
+            fault_counters_reg <= fault_counters_reg + {31'd0, (~response_valid_reg) | response_stale_reg | response_duplicate_reg | response_out_of_order_reg};
+        end
+    end
+
+endmodule

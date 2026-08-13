@@ -1,0 +1,479 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "custom",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 8,
+    "registers": [
+      {
+        "name": "CTRL_ENABLE",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Global enable for transport and safety operation. Bit 0 gates outbound request issuance, response acceptance, and actuator command updates. Other bits read as 0.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "1 enables request/response transport and safety-controlled actuator update path; 0 forces deterministic safe fallback behavior."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_CMD_LO",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Safe fallback actuator command, low byte.",
+        "fields": [
+          {
+            "name": "SAFE_CMD_LO",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [7:0] of the 16-bit deterministic safe fallback actuator command."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_CMD_HI",
+        "offset": "0x05",
+        "access": "RW",
+        "description": "Safe fallback actuator command, high byte.",
+        "fields": [
+          {
+            "name": "SAFE_CMD_HI",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of the 16-bit deterministic safe fallback actuator command."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MIN_LO",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Minimum actuator command clamp, low byte.",
+        "fields": [
+          {
+            "name": "CMD_MIN_LO",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [7:0] of the 16-bit minimum actuator command clamp."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MIN_HI",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "Minimum actuator command clamp, high byte.",
+        "fields": [
+          {
+            "name": "CMD_MIN_HI",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of the 16-bit minimum actuator command clamp."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MAX_LO",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Maximum actuator command clamp, low byte.",
+        "fields": [
+          {
+            "name": "CMD_MAX_LO",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Bits [7:0] of the 16-bit maximum actuator command clamp."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MAX_HI",
+        "offset": "0x0D",
+        "access": "RW",
+        "description": "Maximum actuator command clamp, high byte.",
+        "fields": [
+          {
+            "name": "CMD_MAX_HI",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 127,
+            "description": "Bits [15:8] of the 16-bit maximum actuator command clamp."
+          }
+        ]
+      },
+      {
+        "name": "RATE_LIMIT_EN",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Rate-limit enable.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "1 enables step limiting relative to the prior accepted actuator command; 0 disables rate limiting."
+          }
+        ]
+      },
+      {
+        "name": "RATE_LIMIT_STEP_LO",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Rate-limit step magnitude, low byte.",
+        "fields": [
+          {
+            "name": "STEP_LO",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 1,
+            "description": "Bits [7:0] of the 16-bit maximum permitted per-update step magnitude."
+          }
+        ]
+      },
+      {
+        "name": "RATE_LIMIT_STEP_HI",
+        "offset": "0x15",
+        "access": "RW",
+        "description": "Rate-limit step magnitude, high byte.",
+        "fields": [
+          {
+            "name": "STEP_HI",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of the 16-bit maximum permitted per-update step magnitude."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD_LO",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Watchdog timeout threshold, low byte.",
+        "fields": [
+          {
+            "name": "THRESH_LO",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 255,
+            "description": "Bits [7:0] of the 16-bit response timeout threshold."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD_HI",
+        "offset": "0x19",
+        "access": "RW",
+        "description": "Watchdog timeout threshold, high byte.",
+        "fields": [
+          {
+            "name": "THRESH_HI",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of the 16-bit response timeout threshold."
+          }
+        ]
+      },
+      {
+        "name": "STALE_THRESHOLD_LO",
+        "offset": "0x1C",
+        "access": "RW",
+        "description": "Stale-data age threshold, low byte.",
+        "fields": [
+          {
+            "name": "THRESH_LO",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 8,
+            "description": "Bits [7:0] of the 16-bit stale-data rejection threshold."
+          }
+        ]
+      },
+      {
+        "name": "STALE_THRESHOLD_HI",
+        "offset": "0x1D",
+        "access": "RW",
+        "description": "Stale-data age threshold, high byte.",
+        "fields": [
+          {
+            "name": "THRESH_HI",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bits [15:8] of the 16-bit stale-data rejection threshold."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_FLAGS_LO",
+        "offset": "0x20",
+        "access": "RO",
+        "description": "Latched status flags, low byte.",
+        "fields": [
+          {
+            "name": "REQUEST_ISSUED",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky indication that at least one outbound request packet has been issued since reset."
+          },
+          {
+            "name": "RESPONSE_RECEIVED",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky indication that at least one inbound response packet has been received since reset."
+          },
+          {
+            "name": "CLAMP_OCCURRED",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky indication that an accepted command was clamped to the configured min/max range."
+          },
+          {
+            "name": "TIMEOUT_OCCURRED",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky indication that the watchdog timeout threshold was exceeded."
+          },
+          {
+            "name": "STALE_DROPPED",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky indication that a stale response was observed and ignored."
+          },
+          {
+            "name": "DUPLICATE_DROPPED",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky indication that a duplicate response was observed and ignored."
+          },
+          {
+            "name": "OOO_DROPPED",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky indication that an out-of-order response was observed and ignored."
+          },
+          {
+            "name": "FALLBACK_ENGAGED",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky indication that the deterministic safe fallback command is active or was selected due to timeout, disable, or fault."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_FLAGS_HI",
+        "offset": "0x21",
+        "access": "RO",
+        "description": "Latched status flags, high byte. Reserved for future compact status extension and reads as 0 in the current contract.",
+        "fields": [
+          {
+            "name": "RESERVED",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved. Reads as 0."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_COUNTERS_0",
+        "offset": "0x24",
+        "access": "RO",
+        "description": "Fault/event counters byte 0, least-significant byte of the 32-bit counter bundle.",
+        "fields": [
+          {
+            "name": "COUNTER_BYTE0",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Fault/event counter bits [7:0]."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_COUNTERS_1",
+        "offset": "0x25",
+        "access": "RO",
+        "description": "Fault/event counters byte 1.",
+        "fields": [
+          {
+            "name": "COUNTER_BYTE1",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Fault/event counter bits [15:8]."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_COUNTERS_2",
+        "offset": "0x26",
+        "access": "RO",
+        "description": "Fault/event counters byte 2.",
+        "fields": [
+          {
+            "name": "COUNTER_BYTE2",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Fault/event counter bits [23:16]."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_COUNTERS_3",
+        "offset": "0x27",
+        "access": "RO",
+        "description": "Fault/event counters byte 3, most-significant byte of the 32-bit counter bundle.",
+        "fields": [
+          {
+            "name": "COUNTER_BYTE3",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Fault/event counter bits [31:24]."
+          }
+        ]
+      },
+      {
+        "name": "DEBUG_COUNTERS_0",
+        "offset": "0x28",
+        "access": "RO",
+        "description": "Debug counters byte 0, least-significant byte of the 32-bit debug bundle.",
+        "fields": [
+          {
+            "name": "COUNTER_BYTE0",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Debug counter bits [7:0]."
+          }
+        ]
+      },
+      {
+        "name": "DEBUG_COUNTERS_1",
+        "offset": "0x29",
+        "access": "RO",
+        "description": "Debug counters byte 1.",
+        "fields": [
+          {
+            "name": "COUNTER_BYTE1",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Debug counter bits [15:8]."
+          }
+        ]
+      },
+      {
+        "name": "DEBUG_COUNTERS_2",
+        "offset": "0x2A",
+        "access": "RO",
+        "description": "Debug counters byte 2.",
+        "fields": [
+          {
+            "name": "COUNTER_BYTE2",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Debug counter bits [23:16]."
+          }
+        ]
+      },
+      {
+        "name": "DEBUG_COUNTERS_3",
+        "offset": "0x2B",
+        "access": "RO",
+        "description": "Debug counters byte 3, most-significant byte of the 32-bit debug bundle.",
+        "fields": [
+          {
+            "name": "COUNTER_BYTE3",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Debug counter bits [31:24]."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Assert rst_n low, then release synchronously on clk.",
+      "Program SAFE_CMD via SAFE_CMD_LO/SAFE_CMD_HI to the conservative fallback actuator command.",
+      "Program CMD_MIN via CMD_MIN_LO/CMD_MIN_HI and CMD_MAX via CMD_MAX_LO/CMD_MAX_HI so the allowed command window is valid and bounded.",
+      "Program RATE_LIMIT_STEP via RATE_LIMIT_STEP_LO/RATE_LIMIT_STEP_HI and set RATE_LIMIT_EN as needed.",
+      "Program TIMEOUT_THRESHOLD via TIMEOUT_THRESHOLD_LO/TIMEOUT_THRESHOLD_HI.",
+      "Program STALE_THRESHOLD via STALE_THRESHOLD_LO/STALE_THRESHOLD_HI.",
+      "Set CTRL_ENABLE.ENABLE to 1 only after all limits and fallback values are configured."
+    ],
+    "polling_sequence": [
+      "Poll STATUS_FLAGS_LO/STATUS_FLAGS_HI to detect request issuance, response reception, clamp events, timeout events, stale/duplicate/out-of-order drops, and fallback engagement.",
+      "Read FAULT_COUNTERS_0 through FAULT_COUNTERS_3 to obtain the 32-bit fault/event count bundle.",
+      "Read DEBUG_COUNTERS_0 through DEBUG_COUNTERS_3 to obtain the 32-bit debug count bundle.",
+      "Optionally read CTRL_ENABLE, SAFE_CMD, clamp, rate-limit, timeout, and stale threshold registers to confirm runtime configuration."
+    ],
+    "irq_sequence": []
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map uses a custom byte-wide control bus because the spec implies an 8-bit address and 32-bit data control window rather than AXI/APB.",
+    "Multi-byte values wider than the 8-bit data bus are split into byte registers with explicit little-endian byte ordering.",
+    "No new hierarchy, ports, or bus protocols are invented beyond the DIGITAL_SPEC_JSON contract."
+  ]
+}

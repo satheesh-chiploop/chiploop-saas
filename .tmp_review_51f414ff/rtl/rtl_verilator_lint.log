@@ -1,0 +1,24 @@
+=== STDERR ===
+%Error-MODMISSING: adaptive_aero_control_top.v:61:5: Cannot find file containing module: 'adaptive_aero_control_registers'
+   61 |     adaptive_aero_control_registers u_regs (
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                   ... For error description see https://verilator.org/warn/MODMISSING?v=5.047
+                   ... This may be because there's no search path specified with -I<dir>.
+                   ... Looked in:
+                        adaptive_aero_control_registers
+                        adaptive_aero_control_registers.v
+                        adaptive_aero_control_registers.sv
+                        obj_dir/adaptive_aero_control_registers
+                        obj_dir/adaptive_aero_control_registers.v
+                        obj_dir/adaptive_aero_control_registers.sv
+                   ... With current working directory '/root/chiploop-backend/backend/workflows/51f414ff-9b5c-4f21-8a55-c7792a69faa8/rtl'
+%Error-MODMISSING: adaptive_aero_control_top.v:82:5: Cannot find file containing module: 'adaptive_aero_control_transport'
+   82 |     adaptive_aero_control_transport u_transport (
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error-MODMISSING: adaptive_aero_control_top.v:108:5: Cannot find file containing module: 'adaptive_aero_control_safety'
+  108 |     adaptive_aero_control_safety u_safety (
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error: Exiting due to 3 error(s)
+
+=== RETURN CODE ===
+1
