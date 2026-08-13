@@ -1,0 +1,14 @@
+RTL Agent Summary
+=================
+Mode: flat
+Top module: adaptive_aero_control_top
+Expected files: ['adaptive_aero_control_top.v']
+Materialized files: ['adaptive_aero_control_top.v', 'fpga_block_ram_generic.v']
+Clock ports: ['clk']
+Reset ports: ['rst_n']
+Icarus compile: fail
+Verilator lint: warning_only
+Issue count: 1
+
+Issues:
+- ❌ Icarus Verilog compile failed.

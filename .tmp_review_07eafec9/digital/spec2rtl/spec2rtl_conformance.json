@@ -1,0 +1,100 @@
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "setup_issue",
+  "summary": {
+    "checked": 49,
+    "matched": 0,
+    "partial": 0,
+    "missing": 4,
+    "inconclusive": 45
+  },
+  "setup_issues": [
+    "missing_rtl",
+    "no_parseable_modules"
+  ],
+  "top_module": {
+    "expected": "adaptive_aero_control_top",
+    "modules_found": [],
+    "status": "issues"
+  },
+  "interface": {
+    "status": "issues",
+    "expected_ports": [
+      "act_cmd_data",
+      "act_cmd_valid",
+      "cfg_addr",
+      "cfg_rdata",
+      "cfg_re",
+      "cfg_wdata",
+      "cfg_we",
+      "clk",
+      "debug_clamp_event",
+      "debug_seq_request",
+      "debug_seq_response",
+      "debug_stale_detected",
+      "debug_timeout_expired",
+      "fault_status",
+      "req_data",
+      "req_ready",
+      "req_valid",
+      "rsp_data",
+      "rsp_ready",
+      "rsp_valid",
+      "rst_n"
+    ],
+    "matched_ports": [],
+    "missing_ports": [
+      "act_cmd_data",
+      "act_cmd_valid",
+      "cfg_addr",
+      "cfg_rdata",
+      "cfg_re",
+      "cfg_wdata",
+      "cfg_we",
+      "clk",
+      "debug_clamp_event",
+      "debug_seq_request",
+      "debug_seq_response",
+      "debug_stale_detected",
+      "debug_timeout_expired",
+      "fault_status",
+      "req_data",
+      "req_ready",
+      "req_valid",
+      "rsp_data",
+      "rsp_ready",
+      "rsp_valid",
+      "rst_n"
+    ],
+    "rtl_ports": []
+  },
+  "register_map": {
+    "expected": [
+      "fault_status"
+    ],
+    "matched": [],
+    "expected_registers": [],
+    "matched_registers": [],
+    "expected_addresses": [],
+    "matched_addresses": [],
+    "missing": [
+      "fault_status"
+    ],
+    "missing_registers": [],
+    "missing_addresses": [],
+    "status": "issues"
+  },
+  "clock_reset": {
+    "clock_ports": [],
+    "reset_ports": [],
+    "status": "issues"
+  },
+  "requirements": [],
+  "rtl_files": [],
+  "modules": [],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}

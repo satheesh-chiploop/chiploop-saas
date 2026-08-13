@@ -1,0 +1,218 @@
+{
+  "name": "adaptive_aero_control_top",
+  "description": "Synthesizable FPGA top-level bounded active-aero control wrapper around an external NVIDIA DoMINO-based software/GPU surrogate transport. Implements CSR configuration, request/response handshake transport, response validation, timeout/stale detection, deterministic safe fallback, actuation clamping/rate limiting, and status reporting. No surrogate inference, CFD, mesh, or tensor processing is implemented in RTL.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "rst_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "Single synchronous clock domain clk with active-low reset rst_n.",
+      "CSR interface is a compact 8-bit address / 64-bit data window with separate write-enable and read-enable strobes.",
+      "Model transport payloads are 128-bit valid/ready streams only.",
+      "Top-level outputs must be driven by RTL logic in this module, not by child inputs alone.",
+      "Any bulk history/FIFO storage, if needed for implementation, shall be technology-neutral and inferred to FPGA block RAM; no flattening into wide register banks."
+    ]
+  },
+  "memory_macros": [
+    {
+      "name": "fpga_block_ram_generic",
+      "kind": "fpga_block_ram",
+      "depth": 16,
+      "data_width": 128,
+      "addr_width": 4,
+      "instance_name": "u_response_history_ram",
+      "ports": {
+        "clk": "clk",
+        "csb": "mem_csb",
+        "we": "mem_we",
+        "addr": "mem_addr",
+        "din": "mem_din",
+        "dout": "mem_dout"
+      },
+      "requires_mbist": false
+    }
+  ],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "rst_n",
+      "direction": "input",
+      "width": 1,
+      "active_low": true
+    },
+    {
+      "name": "cfg_addr",
+      "direction": "input",
+      "width": 8
+    },
+    {
+      "name": "cfg_wdata",
+      "direction": "input",
+      "width": 64
+    },
+    {
+      "name": "cfg_rdata",
+      "direction": "output",
+      "width": 64
+    },
+    {
+      "name": "cfg_we",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "cfg_re",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "req_valid",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "req_ready",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "req_data",
+      "direction": "output",
+      "width": 128
+    },
+    {
+      "name": "rsp_valid",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "rsp_ready",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "rsp_data",
+      "direction": "input",
+      "width": 128
+    },
+    {
+      "name": "act_cmd_valid",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "act_cmd_data",
+      "direction": "output",
+      "width": 64
+    },
+    {
+      "name": "fault_status",
+      "direction": "output",
+      "width": 16
+    },
+    {
+      "name": "debug_seq_request",
+      "direction": "output",
+      "width": 16
+    },
+    {
+      "name": "debug_seq_response",
+      "direction": "output",
+      "width": 16
+    },
+    {
+      "name": "debug_timeout_expired",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "debug_stale_detected",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "debug_clamp_event",
+      "direction": "output",
+      "width": 1
+    }
+  ],
+  "functionality": "The top-level module accepts compact configuration via 64-bit CSR accesses and exchanges 128-bit request and response frames with an external CPU/GPU surrogate service. It generates a bounded active-aero actuation command from validated response content, enforces safety constraints, clamps outputs to configurable minimum/maximum bounds, optionally rate-limits changes, and falls back deterministically on timeout, stale response, invalid response, communication loss, or envelope violation. The module tracks request and response sequence numbers, request pending, response pending, busy, timeout, stale, invalid_response, envelope_violation, fallback_active, and last_command_applied status. It supports status clear, enable, diagnostic mode, timeout threshold, stale-data threshold, sequence seed, actuation bounds, rate-limit enable, and fallback mode select. The top-level request frame carries only compact surrogate contract fields such as sequence tag, flow-condition summary, vehicle-state summary, geometry descriptor token, and control flags; it never carries raw geometry or large tensors. The response decoder uses only the defined contract fields and does not implement surrogate inference.",
+  "responsibilities": [
+    "Implement CSR readable and writable configuration registers for enable, diagnostic mode, timeout threshold, stale threshold, sequence seed, actuation min/max bounds, rate-limit enable, fallback mode select, and status clear.",
+    "Generate and hold req_valid/req_data until req_ready is observed, with stable payload while pending.",
+    "Accept rsp_valid/rsp_data only through rsp_ready handshake and validate response sequence and status encoding.",
+    "Maintain outstanding request sequence, age, busy, request_pending, and response_pending tracking.",
+    "Detect timeout, stale response, invalid response, malformed/unsupported payload status, and envelope violations.",
+    "Drive deterministic safe fallback command on any fault condition or communication loss.",
+    "Clamp commanded outputs to configured bounds and optionally rate-limit output changes.",
+    "Provide deterministic startup behavior with safe fallback outputs until configuration is complete and a valid response is accepted.",
+    "Expose debug and verification hooks for request/response sequence tracking, timeout expiration, stale detection, and clamp events.",
+    "Remain synthesizable and FPGA-friendly with only small control/status storage and optional technology-neutral block RAM for limited history buffering."
+  ],
+  "must_drive": [
+    "cfg_rdata",
+    "req_valid",
+    "req_data",
+    "rsp_ready",
+    "act_cmd_valid",
+    "act_cmd_data",
+    "fault_status",
+    "debug_seq_request",
+    "debug_seq_response",
+    "debug_timeout_expired",
+    "debug_stale_detected",
+    "debug_clamp_event"
+  ],
+  "must_receive": [
+    "clk",
+    "rst_n",
+    "cfg_addr",
+    "cfg_wdata",
+    "cfg_we",
+    "cfg_re",
+    "req_ready",
+    "rsp_valid",
+    "rsp_data"
+  ],
+  "must_not_drive": [
+    "req_ready",
+    "rsp_valid",
+    "rsp_data"
+  ],
+  "reset_behavior": "On reset, all control registers initialize to a safe configuration with enable deasserted, request/response state cleared, fallback active, act_cmd_valid deasserted, act_cmd_data driven to the deterministic safe fallback posture, req_valid deasserted, rsp_ready asserted only according to safe receive policy, cfg_rdata cleared, and all fault and debug indicators cleared or set to their safe deterministic reset values. Outputs shall remain in safe fallback until software programs the configuration and a valid response is accepted.",
+  "behavior_rules": [
+    "When enabled and not busy, create a request frame in req_data[127:0] containing a request sequence tag, compact flow-condition fields, compact vehicle-state fields, geometry descriptor token/pointer, and control flags.",
+    "Assert req_valid until req_ready is observed; hold req_data stable during the entire valid/ready wait.",
+    "Latch the outstanding request sequence number when a request is launched and keep request_pending asserted until a matching response is accepted or a timeout occurs.",
+    "Accept rsp_data only on rsp_valid and rsp_ready handshake. rsp_ready must be driven by RTL and may be gated by request_pending, expected sequence, and safe receive policy.",
+    "Validate response sequence against the outstanding request sequence. Sequence mismatch shall mark stale and prevent unsafe actuation.",
+    "Mark stale when response age exceeds the configured stale threshold or when the sequence mismatches.",
+    "Mark invalid_response when response status bits indicate malformed, unsupported, or otherwise invalid payload format.",
+    "On timeout, stale, invalid_response, envelope_violation, or communication loss, enter fallback and drive a deterministic safe command.",
+    "safe_fallback_manager shall support at least two modes: hold-last-safe and predefined-safe-posture.",
+    "Output act_cmd_valid only when a command is available and safe to apply. In fallback-safe-posture mode, act_cmd_valid may remain asserted with the safe command if configured; in deassert mode, act_cmd_valid shall be low while fallback is active.",
+    "Actuator commands shall be clamped to CSR-configured min/max bounds. If clamping occurs, output the clipped value and assert envelope_violation or clamp status.",
+    "If rate-limit enable is set, command changes between successive outputs shall be bounded per the implemented rate limit policy and any exceeded delta shall be clipped.",
+    "After entering fallback, remain in a safe state until status clear is written by software or a new valid response is accepted according to the configured recovery policy.",
+    "Use only fixed-width arithmetic, enumerated FSM states, registered outputs where needed, and explicit default assignments.",
+    "Do not expose geometry arrays, meshes, tensors, or flow fields as top-level pins.",
+    "Do not implement NVIDIA DoMINO inference or CFD in RTL.",
+    "Any optional response history/FIFO storage shall be described through the memory_macros contract and not flattened into wide registers."
+  ],
+  "rtl_output_file": "adaptive_aero_control_top.v"
+}

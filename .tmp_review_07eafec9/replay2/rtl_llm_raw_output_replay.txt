@@ -1,0 +1,346 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    input         clk,
+    input         rst_n,
+    input  [7:0]  cfg_addr,
+    input  [63:0] cfg_wdata,
+    output reg [63:0] cfg_rdata,
+    input         cfg_we,
+    input         cfg_re,
+    output        req_valid,
+    input         req_ready,
+    output [127:0] req_data,
+    input         rsp_valid,
+    output        rsp_ready,
+    input  [127:0] rsp_data,
+    output reg    act_cmd_valid,
+    output reg [63:0] act_cmd_data,
+    output reg [15:0] fault_status,
+    output reg [15:0] debug_seq_request,
+    output reg [15:0] debug_seq_response,
+    output reg       debug_timeout_expired,
+    output reg       debug_stale_detected,
+    output reg       debug_clamp_event
+);
+
+    localparam [7:0] ADDR_CTRL0   = 8'h00;
+    localparam [7:0] ADDR_CTRL1   = 8'h08;
+    localparam [7:0] ADDR_CTRL2   = 8'h10;
+    localparam [7:0] ADDR_CTRL3   = 8'h18;
+    localparam [7:0] ADDR_STATUS0 = 8'h20;
+    localparam [7:0] ADDR_STATUS1 = 8'h28;
+    localparam [7:0] ADDR_STATUS2 = 8'h30;
+    localparam [7:0] ADDR_STATUS3 = 8'h38;
+    localparam [7:0] ADDR_REQSEQ  = 8'h40;
+    localparam [7:0] ADDR_RESPSEQ = 8'h48;
+    localparam [7:0] ADDR_CMDLAST = 8'h50;
+    localparam [7:0] ADDR_FAULT   = 8'h58;
+    localparam [7:0] ADDR_DEBUG   = 8'h60;
+
+    localparam [1:0] FALLBACK_MODE_HOLD = 2'b00;
+    localparam [1:0] FALLBACK_MODE_SAFE = 2'b01;
+
+    localparam [3:0] S_IDLE    = 4'd0;
+    localparam [3:0] S_REQ      = 4'd1;
+    localparam [3:0] S_WAIT_RSP = 4'd2;
+    localparam [3:0] S_FALLBACK = 4'd3;
+
+    reg [3:0] state;
+
+    reg        cfg_enable;
+    reg        cfg_diag_mode;
+    reg [15:0] cfg_timeout_thr;
+    reg [15:0] cfg_stale_thr;
+    reg [15:0] cfg_seq_seed;
+    reg [15:0] cfg_act_min;
+    reg [15:0] cfg_act_max;
+    reg        cfg_rate_limit_en;
+    reg [1:0]  cfg_fallback_mode;
+    reg        cfg_status_clear;
+
+    reg [15:0] seq_req;
+    reg [15:0] seq_resp;
+    reg [15:0] req_seq_latched;
+    reg [15:0] outstanding_seq;
+    reg [15:0] age_cnt;
+    reg [63:0] last_command_applied;
+    reg [63:0] safe_posture_cmd;
+    reg        req_valid_r;
+    reg [127:0] req_data_r;
+    reg        rsp_ready_r;
+    reg        request_pending;
+    reg        response_pending;
+    reg        busy;
+    reg        timeout_f;
+    reg        stale_f;
+    reg        invalid_f;
+    reg        envelope_f;
+    reg        fallback_active;
+    reg        last_cmd_valid;
+    reg [63:0] last_safe_cmd;
+
+    reg [127:0] rsp_shadow;
+    reg [63:0] read_data;
+    reg [127:0] req_frame;
+
+    wire req_accept;
+    wire rsp_accept;
+    wire [15:0] seq_inc;
+    wire [63:0] raw_cmd;
+    wire [63:0] bounded_cmd;
+    wire [63:0] rate_limited_cmd;
+    wire [63:0] selected_cmd;
+    wire clamp_event_int;
+    wire timeout_event_int;
+    wire stale_event_int;
+    wire invalid_event_int;
+    wire envelope_event_int;
+    reg  [63:0] fallback_cmd;
+
+    assign req_valid = req_valid_r;
+    assign req_data  = req_data_r;
+    assign rsp_ready = rsp_ready_r;
+
+    assign req_accept = req_valid_r & req_ready;
+    assign rsp_accept = rsp_valid & rsp_ready_r;
+    assign seq_inc = seq_req + 16'd1;
+
+    assign raw_cmd = rsp_shadow[63:0];
+    assign bounded_cmd = (raw_cmd[15:0] < cfg_act_min) ? {48'd0, cfg_act_min} :
+                         (raw_cmd[15:0] > cfg_act_max) ? {48'd0, cfg_act_max} :
+                         raw_cmd;
+    assign rate_limited_cmd = (cfg_rate_limit_en == 1'b0) ? bounded_cmd :
+                              ((last_command_applied[15:0] > bounded_cmd[15:0]) &&
+                               ((last_command_applied[15:0] - bounded_cmd[15:0]) > 16'd64)) ?
+                               {48'd0, (last_command_applied[15:0] - 16'd64)} :
+                              ((last_command_applied[15:0] <= bounded_cmd[15:0]) &&
+                               ((bounded_cmd[15:0] - last_command_applied[15:0]) > 16'd64)) ?
+                               {48'd0, (last_command_applied[15:0] + 16'd64)} :
+                               bounded_cmd;
+    assign selected_cmd = (cfg_rate_limit_en != 1'b0) ? rate_limited_cmd : bounded_cmd;
+    assign clamp_event_int = (raw_cmd[15:0] < cfg_act_min) || (raw_cmd[15:0] > cfg_act_max) ||
+                             ((cfg_rate_limit_en != 1'b0) &&
+                              (((last_command_applied[15:0] > bounded_cmd[15:0]) &&
+                                ((last_command_applied[15:0] - bounded_cmd[15:0]) > 16'd64)) ||
+                               ((last_command_applied[15:0] <= bounded_cmd[15:0]) &&
+                                ((bounded_cmd[15:0] - last_command_applied[15:0]) > 16'd64))));
+    assign timeout_event_int = timeout_f;
+    assign stale_event_int = stale_f;
+    assign invalid_event_int = invalid_f;
+    assign envelope_event_int = envelope_f;
+
+    always @(*) begin
+        req_frame = 128'h00000000000000000000000000000000;
+        req_frame[127:120] = 8'hA5;
+        req_frame[119:104] = seq_req;
+        req_frame[103] = cfg_diag_mode;
+        req_frame[102] = cfg_rate_limit_en;
+        req_frame[101:100] = cfg_fallback_mode;
+        req_frame[99] = cfg_enable;
+        req_frame[98:83] = cfg_timeout_thr;
+        req_frame[82:67] = cfg_stale_thr;
+        req_frame[66:51] = cfg_act_min;
+        req_frame[50:35] = cfg_act_max;
+        req_frame[34:0] = 35'h00000001;
+    end
+
+    always @(*) begin
+        state = state;
+    end
+
+    always @(*) begin
+        read_data = 64'h0000000000000000;
+        case (cfg_addr)
+            ADDR_CTRL0:   read_data = {58'd0, cfg_fallback_mode, cfg_rate_limit_en, cfg_diag_mode, cfg_enable};
+            ADDR_CTRL1:   read_data = {48'd0, cfg_timeout_thr};
+            ADDR_CTRL2:   read_data = {48'd0, cfg_stale_thr};
+            ADDR_CTRL3:   read_data = {48'd0, cfg_seq_seed};
+            ADDR_STATUS0: read_data = {56'd0, busy, request_pending, response_pending, fallback_active, timeout_f, stale_f, invalid_f, envelope_f};
+            ADDR_STATUS1: read_data = {32'd0, cfg_act_max, cfg_act_min};
+            ADDR_STATUS2: read_data = {48'd0, req_seq_latched};
+            ADDR_STATUS3: read_data = {48'd0, outstanding_seq};
+            ADDR_REQSEQ:  read_data = {48'd0, debug_seq_request};
+            ADDR_RESPSEQ: read_data = {48'd0, debug_seq_response};
+            ADDR_CMDLAST: read_data = last_command_applied;
+            ADDR_FAULT:   read_data = {48'd0, fault_status};
+            ADDR_DEBUG:   read_data = {48'd0, debug_timeout_expired, debug_stale_detected, debug_clamp_event, 13'd0};
+            default:      read_data = 64'h0000000000000000;
+        endcase
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cfg_enable <= 1'b0;
+            cfg_diag_mode <= 1'b0;
+            cfg_timeout_thr <= 16'd16;
+            cfg_stale_thr <= 16'd16;
+            cfg_seq_seed <= 16'd1;
+            cfg_act_min <= 16'd0;
+            cfg_act_max <= 16'hFFFF;
+            cfg_rate_limit_en <= 1'b0;
+            cfg_fallback_mode <= FALLBACK_MODE_SAFE;
+            cfg_status_clear <= 1'b0;
+            seq_req <= 16'd1;
+            seq_resp <= 16'd0;
+            req_seq_latched <= 16'd0;
+            outstanding_seq <= 16'd0;
+            age_cnt <= 16'd0;
+            last_command_applied <= 64'h0000000000000000;
+            safe_posture_cmd <= 64'h0000000000000000;
+            req_valid_r <= 1'b0;
+            req_data_r <= 128'h00000000000000000000000000000000;
+            rsp_ready_r <= 1'b1;
+            request_pending <= 1'b0;
+            response_pending <= 1'b0;
+            busy <= 1'b0;
+            timeout_f <= 1'b0;
+            stale_f <= 1'b0;
+            invalid_f <= 1'b0;
+            envelope_f <= 1'b0;
+            fallback_active <= 1'b1;
+            last_cmd_valid <= 1'b0;
+            last_safe_cmd <= 64'h0000000000000000;
+            act_cmd_valid <= 1'b0;
+            act_cmd_data <= 64'h0000000000000000;
+            fault_status <= 16'h0000;
+            debug_seq_request <= 16'h0000;
+            debug_seq_response <= 16'h0000;
+            debug_timeout_expired <= 1'b0;
+            debug_stale_detected <= 1'b0;
+            debug_clamp_event <= 1'b0;
+            cfg_rdata <= 64'h0000000000000000;
+            state <= S_IDLE;
+        end else begin
+            cfg_status_clear <= 1'b0;
+
+            if (cfg_we) begin
+                case (cfg_addr)
+                    ADDR_CTRL0: begin
+                        cfg_enable <= cfg_wdata[0];
+                        cfg_diag_mode <= cfg_wdata[1];
+                        cfg_rate_limit_en <= cfg_wdata[2];
+                        cfg_fallback_mode <= cfg_wdata[5:4];
+                    end
+                    ADDR_CTRL1: cfg_timeout_thr <= cfg_wdata[15:0];
+                    ADDR_CTRL2: cfg_stale_thr <= cfg_wdata[15:0];
+                    ADDR_CTRL3: begin
+                        cfg_seq_seed <= cfg_wdata[15:0];
+                        seq_req <= cfg_wdata[15:0];
+                    end
+                    ADDR_STATUS0: begin
+                        if (cfg_wdata[0]) cfg_status_clear <= 1'b1;
+                    end
+                    ADDR_STATUS1: begin
+                        cfg_act_min <= cfg_wdata[15:0];
+                        cfg_act_max <= cfg_wdata[31:16];
+                    end
+                    default: begin
+                    end
+                endcase
+            end
+
+            if (cfg_status_clear) begin
+                timeout_f <= 1'b0;
+                stale_f <= 1'b0;
+                invalid_f <= 1'b0;
+                envelope_f <= 1'b0;
+                fallback_active <= 1'b0;
+            end
+
+            if (req_accept) begin
+                request_pending <= 1'b1;
+                response_pending <= 1'b1;
+                busy <= 1'b1;
+                debug_seq_request <= seq_req;
+                req_valid_r <= 1'b0;
+                req_seq_latched <= seq_req;
+                outstanding_seq <= seq_req;
+                seq_req <= seq_inc;
+                age_cnt <= 16'd0;
+            end else if (cfg_enable && !request_pending && !busy && !fallback_active) begin
+                req_valid_r <= 1'b1;
+                req_data_r <= req_frame;
+            end else if (cfg_enable && request_pending) begin
+                req_valid_r <= 1'b0;
+                req_data_r <= req_data_r;
+            end else begin
+                req_valid_r <= req_valid_r;
+            end
+
+            if (rsp_accept) begin
+                seq_resp <= rsp_data[47:32];
+                debug_seq_response <= rsp_data[47:32];
+                rsp_shadow <= rsp_data;
+                if ((rsp_data[127:120] == 8'h5A) && (rsp_data[47:32] == outstanding_seq)) begin
+                    last_command_applied <= selected_cmd;
+                    last_safe_cmd <= selected_cmd;
+                    safe_posture_cmd <= selected_cmd;
+                    act_cmd_data <= selected_cmd;
+                    act_cmd_valid <= 1'b1;
+                    debug_clamp_event <= clamp_event_int;
+                    request_pending <= 1'b0;
+                    response_pending <= 1'b0;
+                    busy <= 1'b0;
+                    fallback_active <= 1'b0;
+                    state <= S_IDLE;
+                end else begin
+                    invalid_f <= invalid_f | (rsp_data[127:120] != 8'h5A);
+                    stale_f <= stale_f | ((rsp_data[127:120] == 8'h5A) && (rsp_data[47:32] != outstanding_seq));
+                    fallback_active <= 1'b1;
+                    act_cmd_valid <= 1'b0;
+                    state <= S_FALLBACK;
+                end
+            end
+
+            if (request_pending) begin
+                if (age_cnt >= cfg_timeout_thr) begin
+                    timeout_f <= 1'b1;
+                    fallback_active <= 1'b1;
+                    busy <= 1'b0;
+                    request_pending <= 1'b0;
+                    response_pending <= 1'b0;
+                    state <= S_FALLBACK;
+                end else begin
+                    age_cnt <= age_cnt + 16'd1;
+                end
+            end else begin
+                age_cnt <= 16'd0;
+            end
+
+            if (state == S_FALLBACK) begin
+                if (cfg_fallback_mode == FALLBACK_MODE_SAFE) begin
+                    act_cmd_valid <= 1'b1;
+                    if (last_cmd_valid) begin
+                        act_cmd_data <= safe_posture_cmd;
+                    end else begin
+                        act_cmd_data <= 64'h0000000000000000;
+                    end
+                end else begin
+                    act_cmd_valid <= 1'b0;
+                end
+                if (cfg_status_clear) begin
+                    state <= S_IDLE;
+                end
+            end
+
+            debug_timeout_expired <= timeout_f;
+            debug_stale_detected <= stale_f;
+            fault_status <= {timeout_f, stale_f, invalid_f, envelope_f, fallback_active, busy, request_pending, response_pending, 8'h00};
+
+            if (cfg_re) begin
+                cfg_rdata <= read_data;
+            end
+        end
+    end
+
+    fpga_block_ram_generic u_response_history_ram (
+        .clk(clk),
+        .csb(1'b0),
+        .we(1'b0),
+        .addr(4'd0),
+        .din(128'h00000000000000000000000000000000),
+        .dout()
+    );
+
+endmodule
+---END adaptive_aero_control_top.v---

@@ -1,0 +1,13 @@
+../.tmp_review_07eafec9/replay\adaptive_aero_control_top.v:334: error: port ``csb'' is not a port of u_response_history_ram.
+../.tmp_review_07eafec9/replay\adaptive_aero_control_top.v:334: error: port ``we'' is not a port of u_response_history_ram.
+../.tmp_review_07eafec9/replay\adaptive_aero_control_top.v:334: error: port ``addr'' is not a port of u_response_history_ram.
+../.tmp_review_07eafec9/replay\adaptive_aero_control_top.v:334: error: port ``din'' is not a port of u_response_history_ram.
+../.tmp_review_07eafec9/replay\adaptive_aero_control_top.v:334: error: port ``dout'' is not a port of u_response_history_ram.
+../.tmp_review_07eafec9/replay\adaptive_aero_control_top.v:146: warning: @* found no sensitivities so it will never trigger.
+5 error(s) during elaboration.
+
+Issues:
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT WARNINGS ===
+Non-fatal Verilator warnings detected.

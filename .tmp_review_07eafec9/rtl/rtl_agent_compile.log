@@ -1,0 +1,7 @@
+
+
+Issues:
+❌ Required memory macro instance mismatch: expected exactly one 'fpga_block_ram_generic u_response_history_ram(...)', found 0. memory_macros[] is authoritative; do not substitute a wrapper, behavioral model, or invented module name.
+
+=== VERILATOR LINT ===
+PASS: Verilator lint completed successfully.

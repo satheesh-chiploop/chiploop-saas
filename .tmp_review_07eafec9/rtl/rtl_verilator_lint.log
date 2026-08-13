@@ -1,0 +1,99 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.047 MB sources in 2 modules, into 0.081 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.026 s (elab=0.002, cvt=0.014, bld=0.000); cpu 0.026 s on 1 threads; allocated 32.363 MB
+
+=== STDERR ===
+%Warning-WIDTHTRUNC: adaptive_aero_control_top.v:163:31: Operator ASSIGN expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 149 bits.
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+  163 |                 req_data_next = {16'hA55A, seq_req, cfg_diag_mode, cfg_rate_limit_en, cfg_fallback_mode, cfg_enable,
+      |                               ^
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: adaptive_aero_control_top.v:182:27: Operator ASSIGN expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 149 bits.
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+  182 |             req_data_next = {16'hA55A, seq_req, cfg_diag_mode, cfg_rate_limit_en, cfg_fallback_mode, cfg_enable,
+      |                           ^
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:5:19: Bits of signal are not used: 'cfg_wdata'[63:32]
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+    5 |     input  [63:0] cfg_wdata,
+      |                   ^~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDPARAM: adaptive_aero_control_top.v:39:22: Parameter is not used: 'FALLBACK_MODE_HOLD'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   39 |     localparam [1:0] FALLBACK_MODE_HOLD = 2'b00;
+      |                      ^~~~~~~~~~~~~~~~~~
+                      ... For warning description see https://verilator.org/warn/UNUSEDPARAM?v=5.047
+                      ... Use "/* verilator lint_off UNUSEDPARAM */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:47:22: Signal is not used: 'state_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   47 |     reg [3:0] state, state_next;
+      |                      ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:79:16: Signal is not used: 'last_safe_cmd'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   79 |     reg [63:0] last_safe_cmd;
+      |                ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:85:16: Signal is not used: 'debug_seq_request_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   85 |     reg [15:0] debug_seq_request_next;
+      |                ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:86:16: Signal is not used: 'debug_seq_response_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   86 |     reg [15:0] debug_seq_response_next;
+      |                ^~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:87:16: Signal is not used: 'seq_req_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   87 |     reg [15:0] seq_req_next;
+      |                ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:88:16: Signal is not used: 'seq_resp_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   88 |     reg [15:0] seq_resp_next;
+      |                ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:89:16: Signal is not used: 'age_cnt_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   89 |     reg [15:0] age_cnt_next;
+      |                ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:90:16: Signal is not used: 'req_seq_latched_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   90 |     reg [15:0] req_seq_latched_next;
+      |                ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:91:16: Signal is not used: 'outstanding_seq_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   91 |     reg [15:0] outstanding_seq_next;
+      |                ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:92:16: Signal is not used: 'last_command_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   92 |     reg [63:0] last_command_next;
+      |                ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:93:16: Signal is not used: 'safe_posture_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   93 |     reg [63:0] safe_posture_next;
+      |                ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:94:16: Signal is not used: 'req_valid_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   94 |     reg        req_valid_next;
+      |                ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:95:17: Signal is not used: 'req_data_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   95 |     reg [127:0] req_data_next;
+      |                 ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:96:16: Signal is not used: 'rsp_ready_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   96 |     reg        rsp_ready_next;
+      |                ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:105:16: Signal is not used: 'last_cmd_valid_next'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  105 |     reg        last_cmd_valid_next;
+      |                ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:106:17: Signal is not used: 'rsp_shadow'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  106 |     reg [127:0] rsp_shadow;
+      |                 ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:107:16: Signal is not driven, nor used: 'read_data'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  107 |     reg [63:0] read_data;
+      |                ^~~~~~~~~
+
+=== RETURN CODE ===
+0

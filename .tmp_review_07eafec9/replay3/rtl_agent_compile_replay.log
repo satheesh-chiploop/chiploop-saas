@@ -1,0 +1,4 @@
+../.tmp_review_07eafec9/replay3\adaptive_aero_control_top.v:146: warning: @* found no sensitivities so it will never trigger.
+
+=== VERILATOR LINT WARNINGS ===
+Non-fatal Verilator warnings detected.

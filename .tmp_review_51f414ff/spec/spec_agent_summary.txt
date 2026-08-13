@@ -1,3 +1,0 @@
-❌ Digital Spec Agent failed.
-
-Pass1 JSON parse/normalize failed: Required child input 'adaptive_aero_control_registers.status_flags_in' has no source in top_level_connections or inter_module_signals. Add an explicit top-level input connection or a real child producer.
