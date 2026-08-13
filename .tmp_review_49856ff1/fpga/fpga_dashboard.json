@@ -1,0 +1,104 @@
+{
+  "agent_count": 4,
+  "bitstream": {},
+  "constraint_cdc_signoff": {},
+  "failure": {
+    "agent": "Digital Register Map Agent",
+    "error_type": "RuntimeError",
+    "message": "\u274c Register map layout remains invalid after repair. Violations: status.duty_cycle [7:0] overlaps pwm_counter [7:0]",
+    "status": "failed"
+  },
+  "hardware_validation": {},
+  "hem": {
+    "enabled": false,
+    "mode": "fixed",
+    "policy": "fpga_fixed_policy_metadata"
+  },
+  "lec": {},
+  "participating_agents": [
+    "Digital Spec Agent",
+    "Digital Architecture Agent",
+    "Digital Microarchitecture Agent",
+    "Digital Register Map Agent"
+  ],
+  "place_route": {},
+  "power_device_qualification": {},
+  "routed_result": {
+    "error_count": null,
+    "logic_utilization_percent": null,
+    "logical_cells_available": null,
+    "logical_cells_used": null,
+    "max_frequency_mhz": null,
+    "routed_flip_flops": null,
+    "routed_lut4_cells": null,
+    "routed_resource": null,
+    "timing_met": null,
+    "timing_violation_count": null,
+    "tns_ns": null,
+    "utilization_source": null,
+    "warning_count": null,
+    "wns_ns": null
+  },
+  "rtl_file_count": 0,
+  "rtl_quality": {},
+  "smart_context": {
+    "enabled": true,
+    "mode": "smart"
+  },
+  "status": "failed",
+  "synthesis": {},
+  "synthesis_closure": {},
+  "synthesis_estimate": {
+    "block_ram_bits_available": null,
+    "block_ram_blocks_available": null,
+    "block_ram_blocks_used": null,
+    "block_ram_primitive": null,
+    "block_ram_utilization_percent": null,
+    "carry_cells": null,
+    "combinational_cells": null,
+    "fabric_mapped_cells": null,
+    "flip_flops": null,
+    "logic_utilization_percent": null,
+    "logical_cells_available": null,
+    "logical_cells_used": null,
+    "lut4_cells": null,
+    "memory_mapping_gate": null,
+    "total_mapped_cells": null
+  },
+  "target": {
+    "board": "orangecrab_ecp5_85f",
+    "board_label": "Lattice OrangeCrab ECP5-85F",
+    "device": "85k",
+    "family": "ecp5",
+    "package": "CSFBGA285",
+    "product_family": "ecp5",
+    "segments": [],
+    "support_tier": "production",
+    "target_frequency_mhz": 12.0,
+    "top_module": "pwm_fpga_demo",
+    "vendor": "lattice"
+  },
+  "timing_closure": {},
+  "timing_drc": {},
+  "timing_rtl_repair": {},
+  "timing_summary": {
+    "max_frequency_mhz": null,
+    "target_frequency_mhz": 12.0,
+    "timing_met": null,
+    "timing_violation_count": null,
+    "tns_ns": null,
+    "wns_ns": null
+  },
+  "top_module": null,
+  "type": "fpga_dashboard",
+  "utilization": {
+    "logic_utilization_percent": null,
+    "logical_cells_available": null,
+    "logical_cells_used": null,
+    "routed_flip_flops": null,
+    "routed_lut4_cells": null,
+    "routed_resource": null,
+    "source": null
+  },
+  "verification": {}
+}

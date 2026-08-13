@@ -1,0 +1,12 @@
+Digital Simulation Execution Agent Log
+[2026-08-13T17:51:59.052080] [INFO] Starting Digital Simulation Execution Agent...
+[2026-08-13T17:51:59.052201] [INFO] manifest_path=backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/vv/tb/simulation_manifest.json
+[2026-08-13T17:51:59.052488] [INFO] tests=[
+  "smoke_test",
+  "constrained_random_sanity"
+]
+[2026-08-13T17:51:59.052661] [INFO] seeds=[
+  1
+]
+[2026-08-13T17:51:59.052771] [INFO] Running testcase=smoke_test seed=1
+[2026-08-13T17:52:07.068275] [INFO] Running testcase=constrained_random_sanity seed=1

@@ -1,0 +1,624 @@
+{
+  "agent_count": 18,
+  "bitstream": {},
+  "constraint_cdc_signoff": {
+    "advisories": [],
+    "agent": "FPGA Constraint and CDC/RDC Signoff Agent",
+    "cdc_rdc_findings": [],
+    "constraint_format": "lpf",
+    "constraint_path": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/constraints/adaptive_aero_control_top_spi_fpga_top.lpf",
+    "detected_async_resets": [
+      "reset_n",
+      "rst_n",
+      "spi_cs_n"
+    ],
+    "detected_clocks": [
+      "clk",
+      "spi_sclk"
+    ],
+    "enabled": true,
+    "errors": [],
+    "required": true,
+    "rtl_file_count": 2,
+    "signoff": {
+      "all_clocks_defined": true,
+      "all_top_level_ports_constrained": true,
+      "cdc_rdc_review_complete": false
+    },
+    "status": "review",
+    "target_frequency_mhz": 24.463,
+    "tool": "ChipLoop structural RTL/constraint analysis",
+    "unconstrained_ports": [],
+    "unsafe_crossing_count": 0,
+    "warnings": [
+      "Multiple RTL clock signals were detected; provide CDC classifications or run structural CDC analysis.",
+      "Asynchronous reset usage was detected; reset release synchronization requires review."
+    ]
+  },
+  "failure": {
+    "agent": "FPGA RTL-to-Netlist Equivalence Agent",
+    "error_type": "RuntimeError",
+    "message": "FPGA RTL-to-netlist LEC did not pass: Command '['/usr/bin/yosys', '-s', '/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.ys']' timed out after 1800 seconds",
+    "status": "failed"
+  },
+  "hardware_validation": {},
+  "hem": {
+    "enabled": false,
+    "mode": "fixed",
+    "policy": "fpga_fixed_policy_metadata"
+  },
+  "lec": {
+    "agent": "FPGA RTL-to-Netlist Equivalence Agent",
+    "comparison": "two_stage_rtl_generic_and_generic_mapped_equivalence",
+    "enabled": true,
+    "failure_kind": "tool_error",
+    "family": "ecp5",
+    "gate_status": "fail",
+    "generic_lec": {
+      "command": {
+        "cmd": [
+          "/usr/bin/yosys",
+          "-s",
+          "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_rtl_to_generic_lec.ys"
+        ],
+        "error": null,
+        "executable": "/usr/bin/yosys",
+        "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_rtl_to_generic_lec.log",
+        "ok": true,
+        "profile_id": "chiploop_saas_default",
+        "returncode": 0,
+        "status": "success",
+        "stderr_tail": "",
+        "stdout_tail": "core.veh_speed_mps [3]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [6]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [14]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [18]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [22]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [26]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [28]: failed.\n Grouping SAT models for \\u_core.cfg_wdata:\n  Trying to prove $equiv for \\u_core.cfg_wdata [0]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [1]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [2]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [3]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [4]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [5]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [6]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [7]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [8]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [9]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [10]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [11]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [12]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [13]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [14]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [15]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [16]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [17]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [18]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [19]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [20]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [21]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [22]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [23]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [24]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [25]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [26]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [27]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [28]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [29]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [30]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [31]: failed.\n Grouping SAT models for \\u_core.cfg_addr:\n  Trying to prove $equiv for \\u_core.cfg_addr [0]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [1]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [2]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [3]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [4]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [5]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [6]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [7]: failed.\n  Trying to prove $equiv for \\u_core.cfg_write: failed.\n  Trying to prove $equiv for \\u_core.cfg_valid: failed.\n  Trying to prove $equiv for \\u_core.rst_n: success!\n  Trying to prove $equiv for \\u_core.clk: success!\nProved 509 previously unproven $equiv cells.\n\n16. Executing EQUIV_INDUCT pass.\nFound 1227 unproven $equiv cells in module equiv:\n  Undef modelling: force def on 3108 initial reg values and 5 inputs.\n  Proving existence of base case for step 1. (817409 clauses over 302131 variables)\n  Proving induction step 1. (1801026 clauses over 661101 variables)\n  Proof for induction step holds. Entire workset of 1227 cells proven!\nProved 1227 previously unproven $equiv cells.\n\n17. Executing EQUIV_STATUS pass.\nFound 1738 $equiv cells in equiv:\n  Of those cells 1738 are proven and 0 are unproven.\n  Equivalence successfully proven!\n\nWarnings: 1 unique messages, 1 total\nEnd of script. Logfile hash: 029233d825, CPU: user 69.21s system 0.49s, MEM: 475.92 MB peak\nYosys 0.33 (git sha1 2584903a060)\nTime spent: 93% 1x equiv_induct (65 sec), 4% 1x equiv_simple (2 sec), ...\n"
+      },
+      "gate": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+      "gold": [
+        "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top.v",
+        "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+      ],
+      "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_rtl_to_generic_lec.log",
+      "proven": true,
+      "script": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_rtl_to_generic_lec.ys",
+      "status": "pass",
+      "timeout_seconds": 598,
+      "unproven_points": 0
+    },
+    "generic_netlist": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+    "generic_proven": true,
+    "induction_depth": 12,
+    "induction_depths_attempted": [
+      12
+    ],
+    "mapped_lec": {
+      "command": {
+        "cmd": [
+          "/usr/bin/yosys",
+          "-s",
+          "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.ys"
+        ],
+        "error": "Command '['/usr/bin/yosys', '-s', '/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.ys']' timed out after 1800 seconds",
+        "executable": "/usr/bin/yosys",
+        "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.log",
+        "ok": false,
+        "profile_id": "chiploop_saas_default",
+        "returncode": null,
+        "status": "exception",
+        "stderr_tail": "",
+        "stdout_tail": ""
+      },
+      "failure_kind": "tool_error",
+      "gate": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+      "gold": [
+        "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v"
+      ],
+      "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.log",
+      "proven": false,
+      "reason": "Command '['/usr/bin/yosys', '-s', '/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.ys']' timed out after 1800 seconds",
+      "script": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.ys",
+      "status": "fail",
+      "timeout_seconds": 1800,
+      "unproven_points": null
+    },
+    "mapped_netlist": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+    "mapped_proven": false,
+    "netlist": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+    "proven": false,
+    "reason": "Command '['/usr/bin/yosys', '-s', '/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.ys']' timed out after 1800 seconds",
+    "required": true,
+    "rtl_file_count": 2,
+    "status": "fail",
+    "tool": "Yosys",
+    "top_module": "adaptive_aero_control_top_spi_fpga_top",
+    "unproven_points": null
+  },
+  "participating_agents": [
+    "FPGA RTL Handoff Ingest Agent",
+    "FPGA RTL Quality Gate Agent",
+    "Digital RTL Linting Agent",
+    "Digital CDC Analysis Agent",
+    "Digital Reset Integrity Agent",
+    "Digital Synthesis Readiness Agent",
+    "Digital DQA Summary Agent",
+    "Digital Verification Handoff Ingest Agent",
+    "Digital Functional Coverage Agent",
+    "Digital Testbench Generator Agent",
+    "Digital Assertions (SVA) Agent",
+    "Digital Simulation Control Agent",
+    "Digital Simulation Execution Agent",
+    "Digital Simulation Summary Coverage Agent",
+    "FPGA Constraint Setup Agent",
+    "FPGA Constraint and CDC/RDC Signoff Agent",
+    "FPGA Yosys Synthesis Agent",
+    "FPGA RTL-to-Netlist Equivalence Agent"
+  ],
+  "place_route": {},
+  "power_device_qualification": {},
+  "routed_result": {
+    "error_count": null,
+    "logic_utilization_percent": null,
+    "logical_cells_available": 44000,
+    "logical_cells_used": null,
+    "max_frequency_mhz": null,
+    "routed_flip_flops": null,
+    "routed_lut4_cells": null,
+    "routed_resource": null,
+    "timing_met": null,
+    "timing_violation_count": null,
+    "tns_ns": null,
+    "utilization_source": null,
+    "warning_count": null,
+    "wns_ns": null
+  },
+  "rtl_file_count": 2,
+  "rtl_quality": {
+    "agent": "FPGA RTL Quality Gate Agent",
+    "pass1": {
+      "rtl_file_count": 2,
+      "status": "pass",
+      "suffix": "pass1",
+      "tools": {
+        "iverilog": {
+          "available": true,
+          "cmd": [
+            "iverilog",
+            "-g2012",
+            "-tnull",
+            "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top.v",
+            "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+          ],
+          "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/quality/iverilog_pass1.log",
+          "ok": true,
+          "returncode": 0
+        },
+        "verilator": {
+          "available": true,
+          "cmd": [
+            "verilator",
+            "--lint-only",
+            "-Wall",
+            "-Wno-fatal",
+            "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top.v",
+            "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+          ],
+          "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/quality/verilator_pass1.log",
+          "ok": true,
+          "returncode": 0
+        }
+      }
+    },
+    "pass2": {
+      "rtl_file_count": 2,
+      "status": "pass",
+      "suffix": "pass2",
+      "tools": {
+        "iverilog": {
+          "available": true,
+          "cmd": [
+            "iverilog",
+            "-g2012",
+            "-tnull",
+            "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top.v",
+            "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+          ],
+          "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/quality/iverilog_pass2.log",
+          "ok": true,
+          "returncode": 0
+        },
+        "verilator": {
+          "available": true,
+          "cmd": [
+            "verilator",
+            "--lint-only",
+            "-Wall",
+            "-Wno-fatal",
+            "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top.v",
+            "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+          ],
+          "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/quality/verilator_pass2.log",
+          "ok": true,
+          "returncode": 0
+        }
+      }
+    },
+    "repair": {
+      "applied": false,
+      "enabled": true
+    },
+    "repair_enabled": true,
+    "rtl_file_count": 2,
+    "rtl_files": [
+      "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top.v",
+      "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+    ],
+    "status": "pass"
+  },
+  "smart_context": {
+    "enabled": false,
+    "mode": "smart"
+  },
+  "status": "failed",
+  "synthesis": {
+    "agent": "FPGA Yosys Synthesis Agent",
+    "block_ram_bits_available": 1944000,
+    "block_ram_blocks_available": 108,
+    "block_ram_blocks_used": 0,
+    "block_ram_primitive": "DP16KD",
+    "block_ram_utilization_percent": 0.0,
+    "carry_cells": 326,
+    "cell_type_counts": {
+      "$specify2": 18,
+      "CCU2C": 326,
+      "L6MUX21": 388,
+      "LUT4": 3498,
+      "PFUMX": 705,
+      "TRELLIS_FF": 1500,
+      "adaptive_aero_control_top": 1
+    },
+    "closure_iteration": 0,
+    "combinational_cells": 4918,
+    "command": {
+      "cmd": [
+        "/usr/bin/yosys",
+        "-s",
+        "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/synth_ecp5.ys"
+      ],
+      "error": null,
+      "executable": "/usr/bin/yosys",
+      "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/yosys_synth.log",
+      "ok": true,
+      "profile_id": "chiploop_saas_default",
+      "returncode": 0,
+      "status": "success",
+      "stderr_tail": "",
+      "stdout_tail": "enblk1.genblk1.genblk1.lut1 (4 -> 1)\n  Optimizing lut $abc$16454$auto$blifparse.cc:525:parse_blif$17369.genblk1.genblk1.genblk1.genblk1.genblk1.lut1 (4 -> 1)\n  Optimizing lut $abc$16454$auto$blifparse.cc:525:parse_blif$17368.genblk1.genblk1.genblk1.genblk1.genblk1.lut1 (4 -> 1)\n  Optimizing lut $abc$16454$auto$blifparse.cc:525:parse_blif$17226.genblk1.genblk1.genblk1.genblk1.genblk1.genblk1.genblk1.lut1 (4 -> 1)\n  Optimizing lut $abc$16454$auto$blifparse.cc:525:parse_blif$17271.genblk1.genblk1.genblk1.genblk1.genblk1.genblk1.genblk1.lut1 (4 -> 1)\n  Optimizing lut $abc$16454$auto$blifparse.cc:525:parse_blif$17303.genblk1.genblk1.genblk1.genblk1.genblk1.genblk1.genblk1.lut1 (4 -> 1)\n  Optimizing lut $abc$16454$auto$blifparse.cc:525:parse_blif$17273.genblk1.genblk1.genblk1.genblk1.genblk1.genblk1.genblk1.lut1 (4 -> 1)\nOptimizing LUTs in adaptive_aero_control_top_spi_fpga_top.\nRemoved 0 unused cells and 5112 unused wires.\n\n9.44. Executing AUTONAME pass.\nRenamed 188643 objects in module adaptive_aero_control_top (132 iterations).\nRenamed 4414 objects in module adaptive_aero_control_top_spi_fpga_top (6 iterations).\n<suppressed ~10377 debug messages>\n\n9.45. Executing HIERARCHY pass (managing design hierarchy).\n\n9.45.1. Analyzing design hierarchy..\nTop module:  \\adaptive_aero_control_top_spi_fpga_top\nUsed module:     \\adaptive_aero_control_top\n\n9.45.2. Analyzing design hierarchy..\nTop module:  \\adaptive_aero_control_top_spi_fpga_top\nUsed module:     \\adaptive_aero_control_top\nRemoved 0 unused modules.\n\n9.46. Printing statistics.\n\n=== adaptive_aero_control_top ===\n\n   Number of wires:               3441\n   Number of wire bits:           8524\n   Number of public wires:        3441\n   Number of public wire bits:    8524\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:               5010\n     CCU2C                         326\n     L6MUX21                       388\n     LUT4                         2896\n     PFUMX                         705\n     TRELLIS_FF                    695\n\n=== adaptive_aero_control_top_spi_fpga_top ===\n\n   Number of wires:                633\n   Number of wire bits:           2012\n   Number of public wires:         633\n   Number of public wire bits:    2012\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:               1408\n     LUT4                          602\n     TRELLIS_FF                    805\n     adaptive_aero_control_top       1\n\n=== design hierarchy ===\n\n   adaptive_aero_control_top_spi_fpga_top      1\n     adaptive_aero_control_top       1\n\n   Number of wires:               4074\n   Number of wire bits:          10536\n   Number of public wires:        4074\n   Number of public wire bits:   10536\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:               6417\n     CCU2C                         326\n     L6MUX21                       388\n     LUT4                         3498\n     PFUMX                         705\n     TRELLIS_FF                   1500\n\n9.47. Executing CHECK pass (checking for obvious problems).\nChecking module adaptive_aero_control_top...\nChecking module adaptive_aero_control_top_spi_fpga_top...\nFound and reported 0 problems.\n\n9.48. Executing JSON backend.\n\n10. Executing Verilog backend.\n\n10.1. Executing BMUXMAP pass.\n\n10.2. Executing DEMUXMAP pass.\nDumping module `\\adaptive_aero_control_top'.\nDumping module `\\adaptive_aero_control_top_spi_fpga_top'.\n\n11. Executing Verilog backend.\n\n11.1. Executing BMUXMAP pass.\n\n11.2. Executing DEMUXMAP pass.\nDumping module `\\adaptive_aero_control_top'.\nDumping module `\\adaptive_aero_control_top_spi_fpga_top'.\n\nEnd of script. Logfile hash: 9324c9e8de, CPU: user 8.84s system 0.14s, MEM: 288.32 MB peak\nYosys 0.33 (git sha1 2584903a060)\nTime spent: 19% 1x abc (2 sec), 14% 1x autoname (1 sec), ...\n"
+    },
+    "equivalence_netlist": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+    "fabric_mapped_cells": 5324,
+    "flatten_enabled": false,
+    "flip_flops": 1500,
+    "json_netlist": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5.json",
+    "logic_utilization_percent": 11.359,
+    "logical_cells_available": 44000,
+    "logical_cells_used": 4998,
+    "lut4_cells": 3498,
+    "mapped_equivalence_netlist": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+    "memory_intent": {
+      "declarations": [],
+      "estimated_bits": 0,
+      "requires_block_ram": false,
+      "threshold_bits": 4096
+    },
+    "memory_mapping_gate": {
+      "enforced": false,
+      "mapped": false,
+      "primitive": "DP16KD",
+      "required": false,
+      "status": "pass",
+      "supported": true
+    },
+    "rtl_file_count": 2,
+    "status": "completed",
+    "tool_effort": {
+      "capability_checked": true,
+      "effective_options": [
+        "-noflatten"
+      ],
+      "flatten": false,
+      "goal": "balanced_timing",
+      "mode": "balanced",
+      "requested": [
+        "technology_mapping",
+        "preserve_hierarchy"
+      ],
+      "retime": false,
+      "strategy": "baseline",
+      "tool_version": null
+    },
+    "top_module": "adaptive_aero_control_top_spi_fpga_top",
+    "total_mapped_cells": 6436,
+    "verilog_netlist": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_netlist.v"
+  },
+  "synthesis_closure": {},
+  "synthesis_estimate": {
+    "block_ram_bits_available": 1944000,
+    "block_ram_blocks_available": 108,
+    "block_ram_blocks_used": 0,
+    "block_ram_primitive": "DP16KD",
+    "block_ram_utilization_percent": 0.0,
+    "carry_cells": 326,
+    "combinational_cells": 4918,
+    "fabric_mapped_cells": 5324,
+    "flip_flops": 1500,
+    "logic_utilization_percent": 11.359,
+    "logical_cells_available": 44000,
+    "logical_cells_used": 4998,
+    "lut4_cells": 3498,
+    "memory_mapping_gate": {
+      "enforced": false,
+      "mapped": false,
+      "primitive": "DP16KD",
+      "required": false,
+      "status": "pass",
+      "supported": true
+    },
+    "total_mapped_cells": 6436
+  },
+  "target": {
+    "bitstream_ext": ".bit",
+    "bitstream_tool": "ecppack",
+    "board": "ulx3s_ecp5_45f",
+    "compute_host": {
+      "external_host_supported": true,
+      "hard_cpu": null,
+      "soft_cpu_supported": true
+    },
+    "constraint_format": "lpf",
+    "default_frequency_mhz": 25.0,
+    "device": "45k",
+    "family": "ecp5",
+    "label": "Lattice ULX3S ECP5-45F",
+    "nextpnr_device_flag": "--45k",
+    "nextpnr_package": "CABGA381",
+    "nextpnr_tool": "nextpnr-ecp5",
+    "package": "CABGA381",
+    "pnr_output_ext": ".config",
+    "programmer_board": "ulx3s",
+    "resources": {
+      "block_ram_bits": 1944000,
+      "block_ram_blocks": 108,
+      "block_ram_primitive": "DP16KD",
+      "dsp_blocks": 72,
+      "io_cells": 245,
+      "logic_cells": 44000
+    },
+    "support_tier": "production",
+    "supported": true,
+    "target_frequency_mhz": 24.463,
+    "vendor": "lattice"
+  },
+  "timing_closure": {},
+  "timing_drc": {},
+  "timing_rtl_repair": {},
+  "timing_summary": {
+    "max_frequency_mhz": null,
+    "target_frequency_mhz": 24.463,
+    "timing_met": null,
+    "timing_violation_count": null,
+    "tns_ns": null,
+    "wns_ns": null
+  },
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "type": "fpga_dashboard",
+  "utilization": {
+    "logic_utilization_percent": null,
+    "logical_cells_available": 44000,
+    "logical_cells_used": null,
+    "routed_flip_flops": null,
+    "routed_lut4_cells": null,
+    "routed_resource": null,
+    "source": null
+  },
+  "verification": {
+    "coverage": {
+      "assertions": {
+        "assertion_failures": 0,
+        "assertion_pass_pct": null,
+        "assertions_generated": 0,
+        "status": "missing"
+      },
+      "bins_hit": 10,
+      "code": {
+        "branch_coverage_pct": 0.58,
+        "branch_found": 7229,
+        "branch_hit": 42,
+        "condition_coverage_pct": 0.58,
+        "condition_found": 7229,
+        "condition_hit": 42,
+        "condition_source": "verilator_lcov_branch_proxy",
+        "line_coverage_pct": 43.12,
+        "line_found": 320,
+        "line_hit": 138,
+        "missed_toggle_points": [
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=rst_n:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_write:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[0]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[1]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[2]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[3]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[3]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[4]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[4]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[5]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[5]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[6]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[6]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[7]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_addr[7]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_wdata[0]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_wdata[0]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_wdata[10]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_wdata[10]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          },
+          {
+            "file": "adaptive_aero_control_top.v",
+            "point": "comment=cfg_wdata[11]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core"
+          }
+        ],
+        "status": "ok",
+        "toggle_coverage_pct": 4.2,
+        "toggle_found": 7092,
+        "toggle_hit": 298,
+        "toggle_source": "verilator_coverage_annotate_points",
+        "tool": "verilator_coverage"
+      },
+      "functional": {
+        "bins_hit": 10,
+        "coverage_pct": 71.43,
+        "gap_count": 4,
+        "gaps": [
+          {
+            "coverage_point": "outputs.fault_indicator",
+            "group": "outputs",
+            "hit_bins": 1,
+            "missing_bins": [
+              "nonzero"
+            ],
+            "seen_values": [
+              0
+            ],
+            "signal": "fault_indicator",
+            "total_bins": 2,
+            "type": "functional_bin_gap"
+          },
+          {
+            "coverage_point": "outputs.spi_miso",
+            "group": "outputs",
+            "hit_bins": 1,
+            "missing_bins": [
+              "nonzero"
+            ],
+            "seen_values": [
+              0
+            ],
+            "signal": "spi_miso",
+            "total_bins": 2,
+            "type": "functional_bin_gap"
+          },
+          {
+            "coverage_point": "inputs.clk",
+            "group": "inputs",
+            "hit_bins": 1,
+            "missing_bins": [
+              "zero"
+            ],
+            "seen_values": [
+              1
+            ],
+            "signal": "clk",
+            "total_bins": 2,
+            "type": "functional_bin_gap"
+          },
+          {
+            "coverage_point": "inputs.reset_n",
+            "group": "inputs",
+            "hit_bins": 1,
+            "missing_bins": [
+              "zero"
+            ],
+            "seen_values": [
+              1
+            ],
+            "signal": "reset_n",
+            "total_bins": 2,
+            "type": "functional_bin_gap"
+          }
+        ],
+        "status": "ok",
+        "total_bins": 14
+      },
+      "functional_coverage_pct": 71.43,
+      "status": "ok",
+      "total_bins": 14
+    },
+    "formal": {
+      "attempted": null,
+      "available": null,
+      "reason": null,
+      "returncode": null,
+      "status": "not_enabled"
+    },
+    "golden_model": {
+      "status": "not_enabled",
+      "top_module": null
+    },
+    "simulation": {
+      "fail": 0,
+      "pass": 2,
+      "total": 2
+    },
+    "toolchain": {
+      "code_coverage": "verilator_coverage",
+      "formal": "none",
+      "formal_solver": null,
+      "golden_model": "none",
+      "simulator": "verilator"
+    },
+    "type": "simulation_summary_coverage"
+  }
+}

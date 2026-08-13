@@ -1,0 +1,84 @@
+{
+  "agent": "FPGA RTL-to-Netlist Equivalence Agent",
+  "comparison": "two_stage_rtl_generic_and_generic_mapped_equivalence",
+  "enabled": true,
+  "failure_kind": "tool_error",
+  "family": "ecp5",
+  "gate_status": "fail",
+  "generic_lec": {
+    "command": {
+      "cmd": [
+        "/usr/bin/yosys",
+        "-s",
+        "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_rtl_to_generic_lec.ys"
+      ],
+      "error": null,
+      "executable": "/usr/bin/yosys",
+      "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_rtl_to_generic_lec.log",
+      "ok": true,
+      "profile_id": "chiploop_saas_default",
+      "returncode": 0,
+      "status": "success",
+      "stderr_tail": "",
+      "stdout_tail": "core.veh_speed_mps [3]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [6]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [14]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [18]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [22]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [26]: failed.\n  Trying to prove $equiv for \\u_core.veh_speed_mps [28]: failed.\n Grouping SAT models for \\u_core.cfg_wdata:\n  Trying to prove $equiv for \\u_core.cfg_wdata [0]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [1]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [2]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [3]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [4]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [5]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [6]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [7]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [8]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [9]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [10]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [11]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [12]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [13]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [14]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [15]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [16]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [17]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [18]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [19]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [20]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [21]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [22]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [23]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [24]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [25]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [26]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [27]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [28]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [29]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [30]: failed.\n  Trying to prove $equiv for \\u_core.cfg_wdata [31]: failed.\n Grouping SAT models for \\u_core.cfg_addr:\n  Trying to prove $equiv for \\u_core.cfg_addr [0]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [1]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [2]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [3]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [4]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [5]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [6]: failed.\n  Trying to prove $equiv for \\u_core.cfg_addr [7]: failed.\n  Trying to prove $equiv for \\u_core.cfg_write: failed.\n  Trying to prove $equiv for \\u_core.cfg_valid: failed.\n  Trying to prove $equiv for \\u_core.rst_n: success!\n  Trying to prove $equiv for \\u_core.clk: success!\nProved 509 previously unproven $equiv cells.\n\n16. Executing EQUIV_INDUCT pass.\nFound 1227 unproven $equiv cells in module equiv:\n  Undef modelling: force def on 3108 initial reg values and 5 inputs.\n  Proving existence of base case for step 1. (817409 clauses over 302131 variables)\n  Proving induction step 1. (1801026 clauses over 661101 variables)\n  Proof for induction step holds. Entire workset of 1227 cells proven!\nProved 1227 previously unproven $equiv cells.\n\n17. Executing EQUIV_STATUS pass.\nFound 1738 $equiv cells in equiv:\n  Of those cells 1738 are proven and 0 are unproven.\n  Equivalence successfully proven!\n\nWarnings: 1 unique messages, 1 total\nEnd of script. Logfile hash: 029233d825, CPU: user 69.21s system 0.49s, MEM: 475.92 MB peak\nYosys 0.33 (git sha1 2584903a060)\nTime spent: 93% 1x equiv_induct (65 sec), 4% 1x equiv_simple (2 sec), ...\n"
+    },
+    "gate": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+    "gold": [
+      "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top.v",
+      "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+    ],
+    "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_rtl_to_generic_lec.log",
+    "proven": true,
+    "script": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_rtl_to_generic_lec.ys",
+    "status": "pass",
+    "timeout_seconds": 598,
+    "unproven_points": 0
+  },
+  "generic_netlist": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+  "generic_proven": true,
+  "induction_depth": 12,
+  "induction_depths_attempted": [
+    12
+  ],
+  "mapped_lec": {
+    "command": {
+      "cmd": [
+        "/usr/bin/yosys",
+        "-s",
+        "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.ys"
+      ],
+      "error": "Command '['/usr/bin/yosys', '-s', '/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.ys']' timed out after 1800 seconds",
+      "executable": "/usr/bin/yosys",
+      "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.log",
+      "ok": false,
+      "profile_id": "chiploop_saas_default",
+      "returncode": null,
+      "status": "exception",
+      "stderr_tail": "",
+      "stdout_tail": ""
+    },
+    "failure_kind": "tool_error",
+    "gate": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+    "gold": [
+      "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v"
+    ],
+    "log": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.log",
+    "proven": false,
+    "reason": "Command '['/usr/bin/yosys', '-s', '/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.ys']' timed out after 1800 seconds",
+    "script": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.ys",
+    "status": "fail",
+    "timeout_seconds": 1800,
+    "unproven_points": null
+  },
+  "mapped_netlist": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "mapped_proven": false,
+  "netlist": "/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "proven": false,
+  "reason": "Command '['/usr/bin/yosys', '-s', '/root/chiploop-backend/backend/workflows/11ef0a71-eb09-426d-9e7f-8e35ba118b9c/fpga/lec/fpga_generic_to_mapped_lec.ys']' timed out after 1800 seconds",
+  "required": true,
+  "rtl_file_count": 2,
+  "status": "fail",
+  "tool": "Yosys",
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "unproven_points": null
+}
