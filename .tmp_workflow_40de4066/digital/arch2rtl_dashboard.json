@@ -1,0 +1,1597 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "adaptive_aero_cfg_window",
+  "rtl_file_count": 1,
+  "module_count": 1,
+  "modules": [
+    {
+      "name": "adaptive_aero_cfg_window",
+      "file": "backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/adaptive_aero_cfg_window.v",
+      "input_count": 98,
+      "output_count": 197,
+      "inout_count": 0,
+      "input_port_count": 13,
+      "output_port_count": 13,
+      "inout_port_count": 0,
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bus_valid",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bus_write",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "cfg_bus_addr",
+          "direction": "input",
+          "width": "[7:0]"
+        },
+        {
+          "name": "cfg_bus_wdata",
+          "direction": "input",
+          "width": "[63:0]"
+        },
+        {
+          "name": "cfg_bus_rdata",
+          "direction": "output",
+          "width": "[63:0]"
+        },
+        {
+          "name": "cfg_bus_ready",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "status_timeout_fault_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_stale_fault_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_comm_fault_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_clamp_active_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_fallback_active_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_request_inflight_in",
+          "direction": "input",
+          "width": "1"
+        },
+        {
+          "name": "status_last_sequence_in",
+          "direction": "input",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_mode_select",
+          "direction": "output",
+          "width": "[1:0]"
+        },
+        {
+          "name": "cfg_stream_velocity_setpoint",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_actuator_min_clamp",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_actuator_max_clamp",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_request_timeout_cycles",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_stale_threshold_cycles",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_sequence_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_geometry_ref_id",
+          "direction": "output",
+          "width": "[15:0]"
+        },
+        {
+          "name": "cfg_fault_ack",
+          "direction": "output",
+          "width": "1"
+        },
+        {
+          "name": "cfg_fallback_actuator_pos",
+          "direction": "output",
+          "width": "[15:0]"
+        }
+      ]
+    }
+  ],
+  "interface": {
+    "input_count": 98,
+    "output_count": 197,
+    "inout_count": 0,
+    "input_port_count": 13,
+    "output_port_count": 13,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": [
+      {
+        "name": "clk",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "reset_n",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "cfg_bus_valid",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "cfg_bus_write",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "cfg_bus_addr",
+        "direction": "input",
+        "width": "[7:0]"
+      },
+      {
+        "name": "cfg_bus_wdata",
+        "direction": "input",
+        "width": "[63:0]"
+      },
+      {
+        "name": "cfg_bus_rdata",
+        "direction": "output",
+        "width": "[63:0]"
+      },
+      {
+        "name": "cfg_bus_ready",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "status_timeout_fault_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "status_stale_fault_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "status_comm_fault_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "status_clamp_active_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "status_fallback_active_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "status_request_inflight_in",
+        "direction": "input",
+        "width": "1"
+      },
+      {
+        "name": "status_last_sequence_in",
+        "direction": "input",
+        "width": "[15:0]"
+      },
+      {
+        "name": "cfg_enable",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "cfg_mode_select",
+        "direction": "output",
+        "width": "[1:0]"
+      },
+      {
+        "name": "cfg_stream_velocity_setpoint",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "cfg_actuator_min_clamp",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "cfg_actuator_max_clamp",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "cfg_request_timeout_cycles",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "cfg_stale_threshold_cycles",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "cfg_sequence_id",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "cfg_geometry_ref_id",
+        "direction": "output",
+        "width": "[15:0]"
+      },
+      {
+        "name": "cfg_fault_ack",
+        "direction": "output",
+        "width": "1"
+      },
+      {
+        "name": "cfg_fallback_actuator_pos",
+        "direction": "output",
+        "width": "[15:0]"
+      }
+    ]
+  },
+  "clock_reset": {
+    "clock_names": [
+      "clk"
+    ],
+    "reset_names": [
+      "reset_n"
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n"
+  },
+  "storage": {
+    "flipflop_count": 161,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 11,
+    "latch_target_count": 0,
+    "sequential_blocks": 2,
+    "posedge_blocks": 1,
+    "negedge_blocks": 1,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [
+      "cfg_actuator_max_clamp_r",
+      "cfg_actuator_min_clamp_r",
+      "cfg_control_reg",
+      "cfg_fallback_actuator_pos_r",
+      "cfg_fault_ack_r",
+      "cfg_geometry_ref_id_r",
+      "cfg_request_timeout_cycles_r",
+      "cfg_sequence_id_r",
+      "cfg_stale_threshold_cycles_r",
+      "cfg_stream_velocity_setpoint_r",
+      "status_shadow_r"
+    ],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 3,
+    "half_cycle_path_count": 1,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "warnings",
+    "scope": "primary",
+    "tool": "verilator",
+    "available": true,
+    "profile_id": "chiploop_saas_default",
+    "runner": "local_saas",
+    "returncode": 0,
+    "warning_count": 3,
+    "error_count": 0,
+    "command": [
+      "/usr/local/bin/verilator",
+      "--lint-only",
+      "-Wall",
+      "-Wno-fatal",
+      "--top-module",
+      "adaptive_aero_cfg_window",
+      "backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/adaptive_aero_cfg_window.v"
+    ],
+    "stdout_tail": [
+      "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b",
+      "- Verilator: Built from 0.034 MB sources in 2 modules, into 0.069 MB in 3 C++ files needing 0.000 MB",
+      "- Verilator: Walltime 0.014 s (elab=0.001, cvt=0.007, bld=0.000); cpu 0.014 s on 1 threads; allocated 31.352 MB"
+    ],
+    "stderr_tail": [
+      "%Warning-WIDTHTRUNC: backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/adaptive_aero_cfg_window.v:69:22: Operator ASSIGNW expects 16 bits on the Assign RHS, but Assign RHS's REPLICATE generates 17 bits.",
+      "                                                                                                                : ... note: In instance 'adaptive_aero_cfg_window'",
+      "   69 | assign status_bits_w = {",
+      "      |                      ^",
+      "                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047",
+      "                     ... Use \"/* verilator lint_off WIDTHTRUNC */\" and lint_on around source to disable this message.",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/adaptive_aero_cfg_window.v:34:14: Bits of signal are not used: 'cfg_bus_wdata'[63:16]",
+      "                                                                                                                  : ... note: In instance 'adaptive_aero_cfg_window'",
+      "   34 | input [63:0] cfg_bus_wdata;",
+      "      |              ^~~~~~~~~~~~~",
+      "                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047",
+      "                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.",
+      "%Warning-UNUSEDSIGNAL: backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/adaptive_aero_cfg_window.v:43:14: Bits of signal are not used: 'status_last_sequence_in'[15:11]",
+      "                                                                                                                  : ... note: In instance 'adaptive_aero_cfg_window'",
+      "   43 | input [15:0] status_last_sequence_in;",
+      "      |              ^~~~~~~~~~~~~~~~~~~~~~~"
+    ],
+    "error": null,
+    "run_result": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "rtl_lint",
+      "tool": "verilator",
+      "executable": "/usr/local/bin/verilator",
+      "command": [
+        "/usr/local/bin/verilator",
+        "--lint-only",
+        "-Wall",
+        "-Wno-fatal",
+        "--top-module",
+        "adaptive_aero_cfg_window",
+        "backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/adaptive_aero_cfg_window.v"
+      ],
+      "cwd": null,
+      "returncode": 0,
+      "stdout": "- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b\n- Verilator: Built from 0.034 MB sources in 2 modules, into 0.069 MB in 3 C++ files needing 0.000 MB\n- Verilator: Walltime 0.014 s (elab=0.001, cvt=0.007, bld=0.000); cpu 0.014 s on 1 threads; allocated 31.352 MB\n",
+      "stderr": "%Warning-WIDTHTRUNC: backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/adaptive_aero_cfg_window.v:69:22: Operator ASSIGNW expects 16 bits on the Assign RHS, but Assign RHS's REPLICATE generates 17 bits.\n                                                                                                                : ... note: In instance 'adaptive_aero_cfg_window'\n   69 | assign status_bits_w = {\n      |                      ^\n                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047\n                     ... Use \"/* verilator lint_off WIDTHTRUNC */\" and lint_on around source to disable this message.\n%Warning-UNUSEDSIGNAL: backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/adaptive_aero_cfg_window.v:34:14: Bits of signal are not used: 'cfg_bus_wdata'[63:16]\n                                                                                                                  : ... note: In instance 'adaptive_aero_cfg_window'\n   34 | input [63:0] cfg_bus_wdata;\n      |              ^~~~~~~~~~~~~\n                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047\n                       ... Use \"/* verilator lint_off UNUSEDSIGNAL */\" and lint_on around source to disable this message.\n%Warning-UNUSEDSIGNAL: backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/adaptive_aero_cfg_window.v:43:14: Bits of signal are not used: 'status_last_sequence_in'[15:11]\n                                                                                                                  : ... note: In instance 'adaptive_aero_cfg_window'\n   43 | input [15:0] status_last_sequence_in;\n      |              ^~~~~~~~~~~~~~~~~~~~~~~\n",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-08-14T18:09:56.878814+00:00",
+      "ended_at": "2026-08-14T18:09:57.002012+00:00",
+      "elapsed_ms": 123
+    }
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 1,
+      "module_count": 1,
+      "modules": [
+        {
+          "name": "adaptive_aero_cfg_window",
+          "file": "backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/adaptive_aero_cfg_window.v",
+          "input_count": 98,
+          "output_count": 197,
+          "inout_count": 0,
+          "input_port_count": 13,
+          "output_port_count": 13,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_write",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_bus_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_timeout_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_comm_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_clamp_active_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_request_inflight_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_last_sequence_in",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode_select",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_stream_velocity_setpoint",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_min_clamp",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_max_clamp",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_request_timeout_cycles",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_stale_threshold_cycles",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_sequence_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_ref_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_fault_ack",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fallback_actuator_pos",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 98,
+        "output_count": 197,
+        "inout_count": 0,
+        "input_port_count": 13,
+        "output_port_count": 13,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_write",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "cfg_bus_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "cfg_bus_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "cfg_bus_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_timeout_fault_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_stale_fault_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_comm_fault_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_clamp_active_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_fallback_active_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_request_inflight_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_last_sequence_in",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "cfg_mode_select",
+            "direction": "output",
+            "width": "[1:0]"
+          },
+          {
+            "name": "cfg_stream_velocity_setpoint",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_actuator_min_clamp",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_actuator_max_clamp",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_request_timeout_cycles",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_stale_threshold_cycles",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_sequence_id",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_geometry_ref_id",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_fault_ack",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "cfg_fallback_actuator_pos",
+            "direction": "output",
+            "width": "[15:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 161,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 11,
+        "latch_target_count": 0,
+        "sequential_blocks": 2,
+        "posedge_blocks": 1,
+        "negedge_blocks": 1,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "cfg_actuator_max_clamp_r",
+          "cfg_actuator_min_clamp_r",
+          "cfg_control_reg",
+          "cfg_fallback_actuator_pos_r",
+          "cfg_fault_ack_r",
+          "cfg_geometry_ref_id_r",
+          "cfg_request_timeout_cycles_r",
+          "cfg_sequence_id_r",
+          "cfg_stale_threshold_cycles_r",
+          "cfg_stream_velocity_setpoint_r",
+          "status_shadow_r"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 1,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 6,
+      "module_count": 6,
+      "modules": [
+        {
+          "name": "adaptive_aero_cfg_window",
+          "file": "backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_cfg_window.v",
+          "input_count": 98,
+          "output_count": 197,
+          "inout_count": 0,
+          "input_port_count": 13,
+          "output_port_count": 13,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_write",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_bus_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_timeout_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_comm_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_clamp_active_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_request_inflight_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_last_sequence_in",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode_select",
+              "direction": "output",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_stream_velocity_setpoint",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_min_clamp",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_max_clamp",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_request_timeout_cycles",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_stale_threshold_cycles",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_sequence_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_ref_id",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_fault_ack",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fallback_actuator_pos",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_control_top",
+          "file": "backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_control_top.v",
+          "input_count": 206,
+          "output_count": 234,
+          "inout_count": 0,
+          "input_port_count": 9,
+          "output_port_count": 14,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_write",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_bus_addr",
+              "direction": "input",
+              "width": "[7:0]"
+            },
+            {
+              "name": "cfg_bus_wdata",
+              "direction": "input",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_rdata",
+              "direction": "output",
+              "width": "[63:0]"
+            },
+            {
+              "name": "cfg_bus_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_req_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_req_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_req_data",
+              "direction": "output",
+              "width": "[127:0]"
+            },
+            {
+              "name": "model_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_data",
+              "direction": "input",
+              "width": "[127:0]"
+            },
+            {
+              "name": "actuator_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_data",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_timeout_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_comm_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_clamp_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_request_inflight",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "status_last_sequence",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_request_packager",
+          "file": "backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_request_packager.v",
+          "input_count": 54,
+          "output_count": 257,
+          "inout_count": 0,
+          "input_port_count": 8,
+          "output_port_count": 3,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_enable",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode_select",
+              "direction": "input",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_stream_velocity_setpoint",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_sequence_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_geometry_ref_id",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "request_ready",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_data",
+              "direction": "output",
+              "width": "[127:0]"
+            },
+            {
+              "name": "request_payload",
+              "direction": "output",
+              "width": "[127:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_response_monitor",
+          "file": "backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_response_monitor.v",
+          "input_count": 164,
+          "output_count": 20,
+          "inout_count": 0,
+          "input_port_count": 7,
+          "output_port_count": 5,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_inflight",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "request_seq_current",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "request_age_cycles",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "model_rsp_valid",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_ready",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "model_rsp_data",
+              "direction": "input",
+              "width": "[127:0]"
+            },
+            {
+              "name": "response_last_sequence",
+              "direction": "output",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_timed_out",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_stale_fault",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "response_comm_fault",
+              "direction": "output",
+              "width": "1"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_safety_guard",
+          "file": "backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_safety_guard.v",
+          "input_count": 73,
+          "output_count": 19,
+          "inout_count": 0,
+          "input_port_count": 12,
+          "output_port_count": 4,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "clk",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "reset_n",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_fault_ack",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "cfg_mode_select",
+              "direction": "input",
+              "width": "[1:0]"
+            },
+            {
+              "name": "cfg_actuator_min_clamp",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_actuator_max_clamp",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "cfg_fallback_actuator_pos",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_recommendation",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "response_valid_sample",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_timeout_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_comm_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "clamp_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "fallback_active",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_valid",
+              "direction": "output",
+              "width": "1"
+            },
+            {
+              "name": "actuator_cmd_data",
+              "direction": "output",
+              "width": "[15:0]"
+            }
+          ]
+        },
+        {
+          "name": "adaptive_aero_status_aggregator",
+          "file": "backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/handoff/adaptive_aero_control_top_ip_package/rtl/adaptive_aero_status_aggregator.v",
+          "input_count": 44,
+          "output_count": 0,
+          "inout_count": 0,
+          "input_port_count": 14,
+          "output_port_count": 0,
+          "inout_port_count": 0,
+          "ports": [
+            {
+              "name": "status_timeout_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_comm_fault_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_clamp_active_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_request_inflight_in",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_last_sequence_in",
+              "direction": "input",
+              "width": "[15:0]"
+            },
+            {
+              "name": "status_timeout_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_stale_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_comm_fault",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_clamp_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_fallback_active",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_request_inflight",
+              "direction": "input",
+              "width": "1"
+            },
+            {
+              "name": "status_last_sequence",
+              "direction": "input",
+              "width": "[15:0]"
+            }
+          ]
+        }
+      ],
+      "interface": {
+        "input_count": 98,
+        "output_count": 197,
+        "inout_count": 0,
+        "input_port_count": 13,
+        "output_port_count": 13,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_valid",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_write",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "cfg_bus_addr",
+            "direction": "input",
+            "width": "[7:0]"
+          },
+          {
+            "name": "cfg_bus_wdata",
+            "direction": "input",
+            "width": "[63:0]"
+          },
+          {
+            "name": "cfg_bus_rdata",
+            "direction": "output",
+            "width": "[63:0]"
+          },
+          {
+            "name": "cfg_bus_ready",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "status_timeout_fault_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_stale_fault_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_comm_fault_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_clamp_active_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_fallback_active_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_request_inflight_in",
+            "direction": "input",
+            "width": "1"
+          },
+          {
+            "name": "status_last_sequence_in",
+            "direction": "input",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "cfg_mode_select",
+            "direction": "output",
+            "width": "[1:0]"
+          },
+          {
+            "name": "cfg_stream_velocity_setpoint",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_actuator_min_clamp",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_actuator_max_clamp",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_request_timeout_cycles",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_stale_threshold_cycles",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_sequence_id",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_geometry_ref_id",
+            "direction": "output",
+            "width": "[15:0]"
+          },
+          {
+            "name": "cfg_fault_ack",
+            "direction": "output",
+            "width": "1"
+          },
+          {
+            "name": "cfg_fallback_actuator_pos",
+            "direction": "output",
+            "width": "[15:0]"
+          }
+        ]
+      },
+      "storage": {
+        "flipflop_count": 474,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 25,
+        "latch_target_count": 0,
+        "sequential_blocks": 8,
+        "posedge_blocks": 4,
+        "negedge_blocks": 4,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [
+          "actuator_cmd_data_r",
+          "actuator_cmd_valid_r",
+          "cfg_actuator_max_clamp_r",
+          "cfg_actuator_min_clamp_r",
+          "cfg_control_reg",
+          "cfg_fallback_actuator_pos_r",
+          "cfg_fault_ack_r",
+          "cfg_geometry_ref_id_r",
+          "cfg_request_timeout_cycles_r",
+          "cfg_sequence_id_r",
+          "cfg_stale_threshold_cycles_r",
+          "cfg_stream_velocity_setpoint_r",
+          "clamp_active_r",
+          "fallback_active_r",
+          "inflight_r",
+          "model_rsp_ready_r",
+          "request_data_r",
+          "request_payload_r",
+          "request_valid_r",
+          "response_comm_fault_r",
+          "response_last_sequence_r",
+          "response_stale_fault_r",
+          "response_timed_out_r",
+          "selected_cmd_r",
+          "status_shadow_r"
+        ],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 3,
+        "half_cycle_path_count": 4,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "functional",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 0,
+    "registers": []
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}

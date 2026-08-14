@@ -1,0 +1,135 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.184 MB sources in 7 modules, into 0.085 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.027 s (elab=0.003, cvt=0.012, bld=0.000); cpu 0.026 s on 1 threads; allocated 32.359 MB
+
+=== STDERR ===
+%Warning-WIDTHEXPAND: pass2/adaptive_aero_safety_guard.v:55:13: Operator CASE expects 16 bits on the Case Item, but Case Item's CONST '2'h0' generates 2 bits.
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_safety_guard'
+   55 |             case (response_recommendation)
+      |             ^~~~
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-WIDTHEXPAND: pass2/adaptive_aero_safety_guard.v:55:13: Operator CASE expects 16 bits on the Case Item, but Case Item's CONST '2'h1' generates 2 bits.
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_safety_guard'
+   55 |             case (response_recommendation)
+      |             ^~~~
+%Warning-WIDTHEXPAND: pass2/adaptive_aero_safety_guard.v:55:13: Operator CASE expects 16 bits on the Case Item, but Case Item's CONST '2'h2' generates 2 bits.
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_safety_guard'
+   55 |             case (response_recommendation)
+      |             ^~~~
+%Warning-WIDTHEXPAND: pass2/adaptive_aero_safety_guard.v:62:66: Operator EQ expects 16 bits on the RHS, but RHS's CONST '2'h0' generates 2 bits.
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_safety_guard'
+   62 |             status_fallback_active_r <= (response_recommendation == 2'b00);
+      |                                                                  ^~
+%Warning-WIDTHEXPAND: pass2/adaptive_aero_safety_guard.v:63:63: Operator EQ expects 16 bits on the RHS, but RHS's CONST '2'h1' generates 2 bits.
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_safety_guard'
+   63 |             status_clamp_active_r <= (response_recommendation == 2'b01) || (response_recommendation == 2'b10);
+      |                                                               ^~
+%Warning-WIDTHEXPAND: pass2/adaptive_aero_safety_guard.v:63:101: Operator EQ expects 16 bits on the RHS, but RHS's CONST '2'h2' generates 2 bits.
+                                                               : ... note: In instance 'adaptive_aero_control_top.u_safety_guard'
+   63 |             status_clamp_active_r <= (response_recommendation == 2'b01) || (response_recommendation == 2'b10);
+      |                                                                                                     ^~
+%Warning-WIDTHEXPAND: pass2/adaptive_aero_safety_guard.v:80:54: Operator EQ expects 16 bits on the RHS, but RHS's CONST '2'h2' generates 2 bits.
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_safety_guard'
+   80 |                 end else if (response_recommendation == 2'b10) begin
+      |                                                      ^~
+%Warning-WIDTHEXPAND: pass2/adaptive_aero_safety_guard.v:76:45: Operator EQ expects 16 bits on the RHS, but RHS's CONST '2'h1' generates 2 bits.
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_safety_guard'
+   76 |                 if (response_recommendation == 2'b01) begin
+      |                                             ^~
+%Warning-WIDTHEXPAND: pass2/adaptive_aero_response_monitor.v:65:35: Operator ASSIGNDLY expects 16 bits on the Assign RHS, but Assign RHS's CONST '2'h0' generates 2 bits.
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_response_monitor'
+   65 |         response_recommendation_r <= 2'b00;
+      |                                   ^~
+%Warning-WIDTHEXPAND: pass2/adaptive_aero_response_monitor.v:92:43: Operator ASSIGNDLY expects 16 bits on the Assign RHS, but Assign RHS's SEL generates 2 bits.
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_response_monitor'
+   92 |                 response_recommendation_r <= model_rsp_data[17:16];
+      |                                           ^~
+%Warning-WIDTHTRUNC: pass2/adaptive_aero_cfg_window.v:70:22: Operator ASSIGNW expects 16 bits on the Assign RHS, but Assign RHS's REPLICATE generates 17 bits.
+                                                           : ... note: In instance 'adaptive_aero_control_top.u_cfg_window'
+   70 | assign status_bits_w = {
+      |                      ^
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:62:14: Signal is not used: 'request_payload_w'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   62 | wire [127:0] request_payload_w;
+      |              ^~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:63:14: Signal is not used: 'response_payload_w'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   63 | wire [127:0] response_payload_w;
+      |              ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:76:13: Signal is not driven, nor used: 'adaptive_aero_cfg_window_cfg_actuator_max_clamp'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   76 | wire [15:0] adaptive_aero_cfg_window_cfg_actuator_max_clamp;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:77:13: Signal is not driven, nor used: 'adaptive_aero_cfg_window_cfg_actuator_min_clamp'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   77 | wire [15:0] adaptive_aero_cfg_window_cfg_actuator_min_clamp;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:78:6: Signal is not driven, nor used: 'adaptive_aero_cfg_window_cfg_enable'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   78 | wire adaptive_aero_cfg_window_cfg_enable;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:79:13: Signal is not driven, nor used: 'adaptive_aero_cfg_window_cfg_fallback_actuator_pos'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   79 | wire [15:0] adaptive_aero_cfg_window_cfg_fallback_actuator_pos;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:80:6: Signal is not driven, nor used: 'adaptive_aero_cfg_window_cfg_fault_ack'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   80 | wire adaptive_aero_cfg_window_cfg_fault_ack;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:81:13: Signal is not driven, nor used: 'adaptive_aero_cfg_window_cfg_geometry_ref_id'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   81 | wire [15:0] adaptive_aero_cfg_window_cfg_geometry_ref_id;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:82:12: Signal is not driven, nor used: 'adaptive_aero_cfg_window_cfg_mode_select'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   82 | wire [1:0] adaptive_aero_cfg_window_cfg_mode_select;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:83:13: Signal is not driven, nor used: 'adaptive_aero_cfg_window_cfg_request_timeout_cycles'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   83 | wire [15:0] adaptive_aero_cfg_window_cfg_request_timeout_cycles;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:84:13: Signal is not driven, nor used: 'adaptive_aero_cfg_window_cfg_sequence_id'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   84 | wire [15:0] adaptive_aero_cfg_window_cfg_sequence_id;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:85:13: Signal is not driven, nor used: 'adaptive_aero_cfg_window_cfg_stale_threshold_cycles'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   85 | wire [15:0] adaptive_aero_cfg_window_cfg_stale_threshold_cycles;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:86:13: Signal is not driven, nor used: 'adaptive_aero_cfg_window_cfg_stream_velocity_setpoint'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   86 | wire [15:0] adaptive_aero_cfg_window_cfg_stream_velocity_setpoint;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:87:13: Signal is not driven, nor used: 'adaptive_aero_response_monitor_response_recommendation'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   87 | wire [15:0] adaptive_aero_response_monitor_response_recommendation;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:88:6: Signal is not driven, nor used: 'adaptive_aero_response_monitor_response_valid_sample'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   88 | wire adaptive_aero_response_monitor_response_valid_sample;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_cfg_window.v:34:14: Bits of signal are not used: 'cfg_bus_wdata'[63:16]
+                                                             : ... note: In instance 'adaptive_aero_control_top.u_cfg_window'
+   34 | input [63:0] cfg_bus_wdata;
+      |              ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_cfg_window.v:43:14: Bits of signal are not used: 'status_last_sequence_in'[15:11]
+                                                             : ... note: In instance 'adaptive_aero_control_top.u_cfg_window'
+   43 | input [15:0] status_last_sequence_in;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_safety_guard.v:22:13: Signal is not used: 'cfg_mode_select'
+                                                               : ... note: In instance 'adaptive_aero_control_top.u_safety_guard'
+   22 | input [1:0] cfg_mode_select;
+      |             ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_safety_guard.v:39:12: Signal is not used: 'selected_cmd_r'
+                                                               : ... note: In instance 'adaptive_aero_control_top.u_safety_guard'
+   39 | reg [15:0] selected_cmd_r;
+      |            ^~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

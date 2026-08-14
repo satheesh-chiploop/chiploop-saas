@@ -1,0 +1,18 @@
+backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/pass3/adaptive_aero_control_top.v:125: error: port ``request_inflight'' is not a port of u_request_packager.
+backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/pass3/adaptive_aero_control_top.v:125: error: port ``request_seq_current'' is not a port of u_request_packager.
+backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/pass3/adaptive_aero_control_top.v:125: error: port ``request_accept'' is not a port of u_request_packager.
+backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/pass3/adaptive_aero_control_top.v:156: warning: Port 8 (response_recommendation) of adaptive_aero_safety_guard expects 16 bits, got 2.
+backend/workflows/40de4066-bc3e-48f2-9652-505623610ed9/rtl/pass3/adaptive_aero_control_top.v:156:        : Padding 14 high bits of the port.
+3 error(s) during elaboration.
+
+Issues:
+❌ Module 'adaptive_aero_request_packager' missing ports vs spec: ['request_inflight', 'request_seq_current', 'request_accept']
+❌ Module 'adaptive_aero_request_packager' has extra ports vs spec: ['request_payload']
+❌ Module 'adaptive_aero_response_monitor' missing ports vs spec: ['cfg_request_timeout_cycles', 'cfg_stale_threshold_cycles', 'response_recommendation', 'response_valid_sample']
+❌ Module 'adaptive_aero_safety_guard' has extra ports vs spec: ['cfg_mode_select']
+❌ Module 'adaptive_aero_status_aggregator' missing ports vs spec: ['clk', 'reset_n', 'top_status_timeout_fault', 'top_status_stale_fault', 'top_status_comm_fault', 'top_status_clamp_active', 'top_status_fallback_active', 'top_status_request_inflight', 'top_status_last_sequence']
+❌ Module 'adaptive_aero_status_aggregator' has extra ports vs spec: ['status_timeout_fault_in', 'status_stale_fault_in', 'status_comm_fault_in', 'status_clamp_active_in', 'status_fallback_active_in', 'status_request_inflight_in', 'status_last_sequence_in']
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

@@ -1,0 +1,100 @@
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "setup_issue",
+  "summary": {
+    "checked": 16,
+    "matched": 0,
+    "partial": 0,
+    "missing": 3,
+    "inconclusive": 13
+  },
+  "setup_issues": [
+    "missing_rtl",
+    "no_parseable_modules"
+  ],
+  "top_module": {
+    "expected": "adaptive_aero_control_top",
+    "modules_found": [],
+    "status": "issues"
+  },
+  "interface": {
+    "status": "issues",
+    "expected_ports": [
+      "actuator_cmd_data",
+      "actuator_cmd_valid",
+      "cfg_bus_addr",
+      "cfg_bus_rdata",
+      "cfg_bus_ready",
+      "cfg_bus_valid",
+      "cfg_bus_wdata",
+      "cfg_bus_write",
+      "clk",
+      "model_req_data",
+      "model_req_ready",
+      "model_req_valid",
+      "model_rsp_data",
+      "model_rsp_ready",
+      "model_rsp_valid",
+      "reset_n",
+      "status_clamp_active",
+      "status_comm_fault",
+      "status_fallback_active",
+      "status_last_sequence",
+      "status_request_inflight",
+      "status_stale_fault",
+      "status_timeout_fault"
+    ],
+    "matched_ports": [],
+    "missing_ports": [
+      "actuator_cmd_data",
+      "actuator_cmd_valid",
+      "cfg_bus_addr",
+      "cfg_bus_rdata",
+      "cfg_bus_ready",
+      "cfg_bus_valid",
+      "cfg_bus_wdata",
+      "cfg_bus_write",
+      "clk",
+      "model_req_data",
+      "model_req_ready",
+      "model_req_valid",
+      "model_rsp_data",
+      "model_rsp_ready",
+      "model_rsp_valid",
+      "reset_n",
+      "status_clamp_active",
+      "status_comm_fault",
+      "status_fallback_active",
+      "status_last_sequence",
+      "status_request_inflight",
+      "status_stale_fault",
+      "status_timeout_fault"
+    ],
+    "rtl_ports": []
+  },
+  "register_map": {
+    "expected": [],
+    "matched": [],
+    "expected_registers": [],
+    "matched_registers": [],
+    "expected_addresses": [],
+    "matched_addresses": [],
+    "missing": [],
+    "missing_registers": [],
+    "missing_addresses": [],
+    "status": "not_applicable"
+  },
+  "clock_reset": {
+    "clock_ports": [],
+    "reset_ports": [],
+    "status": "issues"
+  },
+  "requirements": [],
+  "rtl_files": [],
+  "modules": [],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}

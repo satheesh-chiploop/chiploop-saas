@@ -1,0 +1,565 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    clk,
+    reset_n,
+    cfg_bus_valid,
+    cfg_bus_write,
+    cfg_bus_addr,
+    cfg_bus_wdata,
+    cfg_bus_rdata,
+    cfg_bus_ready,
+    model_req_valid,
+    model_req_ready,
+    model_req_data,
+    model_rsp_valid,
+    model_rsp_ready,
+    model_rsp_data,
+    actuator_cmd_valid,
+    actuator_cmd_data,
+    status_timeout_fault,
+    status_stale_fault,
+    status_comm_fault,
+    status_clamp_active,
+    status_fallback_active,
+    status_request_inflight,
+    status_last_sequence
+);
+input clk;
+input reset_n;
+input cfg_bus_valid;
+input cfg_bus_write;
+input [7:0] cfg_bus_addr;
+input [63:0] cfg_bus_wdata;
+output [63:0] cfg_bus_rdata;
+output cfg_bus_ready;
+output model_req_valid;
+input model_req_ready;
+output [127:0] model_req_data;
+input model_rsp_valid;
+output model_rsp_ready;
+input [127:0] model_rsp_data;
+output actuator_cmd_valid;
+output [15:0] actuator_cmd_data;
+output status_timeout_fault;
+output status_stale_fault;
+output status_comm_fault;
+output status_clamp_active;
+output status_fallback_active;
+output status_request_inflight;
+output [15:0] status_last_sequence;
+
+wire cfg_enable;
+wire [1:0] cfg_mode_select;
+wire [15:0] cfg_stream_velocity_setpoint;
+wire [15:0] cfg_actuator_min_clamp;
+wire [15:0] cfg_actuator_max_clamp;
+wire [15:0] cfg_request_timeout_cycles;
+wire [15:0] cfg_stale_threshold_cycles;
+wire [15:0] cfg_sequence_id;
+wire [15:0] cfg_geometry_ref_id;
+wire cfg_fault_ack;
+wire [15:0] cfg_fallback_actuator_pos;
+
+wire [15:0] status_last_sequence_w;
+wire [127:0] request_payload_w;
+wire [15:0] request_age_cycles_w;
+wire response_timed_out_w;
+wire response_stale_fault_w;
+wire response_comm_fault_w;
+wire model_rsp_ready_w;
+wire actuator_cmd_valid_w;
+wire [15:0] actuator_cmd_data_w;
+wire status_clamp_active_w;
+wire status_fallback_active_w;
+
+assign status_last_sequence = status_last_sequence_w;
+assign actuator_cmd_valid = actuator_cmd_valid_w;
+assign actuator_cmd_data = actuator_cmd_data_w;
+assign status_timeout_fault = response_timed_out_w;
+assign status_stale_fault = response_stale_fault_w;
+assign status_comm_fault = response_comm_fault_w;
+assign status_clamp_active = status_clamp_active_w;
+assign status_fallback_active = status_fallback_active_w;
+assign status_request_inflight = model_req_valid & ~model_rsp_ready_w;
+
+adaptive_aero_cfg_window u_cfg_window (
+    .clk(clk),
+    .reset_n(reset_n),
+    .cfg_bus_valid(cfg_bus_valid),
+    .cfg_bus_write(cfg_bus_write),
+    .cfg_bus_addr(cfg_bus_addr),
+    .cfg_bus_wdata(cfg_bus_wdata),
+    .cfg_bus_rdata(cfg_bus_rdata),
+    .cfg_bus_ready(cfg_bus_ready),
+    .status_timeout_fault_in(response_timed_out_w),
+    .status_stale_fault_in(response_stale_fault_w),
+    .status_comm_fault_in(response_comm_fault_w),
+    .status_clamp_active_in(status_clamp_active_w),
+    .status_fallback_active_in(status_fallback_active_w),
+    .status_request_inflight_in(status_request_inflight),
+    .status_last_sequence_in(status_last_sequence_w),
+    .cfg_enable(cfg_enable),
+    .cfg_mode_select(cfg_mode_select),
+    .cfg_stream_velocity_setpoint(cfg_stream_velocity_setpoint),
+    .cfg_actuator_min_clamp(cfg_actuator_min_clamp),
+    .cfg_actuator_max_clamp(cfg_actuator_max_clamp),
+    .cfg_request_timeout_cycles(cfg_request_timeout_cycles),
+    .cfg_stale_threshold_cycles(cfg_stale_threshold_cycles),
+    .cfg_sequence_id(cfg_sequence_id),
+    .cfg_geometry_ref_id(cfg_geometry_ref_id),
+    .cfg_fault_ack(cfg_fault_ack),
+    .cfg_fallback_actuator_pos(cfg_fallback_actuator_pos)
+);
+
+adaptive_aero_request_packager u_request_packager (
+    .clk(clk),
+    .reset_n(reset_n),
+    .cfg_enable(cfg_enable),
+    .cfg_mode_select(cfg_mode_select),
+    .cfg_stream_velocity_setpoint(cfg_stream_velocity_setpoint),
+    .cfg_sequence_id(cfg_sequence_id),
+    .cfg_geometry_ref_id(cfg_geometry_ref_id),
+    .request_valid(model_req_valid),
+    .request_ready(model_req_ready),
+    .request_data(model_req_data),
+    .request_inflight(status_request_inflight),
+    .request_seq_current(status_last_sequence_w),
+    .request_accept(request_age_cycles_w)
+);
+
+adaptive_aero_response_monitor u_response_monitor (
+    .clk(clk),
+    .reset_n(reset_n),
+    .request_inflight(status_request_inflight),
+    .request_seq_current(status_last_sequence_w),
+    .request_age_cycles(request_age_cycles_w),
+    .model_rsp_valid(model_rsp_valid),
+    .model_rsp_ready(model_rsp_ready_w),
+    .model_rsp_data(model_rsp_data),
+    .response_last_sequence(status_last_sequence_w),
+    .response_timed_out(response_timed_out_w),
+    .response_stale_fault(response_stale_fault_w),
+    .response_comm_fault(response_comm_fault_w)
+);
+
+adaptive_aero_safety_guard u_safety_guard (
+    .clk(clk),
+    .reset_n(reset_n),
+    .cfg_fault_ack(cfg_fault_ack),
+    .cfg_mode_select(cfg_mode_select),
+    .cfg_actuator_min_clamp(cfg_actuator_min_clamp),
+    .cfg_actuator_max_clamp(cfg_actuator_max_clamp),
+    .cfg_fallback_actuator_pos(cfg_fallback_actuator_pos),
+    .response_recommendation(model_rsp_data[1:0]),
+    .response_valid_sample(model_rsp_valid),
+    .status_timeout_fault(response_timed_out_w),
+    .status_stale_fault(response_stale_fault_w),
+    .status_comm_fault(response_comm_fault_w),
+    .clamp_active(status_clamp_active_w),
+    .fallback_active(status_fallback_active_w),
+    .actuator_cmd_valid(actuator_cmd_valid_w),
+    .actuator_cmd_data(actuator_cmd_data_w)
+);
+
+assign model_rsp_ready = model_rsp_ready_w;
+endmodule
+---END adaptive_aero_control_top.v---
+---BEGIN adaptive_aero_cfg_window.v---
+module adaptive_aero_cfg_window (
+    clk,
+    reset_n,
+    cfg_bus_valid,
+    cfg_bus_write,
+    cfg_bus_addr,
+    cfg_bus_wdata,
+    cfg_bus_rdata,
+    cfg_bus_ready,
+    status_timeout_fault_in,
+    status_stale_fault_in,
+    status_comm_fault_in,
+    status_clamp_active_in,
+    status_fallback_active_in,
+    status_request_inflight_in,
+    status_last_sequence_in,
+    cfg_enable,
+    cfg_mode_select,
+    cfg_stream_velocity_setpoint,
+    cfg_actuator_min_clamp,
+    cfg_actuator_max_clamp,
+    cfg_request_timeout_cycles,
+    cfg_stale_threshold_cycles,
+    cfg_sequence_id,
+    cfg_geometry_ref_id,
+    cfg_fault_ack,
+    cfg_fallback_actuator_pos
+);
+input clk;
+input reset_n;
+input cfg_bus_valid;
+input cfg_bus_write;
+input [7:0] cfg_bus_addr;
+input [63:0] cfg_bus_wdata;
+output [63:0] cfg_bus_rdata;
+output cfg_bus_ready;
+input status_timeout_fault_in;
+input status_stale_fault_in;
+input status_comm_fault_in;
+input status_clamp_active_in;
+input status_fallback_active_in;
+input status_request_inflight_in;
+input [15:0] status_last_sequence_in;
+output cfg_enable;
+output [1:0] cfg_mode_select;
+output [15:0] cfg_stream_velocity_setpoint;
+output [15:0] cfg_actuator_min_clamp;
+output [15:0] cfg_actuator_max_clamp;
+output [15:0] cfg_request_timeout_cycles;
+output [15:0] cfg_stale_threshold_cycles;
+output [15:0] cfg_sequence_id;
+output [15:0] cfg_geometry_ref_id;
+output cfg_fault_ack;
+output [15:0] cfg_fallback_actuator_pos;
+
+reg [63:0] cfg_bus_rdata_r;
+reg cfg_bus_ready_r;
+reg [15:0] cfg_control_reg;
+reg [15:0] cfg_stream_velocity_setpoint_r;
+reg [15:0] cfg_actuator_min_clamp_r;
+reg [15:0] cfg_actuator_max_clamp_r;
+reg [15:0] cfg_request_timeout_cycles_r;
+reg [15:0] cfg_stale_threshold_cycles_r;
+reg [15:0] cfg_sequence_id_r;
+reg [15:0] cfg_geometry_ref_id_r;
+reg cfg_fault_ack_r;
+reg [15:0] cfg_fallback_actuator_pos_r;
+reg [15:0] status_shadow_r;
+wire [15:0] status_bits_w;
+
+assign status_bits_w = {
+    status_timeout_fault_in,
+    status_stale_fault_in,
+    status_comm_fault_in,
+    status_clamp_active_in,
+    status_fallback_active_in,
+    status_request_inflight_in,
+    status_last_sequence_in[10:0]
+};
+
+assign cfg_bus_rdata = cfg_bus_rdata_r;
+assign cfg_bus_ready = cfg_bus_ready_r;
+assign cfg_enable = cfg_control_reg[0];
+assign cfg_mode_select = cfg_control_reg[2:1];
+assign cfg_stream_velocity_setpoint = cfg_stream_velocity_setpoint_r;
+assign cfg_actuator_min_clamp = cfg_actuator_min_clamp_r;
+assign cfg_actuator_max_clamp = cfg_actuator_max_clamp_r;
+assign cfg_request_timeout_cycles = cfg_request_timeout_cycles_r;
+assign cfg_stale_threshold_cycles = cfg_stale_threshold_cycles_r;
+assign cfg_sequence_id = cfg_sequence_id_r;
+assign cfg_geometry_ref_id = cfg_geometry_ref_id_r;
+assign cfg_fault_ack = cfg_fault_ack_r;
+assign cfg_fallback_actuator_pos = cfg_fallback_actuator_pos_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        cfg_control_reg <= 16'h0000;
+        cfg_stream_velocity_setpoint_r <= 16'h0000;
+        cfg_actuator_min_clamp_r <= 16'h0000;
+        cfg_actuator_max_clamp_r <= 16'h00ff;
+        cfg_request_timeout_cycles_r <= 16'd32;
+        cfg_stale_threshold_cycles_r <= 16'd8;
+        cfg_sequence_id_r <= 16'h0001;
+        cfg_geometry_ref_id_r <= 16'h0000;
+        cfg_fault_ack_r <= 1'b0;
+        cfg_fallback_actuator_pos_r <= 16'h0000;
+        status_shadow_r <= 16'h0000;
+    end else begin
+        cfg_fault_ack_r <= 1'b0;
+        status_shadow_r <= status_bits_w;
+        if (cfg_bus_valid && cfg_bus_write) begin
+            case (cfg_bus_addr)
+                8'h00: begin
+                    cfg_control_reg <= cfg_bus_wdata[15:0];
+                    cfg_fault_ack_r <= cfg_bus_wdata[0];
+                end
+                8'h08: cfg_stream_velocity_setpoint_r <= cfg_bus_wdata[15:0];
+                8'h10: cfg_actuator_min_clamp_r <= cfg_bus_wdata[15:0];
+                8'h18: cfg_actuator_max_clamp_r <= cfg_bus_wdata[15:0];
+                8'h20: cfg_request_timeout_cycles_r <= cfg_bus_wdata[15:0];
+                8'h28: cfg_stale_threshold_cycles_r <= cfg_bus_wdata[15:0];
+                8'h30: cfg_sequence_id_r <= cfg_bus_wdata[15:0];
+                8'h38: cfg_geometry_ref_id_r <= cfg_bus_wdata[15:0];
+                8'h40: cfg_fallback_actuator_pos_r <= cfg_bus_wdata[15:0];
+                default: begin end
+            endcase
+        end
+    end
+end
+
+always @(*) begin
+    cfg_bus_rdata_r = 64'h0000000000000000;
+    cfg_bus_ready_r = 1'b1;
+    case (cfg_bus_addr)
+        8'h00: cfg_bus_rdata_r = {48'h000000000000, cfg_control_reg};
+        8'h08: cfg_bus_rdata_r = {48'h000000000000, cfg_stream_velocity_setpoint_r};
+        8'h10: cfg_bus_rdata_r = {48'h000000000000, cfg_actuator_min_clamp_r};
+        8'h18: cfg_bus_rdata_r = {48'h000000000000, cfg_actuator_max_clamp_r};
+        8'h20: cfg_bus_rdata_r = {48'h000000000000, cfg_request_timeout_cycles_r};
+        8'h28: cfg_bus_rdata_r = {48'h000000000000, cfg_stale_threshold_cycles_r};
+        8'h30: cfg_bus_rdata_r = {48'h000000000000, cfg_sequence_id_r};
+        8'h38: cfg_bus_rdata_r = {48'h000000000000, cfg_geometry_ref_id_r};
+        8'h40: cfg_bus_rdata_r = {48'h000000000000, cfg_fallback_actuator_pos_r};
+        8'h48: cfg_bus_rdata_r = {48'h000000000000, status_shadow_r};
+        default: cfg_bus_rdata_r = 64'h0000000000000000;
+    endcase
+end
+endmodule
+---END adaptive_aero_cfg_window.v---
+---BEGIN adaptive_aero_request_packager.v---
+module adaptive_aero_request_packager (
+    clk,
+    reset_n,
+    cfg_enable,
+    cfg_mode_select,
+    cfg_stream_velocity_setpoint,
+    cfg_sequence_id,
+    cfg_geometry_ref_id,
+    request_valid,
+    request_ready,
+    request_data,
+    request_payload
+);
+input clk;
+input reset_n;
+input cfg_enable;
+input [1:0] cfg_mode_select;
+input [15:0] cfg_stream_velocity_setpoint;
+input [15:0] cfg_sequence_id;
+input [15:0] cfg_geometry_ref_id;
+output request_valid;
+input request_ready;
+output [127:0] request_data;
+output [127:0] request_payload;
+
+reg request_valid_r;
+reg [127:0] request_data_r;
+reg [127:0] request_payload_r;
+reg inflight_r;
+
+assign request_valid = request_valid_r;
+assign request_data = request_data_r;
+assign request_payload = request_payload_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        request_valid_r <= 1'b0;
+        request_data_r <= 128'h00000000000000000000000000000000;
+        request_payload_r <= 128'h00000000000000000000000000000000;
+        inflight_r <= 1'b0;
+    end else begin
+        if (cfg_enable && !inflight_r) begin
+            request_valid_r <= 1'b1;
+            request_data_r <= {cfg_sequence_id, cfg_geometry_ref_id, cfg_mode_select, cfg_stream_velocity_setpoint, 96'h000000000000000000000000};
+            request_payload_r <= {cfg_sequence_id, cfg_geometry_ref_id, cfg_mode_select, cfg_stream_velocity_setpoint, 96'h000000000000000000000000};
+        end else if (request_valid_r && request_ready) begin
+            request_valid_r <= 1'b0;
+        end
+        if (request_valid_r && request_ready) begin
+            inflight_r <= 1'b1;
+        end else if (!cfg_enable) begin
+            inflight_r <= 1'b0;
+        end
+    end
+end
+endmodule
+---END adaptive_aero_request_packager.v---
+---BEGIN adaptive_aero_response_monitor.v---
+module adaptive_aero_response_monitor (
+    clk,
+    reset_n,
+    request_inflight,
+    request_seq_current,
+    request_age_cycles,
+    model_rsp_valid,
+    model_rsp_ready,
+    model_rsp_data,
+    response_last_sequence,
+    response_timed_out,
+    response_stale_fault,
+    response_comm_fault
+);
+input clk;
+input reset_n;
+input request_inflight;
+input [15:0] request_seq_current;
+input [15:0] request_age_cycles;
+input model_rsp_valid;
+output model_rsp_ready;
+input [127:0] model_rsp_data;
+output [15:0] response_last_sequence;
+output response_timed_out;
+output response_stale_fault;
+output response_comm_fault;
+
+reg model_rsp_ready_r;
+reg [15:0] response_last_sequence_r;
+reg response_timed_out_r;
+reg response_stale_fault_r;
+reg response_comm_fault_r;
+
+assign model_rsp_ready = model_rsp_ready_r;
+assign response_last_sequence = response_last_sequence_r;
+assign response_timed_out = response_timed_out_r;
+assign response_stale_fault = response_stale_fault_r;
+assign response_comm_fault = response_comm_fault_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        model_rsp_ready_r <= 1'b1;
+        response_last_sequence_r <= 16'h0000;
+        response_timed_out_r <= 1'b0;
+        response_stale_fault_r <= 1'b0;
+        response_comm_fault_r <= 1'b0;
+    end else begin
+        model_rsp_ready_r <= 1'b1;
+        if (request_inflight && model_rsp_valid) begin
+            response_last_sequence_r <= model_rsp_data[15:0];
+        end
+        response_timed_out_r <= request_inflight && (request_age_cycles == 16'h0000);
+        response_stale_fault_r <= request_inflight && (request_age_cycles != 16'h0000) && (model_rsp_valid == 1'b0);
+        response_comm_fault_r <= response_timed_out_r | response_stale_fault_r;
+    end
+end
+endmodule
+---END adaptive_aero_response_monitor.v---
+---BEGIN adaptive_aero_safety_guard.v---
+module adaptive_aero_safety_guard (
+    clk,
+    reset_n,
+    cfg_fault_ack,
+    cfg_mode_select,
+    cfg_actuator_min_clamp,
+    cfg_actuator_max_clamp,
+    cfg_fallback_actuator_pos,
+    response_recommendation,
+    response_valid_sample,
+    status_timeout_fault,
+    status_stale_fault,
+    status_comm_fault,
+    clamp_active,
+    fallback_active,
+    actuator_cmd_valid,
+    actuator_cmd_data
+);
+input clk;
+input reset_n;
+input cfg_fault_ack;
+input [1:0] cfg_mode_select;
+input [15:0] cfg_actuator_min_clamp;
+input [15:0] cfg_actuator_max_clamp;
+input [15:0] cfg_fallback_actuator_pos;
+input [1:0] response_recommendation;
+input response_valid_sample;
+input status_timeout_fault;
+input status_stale_fault;
+input status_comm_fault;
+output clamp_active;
+output fallback_active;
+output actuator_cmd_valid;
+output [15:0] actuator_cmd_data;
+
+reg clamp_active_r;
+reg fallback_active_r;
+reg actuator_cmd_valid_r;
+reg [15:0] actuator_cmd_data_r;
+reg [15:0] selected_cmd_r;
+
+assign clamp_active = clamp_active_r;
+assign fallback_active = fallback_active_r;
+assign actuator_cmd_valid = actuator_cmd_valid_r;
+assign actuator_cmd_data = actuator_cmd_data_r;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        clamp_active_r <= 1'b0;
+        fallback_active_r <= 1'b0;
+        actuator_cmd_valid_r <= 1'b0;
+        actuator_cmd_data_r <= 16'h0000;
+        selected_cmd_r <= 16'h0000;
+    end else begin
+        actuator_cmd_valid_r <= 1'b0;
+        if (cfg_fault_ack) begin
+            fallback_active_r <= 1'b0;
+            clamp_active_r <= 1'b0;
+        end
+        if (status_timeout_fault || status_stale_fault || status_comm_fault || (cfg_mode_select == 2'b00)) begin
+            selected_cmd_r <= cfg_fallback_actuator_pos;
+            fallback_active_r <= 1'b1;
+            clamp_active_r <= 1'b0;
+            actuator_cmd_valid_r <= response_valid_sample;
+            actuator_cmd_data_r <= cfg_fallback_actuator_pos;
+        end else if (response_valid_sample) begin
+            case (response_recommendation)
+                2'b01: begin
+                    selected_cmd_r <= cfg_actuator_min_clamp;
+                    clamp_active_r <= 1'b1;
+                    fallback_active_r <= 1'b0;
+                end
+                2'b10: begin
+                    selected_cmd_r <= cfg_actuator_max_clamp;
+                    clamp_active_r <= 1'b1;
+                    fallback_active_r <= 1'b0;
+                end
+                default: begin
+                    selected_cmd_r <= cfg_fallback_actuator_pos;
+                    clamp_active_r <= 1'b0;
+                    fallback_active_r <= 1'b1;
+                end
+            endcase
+            actuator_cmd_valid_r <= 1'b1;
+            actuator_cmd_data_r <= selected_cmd_r;
+        end
+    end
+end
+endmodule
+---END adaptive_aero_safety_guard.v---
+---BEGIN adaptive_aero_status_aggregator.v---
+module adaptive_aero_status_aggregator (
+    status_timeout_fault_in,
+    status_stale_fault_in,
+    status_comm_fault_in,
+    status_clamp_active_in,
+    status_fallback_active_in,
+    status_request_inflight_in,
+    status_last_sequence_in,
+    status_timeout_fault,
+    status_stale_fault,
+    status_comm_fault,
+    status_clamp_active,
+    status_fallback_active,
+    status_request_inflight,
+    status_last_sequence
+);
+input status_timeout_fault_in;
+input status_stale_fault_in;
+input status_comm_fault_in;
+input status_clamp_active_in;
+input status_fallback_active_in;
+input status_request_inflight_in;
+input [15:0] status_last_sequence_in;
+output status_timeout_fault;
+output status_stale_fault;
+output status_comm_fault;
+output status_clamp_active;
+output status_fallback_active;
+output status_request_inflight;
+output [15:0] status_last_sequence;
+
+assign status_timeout_fault = status_timeout_fault_in;
+assign status_stale_fault = status_stale_fault_in;
+assign status_comm_fault = status_comm_fault_in;
+assign status_clamp_active = status_clamp_active_in;
+assign status_fallback_active = status_fallback_active_in;
+assign status_request_inflight = status_request_inflight_in;
+assign status_last_sequence = status_last_sequence_in;
+endmodule
+---END adaptive_aero_status_aggregator.v---
