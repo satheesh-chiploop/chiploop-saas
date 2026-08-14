@@ -25,6 +25,7 @@ import {
   SENSOR_VERIFY_INTENT,
   UART_VERIFY_INTENT,
 } from "@/lib/pwmFullStackDemo";
+import { MBIST_SRAM_ARCH2RTL_SPEC } from "@/lib/pwmFullStackDemo";
 
 const supabase = createClientComponentClient();
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -247,7 +248,15 @@ export default function Arch2RTLAppPage() {
       "sensor_chain", "secure_chain", "safety_chain",
     ].some((key) => params.get(key) === "1");
     if (referenceChain) setHemEnabled(true);
-    let demo = ARCH2RTL_ONBOARDING_DEFAULTS;
+    let demo = params.get("mbist_chain") === "1"
+      ? {
+          ...ARCH2RTL_ONBOARDING_DEFAULTS,
+          projectName: "sram_mbist_demo",
+          topModule: "sram_mbist_demo_controller",
+          specText: MBIST_SRAM_ARCH2RTL_SPEC,
+          toggles: { ...ARCH2RTL_ONBOARDING_DEFAULTS.toggles, insertMbist: true, mbistAlgorithm: "march-c" as const },
+        }
+      : ARCH2RTL_ONBOARDING_DEFAULTS;
     const raw = window.localStorage.getItem(ONBOARDING_DEMO_KEY);
 
     if (raw) {

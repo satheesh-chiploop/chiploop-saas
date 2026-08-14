@@ -559,9 +559,11 @@ Outputs:
 - irq
 
 Memory intent:
-- Use the prebuilt Sky130 SRAM macro collateral named sky130_sram_1kbyte_1rw1r_32x256_8 when macro collateral is available.
-- Expose the memory through a simple functional scratchpad wrapper named demo_sram_32x256_wrapper.
-- If macro collateral is not available during RTL generation, instantiate a synthesizable memory model named demo_sram_32x256_model with the same functional wrapper interface.
+- The implementation must use the qualified prebuilt Sky130 SRAM macro named sky130_sram_1kbyte_1rw1r_32x256_8.
+- Expose it through a simple functional scratchpad wrapper named demo_sram_32x256_wrapper.
+- demo_sram_32x256_wrapper must instantiate sky130_sram_1kbyte_1rw1r_32x256_8 as u_sram_macro.
+- Do not generate or instantiate an inferred array, register array, demo_sram_32x256_model, alternate SRAM, or fallback memory identity.
+- If the qualified macro behavioral collateral is unavailable, fail the journey instead of substituting another memory.
 - Memory is 256 words by 32 bits.
 - The functional wrapper interface should include clk, csb, web, addr[7:0], din[31:0], and dout[31:0].
 - If the underlying macro has a second read port, tie it off safely or leave it reserved for MBIST wrapper integration; the controller should use one functional access path.
@@ -574,15 +576,16 @@ Structured memory macro contract:
 - memory_macros[0].addr_width = 8
 - memory_macros[0].instance_name = u_sram
 - memory_macros[0].requires_mbist = true
-- memory_macros[0].ports.clk = clk
-- memory_macros[0].ports.csb = csb
-- memory_macros[0].ports.we = web
-- memory_macros[0].ports.addr = addr
-- memory_macros[0].ports.din = din
-- memory_macros[0].ports.dout = dout
+- memory_macros[0].ports.clk = clk0
+- memory_macros[0].ports.csb = csb0
+- memory_macros[0].ports.we = web0
+- memory_macros[0].ports.addr = addr0
+- memory_macros[0].ports.din = din0
+- memory_macros[0].ports.dout = dout0
+- Tie the qualified macro write mask wmask0[3:0] to 4'b1111 for full-word writes.
+- Tie the unused second read port clk1/csb1/addr1 safely and leave dout1 unconsumed.
 - The controller RTL must instantiate demo_sram_32x256_wrapper as child memory wrapper instance u_sram.
-- The wrapper may bind to the prebuilt SRAM macro or to demo_sram_32x256_model depending on available collateral.
-- The fallback demo_sram_32x256_model is simulation/synthesis fallback only; it must keep the same clk/csb/web/addr/din/dout interface so AutoMBIST can replace or wrap the path.
+- The wrapper must bind to the prebuilt SRAM macro. The behavioral model used by standalone simulation must define the same qualified macro module name.
 
 Register map:
 - 0x00 CONTROL: bit 0 ENABLE, bit 1 SOFT_RESET, bit 2 IRQ_ENABLE
@@ -602,7 +605,7 @@ Functional requirements:
 - The controller should expose a simple BIST request path through bist_start or BIST_CONTROL.START.
 - BIST status registers should be present even if the downstream MBIST agent later replaces or wraps the memory path.
 - irq asserts when IRQ_ENABLE is set and BIST done/fail status is latched.
-- Keep the RTL synthesizable and avoid vendor-only primitives in the fallback memory wrapper.
+- Keep the controller and wrapper synthesizable; treat the qualified SRAM macro as external physical/behavioral collateral.
 
 Generate synthesizable SystemVerilog, register map, assertions, simulation testbench, UPF-lite collateral, timing constraints, and packaging manifest.`;
 
