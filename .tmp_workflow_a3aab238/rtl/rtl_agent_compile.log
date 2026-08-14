@@ -1,0 +1,8 @@
+backend/workflows/a3aab238-b3f8-4277-a0b8-1c8f2ae8af6d/rtl/adaptive_aero_control_top.v:113: syntax error
+
+Issues:
+❌ Required memory macro instance mismatch: expected exactly one 'adaptive_aero_resp_stage_sram u_resp_stage_sram(...)', found 0. memory_macros[] is authoritative; do not substitute a wrapper, behavioral model, or invented module name.
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

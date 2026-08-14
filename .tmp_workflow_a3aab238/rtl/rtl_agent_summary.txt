@@ -1,0 +1,16 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: adaptive_aero_control_top
+Expected files: ['adaptive_aero_control_top.v']
+Materialized files: ['adaptive_aero_control_top.v']
+Clock ports: ['clk']
+Reset ports: ['rst_n']
+Icarus compile: fail
+Verilator lint: fatal
+Issue count: 3
+
+Issues:
+- ❌ Required memory macro instance mismatch: expected exactly one 'adaptive_aero_resp_stage_sram u_resp_stage_sram(...)', found 0. memory_macros[] is authoritative; do not substitute a wrapper, behavioral model, or invented module name.
+- ❌ Icarus Verilog compile failed.
+- ❌ Verilator lint failed.

@@ -1,0 +1,91 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "implementation_style": "Single-clock synthesizable top-level control IP with a compact register window, shallow control-state request/response sequencing, response validation, deterministic bounded command generation, and telemetry reporting. The implementation should use simple synchronous registers, comparators, counters, clamp logic, and a small encoded or one-hot control state, without any inference or physics computation.",
+      "control_strategy": "Use the register bank to capture enable, mode, clear-fault, slew-enable, timeout/window, sequence tracking, setpoint/velocity estimate, and clamp bounds. Generate request metadata from configuration plus local state, advance outstanding-request tracking on accepted request handshakes, accept response metadata only on valid/ready handshakes, and mark responses stale on sequence mismatch or timeout/age violation. On any validation or bounds failure, select fallback behavior and latch fault status per the configured clear policy.",
+      "state_strategy": "Maintain a small set of synchronous control registers for configuration, outstanding request sequence, request age/timeout counter, latest accepted command, previous command for optional slew limiting, fault latch bits, clamp-activity flag, stale-data flag, timeout flag, and fallback-active flag. Keep any temporary response staging shallow and bounded; if payload staging is needed, map it to the explicitly specified SRAM macro contract rather than flattened registers.",
+      "output_strategy": "Drive req_stream_valid and req_stream_data from real top-level request-generation logic, drive rsp_stream_ready from top-level response-acceptance readiness, drive actuator_cmd_valid and actuator_cmd_data from the clamped and optionally slew-limited command path, and drive telemetry_out_valid and telemetry_out_data from latched status. All required top-level outputs must have explicit RTL drivers and remain deterministic under all conditions.",
+      "ownership_notes": [
+        "This module is the design top and must not be substituted by a status, telemetry, register-bank, or leaf module.",
+        "It owns all externally visible outputs defined in the specification and must not rely on a child-only driver for any required top output.",
+        "External model transport direction follows the mandatory contract: the RTL emits request valid/data and receives request ready; the RTL receives response valid/data and emits response ready.",
+        "No neural inference, CFD, geometry processing, tensor arithmetic, or surrogate model computation is implemented here."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "present": true,
+      "description": "A small synchronous control FSM is implied to coordinate reset-safe idle behavior, configuration readiness, request issuance, response acceptance, validation, command update, telemetry update, and fallback hold behavior. The FSM should remain simple and encoded rather than elaborate.",
+      "states": [
+        "RESET_SAFE",
+        "IDLE_UNCONFIGURED",
+        "READY_TO_REQUEST",
+        "REQUEST_PENDING",
+        "WAIT_RESPONSE",
+        "VALIDATE_RESPONSE",
+        "UPDATE_COMMAND",
+        "FALLBACK_HOLD",
+        "TELEMETRY_UPDATE"
+      ]
+    }
+  ],
+  "datapath_intent": [
+    {
+      "inputs": [
+        "clk",
+        "rst_n",
+        "cfg_wr_en",
+        "cfg_rd_en",
+        "cfg_addr[7:0]",
+        "cfg_wdata[31:0]",
+        "req_stream_ready",
+        "rsp_stream_valid",
+        "rsp_stream_data[127:0]",
+        "actuator_cmd_ready",
+        "telemetry_out_ready"
+      ],
+      "internal_storage": [
+        "Compact configuration register bank for CTRL, STATUS, SEQ, TIMEOUT, SETPOINT, CMD_MIN, CMD_MAX, and SLEW",
+        "Outstanding request sequence tracker",
+        "Request age/timeout counter",
+        "Latest accepted compact request metadata",
+        "Latest accepted compact response metadata",
+        "Previous actuator command for optional slew limiting",
+        "Fault latch and status flag bits",
+        "Optional shallow bounded response staging through the named SRAM macro if implementation requires temporary buffering"
+      ],
+      "output_mapping": [
+        "cfg_rdata[31:0] reflects selected register contents and status words",
+        "cfg_ready indicates register access acceptance/acknowledge",
+        "req_stream_valid and req_stream_data[127:0] reflect compact request metadata only",
+        "rsp_stream_ready indicates readiness to accept a valid compact response",
+        "actuator_cmd_valid and actuator_cmd_data[63:0] reflect the final bounded command after validation, clamping, and optional slew limiting",
+        "telemetry_out_valid and telemetry_out_data[31:0] reflect mode, active fault code, stale-data flag, timeout flag, clamp-activity flag, and fallback-active flag"
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "On synchronous reset, clear configuration state, outstanding request tracking, response freshness tracking, timeout counters, error latches, clamp-activity indicators, fallback-selection state, and command history to safe defaults.",
+    "Do not assert actuation until the controller is configured and explicitly enabled.",
+    "Issue a compact request only when the controller is ready and the shallow control-state handshake policy allows it; keep payloads metadata-only.",
+    "Accept a response only on a successful valid/ready handshake, then compare its sequence and age against the latest outstanding request.",
+    "If the response sequence mismatches or the age/timeout threshold is exceeded, mark the response stale, latch fault status, and select fallback behavior.",
+    "Apply clamp logic to every actuator component before output issuance, and optionally apply slew limiting relative to the previous command when enabled.",
+    "Telemetry should be updated from latched top-level state so that status remains stable and deterministic across handshakes."
+  ],
+  "timing_notes": [
+    "Single synchronous clk domain at 50 MHz; all counters, state transitions, and output register updates should be clocked on clk with synchronous active-low reset handling.",
+    "Avoid asynchronous combinational feedback across valid/ready interfaces.",
+    "Keep request/response staging shallow and bounded to preserve simple timing and avoid large inferred payload memories.",
+    "Use straightforward comparator and counter paths for sequence, timeout, clamp, and slew checks so the design remains FPGA-friendly."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

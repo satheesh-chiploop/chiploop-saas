@@ -1,0 +1,154 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "design_summary": {
+    "purpose": "Synthesizable FPGA control IP for intelligent active-aerodynamics mediation between host configuration, external DoMINO inference transport, response validation, safety enforcement, fallback selection, timeout handling, command clamping, and bounded actuator command issuance.",
+    "operating_model": "A single synchronous clk domain with active-low synchronous reset rst_n. The top-level controller exposes a compact memory-mapped configuration window, emits compact model-request metadata on an output valid/ready stream, accepts compact model-response metadata on an input valid/ready stream, validates response freshness and sequence alignment, applies clamp and optional slew limiting, selects fallback output on any safety failure, and drives deterministic actuator and telemetry outputs. No inference, CFD, geometry processing, or tensor math is implemented in RTL.",
+    "external_interfaces": [
+      {
+        "name": "cfg_reg_if",
+        "type": "memory_mapped_register_window",
+        "notes": "Implemented as the explicit cfg_wr_en/cfg_rd_en/cfg_addr/cfg_wdata/cfg_rdata/cfg_ready register interface. It is compact, 32-bit wide on the data path, and intended only for control/status, timeout, sequence tracking, clamp min/max, and mode select."
+      },
+      {
+        "name": "req_stream",
+        "type": "valid_ready_output_stream",
+        "notes": "External model request transport. The RTL owns req_stream_valid and req_stream_data as outputs and consumes req_stream_ready as an input. Payload is compact metadata only, up to 128 bits, with no geometry or physics payloads."
+      },
+      {
+        "name": "rsp_stream",
+        "type": "valid_ready_input_stream",
+        "notes": "External model response transport. The RTL consumes rsp_stream_valid and rsp_stream_data as inputs and drives rsp_stream_ready as an output. Payload is compact response metadata only, up to 128 bits, including command candidate, sequence number, age tag, and validity tag."
+      },
+      {
+        "name": "actuator_cmd",
+        "type": "valid_ready_output_stream",
+        "notes": "Bounded actuator command output stream. The RTL owns actuator_cmd_valid and actuator_cmd_data as outputs and consumes actuator_cmd_ready as an input. Commands are deterministically clamped and optionally slew-limited, with fallback selection on any safety fault."
+      },
+      {
+        "name": "telemetry_out",
+        "type": "valid_ready_output_stream",
+        "notes": "Compact host-supervision telemetry stream. The RTL owns telemetry_out_valid and telemetry_out_data as outputs and consumes telemetry_out_ready as an input. Telemetry reports mode, active fault code, stale-data flag, timeout flag, clamp-activity flag, and fallback-active flag."
+      }
+    ]
+  },
+  "module_architecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "role": "Top-level adaptive aero-control controller and mediation layer.",
+      "responsibilities": [
+        "Provide safe reset defaults with no actuation until configuration is complete.",
+        "Collect configuration and local state to form a compact inference request containing mode, current velocity estimate, setpoint, sequence number, and request flags only.",
+        "Emit request valid/data only as an RTL output stream and accept request ready only as an input, with shallow control-state buffering if needed.",
+        "Accept response valid/data only as an RTL input stream and emit response ready only as an output, with bounded response staging if used.",
+        "Validate response freshness using sequence matching and timeout/age thresholds.",
+        "Clamp each actuator component to configured min/max bounds and optionally limit slew between consecutive commands.",
+        "Select fallback manager output whenever any safety check fails.",
+        "Report mode, active fault code, stale-data flag, timeout flag, clamp-activity flag, and fallback-active flag in telemetry.",
+        "Drive all required top-level outputs from real RTL logic.",
+        "Avoid any bulk storage beyond the explicitly contracted shallow memory macro for bounded response staging."
+      ],
+      "interface_notes": [
+        "Clocking is single-domain on clk. Reset is active-low synchronous via rst_n.",
+        "The top-level register interface is small and explicit: cfg_wr_en, cfg_rd_en, cfg_addr[7:0], cfg_wdata[31:0], cfg_rdata[31:0], cfg_ready.",
+        "req_stream is an output request channel with req_stream_valid, req_stream_ready, and req_stream_data[127:0]. The RTL drives valid and data, and only observes ready.",
+        "rsp_stream is an input response channel with rsp_stream_valid, rsp_stream_ready, and rsp_stream_data[127:0]. The RTL observes valid and data, and drives ready.",
+        "actuator_cmd is an output command channel with actuator_cmd_valid, actuator_cmd_ready, and actuator_cmd_data[63:0].",
+        "telemetry_out is an output status channel with telemetry_out_valid, telemetry_out_ready, and telemetry_out_data[31:0].",
+        "No top-level output may be left without a real RTL driver; outputs are driven from top-level state and control logic.",
+        "Any buffering is shallow and bounded; if response staging is used, it maps to the explicitly specified technology-neutral SRAM macro rather than flattened registers."
+      ],
+      "ownership_notes": [
+        "This is the only module in the provided hierarchy.",
+        "The top module owns all externally visible outputs listed in must_drive and signal_ownership.",
+        "No child modules are defined in DIGITAL_SPEC_JSON, and none are introduced here.",
+        "The module must not be substituted by a status, telemetry, register-bank, or leaf module as the design top."
+      ]
+    }
+  ],
+  "interface_summary": [
+    {
+      "from": "host/configuration logic",
+      "to": "adaptive_aero_control_top",
+      "signals": [
+        "clk",
+        "rst_n",
+        "cfg_wr_en",
+        "cfg_rd_en",
+        "cfg_addr[7:0]",
+        "cfg_wdata[31:0]",
+        "cfg_rdata[31:0]",
+        "cfg_ready"
+      ],
+      "intent": "Provide compact configuration and status access for enable, mode, clear-fault, slew control, sequence tracking, timeout/window configuration, setpoint and velocity estimate, and command clamp bounds."
+    },
+    {
+      "from": "adaptive_aero_control_top",
+      "to": "external model transport consumer",
+      "signals": [
+        "req_stream_valid",
+        "req_stream_ready",
+        "req_stream_data[127:0]"
+      ],
+      "intent": "Emit compact inference request metadata as an output stream. The top drives valid and data, and consumes ready. The request is limited to control metadata and does not carry geometry or surrogate payloads."
+    },
+    {
+      "from": "external model transport producer",
+      "to": "adaptive_aero_control_top",
+      "signals": [
+        "rsp_stream_valid",
+        "rsp_stream_ready",
+        "rsp_stream_data[127:0]"
+      ],
+      "intent": "Accept compact response metadata from the external inference path. The top consumes valid and data, and drives ready. Responses are checked for sequence match, freshness, validity, and age/timeout compliance."
+    },
+    {
+      "from": "adaptive_aero_control_top",
+      "to": "actuator subsystem",
+      "signals": [
+        "actuator_cmd_valid",
+        "actuator_cmd_ready",
+        "actuator_cmd_data[63:0]"
+      ],
+      "intent": "Issue deterministic bounded actuator commands after validation, clamp enforcement, and optional slew limiting. On any safety failure, the fallback selection is used and the command remains within configured bounds."
+    },
+    {
+      "from": "adaptive_aero_control_top",
+      "to": "host supervision",
+      "signals": [
+        "telemetry_out_valid",
+        "telemetry_out_ready",
+        "telemetry_out_data[31:0]"
+      ],
+      "intent": "Report compact status including mode, active fault code, stale-data flag, timeout flag, clamp-activity flag, and fallback-active flag for supervisory software."
+    }
+  ],
+  "data_flow_summary": [
+    "Configuration writes update the compact register bank and internal control state, including enable, mode, clear-fault behavior, timeout threshold, sequence tracking, setpoint, clamp minimum and maximum, and optional slew limit.",
+    "The controller forms a compact request from configuration and local state. The request is metadata only and is transmitted on req_stream when the output handshake policy allows it.",
+    "The external inference engine returns a compact response on rsp_stream. The top accepts the response only when the input handshake succeeds and then validates its sequence number, age, and freshness.",
+    "If the response sequence does not match the latest outstanding request sequence or exceeds the configured timeout/age threshold, the response is marked stale and a fault is latched.",
+    "The response candidate is clamped to configured min/max bounds. If slew limiting is enabled, the delta from the previous command is limited to the configured bound.",
+    "If any validation, timeout, sequence, or bounds check fails, the fallback manager output is selected and fault status is reflected in telemetry.",
+    "The final actuator command is always deterministic and bounded. No output can exceed configured limits.",
+    "Telemetry is driven from top-level state and reports the current mode, active fault code, stale-data condition, timeout condition, clamp activity, and fallback activity.",
+    "If shallow buffering is required, payload staging is performed through the explicitly contracted adaptive_aero_resp_stage_sram memory macro rather than inferred wide register arrays."
+  ],
+  "clock_reset_summary": {
+    "clocking": "Single synchronous clock domain on clk at the specified 50.0 MHz operating point. All sequencing, counters, FSM state, request/response tracking, and output control are synchronous to clk.",
+    "reset_behavior": "rst_n is active-low and synchronous. On reset assertion, configuration state, outstanding request tracking, response freshness tracking, timeout counters, error latches, clamp-activity indicators, and fallback-selection state are driven to safe defaults. req_stream_valid and actuator_cmd_valid are deasserted, rsp_stream_ready is held low until the controller is configured and ready to accept responses, and actuator command outputs are driven to safe bounded defaults. No actuation is permitted until configuration is complete and the controller is explicitly enabled."
+  },
+  "integration_notes": [
+    "The design is descriptive only and preserves the specification hierarchy exactly as provided.",
+    "No hierarchy, ports, or filenames may differ from DIGITAL_SPEC_JSON.",
+    "External model transport direction follows the mandatory contract: requests are emitted by the RTL and responses are received by the RTL, even when application-specific signal naming differs.",
+    "The top-level output signals must be real RTL drivers; required top outputs are not to be tied only to child inputs.",
+    "Any buffering is intentionally shallow and bounded, and any bulk payload staging is mapped to the named SRAM macro contract rather than flattened into registers.",
+    "The RTL must not instantiate surrogate inference, perform CFD, or process vehicle geometry or flow fields."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

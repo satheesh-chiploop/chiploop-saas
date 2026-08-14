@@ -1,0 +1,466 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "Synthesizable FPGA control IP for intelligent active-aerodynamics control mediation between host configuration, DoMINO inference transport, response validation, safety enforcement, fallback selection, timeout handling, command clamping, and bounded actuator command issuance. The design does not implement neural inference, CFD, geometry processing, or surrogate tensor math; it implements only compact request/response transport, freshness checks, safety monitoring, and deterministic actuator command generation.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "rst_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "Single synchronous clock domain.",
+      "Top-level I/O count remains below 256 scalar-equivalent pins.",
+      "No neural inference, CFD, geometry processing, or tensor arithmetic is performed in RTL.",
+      "Any request/response buffering is shallow and bounded; no large inferred payload memories are used.",
+      "Control-state-only sequencing is preferred for request/response staging; if history or payload buffering is needed, it shall be through an explicit technology-neutral memory macro contract rather than flattened registers."
+    ]
+  },
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [
+    {
+      "name": "adaptive_aero_resp_stage_sram",
+      "kind": "openram_sram",
+      "depth": 16,
+      "data_width": 128,
+      "addr_width": 4,
+      "instance_name": "u_resp_stage_sram",
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "web",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "requires_mbist": false
+    }
+  ],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level adaptive aero control controller that exposes configuration access, compact inference request transport, compact response acceptance, bounded actuator command output, and telemetry reporting. The top arbitrates safe defaults, sequence tracking, timeout/freshness validation, clamp enforcement, slew limiting, and fallback selection. It must drive all externally visible outputs from real RTL state and must not rely on a child-only driver for any required top output.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "cfg_wr_en",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cfg_rd_en",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cfg_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "cfg_wdata",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "cfg_rdata",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "cfg_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "req_stream_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "req_stream_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "req_stream_data",
+          "direction": "output",
+          "width": 128
+        },
+        {
+          "name": "rsp_stream_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rsp_stream_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "rsp_stream_data",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_data",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "telemetry_out_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "telemetry_out_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "telemetry_out_data",
+          "direction": "output",
+          "width": 32
+        }
+      ],
+      "functionality": "Implements an adaptive aero-control mediation layer for host-configured and inference-assisted actuator control. It accepts configuration writes and reads over a compact register window, forms compact request metadata for an external DoMINO inference engine, accepts compact response metadata, validates response sequence and age, detects stale or timed-out responses, clamps command candidates to configured minimum/maximum bounds, optionally enforces slew-rate limits between consecutive commands, selects fallback output on any safety failure, and produces deterministic bounded actuator commands and telemetry. The top must not implement inference or physics; it only manages transport, validation, safety, and output control.",
+      "responsibilities": [
+        "Provide safe reset defaults with no actuation until configuration is complete.",
+        "Collect configuration and local state to form a compact inference request containing mode, current velocity estimate, setpoint, sequence number, and request flags only.",
+        "Emit request valid/data only as an RTL output stream and accept request ready only as an input, with shallow control-state buffering if needed.",
+        "Accept response valid/data only as an RTL input stream and emit response ready only as an output, with bounded response staging if used.",
+        "Validate response freshness using sequence matching and timeout/age thresholds.",
+        "Clamp each actuator component to configured min/max bounds and optionally limit slew between consecutive commands.",
+        "Select fallback manager output whenever any safety check fails.",
+        "Report mode, active fault code, stale-data flag, timeout flag, clamp-activity flag, and fallback-active flag in telemetry.",
+        "Drive all required top-level outputs from real RTL logic.",
+        "Avoid any bulk storage beyond the explicitly contracted shallow memory macro for bounded response staging."
+      ],
+      "must_drive": [
+        "cfg_rdata",
+        "cfg_ready",
+        "req_stream_valid",
+        "req_stream_data",
+        "rsp_stream_ready",
+        "actuator_cmd_valid",
+        "actuator_cmd_data",
+        "telemetry_out_valid",
+        "telemetry_out_data"
+      ],
+      "must_receive": [
+        "clk",
+        "rst_n",
+        "cfg_wr_en",
+        "cfg_rd_en",
+        "cfg_addr",
+        "cfg_wdata",
+        "req_stream_ready",
+        "rsp_stream_valid",
+        "rsp_stream_data",
+        "actuator_cmd_ready",
+        "telemetry_out_ready"
+      ],
+      "must_not_drive": [
+        "req_stream_ready",
+        "rsp_stream_valid",
+        "rsp_stream_data",
+        "actuator_cmd_ready",
+        "telemetry_out_ready"
+      ],
+      "reset_behavior": "On rst_n deassertion low, all configuration state, outstanding request tracking, response freshness tracking, timeout counters, error latches, clamp-activity indicators, and fallback-selection state shall be reset to safe defaults. req_stream_valid and actuator_cmd_valid shall be deasserted, rsp_stream_ready shall be held low until the controller is configured and ready to accept responses, and actuator command outputs shall be driven to safe bounded defaults. No actuation is permitted until configuration is complete and the controller is explicitly enabled.",
+      "behavior_rules": [
+        "Top-level outputs must be deterministically driven under all conditions.",
+        "req_stream_valid and req_stream_data shall represent compact metadata only and shall not contain geometry, flow-field, or surrogate tensor payloads.",
+        "rsp_stream_ready shall be asserted only when the controller is prepared to accept a response for the latest outstanding request or bounded staging is available.",
+        "A response is stale if its sequence number does not match the latest outstanding request sequence or if its age/timeout threshold is exceeded.",
+        "Every actuator component must be clamped to configured min/max bounds before output issuance.",
+        "If slew limiting is enabled, successive actuator outputs must not exceed the configured delta limit per update.",
+        "Any validation, timeout, sequence, or bounds failure shall select the fallback manager output and latch a fault indication for telemetry until cleared by the configured clear behavior.",
+        "Telemetry shall encode the active mode, fault code, stale-data flag, timeout flag, clamp-activity flag, and fallback-active flag.",
+        "No asynchronous combinational feedback shall exist across valid/ready interfaces.",
+        "Any temporary payload staging shall be shallow, bounded, and mapped to the explicitly specified SRAM macro rather than flattened into registers."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": []
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_control_top.clk"
+      ],
+      "description": "Single synchronous clock input fanout into the top-level control, sequencing, and staging logic."
+    },
+    {
+      "top_port": "rst_n",
+      "connected_to": [
+        "adaptive_aero_control_top.rst_n"
+      ],
+      "description": "Active-low synchronous reset input for safe initialization and fault clearing."
+    },
+    {
+      "top_port": "cfg_wr_en",
+      "connected_to": [
+        "adaptive_aero_control_top.cfg_wr_en"
+      ],
+      "description": "Configuration register write strobe into the top-level MMIO window."
+    },
+    {
+      "top_port": "cfg_rd_en",
+      "connected_to": [
+        "adaptive_aero_control_top.cfg_rd_en"
+      ],
+      "description": "Configuration register read strobe into the top-level MMIO window."
+    },
+    {
+      "top_port": "cfg_addr",
+      "connected_to": [
+        "adaptive_aero_control_top.cfg_addr"
+      ],
+      "description": "Compact register address input for control/status access."
+    },
+    {
+      "top_port": "cfg_wdata",
+      "connected_to": [
+        "adaptive_aero_control_top.cfg_wdata"
+      ],
+      "description": "Configuration write data input."
+    },
+    {
+      "top_port": "cfg_rdata",
+      "connected_to": [
+        "adaptive_aero_control_top.cfg_rdata"
+      ],
+      "description": "Configuration read data output driven by the top-level register bank logic."
+    },
+    {
+      "top_port": "cfg_ready",
+      "connected_to": [
+        "adaptive_aero_control_top.cfg_ready"
+      ],
+      "description": "Configuration interface ready/acknowledge output."
+    },
+    {
+      "top_port": "req_stream_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.req_stream_valid"
+      ],
+      "description": "External model request valid output."
+    },
+    {
+      "top_port": "req_stream_ready",
+      "connected_to": [
+        "adaptive_aero_control_top.req_stream_ready"
+      ],
+      "description": "External model request ready input."
+    },
+    {
+      "top_port": "req_stream_data",
+      "connected_to": [
+        "adaptive_aero_control_top.req_stream_data"
+      ],
+      "description": "External model request metadata payload output."
+    },
+    {
+      "top_port": "rsp_stream_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.rsp_stream_valid"
+      ],
+      "description": "External model response valid input."
+    },
+    {
+      "top_port": "rsp_stream_ready",
+      "connected_to": [
+        "adaptive_aero_control_top.rsp_stream_ready"
+      ],
+      "description": "External model response ready output."
+    },
+    {
+      "top_port": "rsp_stream_data",
+      "connected_to": [
+        "adaptive_aero_control_top.rsp_stream_data"
+      ],
+      "description": "External model response metadata payload input."
+    },
+    {
+      "top_port": "actuator_cmd_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.actuator_cmd_valid"
+      ],
+      "description": "Validated actuator command valid output."
+    },
+    {
+      "top_port": "actuator_cmd_ready",
+      "connected_to": [
+        "adaptive_aero_control_top.actuator_cmd_ready"
+      ],
+      "description": "Actuator command downstream ready input."
+    },
+    {
+      "top_port": "actuator_cmd_data",
+      "connected_to": [
+        "adaptive_aero_control_top.actuator_cmd_data"
+      ],
+      "description": "Bounded actuator setpoint/position output."
+    },
+    {
+      "top_port": "telemetry_out_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.telemetry_out_valid"
+      ],
+      "description": "Telemetry valid output for host supervision."
+    },
+    {
+      "top_port": "telemetry_out_ready",
+      "connected_to": [
+        "adaptive_aero_control_top.telemetry_out_ready"
+      ],
+      "description": "Telemetry consumer ready input."
+    },
+    {
+      "top_port": "telemetry_out_data",
+      "connected_to": [
+        "adaptive_aero_control_top.telemetry_out_data"
+      ],
+      "description": "Compact telemetry status word output."
+    }
+  ],
+  "inter_module_signals": [],
+  "signal_ownership": [
+    {
+      "signal": "cfg_rdata",
+      "owner": "adaptive_aero_control_top.cfg_rdata"
+    },
+    {
+      "signal": "cfg_ready",
+      "owner": "adaptive_aero_control_top.cfg_ready"
+    },
+    {
+      "signal": "req_stream_valid",
+      "owner": "adaptive_aero_control_top.req_stream_valid"
+    },
+    {
+      "signal": "req_stream_data",
+      "owner": "adaptive_aero_control_top.req_stream_data"
+    },
+    {
+      "signal": "rsp_stream_ready",
+      "owner": "adaptive_aero_control_top.rsp_stream_ready"
+    },
+    {
+      "signal": "actuator_cmd_valid",
+      "owner": "adaptive_aero_control_top.actuator_cmd_valid"
+    },
+    {
+      "signal": "actuator_cmd_data",
+      "owner": "adaptive_aero_control_top.actuator_cmd_data"
+    },
+    {
+      "signal": "telemetry_out_valid",
+      "owner": "adaptive_aero_control_top.telemetry_out_valid"
+    },
+    {
+      "signal": "telemetry_out_data",
+      "owner": "adaptive_aero_control_top.telemetry_out_data"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "minimal",
+    "registers": [
+      {
+        "name": "CTRL",
+        "address": "0x00",
+        "width": 32,
+        "access": "rw",
+        "reset": "0x00000000",
+        "description": "Control register containing enable, mode, clear-fault, slew-enable, and compact request flags."
+      },
+      {
+        "name": "STATUS",
+        "address": "0x04",
+        "width": 32,
+        "access": "ro",
+        "reset": "0x00000000",
+        "description": "Status register containing fault code, stale flag, timeout flag, clamp activity, fallback activity, and freshness summary."
+      },
+      {
+        "name": "SEQ",
+        "address": "0x08",
+        "width": 32,
+        "access": "rw",
+        "reset": "0x00000000",
+        "description": "Sequence tracking register for request/response correlation."
+      },
+      {
+        "name": "TIMEOUT",
+        "address": "0x0C",
+        "width": 32,
+        "access": "rw",
+        "reset": "0x00000100",
+        "description": "Timeout threshold and response window configuration."
+      },
+      {
+        "name": "SETPOINT",
+        "address": "0x10",
+        "width": 32,
+        "access": "rw",
+        "reset": "0x00000000",
+        "description": "Compact setpoint and velocity estimate configuration."
+      },
+      {
+        "name": "CMD_MIN",
+        "address": "0x14",
+        "width": 32,
+        "access": "rw",
+        "reset": "0x00000000",
+        "description": "Lower clamp bound for actuator command generation."
+      },
+      {
+        "name": "CMD_MAX",
+        "address": "0x18",
+        "width": 32,
+        "access": "rw",
+        "reset": "0x0000FFFF",
+        "description": "Upper clamp bound for actuator command generation."
+      },
+      {
+        "name": "SLEW",
+        "address": "0x1C",
+        "width": 32,
+        "access": "rw",
+        "reset": "0x00000000",
+        "description": "Optional slew-rate limit and enable control."
+      }
+    ]
+  }
+}

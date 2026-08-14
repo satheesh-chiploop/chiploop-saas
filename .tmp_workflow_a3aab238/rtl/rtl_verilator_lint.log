@@ -1,0 +1,16 @@
+=== STDERR ===
+%Error: adaptive_aero_control_top.v:113:9: syntax error, unexpected endcase, expecting IDENTIFIER-for-type
+  113 |         endcase
+      |         ^~~~~~~
+        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.
+%Error: adaptive_aero_control_top.v:125:9: syntax error, unexpected else
+  125 |     end else begin
+      |         ^~~~
+%Error: adaptive_aero_control_top.v:202:40: syntax error, unexpected <=, expecting '('
+  202 |                         fault_code_reg <= 32'h00000000;
+      |                                        ^~
+%Error: Cannot continue
+        ... This fatal error may be caused by the earlier error(s); resolve those first.
+
+=== RETURN CODE ===
+1
