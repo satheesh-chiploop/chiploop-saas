@@ -1,7 +1,0 @@
-backend/workflows/a3aab238-b3f8-4277-a0b8-1c8f2ae8af6d/rtl/pass2/adaptive_aero_control_top.v:128: syntax error
-
-Issues:
-❌ Icarus Verilog compile failed.
-
-=== VERILATOR LINT FAILURE ===
-Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

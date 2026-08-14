@@ -1,0 +1,1308 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level active-aerodynamics controller integrating configuration register access, request/response transport, safety monitoring, actuator command generation, and telemetry. It owns the externally visible interface and directly implements the contract for validation, fallback, and bounded command behavior.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "cfg_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cfg_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "cfg_write",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cfg_read",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cfg_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "cfg_wdata",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "cfg_rdata",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "cfg_rvalid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "req_data",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "rsp_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rsp_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "rsp_data",
+          "direction": "input",
+          "width": 64
+        },
+        {
+          "name": "explicit_fault_in",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "act_cmd",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "act_enable",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "fault_status",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "sticky_fault_status",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "last_txn_id",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "last_rxn_id",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "response_age",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "clamp_active",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "fallback_active",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "request_pending",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "watchdog_expired",
+          "direction": "output",
+          "width": 1
+        }
+      ],
+      "functionality": "Implements a compact control-plane register window and bounded streaming transport for external model inference requests and responses. The top module accepts configuration writes and reads, emits model requests as req_valid/req_data, accepts ready on req_ready, consumes model responses via rsp_valid/rsp_data, and emits rsp_ready. It validates response transaction ID, response freshness, and parser legality; starts a watchdog on accepted requests; enforces stale-data rejection and timeout fallback; clamps the final actuator command to actuator_min/actuator_max; optionally rate-limits command movement if configured; and provides telemetry and sticky-fault status. The module must deterministically enter safe fallback on reset, invalid configuration, timeout, stale data, malformed response, or explicit fault input.",
+      "responsibilities": [
+        "Own the top-level physical-AI control contract for adaptive aerodynamics.",
+        "Drive outbound request transport and accept inbound response transport using the mandated valid/ready directionality.",
+        "Provide a 32-bit register window for enable, clear-faults, operating mode, stream velocity setpoint, timeout, stale-age limit, actuator limits, fallback command, transaction counters, and status readback.",
+        "Generate bounded actuator command outputs only after validation; otherwise emit deterministic fallback command.",
+        "Clamp all commands to the programmed actuator range before driving act_cmd.",
+        "Expose telemetry for faults, transaction IDs, response age, clamp activity, fallback activity, request pending, and watchdog expiry.",
+        "Provide sticky-fault behavior that persists until cleared while the underlying fault condition is absent."
+      ],
+      "must_drive": [
+        "cfg_ready",
+        "cfg_rdata",
+        "cfg_rvalid",
+        "req_valid",
+        "req_data",
+        "rsp_ready",
+        "act_cmd",
+        "act_enable",
+        "fault_status",
+        "sticky_fault_status",
+        "last_txn_id",
+        "last_rxn_id",
+        "response_age",
+        "clamp_active",
+        "fallback_active",
+        "request_pending",
+        "watchdog_expired"
+      ],
+      "must_receive": [
+        "clk",
+        "reset_n",
+        "cfg_valid",
+        "cfg_write",
+        "cfg_read",
+        "cfg_addr",
+        "cfg_wdata",
+        "req_ready",
+        "rsp_valid",
+        "rsp_data",
+        "explicit_fault_in"
+      ],
+      "must_not_drive": [
+        "req_ready",
+        "rsp_valid",
+        "rsp_data",
+        "explicit_fault_in"
+      ],
+      "reset_behavior": "On reset deassertion edge release, all outputs and internal state shall return to a deterministic safe fallback condition. req_valid shall deassert, rsp_ready shall deassert or hold at the safe receive posture defined by the implementation, act_enable shall deassert, act_cmd shall equal fallback_command after register defaults are loaded, request_pending shall clear, watchdog_expired shall clear, and fault_status/sticky_fault_status shall assert until the configuration is initialized and a non-fault state is established. All counters and transaction IDs shall initialize to known values.",
+      "behavior_rules": [
+        "cfg_valid must qualify register accesses; cfg_ready indicates the top-level register window can accept the transfer.",
+        "Register reads are performed only when cfg_valid and cfg_read are asserted; cfg_rdata and cfg_rvalid must present the addressed register contents and read-valid indication in a deterministic manner.",
+        "Register writes are performed only when cfg_valid and cfg_write are asserted; writes outside the register map are ignored and may set parser/config faults.",
+        "req_data shall carry only compact metadata such as transaction ID, stream velocity setpoint, geometry reference tag, and control flags; it shall not carry geometry arrays, tensors, or surrogate payloads.",
+        "A request acceptance event is defined by req_valid && req_ready; on acceptance, the request transaction ID shall be captured and watchdog timing shall begin.",
+        "rsp_ready must be a real top-level driver and must never be left undriven or tied only to a child input.",
+        "A response is valid for control only if transaction ID matches the outstanding request, freshness age is within limit, response framing/status is legal, and no parser error is detected.",
+        "Malformed response framing, unsupported mode, out-of-range fields, invalid status combinations, ID mismatch, stale data, timeout, or explicit_fault_in shall assert fault_status and force fallback behavior.",
+        "Sticky fault status shall remain asserted until clear_faults is written and all active fault conditions are absent.",
+        "act_cmd shall be clamped to [actuator_min, actuator_max] before driving the output and may be rate-limited by an internal programmable delta limit if implemented.",
+        "act_enable shall deassert in fallback or fault modes unless the implementation is explicitly configured to hold last-safe command.",
+        "Telemetry outputs must reflect the last accepted request/response transaction identifiers, response age, clamp state, fallback state, request-pending state, and watchdog expiry state without exposing internal geometry or surrogate contents.",
+        "The design shall preserve deterministic behavior when responses are missing, late, stale, malformed, or mismatched."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "adaptive_aero_control_register_map",
+        "description": "Register-window and configuration decoder submodule that owns the 32-bit register file, address decoding, register readback, clear-fault sequencing, and status/counter storage exposed through the top-level control plane.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_write",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_read",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_addr",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_wdata",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_rdata",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_rvalid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "clear_faults",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "operating_mode",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "stream_velocity_setpoint",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "timeout_cycles",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "stale_age_limit",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_min",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_max",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "fallback_command",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "last_txn_id",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "last_rxn_id",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "sticky_fault_bits",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "request_pending",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "watchdog_expired",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fault_status",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_age",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "clamp_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fallback_active",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements the 8-bit addressable 32-bit register file and exposes decoded semantic configuration/control signals. It stores enable, clear_faults, operating_mode, velocity setpoint, timeout_cycles, stale_age_limit, actuator_min, actuator_max, fallback_command, transaction counters, and sticky fault bits. It also returns readback data and ready/valid status for the control plane.",
+        "responsibilities": [
+          "Decode cfg_addr and implement register read/write side effects.",
+          "Translate transport writes into explicit semantic control outputs.",
+          "Provide readback of status, counters, and sticky fault bits.",
+          "Maintain deterministic reset defaults for safety-critical parameters.",
+          "Capture clear_faults behavior only when write qualified and fault conditions are absent or being cleared according to the contract."
+        ],
+        "must_drive": [
+          "cfg_ready",
+          "cfg_rdata",
+          "cfg_rvalid",
+          "enable",
+          "clear_faults",
+          "operating_mode",
+          "stream_velocity_setpoint",
+          "timeout_cycles",
+          "stale_age_limit",
+          "actuator_min",
+          "actuator_max",
+          "fallback_command",
+          "last_txn_id",
+          "last_rxn_id",
+          "sticky_fault_bits"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_valid",
+          "cfg_write",
+          "cfg_read",
+          "cfg_addr",
+          "cfg_wdata",
+          "request_pending",
+          "watchdog_expired",
+          "fault_status",
+          "response_age",
+          "clamp_active",
+          "fallback_active"
+        ],
+        "must_not_drive": [
+          "request_pending",
+          "watchdog_expired",
+          "fault_status",
+          "response_age",
+          "clamp_active",
+          "fallback_active"
+        ],
+        "reset_behavior": "All registers reset to known safe defaults. enable shall reset deasserted. fallback_command, actuator limits, timeout_cycles, and stale_age_limit shall reset to safe, deterministic values. Sticky fault bits reset according to the safety contract and must not spontaneously clear except via clear_faults when permitted by the absence of active fault conditions.",
+        "behavior_rules": [
+          "Register writes are only accepted when cfg_valid and cfg_write are both asserted and cfg_ready is high.",
+          "Register reads are only accepted when cfg_valid and cfg_read are asserted; cfg_rvalid must indicate valid read data in a deterministic manner.",
+          "The register map shall reject unsupported addresses and may reflect a parser/configuration fault bit in sticky_fault_bits.",
+          "Semantic outputs must be presented as real output ports; no hidden derivation from raw cfg_wdata is allowed across module boundaries.",
+          "The module shall not drive any external request/response transport pin directly."
+        ],
+        "rtl_output_file": "adaptive_aero_control_register_map.v"
+      },
+      {
+        "name": "adaptive_aero_control_transport",
+        "description": "Bounded request/response transport submodule that formats outbound request metadata, captures accepted request transaction IDs, parses inbound responses, checks freshness and framing legality, and produces validated candidate command data for the actuator path.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "operating_mode",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "stream_velocity_setpoint",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "timeout_cycles",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "stale_age_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "fallback_command",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "req_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "req_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "req_data",
+            "direction": "output",
+            "width": 64
+          },
+          {
+            "name": "rsp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rsp_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "rsp_data",
+            "direction": "input",
+            "width": 64
+          },
+          {
+            "name": "request_pending",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "watchdog_expired",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "response_age",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "last_txn_id",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "last_rxn_id",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "candidate_cmd",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "candidate_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "fallback_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "parser_error",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "fault_status",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "explicit_fault_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "clear_faults",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Handles the 64-bit outbound request and inbound response streams using the mandated directionality. It emits compact request metadata, observes req_ready for acceptance, tracks outstanding transactions, validates response transaction IDs and freshness age, parses the response for recommended command and status fields, and flags parser errors or stale/mismatched responses. It generates a validated candidate command and a candidate-valid indication for downstream actuator handling.",
+        "responsibilities": [
+          "Emit req_valid/req_data as outputs and consume req_ready as input.",
+          "Consume rsp_valid/rsp_data as inputs and emit rsp_ready as output.",
+          "Maintain a request-pending state after request acceptance.",
+          "Measure response age and enforce stale_age_limit.",
+          "Detect malformed response framing, unsupported mode, out-of-range fields, invalid status combinations, and transaction ID mismatches.",
+          "Provide validated candidate command data or fall back to fallback_command when invalid.",
+          "Assert fault_status when explicit fault or parser/safety errors are present."
+        ],
+        "must_drive": [
+          "req_valid",
+          "req_data",
+          "rsp_ready",
+          "request_pending",
+          "watchdog_expired",
+          "response_age",
+          "last_txn_id",
+          "last_rxn_id",
+          "candidate_cmd",
+          "candidate_valid",
+          "fallback_active",
+          "parser_error",
+          "fault_status"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "enable",
+          "operating_mode",
+          "stream_velocity_setpoint",
+          "timeout_cycles",
+          "stale_age_limit",
+          "fallback_command",
+          "req_ready",
+          "rsp_valid",
+          "rsp_data",
+          "explicit_fault_in",
+          "clear_faults"
+        ],
+        "must_not_drive": [
+          "req_ready",
+          "rsp_valid",
+          "rsp_data",
+          "explicit_fault_in",
+          "clear_faults"
+        ],
+        "reset_behavior": "All stream outputs deassert or reset to safe values. req_valid shall be low, req_data shall be zeroed or a safe descriptor, rsp_ready shall be driven to the safe receive state, request_pending shall clear, watchdog_expired shall clear, candidate_valid shall deassert, candidate_cmd shall equal fallback_command or a safe reset default, and fault_status shall assert until the controller is configured into a valid non-fault state.",
+        "behavior_rules": [
+          "The transport submodule shall never expose full geometry or surrogate tensors; req_data and rsp_data are limited to compact metadata and recommendation/status fields.",
+          "Request acceptance occurs only when req_valid and req_ready are both asserted.",
+          "Response validity requires matching transaction ID, no parser error, operating mode support, and freshness age within stale_age_limit.",
+          "If no valid response is present, candidate_valid shall deassert and fallback_active shall assert.",
+          "rsp_ready must be a real output port driven by this module.",
+          "The module shall not directly drive final act_cmd or act_enable; those are owned by the actuator path at top level."
+        ],
+        "rtl_output_file": "adaptive_aero_control_transport.v"
+      },
+      {
+        "name": "adaptive_aero_control_actuator",
+        "description": "Actuator command handling and safety-enforcement submodule that clamps candidate commands, optionally rate-limits transitions if implemented, computes act_enable, and resolves deterministic fallback versus validated command behavior.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "actuator_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "actuator_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "fallback_command",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "candidate_cmd",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "candidate_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fault_status",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fallback_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "clamp_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "act_cmd",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "act_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "fallback_active_out",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Selects the final bounded actuator command from the validated candidate command or fallback command, clamps the output to the programmed actuator range, and drives act_enable according to enable/fault/fallback policy. It may optionally include a programmable delta limit if added internally, but the externally visible contract is bounded command output and deterministic safe behavior.",
+        "responsibilities": [
+          "Clamp the final command to [actuator_min, actuator_max].",
+          "Assert clamp_active when clamping occurs.",
+          "Drive act_enable only when safe and enabled per policy.",
+          "Assert fallback_active_out whenever safe fallback is being driven.",
+          "Guarantee deterministic safe output on reset or invalid candidate conditions."
+        ],
+        "must_drive": [
+          "clamp_active",
+          "act_cmd",
+          "act_enable",
+          "fallback_active_out"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "enable",
+          "actuator_min",
+          "actuator_max",
+          "fallback_command",
+          "candidate_cmd",
+          "candidate_valid",
+          "fault_status",
+          "fallback_active"
+        ],
+        "must_not_drive": [
+          "enable",
+          "candidate_cmd",
+          "candidate_valid",
+          "fault_status",
+          "fallback_active"
+        ],
+        "reset_behavior": "On reset, the submodule shall drive fallback_command to act_cmd, deassert act_enable, assert fallback_active_out, and deassert clamp_active until a bounded command is computed. Output shall remain deterministic even if upstream candidate data is absent.",
+        "behavior_rules": [
+          "If candidate_valid is low or fault_status is high, the output shall be the deterministic fallback behavior.",
+          "Clamping must occur before act_cmd is driven to the top-level output.",
+          "The submodule shall not consume transport metadata directly; it only consumes validated candidate command and safety flags.",
+          "If enable is low, act_enable shall deassert and the output shall remain in safe fallback or last-safe mode according to internal policy, without violating the top-level safety contract."
+        ],
+        "rtl_output_file": "adaptive_aero_control_actuator.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_control_register_map.clk",
+        "adaptive_aero_control_transport.clk",
+        "adaptive_aero_control_actuator.clk"
+      ],
+      "description": "Top-level clock fans out to all synchronous submodules."
+    },
+    {
+      "top_port": "reset_n",
+      "connected_to": [
+        "adaptive_aero_control_register_map.reset_n",
+        "adaptive_aero_control_transport.reset_n",
+        "adaptive_aero_control_actuator.reset_n"
+      ],
+      "description": "Active-low reset fans out to all submodules."
+    },
+    {
+      "top_port": "cfg_valid",
+      "connected_to": [
+        "adaptive_aero_control_register_map.cfg_valid"
+      ],
+      "description": "Register access valid qualifies the register map interface."
+    },
+    {
+      "top_port": "cfg_write",
+      "connected_to": [
+        "adaptive_aero_control_register_map.cfg_write"
+      ],
+      "description": "Write strobes feed the register decoder and storage."
+    },
+    {
+      "top_port": "cfg_read",
+      "connected_to": [
+        "adaptive_aero_control_register_map.cfg_read"
+      ],
+      "description": "Read strobes feed the register decoder and readback logic."
+    },
+    {
+      "top_port": "cfg_addr",
+      "connected_to": [
+        "adaptive_aero_control_register_map.cfg_addr"
+      ],
+      "description": "8-bit register address is consumed by the register map."
+    },
+    {
+      "top_port": "cfg_wdata",
+      "connected_to": [
+        "adaptive_aero_control_register_map.cfg_wdata"
+      ],
+      "description": "Write data is consumed by the register map."
+    },
+    {
+      "top_port": "cfg_ready",
+      "connected_to": [
+        "adaptive_aero_control_register_map.cfg_ready"
+      ],
+      "description": "Top-level register ready is driven by the register map."
+    },
+    {
+      "top_port": "cfg_rdata",
+      "connected_to": [
+        "adaptive_aero_control_register_map.cfg_rdata"
+      ],
+      "description": "Top-level register read data is driven by the register map."
+    },
+    {
+      "top_port": "cfg_rvalid",
+      "connected_to": [
+        "adaptive_aero_control_register_map.cfg_rvalid"
+      ],
+      "description": "Top-level read-valid is driven by the register map."
+    },
+    {
+      "top_port": "req_valid",
+      "connected_to": [
+        "adaptive_aero_control_transport.req_valid"
+      ],
+      "description": "Outbound request valid is driven by the transport formatter."
+    },
+    {
+      "top_port": "req_ready",
+      "connected_to": [
+        "adaptive_aero_control_transport.req_ready"
+      ],
+      "description": "Top-level accepts downstream request-ready input and forwards it to the transport formatter."
+    },
+    {
+      "top_port": "req_data",
+      "connected_to": [
+        "adaptive_aero_control_transport.req_data"
+      ],
+      "description": "Outbound compact request metadata is driven by the transport formatter."
+    },
+    {
+      "top_port": "rsp_valid",
+      "connected_to": [
+        "adaptive_aero_control_transport.rsp_valid"
+      ],
+      "description": "Inbound response valid is consumed by the transport parser."
+    },
+    {
+      "top_port": "rsp_ready",
+      "connected_to": [
+        "adaptive_aero_control_transport.rsp_ready"
+      ],
+      "description": "Top-level response-ready output is driven by the transport parser and must have a real RTL driver."
+    },
+    {
+      "top_port": "rsp_data",
+      "connected_to": [
+        "adaptive_aero_control_transport.rsp_data"
+      ],
+      "description": "Inbound compact response payload is consumed by the transport parser."
+    },
+    {
+      "top_port": "explicit_fault_in",
+      "connected_to": [
+        "adaptive_aero_control_transport.explicit_fault_in"
+      ],
+      "description": "External fault input is consumed by the transport safety logic."
+    },
+    {
+      "top_port": "act_cmd",
+      "connected_to": [
+        "adaptive_aero_control_actuator.act_cmd"
+      ],
+      "description": "Final actuator command is driven by the actuator handler."
+    },
+    {
+      "top_port": "act_enable",
+      "connected_to": [
+        "adaptive_aero_control_actuator.act_enable"
+      ],
+      "description": "Final actuator enable is driven by the actuator handler."
+    },
+    {
+      "top_port": "sticky_fault_status",
+      "connected_to": [
+        "adaptive_aero_control_register_map.sticky_fault_bits"
+      ],
+      "description": "Top-level sticky fault readback is sourced from the register map sticky fault storage."
+    },
+    {
+      "top_port": "last_txn_id",
+      "connected_to": [
+        "adaptive_aero_control_register_map.last_txn_id"
+      ],
+      "description": "Top-level last accepted request transaction ID is read back from the register map."
+    },
+    {
+      "top_port": "last_rxn_id",
+      "connected_to": [
+        "adaptive_aero_control_register_map.last_rxn_id"
+      ],
+      "description": "Top-level last accepted response transaction ID is read back from the register map."
+    },
+    {
+      "top_port": "clamp_active",
+      "connected_to": [
+        "adaptive_aero_control_actuator.clamp_active"
+      ],
+      "description": "Top-level clamp telemetry is driven by the actuator handler."
+    },
+    {
+      "top_port": "fallback_active",
+      "connected_to": [
+        "adaptive_aero_control_actuator.fallback_active_out"
+      ],
+      "description": "Top-level fallback telemetry is driven by the actuator handler."
+    },
+    {
+      "top_port": "request_pending",
+      "connected_to": [
+        "adaptive_aero_control_transport.request_pending"
+      ],
+      "description": "Top-level request-pending telemetry is driven by the transport parser."
+    },
+    {
+      "top_port": "watchdog_expired",
+      "connected_to": [
+        "adaptive_aero_control_transport.watchdog_expired"
+      ],
+      "description": "Top-level watchdog-expired telemetry is driven by the transport safety logic."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "enable",
+      "width": 1,
+      "source": "adaptive_aero_control_register_map.enable",
+      "destinations": [
+        "adaptive_aero_control_transport.enable",
+        "adaptive_aero_control_actuator.enable"
+      ],
+      "description": "Global controller enable decoded from the register map and consumed by transport and actuator logic."
+    },
+    {
+      "name": "clear_faults",
+      "width": 1,
+      "source": "adaptive_aero_control_register_map.clear_faults",
+      "destinations": [
+        "adaptive_aero_control_transport.clear_faults"
+      ],
+      "description": "Fault-clear pulse decoded from the register map and consumed by the transport safety logic."
+    },
+    {
+      "name": "operating_mode",
+      "width": 2,
+      "source": "adaptive_aero_control_register_map.operating_mode",
+      "destinations": [
+        "adaptive_aero_control_transport.operating_mode"
+      ],
+      "description": "Operating mode control decoded from the register map and consumed by transport validation."
+    },
+    {
+      "name": "stream_velocity_setpoint",
+      "width": 16,
+      "source": "adaptive_aero_control_register_map.stream_velocity_setpoint",
+      "destinations": [
+        "adaptive_aero_control_transport.stream_velocity_setpoint"
+      ],
+      "description": "Compact velocity setpoint decoded from the register map and used to format outbound request metadata."
+    },
+    {
+      "name": "timeout_cycles",
+      "width": 16,
+      "source": "adaptive_aero_control_register_map.timeout_cycles",
+      "destinations": [
+        "adaptive_aero_control_transport.timeout_cycles"
+      ],
+      "description": "Watchdog timeout programming forwarded from the register map to the transport safety logic."
+    },
+    {
+      "name": "stale_age_limit",
+      "width": 16,
+      "source": "adaptive_aero_control_register_map.stale_age_limit",
+      "destinations": [
+        "adaptive_aero_control_transport.stale_age_limit"
+      ],
+      "description": "Staleness threshold forwarded from the register map to the transport parser."
+    },
+    {
+      "name": "actuator_min",
+      "width": 16,
+      "source": "adaptive_aero_control_register_map.actuator_min",
+      "destinations": [
+        "adaptive_aero_control_actuator.actuator_min"
+      ],
+      "description": "Lower clamp limit forwarded from the register map to the actuator handler."
+    },
+    {
+      "name": "actuator_max",
+      "width": 16,
+      "source": "adaptive_aero_control_register_map.actuator_max",
+      "destinations": [
+        "adaptive_aero_control_actuator.actuator_max"
+      ],
+      "description": "Upper clamp limit forwarded from the register map to the actuator handler."
+    },
+    {
+      "name": "fallback_command",
+      "width": 16,
+      "source": "adaptive_aero_control_register_map.fallback_command",
+      "destinations": [
+        "adaptive_aero_control_transport.fallback_command",
+        "adaptive_aero_control_actuator.fallback_command"
+      ],
+      "description": "Deterministic safe fallback command forwarded to transport validation and actuator selection logic."
+    },
+    {
+      "name": "request_pending",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.request_pending",
+      "destinations": [
+        "adaptive_aero_control_register_map.request_pending"
+      ],
+      "description": "Outstanding request status returned to the register map for readback and diagnostics."
+    },
+    {
+      "name": "watchdog_expired",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.watchdog_expired",
+      "destinations": [
+        "adaptive_aero_control_register_map.watchdog_expired"
+      ],
+      "description": "Watchdog expiry status returned to the register map for readback and diagnostics."
+    },
+    {
+      "name": "fault_status",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.fault_status",
+      "destinations": [
+        "adaptive_aero_control_register_map.fault_status",
+        "adaptive_aero_control_actuator.fault_status"
+      ],
+      "description": "Aggregated fault indication from transport into the register map and actuator safety handler."
+    },
+    {
+      "name": "response_age",
+      "width": 16,
+      "source": "adaptive_aero_control_transport.response_age",
+      "destinations": [
+        "adaptive_aero_control_register_map.response_age"
+      ],
+      "description": "Current response age telemetry forwarded into the register map for readback."
+    },
+    {
+      "name": "candidate_cmd",
+      "width": 16,
+      "source": "adaptive_aero_control_transport.candidate_cmd",
+      "destinations": [
+        "adaptive_aero_control_actuator.candidate_cmd"
+      ],
+      "description": "Validated candidate actuator command forwarded from transport validation to actuator clamping."
+    },
+    {
+      "name": "candidate_valid",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.candidate_valid",
+      "destinations": [
+        "adaptive_aero_control_actuator.candidate_valid"
+      ],
+      "description": "Candidate command validity forwarded from transport validation to actuator handling."
+    },
+    {
+      "name": "fallback_active",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.fallback_active",
+      "destinations": [
+        "adaptive_aero_control_actuator.fallback_active"
+      ],
+      "description": "Fallback indication from transport to actuator logic for consistent safe-state behavior."
+    },
+    {
+      "name": "clamp_active",
+      "width": 1,
+      "source": "adaptive_aero_control_actuator.clamp_active",
+      "destinations": [
+        "adaptive_aero_control_register_map.clamp_active"
+      ],
+      "description": "Clamp telemetry is returned to the register map for readback and status reporting."
+    },
+    {
+      "name": "fallback_active_out",
+      "width": 1,
+      "source": "adaptive_aero_control_actuator.fallback_active_out",
+      "destinations": [
+        "adaptive_aero_control_register_map.fallback_active"
+      ],
+      "description": "Fallback telemetry is returned to the register map for readback and status reporting."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "enable",
+      "owner": "adaptive_aero_control_register_map.enable"
+    },
+    {
+      "signal": "clear_faults",
+      "owner": "adaptive_aero_control_register_map.clear_faults"
+    },
+    {
+      "signal": "operating_mode",
+      "owner": "adaptive_aero_control_register_map.operating_mode"
+    },
+    {
+      "signal": "stream_velocity_setpoint",
+      "owner": "adaptive_aero_control_register_map.stream_velocity_setpoint"
+    },
+    {
+      "signal": "timeout_cycles",
+      "owner": "adaptive_aero_control_register_map.timeout_cycles"
+    },
+    {
+      "signal": "stale_age_limit",
+      "owner": "adaptive_aero_control_register_map.stale_age_limit"
+    },
+    {
+      "signal": "actuator_min",
+      "owner": "adaptive_aero_control_register_map.actuator_min"
+    },
+    {
+      "signal": "actuator_max",
+      "owner": "adaptive_aero_control_register_map.actuator_max"
+    },
+    {
+      "signal": "fallback_command",
+      "owner": "adaptive_aero_control_register_map.fallback_command"
+    },
+    {
+      "signal": "last_txn_id",
+      "owner": "adaptive_aero_control_transport.last_txn_id"
+    },
+    {
+      "signal": "last_rxn_id",
+      "owner": "adaptive_aero_control_transport.last_rxn_id"
+    },
+    {
+      "signal": "request_pending",
+      "owner": "adaptive_aero_control_transport.request_pending"
+    },
+    {
+      "signal": "watchdog_expired",
+      "owner": "adaptive_aero_control_transport.watchdog_expired"
+    },
+    {
+      "signal": "response_age",
+      "owner": "adaptive_aero_control_transport.response_age"
+    },
+    {
+      "signal": "candidate_cmd",
+      "owner": "adaptive_aero_control_transport.candidate_cmd"
+    },
+    {
+      "signal": "candidate_valid",
+      "owner": "adaptive_aero_control_transport.candidate_valid"
+    },
+    {
+      "signal": "fallback_active",
+      "owner": "adaptive_aero_control_transport.fallback_active"
+    },
+    {
+      "signal": "parser_error",
+      "owner": "adaptive_aero_control_transport.parser_error"
+    },
+    {
+      "signal": "fault_status",
+      "owner": "adaptive_aero_control_transport.fault_status"
+    },
+    {
+      "signal": "clamp_active",
+      "owner": "adaptive_aero_control_actuator.clamp_active"
+    },
+    {
+      "signal": "fallback_active_out",
+      "owner": "adaptive_aero_control_actuator.fallback_active_out"
+    },
+    {
+      "signal": "sticky_fault_bits",
+      "owner": "adaptive_aero_control_register_map.sticky_fault_bits"
+    },
+    {
+      "signal": "cfg_ready",
+      "owner": "adaptive_aero_control_register_map.cfg_ready"
+    },
+    {
+      "signal": "cfg_rdata",
+      "owner": "adaptive_aero_control_register_map.cfg_rdata"
+    },
+    {
+      "signal": "cfg_rvalid",
+      "owner": "adaptive_aero_control_register_map.cfg_rvalid"
+    },
+    {
+      "signal": "req_valid",
+      "owner": "adaptive_aero_control_transport.req_valid"
+    },
+    {
+      "signal": "req_data",
+      "owner": "adaptive_aero_control_transport.req_data"
+    },
+    {
+      "signal": "rsp_ready",
+      "owner": "adaptive_aero_control_transport.rsp_ready"
+    },
+    {
+      "signal": "act_cmd",
+      "owner": "adaptive_aero_control_actuator.act_cmd"
+    },
+    {
+      "signal": "act_enable",
+      "owner": "adaptive_aero_control_actuator.act_enable"
+    },
+    {
+      "signal": "sticky_fault_status",
+      "owner": "adaptive_aero_control_register_map.sticky_fault_bits"
+    },
+    {
+      "signal": "last_txn_id",
+      "owner": "adaptive_aero_control_register_map.last_txn_id"
+    },
+    {
+      "signal": "last_rxn_id",
+      "owner": "adaptive_aero_control_register_map.last_rxn_id"
+    },
+    {
+      "signal": "fallback_active",
+      "owner": "adaptive_aero_control_actuator.fallback_active_out"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "abstract",
+    "registers": [
+      {
+        "name": "CTRL_EN",
+        "addr": 0,
+        "width": 32,
+        "access": "rw",
+        "description": "Bit 0 enable, bit 1 clear_faults, bits [3:2] operating_mode, remaining bits reserved."
+      },
+      {
+        "name": "STREAM_VEL_SETPOINT",
+        "addr": 4,
+        "width": 32,
+        "access": "rw",
+        "description": "Stream velocity setpoint and related compact command metadata."
+      },
+      {
+        "name": "TIMEOUT_CYCLES",
+        "addr": 8,
+        "width": 32,
+        "access": "rw",
+        "description": "Watchdog timeout programming in clock cycles."
+      },
+      {
+        "name": "STALE_AGE_LIMIT",
+        "addr": 12,
+        "width": 32,
+        "access": "rw",
+        "description": "Maximum acceptable response age before stale rejection."
+      },
+      {
+        "name": "ACTUATOR_MIN",
+        "addr": 16,
+        "width": 32,
+        "access": "rw",
+        "description": "Lower bound for clamped actuator command."
+      },
+      {
+        "name": "ACTUATOR_MAX",
+        "addr": 20,
+        "width": 32,
+        "access": "rw",
+        "description": "Upper bound for clamped actuator command."
+      },
+      {
+        "name": "FALLBACK_COMMAND",
+        "addr": 24,
+        "width": 32,
+        "access": "rw",
+        "description": "Deterministic safe fallback command value."
+      },
+      {
+        "name": "LAST_TXN_ID",
+        "addr": 28,
+        "width": 32,
+        "access": "ro",
+        "description": "Last accepted request transaction ID and status mirror."
+      },
+      {
+        "name": "LAST_RXN_ID",
+        "addr": 32,
+        "width": 32,
+        "access": "ro",
+        "description": "Last accepted response transaction ID and status mirror."
+      },
+      {
+        "name": "STATUS_FAULTS",
+        "addr": 36,
+        "width": 32,
+        "access": "ro",
+        "description": "Sticky faults, active faults, request pending, watchdog expired, clamp active, and fallback active status bits."
+      }
+    ]
+  }
+}

@@ -1,0 +1,240 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "implementation_style": "Single-clock FPGA controller wrapper that composes register access, bounded request/response transport, safety enforcement, and actuator limiting without implementing the external surrogate model.",
+      "control_strategy": "Use the register map as the sole source of configuration and status semantics, route transport handshake/data through the mandated valid/ready directions, and combine transport validation with actuator-safe fallback so any invalid, stale, timed-out, or faulted condition deterministically drives the safe command path.",
+      "state_strategy": "Maintain only the minimum synchronous state needed for configuration storage, outstanding request tracking, watchdog timing, response freshness/ID checking, sticky fault accumulation, and clamped actuator selection; keep all state reset-deterministic and avoid unnecessary FSM complexity.",
+      "output_strategy": "Drive cfg_ready/cfg_rdata/cfg_rvalid from the register plane, drive req_valid/req_data outward and rsp_ready as a real output, and drive act_cmd/act_enable plus telemetry from validated or fallback-selected command results, with clamp and fallback indicators reflected as status.",
+      "ownership_notes": [
+        "Owns the externally visible contract and integrates the three subfunctions without redefining hierarchy or ports.",
+        "Must preserve the requested transport directionality: request valid/data are outputs, request ready is input; response valid/data are inputs, response ready is output.",
+        "Must keep rsp_ready as a top-level RTL-driven output, not a pass-through from a child input.",
+        "Must not expose geometry arrays, tensors, flow fields, or surrogate internals."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_register_map",
+      "implementation_style": "Small synchronous 32-bit register window with 8-bit addressing and direct semantic decode for control, limits, timeout programming, counters, and sticky fault readback.",
+      "control_strategy": "Qualify all access with cfg_valid and the corresponding read/write strobes, decode addresses into named control fields, and update status/readback fields only on accepted operations or from explicit telemetry inputs.",
+      "state_strategy": "Store enable, clear_faults, operating_mode, stream_velocity_setpoint, timeout_cycles, stale_age_limit, actuator_min, actuator_max, fallback_command, counters, and sticky fault bits in deterministic resettable registers; keep unsupported-address behavior simple and synchronous.",
+      "output_strategy": "Provide cfg_ready, cfg_rdata, and cfg_rvalid deterministically for the selected address, and present decoded control outputs directly to downstream blocks without hidden interfaces.",
+      "ownership_notes": [
+        "Owns the control-plane register file and its readback behavior.",
+        "Owns the semantic control outputs used by transport and actuator logic.",
+        "Consumes transport/status telemetry for status mirrors and sticky-fault management but does not drive transport pins directly."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_transport",
+      "implementation_style": "Bounded 64-bit streaming formatter/parser with minimal request descriptor handling and compact response validation logic, optionally backed by inferred block RAM or a small FIFO only if timing closure requires storage.",
+      "control_strategy": "Emit outbound request metadata only after configuration enables operation, accept requests via req_valid && req_ready, capture the accepted transaction ID, start the watchdog, and parse inbound responses for ID match, freshness, and field legality before marking a candidate command valid.",
+      "state_strategy": "Track a request-pending bit, outstanding transaction ID, last response ID, watchdog age, response age, parser error, candidate validity, and fallback indication with simple synchronous counters/flags; avoid complex FSMs beyond the natural request/response lifecycle.",
+      "output_strategy": "Drive req_valid/req_data outward, consume req_ready as input, consume rsp_valid/rsp_data as inputs, and drive rsp_ready as a real output; produce candidate_cmd/candidate_valid only when response validation succeeds, otherwise select fallback behavior and assert safety status.",
+      "ownership_notes": [
+        "Owns the request/response transport handshake and validation path.",
+        "Owns request-pending, watchdog-expired, response-age, last transaction IDs, candidate command, candidate validity, fallback indication, parser error, and fault status outputs.",
+        "Must not drive act_cmd or act_enable directly."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_actuator",
+      "implementation_style": "Simple combinational-plus-registered actuator safety block that selects validated command or fallback, clamps to programmed bounds, and optionally applies a small bounded transition policy if desired.",
+      "control_strategy": "Prefer the validated candidate command when it is marked valid and the system is not faulted; otherwise drive the deterministic fallback command. Deassert act_enable in fault/fallback conditions unless the design is explicitly configured to hold last-safe command.",
+      "state_strategy": "Keep only minimal state for any optional rate-limiting or last-safe behavior; otherwise remain primarily feed-through from validated inputs to bounded outputs with reset-safe defaults.",
+      "output_strategy": "Clamp the selected command to [actuator_min, actuator_max], assert clamp_active when clamping occurs, and drive fallback_active_out whenever safe fallback is being output; ensure deterministic act_cmd and act_enable under reset or invalid input.",
+      "ownership_notes": [
+        "Owns the final bounded actuator command and enable output.",
+        "Consumes only validated candidate command, fallback command, and safety flags; it does not inspect raw transport metadata.",
+        "Must preserve deterministic safe behavior on reset, missing candidate data, or fault conditions."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "module": "adaptive_aero_control_top",
+      "present": false,
+      "description": "No explicit complex FSM is required beyond synchronous register updates, request-pending tracking, watchdog timing, and safe fallback selection. A small implicit lifecycle is sufficient: reset/safe, configured/idle, request outstanding, response validate, and fallback/fault handling.",
+      "states": [
+        "reset_safe",
+        "configured_idle",
+        "request_outstanding",
+        "response_validate",
+        "fallback_fault"
+      ]
+    },
+    {
+      "module": "adaptive_aero_control_register_map",
+      "present": false,
+      "description": "Use direct address decode and registered side effects rather than a multi-state FSM; writes and reads are qualified by the bus strobes.",
+      "states": []
+    },
+    {
+      "module": "adaptive_aero_control_transport",
+      "present": false,
+      "description": "Use a simple synchronous request/response lifecycle with request accept, watchdog count, response check, and fallback/fault assertion; avoid a complicated FSM.",
+      "states": [
+        "idle",
+        "request_issued",
+        "waiting_response",
+        "response_checked",
+        "fallback_fault"
+      ]
+    },
+    {
+      "module": "adaptive_aero_control_actuator",
+      "present": false,
+      "description": "No explicit FSM is required; output selection can be implemented as straightforward conditional logic with optional registered last-safe state if used.",
+      "states": []
+    }
+  ],
+  "datapath_intent": [
+    {
+      "module": "adaptive_aero_control_top",
+      "inputs": [
+        "cfg interface signals",
+        "req_ready",
+        "rsp_valid",
+        "rsp_data",
+        "explicit_fault_in",
+        "semantic control outputs from register map",
+        "candidate_cmd/candidate_valid from transport",
+        "actuator policy inputs"
+      ],
+      "internal_storage": [
+        "configuration registers",
+        "transaction ID tracking",
+        "watchdog counter",
+        "response age counter",
+        "sticky fault bits",
+        "optional small FIFO/BRAM if needed for timing closure"
+      ],
+      "output_mapping": [
+        "cfg_ready/cfg_rdata/cfg_rvalid from register map",
+        "req_valid/req_data from transport",
+        "rsp_ready from transport",
+        "act_cmd/act_enable from actuator",
+        "telemetry outputs from the owning submodules"
+      ]
+    },
+    {
+      "module": "adaptive_aero_control_register_map",
+      "inputs": [
+        "cfg_valid",
+        "cfg_write",
+        "cfg_read",
+        "cfg_addr",
+        "cfg_wdata",
+        "request_pending",
+        "watchdog_expired",
+        "fault_status",
+        "response_age",
+        "clamp_active",
+        "fallback_active"
+      ],
+      "internal_storage": [
+        "enable",
+        "clear_faults",
+        "operating_mode",
+        "stream_velocity_setpoint",
+        "timeout_cycles",
+        "stale_age_limit",
+        "actuator_min",
+        "actuator_max",
+        "fallback_command",
+        "last_txn_id",
+        "last_rxn_id",
+        "sticky fault bits"
+      ],
+      "output_mapping": [
+        "cfg_ready",
+        "cfg_rdata",
+        "cfg_rvalid",
+        "semantic control outputs and diagnostic mirrors"
+      ]
+    },
+    {
+      "module": "adaptive_aero_control_transport",
+      "inputs": [
+        "enable",
+        "operating_mode",
+        "stream_velocity_setpoint",
+        "timeout_cycles",
+        "stale_age_limit",
+        "fallback_command",
+        "req_ready",
+        "rsp_valid",
+        "rsp_data",
+        "explicit_fault_in",
+        "clear_faults"
+      ],
+      "internal_storage": [
+        "outstanding transaction ID",
+        "request-pending flag",
+        "watchdog counter",
+        "response age counter",
+        "parsed status bits",
+        "candidate command register",
+        "parser error latch",
+        "fallback indicator"
+      ],
+      "output_mapping": [
+        "req_valid",
+        "req_data",
+        "rsp_ready",
+        "request_pending",
+        "watchdog_expired",
+        "response_age",
+        "last_txn_id",
+        "last_rxn_id",
+        "candidate_cmd",
+        "candidate_valid",
+        "fallback_active",
+        "parser_error",
+        "fault_status"
+      ]
+    },
+    {
+      "module": "adaptive_aero_control_actuator",
+      "inputs": [
+        "enable",
+        "actuator_min",
+        "actuator_max",
+        "fallback_command",
+        "candidate_cmd",
+        "candidate_valid",
+        "fault_status",
+        "fallback_active"
+      ],
+      "internal_storage": [
+        "optional last-safe command register if rate limiting or hold-last-safe behavior is used"
+      ],
+      "output_mapping": [
+        "act_cmd",
+        "act_enable",
+        "clamp_active",
+        "fallback_active_out"
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "Configuration writes only take effect when cfg_valid and cfg_write are asserted with cfg_ready high; reads only return valid data when cfg_valid and cfg_read are asserted.",
+    "A request acceptance event is req_valid && req_ready; on that event the transport captures transaction ID and starts the watchdog.",
+    "A response is only consumed for control if rsp_valid is asserted and the parsed fields satisfy transaction ID match, freshness limit, legal status, and parser checks.",
+    "Fault conditions force fallback immediately or on the next synchronous update, with sticky faults retained until clear_faults is written and the active fault condition has cleared.",
+    "The actuator path should clamp after selecting the candidate or fallback command, then drive act_cmd and act_enable according to safe-state policy."
+  ],
+  "timing_notes": [
+    "Use a single clk domain with fully synchronous state updates.",
+    "Prefer simple registered control paths and combinational decode where possible to keep timing predictable.",
+    "If bulk history/FIFO storage is needed, implement it with inferred or vendor block RAM via a technology-neutral wrapper, not flattened registers.",
+    "Keep top-level buses at 64 bits or less and maintain a compact pinout under the stated limit."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

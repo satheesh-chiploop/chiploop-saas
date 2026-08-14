@@ -1,0 +1,10 @@
+=== STDERR ===
+%Error: pass2/adaptive_aero_control_register_map.v:154:9: syntax error, unexpected endcase, expecting IDENTIFIER-for-type
+  154 |         endcase
+      |         ^~~~~~~
+        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.
+%Error: Cannot continue
+        ... This fatal error may be caused by the earlier error(s); resolve those first.
+
+=== RETURN CODE ===
+1

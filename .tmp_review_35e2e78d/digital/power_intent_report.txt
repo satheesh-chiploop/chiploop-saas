@@ -1,4 +1,0 @@
-Digital Power Intent (UPF-Lite) Agent Report
-Spec mode: hierarchical
-Top module: sram_mbist_demo_controller
-Domains: ['PD_TOP']

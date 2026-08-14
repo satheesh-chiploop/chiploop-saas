@@ -1,8 +1,0 @@
-{
-  "workflow_id": "35e2e78d-d764-4a04-be6c-e0d174aa908a",
-  "workflow_dir": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a",
-  "digital_spec_json": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/spec/sram_mbist_demo_controller_spec.json",
-  "spec_json": "backend/workflows/35e2e78d-d764-4a04-be6c-e0d174aa908a/spec/sram_mbist_demo_controller_spec.json",
-  "digital_spec_json_exists": true,
-  "spec_json_exists": true
-}

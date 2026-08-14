@@ -1,2 +1,0 @@
-read_verilog -sv /root/chiploop-backend/backend/workflows/c12d48b3-0c8c-4c48-8f08-ff713010262e/fpga/src/upstream/adaptive_aero_control_top.v
-synth_nexus -top adaptive_aero_control_top -family lfd2nx -noflatten -noiopad -json /root/chiploop-backend/backend/workflows/c12d48b3-0c8c-4c48-8f08-ff713010262e/fpga/target_explorer/certus_nx_versa_40/baseline/synth/adaptive_aero_control_top_nexus.json
