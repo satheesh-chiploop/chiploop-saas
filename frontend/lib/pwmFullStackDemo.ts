@@ -595,7 +595,7 @@ Register map:
 - 0x10 MEM_RDATA: memory read data[31:0], read-only
 - 0x14 MEM_CONTROL: bit 0 MEM_WRITE, bit 1 MEM_READ
 - 0x18 BIST_CONTROL: bit 0 START, bit 1 CLEAR_RESULT
-- 0x1C BIST_STATUS: done, fail, running, last_fail_addr[7:0]
+- 0x1C BIST_STATUS: bit 0 done, bit 1 fail, bit 2 running, last_fail_addr occupies register bits [15:8]
 - 0x20 IRQ_STATUS: bist_done, bist_fail
 - 0x24 IRQ_CLEAR: write one to clear IRQ_STATUS
 

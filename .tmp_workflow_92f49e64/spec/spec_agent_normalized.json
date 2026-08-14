@@ -1,0 +1,272 @@
+{
+  "design_name": "sram_mbist_demo_controller",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [
+    {
+      "name": "sky130_sram_1kbyte_1rw1r_32x256_8",
+      "kind": "prebuilt_sky130_sram",
+      "depth": 256,
+      "data_width": 32,
+      "addr_width": 8,
+      "instance_name": "u_sram",
+      "requires_mbist": true,
+      "ports": {
+        "clk": "clk0",
+        "csb": "csb0",
+        "we": "web0",
+        "addr": "addr0",
+        "din": "din0",
+        "dout": "dout0"
+      }
+    }
+  ],
+  "hierarchy": {
+    "top_module": {
+      "name": "sram_mbist_demo_controller",
+      "description": "Top-level scratchpad controller with MMIO-style register map, simple SRAM read/write sequencing, and BIST status/interrupt reporting while preserving explicit macro usage intent for downstream DFT and MBIST flows.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "wr_en",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wr_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "wr_data",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "rd_en",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rd_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "bist_start",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rd_data",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "bist_done",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "bist_fail",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "irq",
+          "direction": "output",
+          "width": 1
+        }
+      ],
+      "functionality": "Implements a small register-mapped controller that accepts writes and reads on a simple bus, controls a 256x32 scratchpad via a dedicated SRAM wrapper child, mirrors selected memory and BIST status into readable registers, and raises an interrupt when enabled BIST completion or failure events are latched. The top remains a controller and is not a raw SRAM model.",
+      "responsibilities": [
+        "Decode the external register interface.",
+        "Manage control, status, memory address/data, BIST control, BIST status, IRQ status, and IRQ clear registers.",
+        "Drive the SRAM wrapper child instance u_sram for functional memory access.",
+        "Present read data for memory and register locations on rd_data.",
+        "Latch BIST completion/failure indications and expose ready/busy state.",
+        "Assert irq only when IRQ_ENABLE is set and a BIST event is latched.",
+        "Preserve explicit macro integration intent for downstream synthesis/DFT/MBIST collateral generation."
+      ],
+      "must_drive": [
+        "rd_data",
+        "ready",
+        "bist_done",
+        "bist_fail",
+        "irq"
+      ],
+      "must_receive": [
+        "clk",
+        "reset_n",
+        "wr_en",
+        "wr_addr",
+        "wr_data",
+        "rd_en",
+        "rd_addr",
+        "bist_start"
+      ],
+      "must_not_drive": [
+        "clk",
+        "reset_n",
+        "wr_en",
+        "wr_addr",
+        "wr_data",
+        "rd_en",
+        "rd_addr",
+        "bist_start"
+      ],
+      "reset_behavior": "On reset deassertion entry, clear CONTROL, STATUS, MEM_ADDR, MEM_WDATA, MEM_RDATA, MEM_CONTROL, BIST_CONTROL, BIST_STATUS, IRQ_STATUS, ready, bist_done, bist_fail, irq, and any internal pending state; memory macro contents are not initialized by this controller.",
+      "behavior_rules": [
+        "The top-level controller shall instantiate demo_sram_32x256_wrapper as child memory wrapper instance u_sram.",
+        "The controller shall never infer, substitute, or model the scratchpad as a register array.",
+        "Writes to MEM_ADDR and MEM_WDATA update the corresponding holding registers.",
+        "A write to MEM_CONTROL with MEM_WRITE asserted performs a write transaction to the wrapper using the stored MEM_ADDR and MEM_WDATA.",
+        "A read sequence initiated by rd_en and a readable address shall return register values or memory read data without exposing undocumented locations.",
+        "BIST_START may be requested by the bist_start input or by BIST_CONTROL.START; BIST_CONTROL.CLEAR_RESULT clears latched done/fail status and IRQ status bits.",
+        "STATUS.ready reflects controller availability for a new memory or BIST request; STATUS.busy is the inverse of ready when an operation is in progress.",
+        "IRQ_STATUS bits latch on BIST done/fail events and are cleared by IRQ_CLEAR or BIST_CONTROL.CLEAR_RESULT as specified.",
+        "irq asserts only when IRQ_ENABLE is set and at least one IRQ_STATUS bit is set.",
+        "The controller shall keep the functional memory access path single-ported from the controller perspective, even though the underlying macro is 1RW1R.",
+        "All BIST status registers must remain architecturally present even if downstream MBIST logic later replaces or wraps the memory path."
+      ],
+      "rtl_output_file": "sram_mbist_demo_controller.v",
+      "ports_documentation": []
+    },
+    "modules": [
+      {
+        "name": "demo_sram_32x256_wrapper",
+        "description": "Simple functional scratchpad wrapper that binds the controller to the qualified prebuilt Sky130 SRAM macro sky130_sram_1kbyte_1rw1r_32x256_8 via the required macro instance u_sram. The wrapper exposes one functional 1RW access path and leaves the second read port safely tied off or reserved for future MBIST wrapper integration.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "csb",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "web",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "addr",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "din",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "dout",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "clk1",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "csb1",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "addr1",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "dout1",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wmask0",
+            "direction": "input",
+            "width": 4
+          }
+        ],
+        "functionality": "Acts as the explicit physical/behavioral binding layer for the prebuilt 1KB Sky130 SRAM macro. It forwards the functional port set clk/csb/web/addr/din/dout to the qualified macro cell sky130_sram_1kbyte_1rw1r_32x256_8 instantiated as u_sram_macro, keeps wmask0 fixed to full-word writes, and ties or reserves the second read port interface for safe non-use.",
+        "responsibilities": [
+          "Instantiate sky130_sram_1kbyte_1rw1r_32x256_8 as u_sram_macro.",
+          "Expose a clean functional scratchpad interface for the top controller.",
+          "Preserve qualified macro name and instance identity for downstream flows.",
+          "Tie wmask0 to 4'b1111 for full-word access.",
+          "Keep the second read port safe and unused from the controller perspective."
+        ],
+        "must_drive": [
+          "dout",
+          "dout1"
+        ],
+        "must_receive": [
+          "clk",
+          "csb",
+          "web",
+          "addr",
+          "din",
+          "clk1",
+          "csb1",
+          "addr1",
+          "wmask0"
+        ],
+        "must_not_drive": [
+          "clk",
+          "csb",
+          "web",
+          "addr",
+          "din",
+          "clk1",
+          "csb1",
+          "addr1",
+          "wmask0"
+        ],
+        "reset_behavior": "No architectural reset is required on the wrapper ports; memory state is owned by the underlying macro collateral and is not cleared by wrapper logic.",
+        "behavior_rules": [
+          "The wrapper must bind to the prebuilt SRAM macro and must not implement an inferred array or alternate model identity.",
+          "The wrapper must instantiate the macro using the required name sky130_sram_1kbyte_1rw1r_32x256_8 and instance name u_sram_macro.",
+          "The wrapper shall present a single functional access path through csb/web/addr/din/dout.",
+          "wmask0 shall be fixed to full-word writes for all functional accesses.",
+          "clk1, csb1, and addr1 shall be safely tied off or reserved for future MBIST integration; dout1 is not consumed by the controller.",
+          "The wrapper shall not substitute any fallback memory if the qualified macro collateral is unavailable."
+        ],
+        "rtl_output_file": "demo_sram_32x256_wrapper.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "demo_sram_32x256_wrapper.clk"
+      ],
+      "description": "Top-level port clk connected to matching child module port(s)."
+    }
+  ],
+  "inter_module_signals": [],
+  "signal_ownership": [],
+  "register_contract": {}
+}

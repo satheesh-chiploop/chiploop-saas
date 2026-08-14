@@ -1,0 +1,93 @@
+Info: Packing IOLOGIC...
+Info: Packing DSPs...
+Info: Packing BRAM...
+Info: Packing LRAM...
+Info: Packing carries...
+Info: Packing FFs...
+Info:     Created 19 OXIDE_FF cells from:
+Info:             19x FD1P3DX
+Info: Packing LUTs...
+Info: Packing IOLOGIC...
+Info: Placing DQSBUFs...
+Info: Placing edge clocks...
+Info: Inferring LUT+FF pairs...
+Info:     Created 0 LUT+FF pairs and extended 0 clusters using total 19 FFs and 0 LUTs
+Info: Promoting globals...
+Info: Placing globals...
+Info: Generating derived timing constraints...
+
+Info: Device utilisation:
+Info: 	            OXIDE_FF:      19/  32256     0%
+Info: 	          OXIDE_COMB:       0/  32256     0%
+Info: 	                RAMW:       0/   4032     0%
+Info: 	         SEIO33_CORE:       0/    111     0%
+Info: 	         SEIO18_CORE:       0/     74     0%
+Info: 	       DIFFIO18_CORE:       0/     37     0%
+Info: 	            OSC_CORE:       0/      1     0%
+Info: 	           OXIDE_EBR:       0/     84     0%
+Info: 	        PREADD9_CORE:       0/    112     0%
+Info: 	          MULT9_CORE:       0/    112     0%
+Info: 	         MULT18_CORE:       0/     56     0%
+Info: 	          REG18_CORE:       0/    112     0%
+Info: 	      MULT18X36_CORE:       0/     28     0%
+Info: 	         MULT36_CORE:       0/     14     0%
+Info: 	          ACC54_CORE:       0/     28     0%
+Info: 	                 DCC:       0/     62     0%
+Info: 	             VCC_DRV:       0/     86     0%
+Info: 	            PLL_CORE:       0/      3     0%
+Info: 	           LRAM_CORE:       0/      2     0%
+Info: 	           DPHY_CORE:       0/      2     0%
+Info: 	             IOLOGIC:       0/     74     0%
+Info: 	            SIOLOGIC:       0/    110     0%
+Info: 	        ECLKDIV_CORE:       0/     12     0%
+Info: 	       ECLKSYNC_CORE:       0/     12     0%
+Info: 	         DQSBUF_CORE:       0/      4     0%
+Info: 	         DDRDLL_CORE:       0/      2     0%
+Info: 	                 DCS:       0/      1     0%
+Info: 	CONFIG_MULTIBOOT_CORE:       0/      1     0%
+Info: 	    CONFIG_LMMI_CORE:       0/      1     0%
+Info: 	  CONFIG_CLKRST_CORE:       0/      1     0%
+Info: 	     CONFIG_HSE_CORE:       0/      1     0%
+
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 0 cells, random placement wirelen = 0.
+Info:     at initial placer iter 0, wirelen = 0
+Info:     at initial placer iter 1, wirelen = 0
+Info:     at initial placer iter 2, wirelen = 0
+Info:     at initial placer iter 3, wirelen = 0
+Info: Running main analytical placer, max placement attempts per cell = 10000.
+Info: HeAP Placer Time: 0.02s
+Info:   of which solving equations: 0.00s
+Info:   of which spreading cells: 0.00s
+Info:   of which strict legalisation: 0.00s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 0, wirelen = 0
+Info:   at iteration #2: temp = 0.000000, timing cost = 0, wirelen = 0 
+Info: SA placement time 0.00s
+
+Info: No Fmax available; no interior timing paths found in design.
+Info: Checksum: 0x2d5779f5
+Info: Running post-place optimisations...
+Info:      created 0 direct LUT-FF pairs
+Info: Routing globals...
+Info: Running router2...
+Info: Setting up routing resources...
+Info: Running main router loop...
+Info:     iter=1 wires=0 overused=0 overuse=0 archfail=0
+Info: Router2 time 1.11s
+Info: Running router1 to check that route is legal...
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 0 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
+Info:          0 |        0          0 |    0     0 |         0|       0.00       0.00|
+Info: Routing complete.
+Info: Router1 time 0.00s
+Info: Checksum: 0x86cc05fb
+
+Info: No Fmax available; no interior timing paths found in design.
+
+Info: Program finished normally.
