@@ -1,0 +1,75 @@
+The required synthesizable top module is adaptive_aero_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must implement the selected Physical AI application contract, external model request/response transport, validation, safety, timeout, fallback, and bounded actuator-command behavior.
+
+EXTERNAL MODEL TRANSPORT DIRECTION CONTRACT (mandatory; this takes precedence over ambiguous ingress/egress wording in upstream prose): the RTL emits model-request valid/data as outputs and receives model-request ready as an input. The RTL receives model-response valid/data as inputs and emits model-response ready as an output. Apply this rule by data flow even when application-specific ports use cmd_*, req_*, rsp_*, or response_* names. A top-level output must have a real RTL driver; never connect a required top-level output only to a child input.
+
+FIRMWARE CONTROL-PLANE CONTRACT (mandatory): this product journey requests generated firmware. The synthesizable top must expose a real firmware-visible CSR/MMIO interface with address, write-data, read-data, transaction-valid/write-enable, and response/ready semantics. DIGITAL_SPEC_JSON.register_contract must describe the implemented registers and fields. Every declared register must be reachable through RTL decode; do not label inaccessible internal state as software-visible. The streaming transport may coexist with, but cannot replace, this interface.
+Implement a synthesizable FPGA top-level module named adaptive_aero_control_top. The module shall provide a compact register-window plus streaming-bus architecture and shall not expose any geometry arrays, flow fields, or surrogate tensors at the top level.
+
+1) Ports
+- clk: system clock.
+- rst_n or rst: synchronous reset behavior shall be clearly defined.
+- ctrl_reg_if: 64-bit memory-mapped register window for configuration and status. The register interface may be implemented as simple address/data/write-enable/read-data signals or an equivalent compact CSR bus, but the external top-level scalar-equivalent I/O count shall remain below 256.
+- model_req_stream: 128-bit outbound valid/ready stream toward software/firmware transport.
+- model_resp_stream: 128-bit inbound valid/ready stream from software/firmware transport.
+- actuator_cmd_out: bounded actuator command output bundle.
+- fault_status_out: fault and fallback status bits.
+
+2) Control/register map requirements
+- Provide writable configuration registers for: enable, clear_fault, sequence seed, request timeout threshold, response age threshold, actuator min clamp, actuator max clamp, actuator rate limit, fallback command value, and operating mode.
+- Provide readable status registers for: current FSM state, last accepted sequence number, last request sequence number, last response sequence number, timeout counter, stale reject counter, clamp event counter, fault cause code, and fallback active flag.
+- Provide a configuration-valid bit; until configuration is valid, the controller shall hold safe fallback outputs.
+
+3) Request generation
+- On enable and when not busy, generate a request packet to model_req_stream containing: request sequence number, velocity setpoint or current operating velocity, geometry handle or external payload identifier, mode flags, and a small checksum or parity field.
+- The request packet format shall fit within 128 bits.
+- The RTL shall not serialize raw STL geometry or large payloads; those are managed externally by firmware/software and may be referenced only by handle or index.
+- A request shall only be emitted when model_req_stream.ready is asserted and the controller is not in fault-latched state.
+
+4) Response handling
+- model_resp_stream shall carry a compact response packet including response sequence number, command value(s), validity flags, and checksum/parity.
+- The parser shall reject malformed frames, mismatched sequence numbers, stale responses, and responses arriving after the timeout threshold.
+- A valid response shall update internal accepted-command staging registers but shall not drive actuator_cmd_out until it passes clamp and mode checks.
+
+5) Safety filtering
+- Command_clamper shall enforce programmable minimum/maximum limits on each command component and a programmable rate limit relative to the last applied command.
+- If clamping occurs, status shall record the event and the clamped command shall be applied only if still within safe policy.
+- If the command is outside permitted bounds after clamping policy, or if a policy violation occurs, transition to fallback.
+
+6) Timeout and stale-data detection
+- timeout_watchdog shall measure cycles since request issuance and cycles since last valid response.
+- If no valid response is received before the timeout threshold, assert fallback_active, set the timeout fault code, and transition to fallback or fault-latched state.
+- If a response sequence is stale or duplicated relative to the latest issued request, reject it and increment a stale reject counter.
+
+7) FSM behavior
+- Provide explicit states at minimum: RESET, IDLE, ISSUE_REQ, WAIT_RESP, VALIDATE_RESP, APPLY_CMD, FALLBACK, FAULT_LATCH.
+- RESET and IDLE shall drive safe fallback outputs.
+- ISSUE_REQ shall present one request packet.
+- WAIT_RESP shall wait for valid response or timeout.
+- VALIDATE_RESP shall perform sequence, integrity, and age checks.
+- APPLY_CMD shall update actuator_cmd_out with the bounded response command.
+- FALLBACK shall drive the configured fallback command.
+- FAULT_LATCH shall hold safe output and require clear_fault plus a clean configuration/enable sequence to exit.
+
+8) Output behavior
+- actuator_cmd_out shall be registered, deterministic, and only change on a clock edge.
+- Any output change shall be subject to clamp and rate-limit logic.
+- fault_status_out shall expose compact bitfields for stale reject, timeout, clamp event, fault latch, fallback active, and configuration invalid.
+
+9) FPGA memory usage
+- For FPGA prototype only, the design may instantiate platform BRAM or vendor-agnostic FPGA RAM inference for small request/response staging buffers and telemetry snapshots.
+- Do not use Sky130 hard macros in FPGA synthesis.
+- Do not use inferred flip-flop arrays as bulk payload storage; keep payload buffers bounded and minimal.
+
+10) Software/firmware integration
+- The RTL shall assume the surrogate executes in software/GPU and returns commands through the response stream.
+- The RTL shall support transparent CPU-reference operation with no dependence on the internal surrogate computation.
+- Include status hooks sufficient for firmware to observe request issuance, response acceptance, stale reject, timeout, and fallback causes.
+
+11) Timing and determinism
+- All control outputs and status updates shall be synchronous to clk.
+- Reset shall place the design into a deterministic safe fallback state.
+- The design shall avoid combinational loops between request, response, and output stages.
+
+12) ASIC migration note
+- If later ported to Sky130 ASIC, payload storage must use only hard macro sky130_sram_1kbyte_1rw1r_32x256_8 with ports clk0, csb0, web0, wmask0[3:0], addr0[7:0], din0[31:0], and dout0[31:0], and implementation must stop at the memory-collateral gate unless behavioral Verilog, Liberty, LEF, GDS, and SPICE are available.
+FPGA MEMORY CONTRACT (mandatory): describe bulk payload/history/FIFO storage through a technology-neutral memory wrapper that the FPGA flow can map to native block RAM; do not flatten it into registers.

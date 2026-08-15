@@ -1,0 +1,172 @@
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "setup_issue",
+  "summary": {
+    "checked": 13,
+    "matched": 0,
+    "partial": 0,
+    "missing": 4,
+    "inconclusive": 9
+  },
+  "setup_issues": [
+    "missing_rtl",
+    "no_parseable_modules"
+  ],
+  "top_module": {
+    "expected": "adaptive_aero_control_top",
+    "modules_found": [],
+    "status": "issues"
+  },
+  "interface": {
+    "status": "issues",
+    "expected_ports": [
+      "actuator_cmd_out",
+      "clk",
+      "ctrl_reg_addr",
+      "ctrl_reg_rdata",
+      "ctrl_reg_read_en",
+      "ctrl_reg_ready",
+      "ctrl_reg_valid",
+      "ctrl_reg_wdata",
+      "ctrl_reg_write_en",
+      "fault_status_out",
+      "model_req_data",
+      "model_req_ready",
+      "model_req_valid",
+      "model_resp_data",
+      "model_resp_ready",
+      "model_resp_valid",
+      "rst_n"
+    ],
+    "matched_ports": [],
+    "missing_ports": [
+      "actuator_cmd_out",
+      "clk",
+      "ctrl_reg_addr",
+      "ctrl_reg_rdata",
+      "ctrl_reg_read_en",
+      "ctrl_reg_ready",
+      "ctrl_reg_valid",
+      "ctrl_reg_wdata",
+      "ctrl_reg_write_en",
+      "fault_status_out",
+      "model_req_data",
+      "model_req_ready",
+      "model_req_valid",
+      "model_resp_data",
+      "model_resp_ready",
+      "model_resp_valid",
+      "rst_n"
+    ],
+    "rtl_ports": []
+  },
+  "register_map": {
+    "expected": [
+      "actuator_max_clamp",
+      "actuator_min_clamp",
+      "actuator_rate_limit",
+      "clamp_event_counter",
+      "clear_fault",
+      "config_valid",
+      "enable",
+      "fallback_active",
+      "fallback_command_value",
+      "fault_cause_code",
+      "fault_latched",
+      "fsm_state",
+      "last_accepted_sequence",
+      "last_request_sequence",
+      "last_response_sequence",
+      "operating_mode",
+      "request_timeout_threshold",
+      "response_age_threshold",
+      "sequence_seed",
+      "stale_reject_counter",
+      "timeout_counter"
+    ],
+    "matched": [],
+    "expected_registers": [
+      "CTRL_ENABLE",
+      "CTRL_FALLBACK",
+      "CTRL_LIMITS",
+      "CTRL_SEQUENCE",
+      "CTRL_TIMEOUTS",
+      "STATUS_COUNTERS",
+      "STATUS_FAULT",
+      "STATUS_FSM",
+      "STATUS_SEQUENCES"
+    ],
+    "matched_registers": [],
+    "expected_addresses": [
+      "0x00",
+      "0x08",
+      "0x10",
+      "0x18",
+      "0x20",
+      "0x40",
+      "0x48",
+      "0x50",
+      "0x58"
+    ],
+    "matched_addresses": [],
+    "missing": [
+      "actuator_max_clamp",
+      "actuator_min_clamp",
+      "actuator_rate_limit",
+      "clamp_event_counter",
+      "clear_fault",
+      "config_valid",
+      "enable",
+      "fallback_active",
+      "fallback_command_value",
+      "fault_cause_code",
+      "fault_latched",
+      "fsm_state",
+      "last_accepted_sequence",
+      "last_request_sequence",
+      "last_response_sequence",
+      "operating_mode",
+      "request_timeout_threshold",
+      "response_age_threshold",
+      "sequence_seed",
+      "stale_reject_counter",
+      "timeout_counter"
+    ],
+    "missing_registers": [
+      "CTRL_ENABLE",
+      "CTRL_FALLBACK",
+      "CTRL_LIMITS",
+      "CTRL_SEQUENCE",
+      "CTRL_TIMEOUTS",
+      "STATUS_COUNTERS",
+      "STATUS_FAULT",
+      "STATUS_FSM",
+      "STATUS_SEQUENCES"
+    ],
+    "missing_addresses": [
+      "0x00",
+      "0x08",
+      "0x10",
+      "0x18",
+      "0x20",
+      "0x40",
+      "0x48",
+      "0x50",
+      "0x58"
+    ],
+    "status": "issues"
+  },
+  "clock_reset": {
+    "clock_ports": [],
+    "reset_ports": [],
+    "status": "issues"
+  },
+  "requirements": [],
+  "rtl_files": [],
+  "modules": [],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}

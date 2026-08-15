@@ -1,0 +1,124 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "implementation_style": "Compact FPGA top-level integrator with a firmware-visible CSR/MMIO plane, 128-bit request/response transport, registered actuator output path, and explicit ownership of all top-level outputs.",
+      "control_strategy": "Use the CSR block as the sole source of configuration, then gate request issuance, response acceptance, safety filtering, fallback selection, and fault handling through the stream and safety blocks. Keep request/response flow strictly handshake-driven and avoid combinational dependence between transport and actuator outputs.",
+      "state_strategy": "Hold only the minimum top-level coordination state needed to connect the CSR, stream, and safety functions; all control/status state remains registered in the owned sub-blocks. Reset places the design into a deterministic safe fallback condition and preserves no ambiguous startup behavior.",
+      "output_strategy": "Drive every required top-level output from a real RTL owner: CSR readback/handshake, outbound request stream, inbound response ready, registered actuator command, and compact fault status. No required output is left to a child-input-only path.",
+      "ownership_notes": [
+        "Owns the top-level integration boundary and top-level output connectivity.",
+        "Owns the compact control-plane and transport contract without exposing geometry arrays, flow fields, or surrogate tensors.",
+        "Keeps scalar-equivalent I/O count below the stated limit while preserving firmware-visible MMIO and streaming interfaces."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_csr",
+      "implementation_style": "Simple decoded CSR/MMIO window with 64-bit read/write data, byte-addressed register decode, and synchronous response signaling.",
+      "control_strategy": "Decode firmware accesses into the implemented configuration registers and multiplex readable status back through the same compact window. Writable fields include enable, clear_fault, sequence seed, timeout thresholds, clamp/rate settings, fallback value, operating mode, and configuration-valid control.",
+      "state_strategy": "Store only the register-visible configuration state and present status fields from downstream blocks for readback. Do not create hidden software-visible state beyond the documented register contract.",
+      "output_strategy": "Provide registered CSR read-data and response-valid/ready semantics, with each declared register reachable through RTL decode. Return deterministic readback values for all mapped registers and a safe default for unmapped addresses.",
+      "ownership_notes": [
+        "Owns the firmware-visible register contract implementation.",
+        "Owns cfg_enable, cfg_clear_fault, cfg_sequence_seed, cfg_request_timeout_threshold, cfg_response_age_threshold, cfg_actuator_min_clamp, cfg_actuator_max_clamp, cfg_actuator_rate_limit, cfg_fallback_command_value, cfg_operating_mode, and cfg_config_valid.",
+        "Owns CSR response/ready semantics and status readback multiplexing."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_stream",
+      "implementation_style": "Handshake-based request packetizer and response parser with compact sequencing, integrity checking, timeout supervision, and minimal staging storage.",
+      "control_strategy": "When enabled, configured, not busy, and not fault-latched, emit one outbound request packet only when request-ready is asserted. Accept inbound responses only through the required valid/ready handshake and only when they match the latest issued request and freshness policy.",
+      "state_strategy": "Maintain a small set of registered sequence and watchdog counters, plus FSM state for RESET, IDLE, ISSUE_REQ, WAIT_RESP, VALIDATE_RESP, APPLY_CMD, FALLBACK, and FAULT_LATCH. Keep the logic simple and explicit rather than introducing extra sub-states.",
+      "output_strategy": "Drive model_req_valid/model_req_data as RTL outputs, model_req_ready as an input, model_resp_valid/model_resp_data as inputs, and model_resp_ready as an RTL output. Update accepted_command_word only after a valid response passes sequence, integrity, and age checks; otherwise increment stale/timeout/fault indicators and suppress unsafe forwarding.",
+      "ownership_notes": [
+        "Owns request generation and response parsing state.",
+        "Owns status_fsm_state, sequence tracking, timeout/stale counters, fault cause code, fallback active, and fault-latched indicators.",
+        "May use bounded technology-neutral staging memory for minimal buffering or telemetry snapshots, but not bulk registers or top-level payload exposure."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_safety",
+      "implementation_style": "Registered command guard and output select block that clamps, rate-limits, and conditionally accepts the parsed command word before it reaches the actuator output.",
+      "control_strategy": "Compare the accepted command against programmable min/max clamp limits and a programmable rate limit relative to the last applied command. If policy is satisfied, update the registered actuator output; otherwise select configured fallback behavior and propagate fault status as required.",
+      "state_strategy": "Retain only the last applied command, clamp/rate-limit evaluation results, and the registered fault/fallback outcome needed for deterministic output behavior. Reset and fault-latch behavior force safe output without combinational interaction with upstream request logic.",
+      "output_strategy": "Drive actuator_cmd_out and fault_status_out as registered outputs only. Any output change occurs on a clock edge and is subject to the configured clamp/rate-limit policy and fallback override.",
+      "ownership_notes": [
+        "Owns actuator_cmd_out and fault_status_out.",
+        "Owns the safety policy enforcement path for clamp, rate limit, fallback selection, and fault-latched hold behavior.",
+        "Keeps output behavior deterministic and synchronous, with safe fallback in RESET, IDLE, FALLBACK, and FAULT_LATCH conditions."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "module": "adaptive_aero_control_stream",
+      "present": true,
+      "description": "Use a compact explicit controller FSM with the minimum states requested by the specification. RESET and IDLE hold safe fallback behavior. ISSUE_REQ presents a single request packet. WAIT_RESP waits for a valid response or timeout. VALIDATE_RESP checks sequence, integrity, and age. APPLY_CMD stages an accepted command for safety filtering. FALLBACK drives safe fallback behavior. FAULT_LATCH holds safe output until clear_fault plus a clean re-enable/configuration sequence is observed.",
+      "states": [
+        "RESET",
+        "IDLE",
+        "ISSUE_REQ",
+        "WAIT_RESP",
+        "VALIDATE_RESP",
+        "APPLY_CMD",
+        "FALLBACK",
+        "FAULT_LATCH"
+      ]
+    }
+  ],
+  "datapath_intent": [
+    {
+      "module": "adaptive_aero_control_top",
+      "inputs": [
+        "clk",
+        "rst_n",
+        "ctrl_reg_addr",
+        "ctrl_reg_wdata",
+        "ctrl_reg_write_en",
+        "ctrl_reg_read_en",
+        "model_req_ready",
+        "model_resp_valid",
+        "model_resp_data"
+      ],
+      "internal_storage": [
+        "Registered CSR configuration fields.",
+        "Registered request/response sequencing and watchdog counters in the stream block.",
+        "Small bounded staging/telemetry memory inferred as FPGA-friendly block RAM when needed for request/response/history snapshots.",
+        "Registered last-applied command and fault/fallback status in the safety block."
+      ],
+      "output_mapping": [
+        "ctrl_reg_rdata, ctrl_reg_ready, and ctrl_reg_valid from the CSR read/response path.",
+        "model_req_valid and model_req_data as outbound request-stream outputs.",
+        "model_resp_ready as the inbound response-stream ready output.",
+        "actuator_cmd_out as the registered bounded actuator command.",
+        "fault_status_out as compact fault/fallback status bits."
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "Firmware programs configuration through the CSR window first; configuration-valid gates normal operation and safe fallback is held until configuration is valid.",
+    "When enabled and not fault-latched, the stream block generates a request only when idle/not busy and request-ready is asserted.",
+    "The request sequence number advances from the programmed seed and is checked against each response for match/freshness before acceptance.",
+    "Responses are accepted only after handshake, then validated for integrity, sequence, and age before any command staging occurs.",
+    "The safety block applies clamp and rate-limit policy before updating actuator_cmd_out; if policy fails, fallback is selected and fault behavior is asserted.",
+    "timeout and stale-data conditions update counters and can force fallback or fault-latch behavior according to the documented contract.",
+    "clear_fault is honored through the CSR/control path, but exit from FAULT_LATCH requires a clean re-enable/configuration sequence, not a combinational shortcut."
+  ],
+  "timing_notes": [
+    "All control outputs and status updates are synchronous to clk.",
+    "Reset is synchronous active-low and deterministically forces safe fallback outputs and initialized status state.",
+    "Request and response handshakes are registered and avoid combinational loops across the transport boundary.",
+    "actuator_cmd_out is registered and only changes on clock edges after safety evaluation.",
+    "fault_status_out is also registered so firmware observes stable, synchronous status transitions.",
+    "Any minimal staging memory used for FPGA mapping is technology-neutral and bounded; bulk payload storage is not flattened into registers."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json.",
+    "The top module remains adaptive_aero_control_top and is the synthesizable design top.",
+    "The CSR/MMIO interface is real and firmware-visible, and the streaming transport direction follows the mandatory contract."
+  ]
+}

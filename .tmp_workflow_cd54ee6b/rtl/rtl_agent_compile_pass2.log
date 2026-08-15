@@ -1,0 +1,17 @@
+backend/workflows/cd54ee6b-a80c-43b2-97b9-39b09f58fbcf/rtl/pass2/adaptive_aero_control_top.v:65: error: Unknown module type: adaptive_aero_control_csr
+backend/workflows/cd54ee6b-a80c-43b2-97b9-39b09f58fbcf/rtl/pass2/adaptive_aero_control_top.v:98: error: Unknown module type: adaptive_aero_control_stream
+backend/workflows/cd54ee6b-a80c-43b2-97b9-39b09f58fbcf/rtl/pass2/adaptive_aero_control_top.v:127: error: Unknown module type: adaptive_aero_control_safety
+backend/workflows/cd54ee6b-a80c-43b2-97b9-39b09f58fbcf/rtl/pass2/adaptive_aero_control_top.v:155: error: Unknown module type: adaptive_aero_staging_ram
+5 error(s) during elaboration.
+*** These modules were missing:
+        adaptive_aero_control_csr referenced 1 times.
+        adaptive_aero_control_safety referenced 1 times.
+        adaptive_aero_control_stream referenced 1 times.
+        adaptive_aero_staging_ram referenced 1 times.
+***
+
+Issues:
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.
