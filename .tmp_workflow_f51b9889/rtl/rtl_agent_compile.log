@@ -1,7 +1,0 @@
-backend/workflows/f51b9889-8063-4362-8478-8d7d0c4c9400/rtl/adaptive_aero_control_register_map.v:167: syntax error
-
-Issues:
-❌ Icarus Verilog compile failed.
-
-=== VERILATOR LINT FAILURE ===
-Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

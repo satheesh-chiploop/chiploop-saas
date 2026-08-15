@@ -1,0 +1,839 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "Synthesizable FPGA top-level digital control plane for an external DoMINO surrogate service. It implements firmware-visible CSR/MMIO control, compact model request/response transport, request validation, timeout and stale-data detection, bounded actuator-command output, fault retention, and fallback behavior. The RTL does not implement the physics surrogate itself and does not expose meshes, fields, or tensors at the top level.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "rst_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "Single synchronous clock domain only.",
+      "All control and state logic is edge-triggered on clk.",
+      "Active-low synchronous reset rst_n returns the design to safe fallback outputs and idle state.",
+      "Compact host interface is a 64-bit CSR/MMIO window; no wide streaming interface is exposed.",
+      "Total top-level scalar-equivalent I/O remains below 256.",
+      "External inference service is off-chip or software/GPU-side and is accessed only through compact request/response transport signals."
+    ]
+  },
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level adaptive aero control controller with firmware-visible CSR/MMIO registers, request issuance, response validation, watchdog timeout, stale-data rejection, actuator clamp/fallback generation, and persistent fault status. This module is the design top and must not be replaced by a register-bank or leaf module.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "csr_addr",
+          "direction": "input",
+          "width": 6
+        },
+        {
+          "name": "csr_wdata",
+          "direction": "input",
+          "width": 64
+        },
+        {
+          "name": "csr_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "csr_we",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "csr_rdata",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "csr_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_req_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_req_data",
+          "direction": "output",
+          "width": 128
+        },
+        {
+          "name": "model_req_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_data",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "model_rsp_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_out",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_surrogate_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "fault_status_out",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "status_out",
+          "direction": "output",
+          "width": 16
+        }
+      ],
+      "functionality": "Implements the full digital control-plane contract for an external aerodynamics surrogate service. Accepts firmware/MMIO configuration for operating mode, timeout threshold, stale-age threshold, actuator clamp limits, and fallback command values. Captures compact host requests containing transaction ID, geometry reference handle, stream velocity, and flow-condition summary. Validates velocity against the configured 20 to 55 m/s envelope and rejects stale requests relative to last accepted sequence and age. Marshals validated requests to an external model service. Accepts model responses with transaction ID, predicted outputs, and status; verifies freshness, completeness, and transaction match before allowing command influence. Produces bounded actuator command outputs only from validated surrogate responses or safe fallback values. Retains fault status until software acknowledgment and supports re-arming and parameter updates through CSR writes.",
+      "responsibilities": [
+        "Expose a real firmware-visible CSR/MMIO control plane with address, write-data, read-data, transaction-valid/write-enable, and ready/response semantics.",
+        "Implement a compact 128-bit external model request payload and 128-bit response payload with the required ready/valid directionality.",
+        "Track transaction IDs, sequence numbers, freshness, watchdog counters, and error codes in flip-flops only.",
+        "Generate safe fallback actuator outputs on validation failure, timeout, stale request rejection, or response mismatch.",
+        "Clamp all actuator outputs to configured minimum and maximum limits before presentation.",
+        "Hold fault status until explicit CSR clear/acknowledge.",
+        "Keep the default output after reset at the configured safe fallback command and a safe inactive command-valid state.",
+        "Avoid any bulk tensor, mesh, or field storage in RTL."
+      ],
+      "must_drive": [
+        "csr_rdata",
+        "csr_ready",
+        "model_req_valid",
+        "model_req_data",
+        "model_rsp_ready",
+        "actuator_cmd_out",
+        "actuator_cmd_valid",
+        "actuator_cmd_surrogate_valid",
+        "fault_status_out",
+        "status_out"
+      ],
+      "must_receive": [
+        "clk",
+        "rst_n",
+        "csr_addr",
+        "csr_wdata",
+        "csr_valid",
+        "csr_we",
+        "model_req_ready",
+        "model_rsp_valid",
+        "model_rsp_data"
+      ],
+      "must_not_drive": [
+        "model_req_ready",
+        "model_rsp_valid",
+        "model_rsp_data"
+      ],
+      "reset_behavior": "On rst_n deassertion, all internal registers, timers, FSM state, transaction trackers, and fault latches reset to known safe values. csr_ready asserts only according to the internal CSR timing model. model_req_valid deasserts, model_rsp_ready deasserts or idles per protocol-safe default, actuator_cmd_out loads safe fallback command, actuator_cmd_valid deasserts until a valid command is issued, actuator_cmd_surrogate_valid deasserts, and fault_status_out reflects no latched fault unless explicitly configured otherwise.",
+      "behavior_rules": [
+        "Use a small synchronous FSM with at least IDLE, ISSUE_REQ, WAIT_RSP, VALIDATE_RSP, APPLY_CMD, FALLBACK, and FAULT_HOLD states.",
+        "Accept host request data only when configuration and validation conditions pass.",
+        "Reject requests with stream velocity outside 20 to 55 m/s inclusive configuration envelope.",
+        "Reject stale requests using programmed stale-age threshold and last accepted sequence tracking.",
+        "Start the watchdog timer when a request is issued and assert timeout fault if no validated response arrives before expiry.",
+        "Verify response transaction ID match, freshness, and completeness before accepting outputs.",
+        "Never allow unvalidated response data to affect actuator_cmd_out.",
+        "Assert fallback_active behavior on validation failure, response mismatch, timeout, or inactivity detection when enabled.",
+        "Clamp actuator_cmd_out to configured bounds on every update path.",
+        "Retain the last fault until software clears it through the CSR interface.",
+        "Do not expose geometry meshes, surfaces, full flow fields, or surrogate tensors as top-level pins.",
+        "Do not infer bulk memory or FIFO structures in flip-flops; any future enlargement must use technology-neutral block RAM abstraction outside this contract.",
+        "Top-level output ports must have real RTL drivers and must not depend solely on child inputs."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": []
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_control_top.clk"
+      ],
+      "description": "Top-level synchronous clock drives the entire control plane."
+    },
+    {
+      "top_port": "rst_n",
+      "connected_to": [
+        "adaptive_aero_control_top.rst_n"
+      ],
+      "description": "Top-level active-low reset controls safe-state reset behavior."
+    },
+    {
+      "top_port": "csr_addr",
+      "connected_to": [
+        "adaptive_aero_control_top.csr_addr"
+      ],
+      "description": "Firmware-visible CSR address input."
+    },
+    {
+      "top_port": "csr_wdata",
+      "connected_to": [
+        "adaptive_aero_control_top.csr_wdata"
+      ],
+      "description": "Firmware-visible CSR write-data input."
+    },
+    {
+      "top_port": "csr_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.csr_valid"
+      ],
+      "description": "CSR transaction valid strobe input."
+    },
+    {
+      "top_port": "csr_we",
+      "connected_to": [
+        "adaptive_aero_control_top.csr_we"
+      ],
+      "description": "CSR write-enable input; read when low, write when high."
+    },
+    {
+      "top_port": "csr_rdata",
+      "connected_to": [
+        "adaptive_aero_control_top.csr_rdata"
+      ],
+      "description": "CSR read-data output returning register contents and status."
+    },
+    {
+      "top_port": "csr_ready",
+      "connected_to": [
+        "adaptive_aero_control_top.csr_ready"
+      ],
+      "description": "CSR ready/response output for MMIO handshake."
+    },
+    {
+      "top_port": "model_req_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.model_req_valid"
+      ],
+      "description": "External model request valid output."
+    },
+    {
+      "top_port": "model_req_data",
+      "connected_to": [
+        "adaptive_aero_control_top.model_req_data"
+      ],
+      "description": "External model request payload output."
+    },
+    {
+      "top_port": "model_req_ready",
+      "connected_to": [
+        "adaptive_aero_control_top.model_req_ready"
+      ],
+      "description": "External model request ready input from inference service."
+    },
+    {
+      "top_port": "model_rsp_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.model_rsp_valid"
+      ],
+      "description": "External model response valid input from inference service."
+    },
+    {
+      "top_port": "model_rsp_data",
+      "connected_to": [
+        "adaptive_aero_control_top.model_rsp_data"
+      ],
+      "description": "External model response payload input from inference service."
+    },
+    {
+      "top_port": "model_rsp_ready",
+      "connected_to": [
+        "adaptive_aero_control_top.model_rsp_ready"
+      ],
+      "description": "External model response ready output toward inference service."
+    },
+    {
+      "top_port": "actuator_cmd_out",
+      "connected_to": [
+        "adaptive_aero_control_top.actuator_cmd_out"
+      ],
+      "description": "Top-level bounded actuator command output."
+    },
+    {
+      "top_port": "actuator_cmd_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.actuator_cmd_valid"
+      ],
+      "description": "Command validity output indicating update event."
+    },
+    {
+      "top_port": "actuator_cmd_surrogate_valid",
+      "connected_to": [
+        "adaptive_aero_control_top.actuator_cmd_surrogate_valid"
+      ],
+      "description": "Separate enable/fail-safe indication for surrogate-derived versus fallback-derived command selection."
+    },
+    {
+      "top_port": "fault_status_out",
+      "connected_to": [
+        "adaptive_aero_control_top.fault_status_out"
+      ],
+      "description": "Latched fault status output retained until CSR acknowledgment."
+    },
+    {
+      "top_port": "status_out",
+      "connected_to": [
+        "adaptive_aero_control_top.status_out"
+      ],
+      "description": "Compact status output including busy, response_valid, stale_reject, timeout_fault, invalid_response_fault, clamp_active, fallback_active, and last_error_code encoding."
+    }
+  ],
+  "inter_module_signals": [],
+  "signal_ownership": [
+    {
+      "signal": "model_req_valid_int",
+      "owner": "adaptive_aero_control_top.model_req_valid"
+    },
+    {
+      "signal": "model_req_data_int",
+      "owner": "adaptive_aero_control_top.model_req_data"
+    },
+    {
+      "signal": "model_rsp_ready_int",
+      "owner": "adaptive_aero_control_top.model_rsp_ready"
+    },
+    {
+      "signal": "actuator_cmd_out_int",
+      "owner": "adaptive_aero_control_top.actuator_cmd_out"
+    },
+    {
+      "signal": "actuator_cmd_valid_int",
+      "owner": "adaptive_aero_control_top.actuator_cmd_valid"
+    },
+    {
+      "signal": "actuator_cmd_surrogate_valid_int",
+      "owner": "adaptive_aero_control_top.actuator_cmd_surrogate_valid"
+    },
+    {
+      "signal": "fault_status_out_int",
+      "owner": "adaptive_aero_control_top.fault_status_out"
+    },
+    {
+      "signal": "status_out_int",
+      "owner": "adaptive_aero_control_top.status_out"
+    },
+    {
+      "signal": "csr_rdata",
+      "owner": "adaptive_aero_control_top.csr_rdata"
+    },
+    {
+      "signal": "csr_ready",
+      "owner": "adaptive_aero_control_top.csr_ready"
+    },
+    {
+      "signal": "model_req_valid",
+      "owner": "adaptive_aero_control_top.model_req_valid"
+    },
+    {
+      "signal": "model_req_data",
+      "owner": "adaptive_aero_control_top.model_req_data"
+    },
+    {
+      "signal": "model_rsp_ready",
+      "owner": "adaptive_aero_control_top.model_rsp_ready"
+    },
+    {
+      "signal": "actuator_cmd_out",
+      "owner": "adaptive_aero_control_top.actuator_cmd_out"
+    },
+    {
+      "signal": "actuator_cmd_valid",
+      "owner": "adaptive_aero_control_top.actuator_cmd_valid"
+    },
+    {
+      "signal": "actuator_cmd_surrogate_valid",
+      "owner": "adaptive_aero_control_top.actuator_cmd_surrogate_valid"
+    },
+    {
+      "signal": "fault_status_out",
+      "owner": "adaptive_aero_control_top.fault_status_out"
+    },
+    {
+      "signal": "status_out",
+      "owner": "adaptive_aero_control_top.status_out"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "minimal",
+    "registers": [
+      {
+        "name": "CTRL",
+        "address": 0,
+        "access": "rw",
+        "width": 64,
+        "reset": 0,
+        "description": "Control register for operating mode, request arm, watchdog enable, host inactivity enable, and software ack/clear bits.",
+        "fields": [
+          {
+            "name": "operating_mode",
+            "lsb": 0,
+            "msb": 2,
+            "access": "rw",
+            "reset": 0,
+            "description": "Operating mode control."
+          },
+          {
+            "name": "request_arm",
+            "lsb": 3,
+            "msb": 3,
+            "access": "rw",
+            "reset": 0,
+            "description": "Arms host request capture and issue sequencing."
+          },
+          {
+            "name": "watchdog_enable",
+            "lsb": 4,
+            "msb": 4,
+            "access": "rw",
+            "reset": 1,
+            "description": "Enables request watchdog timing."
+          },
+          {
+            "name": "host_inactivity_enable",
+            "lsb": 5,
+            "msb": 5,
+            "access": "rw",
+            "reset": 0,
+            "description": "Enables host inactivity detection."
+          },
+          {
+            "name": "clear_faults",
+            "lsb": 6,
+            "msb": 6,
+            "access": "wo",
+            "reset": 0,
+            "description": "Write-1-to-clear latched faults and error flags."
+          },
+          {
+            "name": "ack_response",
+            "lsb": 7,
+            "msb": 7,
+            "access": "wo",
+            "reset": 0,
+            "description": "Software acknowledgement for accepted response or fallback event."
+          },
+          {
+            "name": "reserved",
+            "lsb": 8,
+            "msb": 63,
+            "access": "ro",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "TIMING_CFG",
+        "address": 1,
+        "access": "rw",
+        "width": 64,
+        "reset": 0,
+        "description": "Programmable timeout and stale-age thresholds.",
+        "fields": [
+          {
+            "name": "timeout_threshold",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 1000,
+            "description": "Watchdog timeout threshold in clock cycles."
+          },
+          {
+            "name": "stale_age_threshold",
+            "lsb": 16,
+            "msb": 31,
+            "access": "rw",
+            "reset": 32,
+            "description": "Maximum allowed request age or sequence staleness threshold."
+          },
+          {
+            "name": "inactivity_threshold",
+            "lsb": 32,
+            "msb": 47,
+            "access": "rw",
+            "reset": 0,
+            "description": "Optional host inactivity threshold in clock cycles when enabled."
+          },
+          {
+            "name": "reserved",
+            "lsb": 48,
+            "msb": 63,
+            "access": "ro",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "CLAMP_CFG",
+        "address": 2,
+        "access": "rw",
+        "width": 64,
+        "reset": 0,
+        "description": "Actuator clamp limits for output bounding.",
+        "fields": [
+          {
+            "name": "actuator_min",
+            "lsb": 0,
+            "msb": 31,
+            "access": "rw",
+            "reset": 0,
+            "description": "Minimum actuator command clamp."
+          },
+          {
+            "name": "actuator_max",
+            "lsb": 32,
+            "msb": 63,
+            "access": "rw",
+            "reset": 4294967295,
+            "description": "Maximum actuator command clamp."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_CFG",
+        "address": 3,
+        "access": "rw",
+        "width": 64,
+        "reset": 0,
+        "description": "Safe fallback command value and associated control bits.",
+        "fields": [
+          {
+            "name": "fallback_cmd",
+            "lsb": 0,
+            "msb": 31,
+            "access": "rw",
+            "reset": 0,
+            "description": "Safe fallback actuator command."
+          },
+          {
+            "name": "fallback_valid",
+            "lsb": 32,
+            "msb": 32,
+            "access": "rw",
+            "reset": 1,
+            "description": "Indicates fallback command is valid and driveable."
+          },
+          {
+            "name": "reserved",
+            "lsb": 33,
+            "msb": 63,
+            "access": "ro",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "REQ_CAPTURE",
+        "address": 4,
+        "access": "rw",
+        "width": 64,
+        "reset": 0,
+        "description": "Host request capture register containing compact request record fields.",
+        "fields": [
+          {
+            "name": "transaction_id",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 0,
+            "description": "Compact transaction identifier."
+          },
+          {
+            "name": "geometry_handle",
+            "lsb": 16,
+            "msb": 31,
+            "access": "rw",
+            "reset": 0,
+            "description": "Geometry reference handle; no mesh data is stored in RTL."
+          },
+          {
+            "name": "stream_velocity",
+            "lsb": 32,
+            "msb": 47,
+            "access": "rw",
+            "reset": 20,
+            "description": "Stream velocity in fixed-point or integer m/s encoding, validated against 20 to 55 m/s."
+          },
+          {
+            "name": "flow_summary",
+            "lsb": 48,
+            "msb": 63,
+            "access": "rw",
+            "reset": 0,
+            "description": "Compact flow-condition summary."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_STATUS",
+        "address": 5,
+        "access": "ro",
+        "width": 64,
+        "reset": 0,
+        "description": "Sequence and status tracking.",
+        "fields": [
+          {
+            "name": "current_state",
+            "lsb": 0,
+            "msb": 2,
+            "access": "ro",
+            "reset": 0,
+            "description": "FSM state encoding."
+          },
+          {
+            "name": "busy",
+            "lsb": 3,
+            "msb": 3,
+            "access": "ro",
+            "reset": 0,
+            "description": "Busy status."
+          },
+          {
+            "name": "response_valid",
+            "lsb": 4,
+            "msb": 4,
+            "access": "ro",
+            "reset": 0,
+            "description": "Indicates last response was validated and accepted."
+          },
+          {
+            "name": "stale_reject",
+            "lsb": 5,
+            "msb": 5,
+            "access": "ro",
+            "reset": 0,
+            "description": "Sticky stale-request rejection flag."
+          },
+          {
+            "name": "timeout_fault",
+            "lsb": 6,
+            "msb": 6,
+            "access": "ro",
+            "reset": 0,
+            "description": "Sticky timeout fault flag."
+          },
+          {
+            "name": "invalid_response_fault",
+            "lsb": 7,
+            "msb": 7,
+            "access": "ro",
+            "reset": 0,
+            "description": "Sticky invalid response fault flag."
+          },
+          {
+            "name": "clamp_active",
+            "lsb": 8,
+            "msb": 8,
+            "access": "ro",
+            "reset": 0,
+            "description": "Indicates clamp was applied to the current command."
+          },
+          {
+            "name": "fallback_active",
+            "lsb": 9,
+            "msb": 9,
+            "access": "ro",
+            "reset": 0,
+            "description": "Indicates fallback command is currently driving the actuator output."
+          },
+          {
+            "name": "last_error_code",
+            "lsb": 10,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Encoded last error code."
+          },
+          {
+            "name": "reserved",
+            "lsb": 16,
+            "msb": 63,
+            "access": "ro",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_OUT",
+        "address": 6,
+        "access": "ro",
+        "width": 64,
+        "reset": 0,
+        "description": "Actuator output observation register.",
+        "fields": [
+          {
+            "name": "actuator_cmd_out",
+            "lsb": 0,
+            "msb": 31,
+            "access": "ro",
+            "reset": 0,
+            "description": "Current actuator command output."
+          },
+          {
+            "name": "surrogate_valid",
+            "lsb": 32,
+            "msb": 32,
+            "access": "ro",
+            "reset": 0,
+            "description": "Valid when command is surrogate-derived and validated."
+          },
+          {
+            "name": "command_valid",
+            "lsb": 33,
+            "msb": 33,
+            "access": "ro",
+            "reset": 0,
+            "description": "Current command update valid flag."
+          },
+          {
+            "name": "reserved",
+            "lsb": 34,
+            "msb": 63,
+            "access": "ro",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_STATUS",
+        "address": 7,
+        "access": "rw1c",
+        "width": 64,
+        "reset": 0,
+        "description": "Latched fault and error status register, write-1-to-clear per field semantics.",
+        "fields": [
+          {
+            "name": "latched_fault",
+            "lsb": 0,
+            "msb": 0,
+            "access": "rw1c",
+            "reset": 0,
+            "description": "Composite latched fault indicator."
+          },
+          {
+            "name": "timeout_fault",
+            "lsb": 1,
+            "msb": 1,
+            "access": "rw1c",
+            "reset": 0,
+            "description": "Timeout fault latch."
+          },
+          {
+            "name": "invalid_response_fault",
+            "lsb": 2,
+            "msb": 2,
+            "access": "rw1c",
+            "reset": 0,
+            "description": "Invalid response fault latch."
+          },
+          {
+            "name": "stale_reject",
+            "lsb": 3,
+            "msb": 3,
+            "access": "rw1c",
+            "reset": 0,
+            "description": "Stale request rejection latch."
+          },
+          {
+            "name": "response_mismatch_fault",
+            "lsb": 4,
+            "msb": 4,
+            "access": "rw1c",
+            "reset": 0,
+            "description": "Transaction ID mismatch or incomplete response fault latch."
+          },
+          {
+            "name": "host_inactivity_fault",
+            "lsb": 5,
+            "msb": 5,
+            "access": "rw1c",
+            "reset": 0,
+            "description": "Host inactivity fault latch."
+          },
+          {
+            "name": "clamp_active",
+            "lsb": 6,
+            "msb": 6,
+            "access": "ro",
+            "reset": 0,
+            "description": "Clamp active indicator."
+          },
+          {
+            "name": "fallback_active",
+            "lsb": 7,
+            "msb": 7,
+            "access": "ro",
+            "reset": 0,
+            "description": "Fallback active indicator."
+          },
+          {
+            "name": "last_error_code",
+            "lsb": 8,
+            "msb": 13,
+            "access": "rw1c",
+            "reset": 0,
+            "description": "Sticky last error code."
+          },
+          {
+            "name": "reserved",
+            "lsb": 14,
+            "msb": 63,
+            "access": "ro",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      }
+    ]
+  }
+}

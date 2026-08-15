@@ -1,0 +1,453 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 6,
+    "data_width": 64,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control register for operating mode, request arm, watchdog enable, host inactivity enable, and software ack/clear bits.",
+        "fields": [
+          {
+            "name": "operating_mode",
+            "lsb": 0,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Operating mode control. Encoded mode selection for the controller."
+          },
+          {
+            "name": "request_arm",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "Arms host request capture and issue sequencing when set."
+          },
+          {
+            "name": "watchdog_enable",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RW",
+            "reset": 1,
+            "description": "Enables request watchdog timing when set."
+          },
+          {
+            "name": "host_inactivity_enable",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enables host inactivity detection when set."
+          },
+          {
+            "name": "clear_faults",
+            "lsb": 6,
+            "msb": 6,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write-1-to-clear latched faults and error flags."
+          },
+          {
+            "name": "ack_response",
+            "lsb": 7,
+            "msb": 7,
+            "access": "WO",
+            "reset": 0,
+            "description": "Software acknowledgement for accepted response or fallback event."
+          },
+          {
+            "name": "reserved",
+            "lsb": 8,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "TIMING_CFG",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "Programmable timeout and stale-age thresholds.",
+        "fields": [
+          {
+            "name": "timeout_threshold",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 1000,
+            "description": "Watchdog timeout threshold in clock cycles."
+          },
+          {
+            "name": "stale_age_threshold",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RW",
+            "reset": 32,
+            "description": "Maximum allowed request age or sequence staleness threshold."
+          },
+          {
+            "name": "inactivity_threshold",
+            "lsb": 32,
+            "msb": 47,
+            "access": "RW",
+            "reset": 0,
+            "description": "Optional host inactivity threshold in clock cycles when enabled."
+          },
+          {
+            "name": "reserved",
+            "lsb": 48,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "CLAMP_CFG",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Actuator clamp limits for output bounding.",
+        "fields": [
+          {
+            "name": "actuator_min",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum actuator command clamp."
+          },
+          {
+            "name": "actuator_max",
+            "lsb": 32,
+            "msb": 63,
+            "access": "RW",
+            "reset": 4294967295,
+            "description": "Maximum actuator command clamp."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_CFG",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "Safe fallback command value and associated control bits.",
+        "fields": [
+          {
+            "name": "fallback_cmd",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Safe fallback actuator command."
+          },
+          {
+            "name": "fallback_valid",
+            "lsb": 32,
+            "msb": 32,
+            "access": "RW",
+            "reset": 1,
+            "description": "Indicates fallback command is valid and driveable."
+          },
+          {
+            "name": "reserved",
+            "lsb": 33,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "REQ_CAPTURE",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Host request capture register containing compact request record fields.",
+        "fields": [
+          {
+            "name": "transaction_id",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Compact transaction identifier."
+          },
+          {
+            "name": "geometry_handle",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Geometry reference handle; no mesh data is stored in RTL."
+          },
+          {
+            "name": "stream_velocity",
+            "lsb": 32,
+            "msb": 47,
+            "access": "RW",
+            "reset": 20,
+            "description": "Stream velocity in fixed-point or integer m/s encoding, validated against 20 to 55 m/s."
+          },
+          {
+            "name": "flow_summary",
+            "lsb": 48,
+            "msb": 63,
+            "access": "RW",
+            "reset": 0,
+            "description": "Compact flow-condition summary."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_STATUS",
+        "offset": "0x05",
+        "access": "RO",
+        "description": "Sequence and status tracking.",
+        "fields": [
+          {
+            "name": "current_state",
+            "lsb": 0,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "FSM state encoding."
+          },
+          {
+            "name": "busy",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Busy status."
+          },
+          {
+            "name": "response_valid",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates last response was validated and accepted."
+          },
+          {
+            "name": "stale_reject",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky stale-request rejection flag."
+          },
+          {
+            "name": "timeout_fault",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky timeout fault flag."
+          },
+          {
+            "name": "invalid_response_fault",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky invalid response fault flag."
+          },
+          {
+            "name": "clamp_active",
+            "lsb": 8,
+            "msb": 8,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates clamp was applied to the current command."
+          },
+          {
+            "name": "fallback_active",
+            "lsb": 9,
+            "msb": 9,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates fallback command is currently driving the actuator output."
+          },
+          {
+            "name": "last_error_code",
+            "lsb": 10,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Encoded last error code."
+          },
+          {
+            "name": "reserved",
+            "lsb": 16,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_OUT",
+        "offset": "0x06",
+        "access": "RO",
+        "description": "Actuator output observation register.",
+        "fields": [
+          {
+            "name": "actuator_cmd_out",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current actuator command output."
+          },
+          {
+            "name": "surrogate_valid",
+            "lsb": 32,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Valid when command is surrogate-derived and validated."
+          },
+          {
+            "name": "command_valid",
+            "lsb": 33,
+            "msb": 33,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current command update valid flag."
+          },
+          {
+            "name": "reserved",
+            "lsb": 34,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_STATUS",
+        "offset": "0x07",
+        "access": "RW1C",
+        "description": "Latched fault and error status register, write-1-to-clear per field semantics.",
+        "fields": [
+          {
+            "name": "latched_fault",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Composite latched fault indicator."
+          },
+          {
+            "name": "timeout_fault",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Timeout fault latch."
+          },
+          {
+            "name": "invalid_response_fault",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Invalid response fault latch."
+          },
+          {
+            "name": "stale_reject",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Stale request rejection latch."
+          },
+          {
+            "name": "response_mismatch_fault",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Transaction ID mismatch or incomplete response fault latch."
+          },
+          {
+            "name": "host_inactivity_fault",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Host inactivity fault latch."
+          },
+          {
+            "name": "clamp_active",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Clamp active indicator."
+          },
+          {
+            "name": "fallback_active",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Fallback active indicator."
+          },
+          {
+            "name": "last_error_code",
+            "lsb": 8,
+            "msb": 13,
+            "access": "RW1C",
+            "reset": 0,
+            "description": "Sticky last error code."
+          },
+          {
+            "name": "reserved",
+            "lsb": 14,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Write CLAMP_CFG and FALLBACK_CFG to safe values before arming.",
+      "Program TIMING_CFG timeout/stale/inactivity thresholds.",
+      "Write REQ_CAPTURE with transaction_id, geometry_handle, stream_velocity, and flow_summary.",
+      "Write CTRL to select operating_mode, enable watchdog as needed, and assert request_arm when ready."
+    ],
+    "polling_sequence": [
+      "Poll SEQ_STATUS for busy, response_valid, stale_reject, timeout_fault, invalid_response_fault, clamp_active, fallback_active, and last_error_code.",
+      "Read ACTUATOR_OUT to observe the current bounded actuator command and surrogate/fallback qualification.",
+      "Read FAULT_STATUS until latched faults are cleared by W1C writes."
+    ],
+    "irq_sequence": [
+      "No interrupt interface is defined in DIGITAL_SPEC_JSON; software should use CSR polling and write-1-to-clear fault handling."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The interface is a compact 64-bit CSR/MMIO window, matching the primary source of truth.",
+    "No new hierarchy, ports, or bus protocols were invented.",
+    "Every declared register is reachable through RTL decode and corresponds to DIGITAL_SPEC_JSON."
+  ]
+}
