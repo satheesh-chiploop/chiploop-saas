@@ -1,0 +1,461 @@
+{
+  "package_type": "system_software_validation_manifest",
+  "package_version": "1.0",
+  "generated_at": "2026-08-15T21:19:42.241777+00:00",
+  "validation_scope": "software_only",
+  "co_sim_enabled": false,
+  "source_workflow_id": "2946df15-8b31-4984-a881-a64b03148f24",
+  "source_resolution": {
+    "mode": "supabase_or_local",
+    "artifact_bucket": "",
+    "storage_prefixes": [
+      "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/",
+      "3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/2946df15-8b31-4984-a881-a64b03148f24/",
+      "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/2946df15-8b31-4984-a881-a64b03148f24/",
+      "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/system_software_validation/"
+    ],
+    "workflow_row_found": true,
+    "workflow_name": "HEM: System Software"
+  },
+  "artifact_roots": {
+    "software_root": "system/software",
+    "validation_root": "system/software_validation/input",
+    "package_root": "system/software/package",
+    "build_root": "system/software",
+    "tests_root": "system/software/tests",
+    "mock_root": "system/software/mock"
+  },
+  "discovered_assets": {
+    "software_package_manifest": {
+      "exists": true,
+      "source": "supabase",
+      "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/package/system_software_package.json",
+      "bucket": "artifacts"
+    },
+    "build_manifest": {
+      "exists": true,
+      "source": "supabase",
+      "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/system_software_build_manifest.json",
+      "bucket": "artifacts"
+    },
+    "test_manifest": {
+      "exists": true,
+      "source": "supabase",
+      "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/tests/system_software_test_manifest.json",
+      "bucket": "artifacts"
+    },
+    "mock_manifest": {
+      "exists": true,
+      "source": "supabase",
+      "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/mock/system_software_mock_manifest.json",
+      "bucket": "artifacts"
+    },
+    "sdk_manifest": {
+      "exists": true,
+      "source": "supabase",
+      "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/sdk/system_software_sdk_manifest.json",
+      "bucket": "artifacts"
+    },
+    "application_manifest": {
+      "exists": true,
+      "source": "supabase",
+      "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/apps/system_software_application_manifest.json",
+      "bucket": "artifacts"
+    },
+    "tools_manifest": {
+      "exists": false,
+      "source": "missing",
+      "resolved_path": "",
+      "bucket": ""
+    },
+    "adapter_manifest": {
+      "exists": true,
+      "source": "supabase",
+      "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/adapter/system_software_adapter_manifest.json",
+      "bucket": "artifacts"
+    },
+    "services_manifest": {
+      "exists": true,
+      "source": "supabase",
+      "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/services/system_software_core_services_manifest.json",
+      "bucket": "artifacts"
+    },
+    "input_contract": {
+      "exists": true,
+      "source": "supabase",
+      "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/input/system_software_input_contract.json",
+      "bucket": "artifacts"
+    },
+    "api_contract": {
+      "exists": true,
+      "source": "supabase",
+      "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/sdk/system_software_api_contract.json",
+      "bucket": "artifacts"
+    },
+    "executive_summary": {
+      "exists": true,
+      "source": "supabase",
+      "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/executive/system_software_executive_summary.json",
+      "bucket": "artifacts"
+    }
+  },
+  "crate_targets": {
+    "workspace_members": [
+      "sdk/adaptive_aero_control",
+      "services",
+      "adapter/adaptive_aero_control_adapter",
+      "apps/control_service",
+      "apps/diagnostics",
+      "apps/demo_cli"
+    ],
+    "sdk_crate_name": "adaptive_aero_control",
+    "app_names": [
+      "control_service",
+      "diagnostics",
+      "demo_cli"
+    ],
+    "service_names": [
+      "init_manager",
+      "health_monitor",
+      "control_service",
+      "interrupt_service"
+    ]
+  },
+  "validation_inputs": {
+    "required_assets": [
+      {
+        "name": "software_package_manifest",
+        "required": true,
+        "status": "present"
+      },
+      {
+        "name": "build_manifest",
+        "required": true,
+        "status": "present"
+      },
+      {
+        "name": "sdk_manifest",
+        "required": true,
+        "status": "present"
+      },
+      {
+        "name": "application_manifest",
+        "required": true,
+        "status": "present"
+      },
+      {
+        "name": "input_contract",
+        "required": true,
+        "status": "present"
+      },
+      {
+        "name": "api_contract",
+        "required": true,
+        "status": "present"
+      }
+    ],
+    "optional_assets": [
+      {
+        "name": "test_manifest",
+        "required": false,
+        "status": "present"
+      },
+      {
+        "name": "mock_manifest",
+        "required": false,
+        "status": "present"
+      },
+      {
+        "name": "tools_manifest",
+        "required": false,
+        "status": "missing_optional"
+      },
+      {
+        "name": "adapter_manifest",
+        "required": false,
+        "status": "present"
+      },
+      {
+        "name": "services_manifest",
+        "required": false,
+        "status": "present"
+      },
+      {
+        "name": "executive_summary",
+        "required": false,
+        "status": "present"
+      }
+    ],
+    "package_file_checks": [
+      {
+        "path": "system/software/sdk/adaptive_aero_control/Cargo.toml",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/sdk/adaptive_aero_control/Cargo.toml",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/sdk/adaptive_aero_control/src/lib.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/sdk/adaptive_aero_control/src/lib.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/sdk/adaptive_aero_control/examples/basic.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/sdk/adaptive_aero_control/examples/basic.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/sdk/adaptive_aero_control/src/bin/diag_cli.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/sdk/adaptive_aero_control/src/bin/diag_cli.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/sdk/adaptive_aero_control/config/default.toml",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/sdk/adaptive_aero_control/config/default.toml",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/apps/control_service/src/main.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/apps/control_service/src/main.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/apps/control_service/Cargo.toml",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/apps/control_service/Cargo.toml",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/apps/diagnostics/src/main.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/apps/diagnostics/src/main.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/apps/diagnostics/Cargo.toml",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/apps/diagnostics/Cargo.toml",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/apps/demo_cli/src/main.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/apps/demo_cli/src/main.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/apps/demo_cli/Cargo.toml",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/apps/demo_cli/Cargo.toml",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/Cargo.toml",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/Cargo.toml",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/Makefile",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/Makefile",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/build_plan.json",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/build_plan.json",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/tests/sdk/sdk_tests.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/tests/sdk/sdk_tests.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/tests/services/service_tests.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/tests/services/service_tests.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/tests/apps/control_service_smoke.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/tests/apps/control_service_smoke.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/tests/apps/diagnostics_smoke.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/tests/apps/diagnostics_smoke.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/tests/apps/demo_cli_smoke.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/tests/apps/demo_cli_smoke.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/mock/src/mock_runtime.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/mock/src/mock_runtime.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/adapter/adaptive_aero_control_adapter/src/adapter/register_adapter.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/adapter/adaptive_aero_control_adapter/src/adapter/register_adapter.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/adapter/adaptive_aero_control_adapter/src/adapter/device_adapter.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/adapter/adaptive_aero_control_adapter/src/adapter/device_adapter.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/adapter/adaptive_aero_control_adapter/src/error.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/adapter/adaptive_aero_control_adapter/src/error.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/adapter/adaptive_aero_control_adapter/Cargo.toml",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/adapter/adaptive_aero_control_adapter/Cargo.toml",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/adapter/adaptive_aero_control_adapter/src/lib.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/adapter/adaptive_aero_control_adapter/src/lib.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/adapter/adaptive_aero_control_adapter/src/adapter/mod.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/adapter/adaptive_aero_control_adapter/src/adapter/mod.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/services/src/init_manager.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/services/src/init_manager.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/services/src/health_monitor.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/services/src/health_monitor.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/services/src/control_service.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/services/src/control_service.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/services/src/interrupt_service.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/services/src/interrupt_service.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/services/src/error.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/services/src/error.rs",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/services/Cargo.toml",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/services/Cargo.toml",
+        "bucket": "artifacts"
+      },
+      {
+        "path": "system/software/services/src/lib.rs",
+        "required": true,
+        "exists": true,
+        "source": "supabase",
+        "resolved_path": "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/services/src/lib.rs",
+        "bucket": "artifacts"
+      }
+    ]
+  },
+  "validation_readiness": {
+    "missing_required_assets": [],
+    "missing_required_package_files": [],
+    "overall_ingest_status": "ready"
+  }
+}

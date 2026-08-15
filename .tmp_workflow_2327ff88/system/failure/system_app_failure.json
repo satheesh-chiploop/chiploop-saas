@@ -1,0 +1,11 @@
+{
+  "schema": "chiploop.system.app_failure.v1",
+  "status": "failed",
+  "workflow_id": "2327ff88-858e-4379-be01-f783386b58c8",
+  "run_id": "777b23bc-9caf-470d-a5d7-eedb3f8795d0",
+  "template_workflow": "System_Software_Validation_L2",
+  "app_name": "system-software-validation",
+  "exception_type": "RuntimeError",
+  "message": "System software package audit failed: required artifacts are missing",
+  "traceback": "Traceback (most recent call last):\n  File \"/root/chiploop-backend/main.py\", line 14719, in execute_system_app_background\n    _run_nodes_with_shared_state(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        workflow_id=workflow_id,\n        ^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n        shared_state=shared_state,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/root/chiploop-backend/main.py\", line 2158, in _run_nodes_with_shared_state\n    result = _execute_agent_with_runtime(\n        label,\n    ...<4 lines>...\n        loop_type,\n    )\n  File \"/root/chiploop-backend/main.py\", line 1970, in _execute_agent_with_runtime\n    runtime_result = execute_legacy_agent(agent_fn, context)\n  File \"/root/chiploop-backend/agents/runtime.py\", line 311, in execute_legacy_agent\n    return execute_agent(context, _handler)\n  File \"/root/chiploop-backend/agents/runtime.py\", line 224, in execute_agent\n    result = AgentResult.from_legacy(handler(context))\n                                     ~~~~~~~^^^^^^^^^\n  File \"/root/chiploop-backend/agents/runtime.py\", line 304, in _handler\n    return agent_fn(ctx.state)\n  File \"/root/chiploop-backend/agents/system/system_software_package_audit_agent.py\", line 182, in run_agent\n    raise RuntimeError(\"System software package audit failed: required artifacts are missing\")\nRuntimeError: System software package audit failed: required artifacts are missing\n"
+}

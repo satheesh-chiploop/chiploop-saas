@@ -1,0 +1,27 @@
+{
+  "agent": "System Software Package Audit Agent",
+  "generated_at": "2026-08-15T21:20:00.254787+00:00",
+  "package_manifest_present": true,
+  "package_file_check_count": 33,
+  "expected_sections": {
+    "sdk": true,
+    "apps": true,
+    "build": true,
+    "input_contract": true,
+    "api_contract": true,
+    "tests": true,
+    "mock": true,
+    "tools": false,
+    "adapter": true,
+    "services": true,
+    "executive_summary": true
+  },
+  "required_adapter_package_files": [
+    "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/adapter/Cargo.toml",
+    "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/adapter/src/lib.rs"
+  ],
+  "missing_required_adapter_package_files": [
+    "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/adapter/Cargo.toml",
+    "backend/workflows/2946df15-8b31-4984-a881-a64b03148f24/system/software/adapter/src/lib.rs"
+  ]
+}
