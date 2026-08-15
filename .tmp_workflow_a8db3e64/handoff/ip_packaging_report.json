@@ -1,0 +1,19 @@
+{
+  "type": "ip_packaging_handoff",
+  "version": "1.0",
+  "top_module": "adaptive_aero_control_top",
+  "package_dir": "backend/workflows/a8db3e64-a3f2-4fbe-b6ee-0d89280acaa5/handoff/adaptive_aero_control_top_ip_package",
+  "zip_path": "backend/workflows/a8db3e64-a3f2-4fbe-b6ee-0d89280acaa5/handoff/adaptive_aero_control_top_ip_package.zip",
+  "bucket_counts": {
+    "rtl": 0,
+    "spec": 5,
+    "arch": 0,
+    "microarch": 0,
+    "regmap": 0,
+    "constraints": 0,
+    "power_intent": 0,
+    "verification": 0,
+    "reports": 0,
+    "other": 3
+  }
+}

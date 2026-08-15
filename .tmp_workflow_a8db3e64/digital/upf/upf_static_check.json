@@ -1,0 +1,93 @@
+{
+  "workflow_id": "a8db3e64-a3f2-4fbe-b6ee-0d89280acaa5",
+  "agent": "Digital UPF Static Check Agent",
+  "status": "fail",
+  "upf_file": null,
+  "domain_count": 0,
+  "supply_port_count": 0,
+  "supply_net_count": 0,
+  "isolation_rule_count": 0,
+  "retention_rule_count": 0,
+  "level_shifter_rule_count": 0,
+  "pst_present": false,
+  "unsupported_command_count": 0,
+  "openroad_read_upf": {
+    "status": "not_run",
+    "reason": "missing_upf",
+    "tool": "openroad"
+  },
+  "private_adapter": {
+    "status": "not_configured"
+  },
+  "power_aware_sim": {
+    "status": "not_supported_by_open_source_flow",
+    "note": "This static checker does not simulate UPF supply corruption/isolation/retention semantics."
+  },
+  "checks": [
+    {
+      "name": "upf_present",
+      "status": "fail",
+      "severity": "error",
+      "message": "No UPF artifact found."
+    },
+    {
+      "name": "power_domains",
+      "status": "fail",
+      "severity": "error",
+      "message": "No create_power_domain command found."
+    },
+    {
+      "name": "supplies",
+      "status": "fail",
+      "severity": "error",
+      "message": "Missing supply ports or supply nets."
+    },
+    {
+      "name": "domain_supply_mapping",
+      "status": "pass",
+      "severity": "info"
+    },
+    {
+      "name": "domain_elements_resolve",
+      "status": "not_run",
+      "severity": "info",
+      "message": "No RTL files available for element resolution."
+    },
+    {
+      "name": "unsupported_commands",
+      "status": "pass",
+      "severity": "info"
+    },
+    {
+      "name": "isolation_intent",
+      "status": "pass",
+      "severity": "info",
+      "count": 0
+    },
+    {
+      "name": "retention_intent",
+      "status": "pass",
+      "severity": "info",
+      "count": 0
+    },
+    {
+      "name": "level_shifter_intent",
+      "status": "pass",
+      "severity": "info",
+      "count": 0
+    },
+    {
+      "name": "power_state_table",
+      "status": "warn",
+      "severity": "warn",
+      "message": "No PST/power states found."
+    }
+  ],
+  "unsupported_commands": [],
+  "generated_at": "2026-08-15T17:09:15.189569Z",
+  "artifacts": {
+    "summary": "digital/upf/upf_static_check.json",
+    "report": "digital/upf/upf_static_check.md",
+    "unsupported": "digital/upf/upf_unsupported_commands.txt"
+  }
+}

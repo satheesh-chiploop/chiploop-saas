@@ -1,0 +1,2 @@
+Digital Spec Agent final contract repair failure:
+Mandatory firmware control-plane contract is missing a concrete register_contract bus and registers

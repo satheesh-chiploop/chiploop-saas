@@ -1,0 +1,332 @@
+{
+  "name": "adaptive_aero_control_top",
+  "description": "Top-level adaptive aero control shell. Integrates firmware-visible CSR/MMIO, request transport, response validation, timeout/stale detection, bounded actuator command generation, and safe fallback behavior. It is the required top module and is fully synthesizable RTL.",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "rst_n",
+      "direction": "input",
+      "width": 1,
+      "active_low": true
+    },
+    {
+      "name": "s_req_valid",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "s_req_ready",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "s_req_data",
+      "direction": "input",
+      "width": 128
+    },
+    {
+      "name": "s_rsp_valid",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "s_rsp_ready",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "s_rsp_data",
+      "direction": "input",
+      "width": 128
+    },
+    {
+      "name": "m_cmd_valid",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "m_cmd_ready",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "m_cmd_data",
+      "direction": "output",
+      "width": 64
+    },
+    {
+      "name": "mmio_valid",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "mmio_write",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "mmio_addr",
+      "direction": "input",
+      "width": 32
+    },
+    {
+      "name": "mmio_wdata",
+      "direction": "input",
+      "width": 32
+    },
+    {
+      "name": "mmio_rdata",
+      "direction": "output",
+      "width": 32
+    },
+    {
+      "name": "mmio_ready",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "status_fault",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "status_fallback_active",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "status_req_pending",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "status_rsp_validated",
+      "direction": "output",
+      "width": 1
+    }
+  ],
+  "functionality": "Implements the digital control shell around a remote surrogate execution service. The module accepts packed 128-bit requests only when valid/ready handshakes complete, captures sequence/mode/reference/velocity summary/config tags, emits request context to the host side, accepts 128-bit responses from the host side, validates echoed sequence, freshness, and age, rejects stale or mismatched responses, latches timeout/fault conditions, and produces a bounded 64-bit actuator command or a safe fallback command. The module also exposes a small firmware-visible register window for mode control, sequence tracking, timeout/stale limits, actuator bounds, fallback selection, and fault clear semantics.",
+  "responsibilities": [
+    "Accept and backpressure model requests until downstream acceptance conditions allow a new outstanding request.",
+    "Expose a 128-bit request record on s_req_data with valid/ready semantics to the remote software surrogate runner.",
+    "Accept a 128-bit response record on s_rsp_data with valid/ready semantics and validate sequence/freshness/age before use.",
+    "Generate a 64-bit actuator command word only from validated response data or from safe fallback manager state.",
+    "Clamp actuator target fields to programmable min/max bounds before issuing the command.",
+    "Assert safe fallback on reset, timeout expiry, stale response detection, invalid response status, or host fault conditions.",
+    "Provide firmware-visible CSR/MMIO access to operating mode, timeout limit, stale-age limit, actuator bounds, fallback selector, request sequence, status, and fault clear controls.",
+    "Use technology-neutral block RAM style storage for request/response history or buffering when needed for timing closure.",
+    "Keep all outputs registered and deterministic, with no combinational loops across ready/valid or control paths."
+  ],
+  "must_drive": [
+    "s_req_ready",
+    "s_rsp_ready",
+    "m_cmd_valid",
+    "m_cmd_data",
+    "mmio_rdata",
+    "mmio_ready",
+    "status_fault",
+    "status_fallback_active",
+    "status_req_pending",
+    "status_rsp_validated"
+  ],
+  "must_receive": [
+    "clk",
+    "rst_n",
+    "s_req_valid",
+    "s_req_data",
+    "s_rsp_valid",
+    "s_rsp_data",
+    "m_cmd_ready",
+    "mmio_valid",
+    "mmio_write",
+    "mmio_addr",
+    "mmio_wdata"
+  ],
+  "must_not_drive": [
+    "s_req_valid",
+    "s_req_data",
+    "s_rsp_valid",
+    "s_rsp_data",
+    "m_cmd_ready",
+    "mmio_valid",
+    "mmio_write",
+    "mmio_addr",
+    "mmio_wdata"
+  ],
+  "reset_behavior": "On rst_n deassertion, clear outstanding request state, clear validated-response state, clear timeout and stale counters, assert safe fallback, set command outputs to the predefined safe aerodynamic configuration, deassert command valid until a fresh valid response is accepted, and initialize MMIO status readback to faultless safe mode with explicit reset state fields as defined by the register contract.",
+  "behavior_rules": [
+    "s_req_valid and s_req_data are only captured when s_req_ready is asserted in the same cycle.",
+    "At most one outstanding request is tracked for command generation unless internal buffering is explicitly enabled by firmware.",
+    "s_rsp_valid and s_rsp_data are only accepted when s_rsp_ready is asserted and the echoed sequence matches the tracked request sequence.",
+    "Responses with invalid status, stale age, or timeout expiry are rejected and must not update the actuator command.",
+    "The command manager clamps every actuator target field to the programmed min/max range before issuing m_cmd_data.",
+    "Safe fallback remains active whenever reset is asserted, a timeout occurs, a stale response is detected, the response is invalid, or a host fault is asserted, and is released only after a fresh validated response is accepted.",
+    "Firmware may clear latched faults through the documented MMIO control path, but clearing does not bypass validation or timeout checks.",
+    "Response freshness and watchdog expiry are independently evaluated to prevent stale commands from driving actuators.",
+    "No top-level output may be left undriven; all status and transport outputs must have real RTL drivers.",
+    "The design must not expose large model artifacts or internal arrays at the top level."
+  ],
+  "rtl_output_file": "adaptive_aero_control_top.v",
+  "register_contract": {
+    "address_width": 6,
+    "data_width": 32,
+    "transaction_semantics": "mmio_valid indicates a transaction request; mmio_write selects write transactions; mmio_ready returns response/acceptance; mmio_rdata is valid on read completion or read-side return cycle as implemented by the RTL.",
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "operating_mode",
+            "lsb": 0,
+            "msb": 3,
+            "reset": 0,
+            "description": "Selects adaptive control mode."
+          },
+          {
+            "name": "fallback_sel",
+            "lsb": 4,
+            "msb": 5,
+            "reset": 0,
+            "description": "Selects predefined safe aerodynamic fallback configuration."
+          },
+          {
+            "name": "fault_clear",
+            "lsb": 8,
+            "msb": 8,
+            "reset": 0,
+            "description": "Write-1-to-clear latched fault state."
+          }
+        ]
+      },
+      {
+        "name": "SEQ",
+        "offset": "0x04",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "seq_counter",
+            "lsb": 0,
+            "msb": 15,
+            "reset": 0,
+            "description": "Firmware-visible request sequence counter."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT",
+        "offset": "0x08",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "timeout_limit",
+            "lsb": 0,
+            "msb": 15,
+            "reset": 32,
+            "description": "Watchdog expiration limit in cycles."
+          }
+        ]
+      },
+      {
+        "name": "STALE",
+        "offset": "0x0C",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "stale_age_limit",
+            "lsb": 0,
+            "msb": 15,
+            "reset": 16,
+            "description": "Maximum permitted response age."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MIN",
+        "offset": "0x10",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "act_min",
+            "lsb": 0,
+            "msb": 15,
+            "reset": 0,
+            "description": "Lower clamp bound for actuator targets."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MAX",
+        "offset": "0x14",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "act_max",
+            "lsb": 0,
+            "msb": 15,
+            "reset": 4095,
+            "description": "Upper clamp bound for actuator targets."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x18",
+        "access": "ro",
+        "fields": [
+          {
+            "name": "fault",
+            "lsb": 0,
+            "msb": 0,
+            "reset": 0,
+            "description": "Latched fault indicator."
+          },
+          {
+            "name": "fallback_active",
+            "lsb": 1,
+            "msb": 1,
+            "reset": 1,
+            "description": "Safe fallback active indicator."
+          },
+          {
+            "name": "req_pending",
+            "lsb": 2,
+            "msb": 2,
+            "reset": 0,
+            "description": "Outstanding request pending indicator."
+          },
+          {
+            "name": "rsp_validated",
+            "lsb": 3,
+            "msb": 3,
+            "reset": 0,
+            "description": "Validated response accepted indicator."
+          }
+        ]
+      },
+      {
+        "name": "WATCHDOG",
+        "offset": "0x1C",
+        "access": "ro",
+        "fields": [
+          {
+            "name": "watchdog_age",
+            "lsb": 0,
+            "msb": 15,
+            "reset": 0,
+            "description": "Current watchdog age."
+          }
+        ]
+      }
+    ]
+  }
+}
