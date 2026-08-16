@@ -1,0 +1,12 @@
+{
+  "source_arch2rtl_workflow_id": "627798ae-dd72-40db-9703-a2f65d55ddb1",
+  "parent_workflow_id": "7d9eb0db-fd88-4585-9585-21a8848a5667",
+  "current_workflow_id": "9e8ddae3-e03a-445c-8121-f02792ae17ac",
+  "current_run_id": "4938c78d-2857-4fbd-846b-9da7c8af50ea",
+  "current_app": "fpga",
+  "upstream_workflows": {
+    "physical_ai": "7d9eb0db-fd88-4585-9585-21a8848a5667",
+    "arch2rtl": "627798ae-dd72-40db-9703-a2f65d55ddb1",
+    "fpga": "9e8ddae3-e03a-445c-8121-f02792ae17ac"
+  }
+}

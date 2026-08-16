@@ -1,2 +1,0 @@
-Digital Spec Agent pass3 repair failure (contract_repair_pass3):
-Required child input 'cfg_regs.cfg_status_mode' has no source in top_level_connections or inter_module_signals. Add an explicit top-level input connection or a real child producer.

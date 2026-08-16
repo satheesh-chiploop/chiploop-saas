@@ -1,0 +1,22 @@
+{
+  "type": "vv_simulation_control_generation",
+  "version": "1.1",
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "spec_path": "/root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/spec/fpga_verification_source_spec.json",
+  "rtl_file_count": 8,
+  "default_tests": [
+    "smoke_test",
+    "constrained_random_sanity"
+  ],
+  "simulation_manifest_json": "backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/vv/tb/simulation_manifest.json",
+  "tools_detected": {
+    "verilator": true,
+    "make": true
+  },
+  "artifacts": {
+    "simulation_manifest": "backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/vv/tb/simulation_manifest.json",
+    "runner_py": "backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/vv/tb/run_regression.py",
+    "sim_readme": "backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/vv/tb/SIM_CONTROL.md",
+    "log": "backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/vv/simulation_control_agent.log"
+  }
+}

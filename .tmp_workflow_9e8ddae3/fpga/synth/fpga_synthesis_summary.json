@@ -1,0 +1,96 @@
+{
+  "agent": "FPGA Yosys Synthesis Agent",
+  "block_ram_bits_available": 1944000,
+  "block_ram_blocks_available": 108,
+  "block_ram_blocks_used": 0,
+  "block_ram_primitive": "DP16KD",
+  "block_ram_utilization_percent": 0.0,
+  "carry_cells": 162,
+  "cell_type_counts": {
+    "$specify2": 18,
+    "CCU2C": 162,
+    "L6MUX21": 48,
+    "LUT4": 2127,
+    "PFUMX": 297,
+    "TRELLIS_FF": 1450,
+    "adaptive_aero_command_safety": 1,
+    "adaptive_aero_control_csr_mmio": 1,
+    "adaptive_aero_control_top": 1,
+    "adaptive_aero_request_engine": 1,
+    "adaptive_aero_response_validator": 1,
+    "adaptive_aero_status_telemetry": 1
+  },
+  "closure_iteration": 0,
+  "combinational_cells": 2640,
+  "command": {
+    "cmd": [
+      "/usr/bin/yosys",
+      "-s",
+      "/root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/synth/synth_ecp5.ys"
+    ],
+    "error": null,
+    "executable": "/usr/bin/yosys",
+    "log": "/root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/synth/yosys_synth.log",
+    "ok": true,
+    "profile_id": "chiploop_saas_default",
+    "returncode": 0,
+    "status": "success",
+    "stderr_tail": "",
+    "stdout_tail": "LLIS_FF                    877\n     adaptive_aero_control_top       1\n\n=== adaptive_aero_request_engine ===\n\n   Number of wires:                272\n   Number of wire bits:            772\n   Number of public wires:         272\n   Number of public wire bits:     772\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:                434\n     CCU2C                          16\n     LUT4                          244\n     PFUMX                          20\n     TRELLIS_FF                    154\n\n=== adaptive_aero_response_validator ===\n\n   Number of wires:                173\n   Number of wire bits:            466\n   Number of public wires:         173\n   Number of public wire bits:     466\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:                223\n     CCU2C                           8\n     L6MUX21                        14\n     LUT4                          126\n     PFUMX                          25\n     TRELLIS_FF                     50\n\n=== adaptive_aero_status_telemetry ===\n\n   Number of wires:                109\n   Number of wire bits:            378\n   Number of public wires:         109\n   Number of public wire bits:     378\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:                188\n     CCU2C                          32\n     LUT4                           80\n     TRELLIS_FF                     76\n\n=== design hierarchy ===\n\n   adaptive_aero_control_top_spi_fpga_top      1\n     adaptive_aero_control_top       1\n       adaptive_aero_command_safety      1\n       adaptive_aero_control_csr_mmio      1\n       adaptive_aero_request_engine      1\n       adaptive_aero_response_validator      1\n       adaptive_aero_status_telemetry      1\n\n   Number of wires:               2424\n   Number of wire bits:           7457\n   Number of public wires:        2424\n   Number of public wire bits:    7457\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:               4084\n     CCU2C                         162\n     L6MUX21                        48\n     LUT4                         2127\n     PFUMX                         297\n     TRELLIS_FF                   1450\n\n15.47. Executing CHECK pass (checking for obvious problems).\nChecking module adaptive_aero_command_safety...\nChecking module adaptive_aero_control_csr_mmio...\nChecking module adaptive_aero_control_top...\nChecking module adaptive_aero_control_top_spi_fpga_top...\nChecking module adaptive_aero_request_engine...\nChecking module adaptive_aero_response_validator...\nChecking module adaptive_aero_status_telemetry...\nFound and reported 0 problems.\n\n15.48. Executing JSON backend.\n\n16. Executing Verilog backend.\n\n16.1. Executing BMUXMAP pass.\n\n16.2. Executing DEMUXMAP pass.\nDumping module `\\adaptive_aero_command_safety'.\nDumping module `\\adaptive_aero_control_csr_mmio'.\nDumping module `\\adaptive_aero_control_top'.\nDumping module `\\adaptive_aero_control_top_spi_fpga_top'.\nDumping module `\\adaptive_aero_request_engine'.\nDumping module `\\adaptive_aero_response_validator'.\nDumping module `\\adaptive_aero_status_telemetry'.\n\n17. Executing Verilog backend.\n\n17.1. Executing BMUXMAP pass.\n\n17.2. Executing DEMUXMAP pass.\nDumping module `\\adaptive_aero_command_safety'.\nDumping module `\\adaptive_aero_control_csr_mmio'.\nDumping module `\\adaptive_aero_control_top'.\nDumping module `\\adaptive_aero_control_top_spi_fpga_top'.\nDumping module `\\adaptive_aero_request_engine'.\nDumping module `\\adaptive_aero_response_validator'.\nDumping module `\\adaptive_aero_status_telemetry'.\n\nEnd of script. Logfile hash: b3070bc17f, CPU: user 5.10s system 0.10s, MEM: 200.82 MB peak\nYosys 0.33 (git sha1 2584903a060)\nTime spent: 25% 1x abc (1 sec), 14% 29x opt_clean (0 sec), ...\n"
+  },
+  "equivalence_netlist": "/root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+  "error": "RTL contains substantial memory arrays, but synthesis did not map them to the selected board's native DP16KD primitive.",
+  "fabric_mapped_cells": 3739,
+  "flatten_enabled": false,
+  "flip_flops": 1450,
+  "json_netlist": "/root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5.json",
+  "logic_utilization_percent": 8.13,
+  "logical_cells_available": 44000,
+  "logical_cells_used": 3577,
+  "lut4_cells": 2127,
+  "mapped_equivalence_netlist": "/root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "memory_intent": {
+    "declarations": [
+      {
+        "bits": 16384,
+        "depth": 512,
+        "file": "/root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/fpga_bram_512x32.v",
+        "name": "mem",
+        "requires_block_ram": true,
+        "width": 32
+      }
+    ],
+    "estimated_bits": 16384,
+    "requires_block_ram": true,
+    "threshold_bits": 4096
+  },
+  "memory_mapping_gate": {
+    "enforced": true,
+    "mapped": false,
+    "primitive": "DP16KD",
+    "required": true,
+    "status": "fail",
+    "supported": true
+  },
+  "rtl_file_count": 8,
+  "status": "failed",
+  "tool_effort": {
+    "capability_checked": true,
+    "effective_options": [
+      "-noflatten"
+    ],
+    "flatten": false,
+    "goal": "balanced_timing",
+    "mode": "balanced",
+    "requested": [
+      "technology_mapping",
+      "preserve_hierarchy"
+    ],
+    "retime": false,
+    "strategy": "baseline",
+    "tool_version": null
+  },
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "total_mapped_cells": 4108,
+  "verilog_netlist": "/root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_netlist.v"
+}

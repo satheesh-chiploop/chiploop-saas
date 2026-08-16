@@ -1,0 +1,127 @@
+%Warning-WIDTHEXPAND: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_request_engine.v:45:31: Operator ASSIGNDLY expects 8 bits on the Assign RHS, but Assign RHS's REPLICATE generates 5 bits.
+                                                                                                                                                          : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_req'
+   45 |             req_data_r[95:88] <= {3'b000, cfg_pipelined_mode, cfg_enable};
+      |                               ^~
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:44:22: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   44 |         fallback_now = fault_timeout | fault_stale | fault_sequence_mismatch | fault_invalid_packet | fault_transport_error | ~response_validity_ok | ~response_fresh_ok;
+      |                      ^
+                 ... For warning description see https://verilator.org/warn/BLKSEQ?v=5.047
+                 ... Use "/* verilator lint_off BLKSEQ */" and lint_on around source to disable this message.
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:46:24: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   46 |             target_cmd = response_suggestion;
+      |                        ^
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:47:26: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   47 |             clamp_needed = 1'b0;
+      |                          ^
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:49:29: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   49 |                 clamped_cmd = cfg_actuator_min;
+      |                             ^
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:50:30: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   50 |                 clamp_needed = 1'b1;
+      |                              ^
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:52:29: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   52 |                 clamped_cmd = cfg_actuator_max;
+      |                             ^
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:53:30: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   53 |                 clamp_needed = 1'b1;
+      |                              ^
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:55:29: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   55 |                 clamped_cmd = target_cmd;
+      |                             ^
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:57:26: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   57 |             signed_delta = {1'b0, clamped_cmd} - {1'b0, prev_cmd};
+      |                          ^
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:58:45: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   58 |             if (signed_delta < 0) delta_abs = -signed_delta[15:0];
+      |                                             ^
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:59:28: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   59 |             else delta_abs = signed_delta[15:0];
+      |                            ^
+%Warning-BLKSEQ: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_request_engine.v:53:26: Blocking assignment '=' in sequential logic process
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_req'
+                                                                                                                                                     : ... Suggest using delayed assignment '<='
+   53 |                 next_seq = request_seq + 16'h0001;
+      |                          ^
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_control_top.v:19:18: Signal is not used: 'response_seq_probe'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   19 |     input [15:0] response_seq_probe,
+      |                  ^~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_control_top.v:20:17: Signal is not used: 'response_status_flags_probe'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   20 |     input [7:0] response_status_flags_probe,
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_control_top.v:53:6: Signal is not used: 'response_rejected'
+                                                                                                                                                       : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   53 | wire response_rejected;
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_control_top.v:54:13: Signal is not used: 'response_seq'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   54 | wire [15:0] response_seq;
+      |             ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_control_top.v:56:12: Signal is not used: 'response_status_flags'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   56 | wire [7:0] response_status_flags;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_control_top.v:66:6: Signal is not used: 'request_busy'
+                                                                                                                                                       : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   66 | wire request_busy;
+      |      ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_command_safety.v:26:12: Signal is not driven, nor used: 'rate_delta'
+                                                                                                                                                           : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_cmd'
+   26 | reg [15:0] rate_delta;
+      |            ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_control_csr_mmio.v:25:18: Bits of signal are not used: 'request_counter'[15:8]
+                                                                                                                                                             : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_csr'
+   25 |     input [15:0] request_counter,
+      |                  ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_control_csr_mmio.v:26:18: Bits of signal are not used: 'response_counter'[15:8]
+                                                                                                                                                             : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_csr'
+   26 |     input [15:0] response_counter,
+      |                  ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_response_validator.v:5:19: Bits of signal are not used: 'resp_data'[126:96,79:32]
+                                                                                                                                                              : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_val'
+    5 |     input [127:0] resp_data,
+      |                   ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_response_validator.v:8:18: Signal is not used: 'request_timestamp'
+                                                                                                                                                              : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_val'
+    8 |     input [15:0] request_timestamp,
+      |                  ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/upstream/adaptive_aero_response_validator.v:10:18: Signal is not used: 'cfg_timeout_limit'
+                                                                                                                                                               : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_val'
+   10 |     input [15:0] cfg_timeout_limit,
+      |                  ^~~~~~~~~~~~~~~~~
+%Warning-SYNCASYNCNET: /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:7:16: Signal flopped as both synchronous and async: 'spi_cs_n'
+                       /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:55:9: ... Location of async usage
+   55 |     if (spi_cs_n) spi_active <= 1'b0;
+      |         ^~~~~~~~
+                       /root/chiploop-backend/backend/workflows/9e8ddae3-e03a-445c-8121-f02792ae17ac/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:59:10: ... Location of sync usage
+   59 |     if (!spi_cs_n) begin
+      |          ^~~~~~~~
+                       ... For warning description see https://verilator.org/warn/SYNCASYNCNET?v=5.047
+                       ... Use "/* verilator lint_off SYNCASYNCNET */" and lint_on around source to disable this message.
