@@ -1,0 +1,1610 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level integration point exposing clock/reset, firmware-visible MMIO control/status, external surrogate request/response transport, safety validation, fallback control, and bounded 32-bit actuator command output.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "mmio_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "mmio_write_enable",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "mmio_addr",
+          "direction": "input",
+          "width": 64
+        },
+        {
+          "name": "mmio_wdata",
+          "direction": "input",
+          "width": 64
+        },
+        {
+          "name": "mmio_rdata",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "mmio_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "mmio_rvalid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_request_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_request_data",
+          "direction": "output",
+          "width": 128
+        },
+        {
+          "name": "model_request_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_response_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_response_data",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "model_response_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_command",
+          "direction": "output",
+          "width": 32
+        }
+      ],
+      "functionality": "Integrates firmware-visible register decode, request packaging, buffering, response validation, staleness and timeout checking, safety management, fallback selection, command clamping, and final actuator command emission. The top does not compute aerodynamic predictions; it only manages hardware transport and safe bounded command behavior.",
+      "responsibilities": [
+        "Expose a real firmware-visible CSR/MMIO interface with address, write-data, read-data, transaction-valid/write-enable, and ready/response semantics.",
+        "Decode register writes into operating mode, velocity setpoint, timeout threshold, sequence seed, clamp bounds, fallback selection, overwrite enable, command trigger, and fault clear controls.",
+        "Package compact request descriptors for the external surrogate service and emit them on the mandatory 128-bit request stream.",
+        "Accept compact response descriptors from the external service and validate sequence, freshness, and result validity.",
+        "Latch faults and timeouts, clamp commands to configured bounds, and force fallback output when required.",
+        "Produce a bounded 32-bit actuator command word that reflects validated aerodynamic intent or deterministic fallback intent.",
+        "Publish compact status telemetry including busy, request_outstanding, response_seen, stale_response, timeout_error, invalid_response, fallback_active, fault_latched, and last_sequence_id."
+      ],
+      "must_drive": [
+        "mmio_rdata",
+        "mmio_ready",
+        "mmio_rvalid",
+        "model_request_valid",
+        "model_request_data",
+        "model_response_ready",
+        "actuator_command"
+      ],
+      "must_receive": [
+        "clk",
+        "reset_n",
+        "mmio_valid",
+        "mmio_write_enable",
+        "mmio_addr",
+        "mmio_wdata",
+        "model_request_ready",
+        "model_response_valid",
+        "model_response_data"
+      ],
+      "must_not_drive": [
+        "model_request_ready",
+        "model_response_valid",
+        "model_response_data"
+      ],
+      "reset_behavior": "On active-low reset, all state initializes to safe fallback mode, outstanding transaction state is cleared, valid outputs are deasserted, response-ready is set to a safe quiescent value, counters clear to zero, fault and timeout indicators are cleared, and the actuator command drives the configured deterministic safe fallback value.",
+      "behavior_rules": [
+        "All sequential state updates are synchronous to clk and reset-safe.",
+        "No combinational ready/valid loop may exist between request/response ports and internal state.",
+        "MMIO writes update only decoded firmware-visible registers; unreadable or undefined addresses return benign zero data.",
+        "The top must never expose tensors, geometry arrays, pressure fields, or flow fields as external pins.",
+        "A request may only be issued when no request is outstanding unless overwrite is enabled by configuration.",
+        "If response validation fails, the response is rejected, the rejected_response_count increments, and fallback behavior is entered or maintained.",
+        "If timeout expires before a matching response is accepted, timeout_count increments, timeout status asserts, and actuator output switches to fallback until revalidated.",
+        "If any fault is latched, safe fallback output persists until fault-clear is requested and the system is revalidated.",
+        "Actuator output is always clamped to the configured minimum and maximum bounds before emission.",
+        "The top must remain functional when the external surrogate is unavailable by staying in fallback mode and preserving bounded command behavior."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "cfg_regs",
+        "description": "Firmware-visible configuration and status register bank that decodes MMIO transactions into explicit semantic control fields and exposes compact status and counters for readback.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "mmio_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "mmio_write_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "mmio_addr",
+            "direction": "input",
+            "width": 64
+          },
+          {
+            "name": "mmio_wdata",
+            "direction": "input",
+            "width": 64
+          },
+          {
+            "name": "mmio_rdata",
+            "direction": "output",
+            "width": 64
+          },
+          {
+            "name": "mmio_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "mmio_rvalid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_mode",
+            "direction": "output",
+            "width": 3
+          },
+          {
+            "name": "cfg_velocity_setpoint",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_timeout_threshold",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_sequence_seed",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_clamp_min",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_clamp_max",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_mode",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "cfg_overwrite_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_command_trigger",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_fault_clear",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_mode",
+            "direction": "input",
+            "width": 3
+          },
+          {
+            "name": "cfg_status_busy",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_request_outstanding",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_response_seen",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_stale_response",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_timeout_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_invalid_response",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_fallback_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_fault_latched",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_last_sequence_id",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_status_request_count",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_status_accepted_response_count",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_status_rejected_response_count",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_status_timeout_count",
+            "direction": "input",
+            "width": 16
+          }
+        ],
+        "functionality": "Implements the full firmware-visible CSR/MMIO decode path. Writes program operating mode, velocity setpoint, timeout threshold, sequence seed, clamp bounds, fallback mode selection, overwrite enable, command trigger, and fault clear. Reads return compact status and counters. This module is the sole producer of semantic configuration signals consumed by control and transport logic.",
+        "responsibilities": [
+          "Decode the 64-bit MMIO control window into explicit semantic configuration outputs.",
+          "Provide a real ready/valid/response handshake for firmware-visible accesses.",
+          "Expose compact status and counters through readable MMIO locations.",
+          "Generate one-cycle command trigger and fault-clear semantic pulses from firmware writes.",
+          "Hold all configuration outputs stable across cycles until updated by firmware."
+        ],
+        "must_drive": [
+          "cfg_mode",
+          "cfg_velocity_setpoint",
+          "cfg_timeout_threshold",
+          "cfg_sequence_seed",
+          "cfg_clamp_min",
+          "cfg_clamp_max",
+          "cfg_fallback_mode",
+          "cfg_overwrite_enable",
+          "cfg_command_trigger",
+          "cfg_fault_clear",
+          "mmio_rdata",
+          "mmio_ready",
+          "mmio_rvalid"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "mmio_valid",
+          "mmio_write_enable",
+          "mmio_addr",
+          "mmio_wdata",
+          "cfg_status_mode",
+          "cfg_status_busy",
+          "cfg_status_request_outstanding",
+          "cfg_status_response_seen",
+          "cfg_status_stale_response",
+          "cfg_status_timeout_error",
+          "cfg_status_invalid_response",
+          "cfg_status_fallback_active",
+          "cfg_status_fault_latched",
+          "cfg_status_last_sequence_id",
+          "cfg_status_request_count",
+          "cfg_status_accepted_response_count",
+          "cfg_status_rejected_response_count",
+          "cfg_status_timeout_count"
+        ],
+        "must_not_drive": [
+          "cfg_status_mode",
+          "cfg_status_busy",
+          "cfg_status_request_outstanding",
+          "cfg_status_response_seen",
+          "cfg_status_stale_response",
+          "cfg_status_timeout_error",
+          "cfg_status_invalid_response",
+          "cfg_status_fallback_active",
+          "cfg_status_fault_latched",
+          "cfg_status_last_sequence_id",
+          "cfg_status_request_count",
+          "cfg_status_accepted_response_count",
+          "cfg_status_rejected_response_count",
+          "cfg_status_timeout_count"
+        ],
+        "reset_behavior": "All configuration outputs initialize to safe defaults: neutral mode, conservative velocity setpoint, maximum-safe timeout threshold, zero sequence seed, narrow clamp bounds around safe command, fallback mode selected, overwrite disabled, and one-cycle control pulses deasserted. MMIO response outputs return ready/valid-low quiescent values until accessed.",
+        "behavior_rules": [
+          "Every declared configuration register must be reachable through MMIO decode.",
+          "Semantic outputs must not be derived implicitly from raw mmio_wdata elsewhere; cfg_regs is the sole producer.",
+          "Readback data must reflect the implemented register map and status fields only.",
+          "Writes that set command trigger or fault clear must generate bounded one-cycle pulses and then self-clear.",
+          "Unused MMIO addresses must not create side effects.",
+          "Status inputs are sampled only for readback and do not feed back combinationally into the MMIO bus."
+        ],
+        "rtl_output_file": "cfg_regs.v"
+      },
+      {
+        "name": "cmd_parser",
+        "description": "Parses control-plane trigger events and current configuration into a compact 128-bit request descriptor for the external surrogate service.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_mode",
+            "direction": "input",
+            "width": 3
+          },
+          {
+            "name": "cfg_velocity_setpoint",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_timeout_threshold",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_sequence_seed",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_overwrite_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_command_trigger",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_busy",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_outstanding",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_sequence_id",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "request_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "request_descriptor",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "request_job_tag",
+            "direction": "output",
+            "width": 8
+          }
+        ],
+        "functionality": "Forms a compact request packet containing request_valid, request_sequence_id, operating mode, velocity setpoint, vehicle-state summary fields, and a compact job tag. The parser only emits requests when allowed by outstanding-request state or explicit overwrite configuration.",
+        "responsibilities": [
+          "Generate request descriptors from explicit control fields only.",
+          "Create bounded request sequencing using the configured sequence seed and internal increment policy.",
+          "Encode compact vehicle-state summary and job tag fields into the 128-bit request descriptor.",
+          "Respect outstanding transaction state and overwrite enable policy.",
+          "Provide a clean valid pulse that initiates request capture by downstream transport logic."
+        ],
+        "must_drive": [
+          "request_sequence_id",
+          "request_valid",
+          "request_descriptor",
+          "request_job_tag"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_mode",
+          "cfg_velocity_setpoint",
+          "cfg_timeout_threshold",
+          "cfg_sequence_seed",
+          "cfg_overwrite_enable",
+          "cfg_command_trigger",
+          "request_busy",
+          "request_outstanding"
+        ],
+        "must_not_drive": [
+          "cfg_mode",
+          "cfg_velocity_setpoint",
+          "cfg_timeout_threshold",
+          "cfg_sequence_seed",
+          "cfg_overwrite_enable",
+          "cfg_command_trigger",
+          "request_busy",
+          "request_outstanding"
+        ],
+        "reset_behavior": "Clears request_valid, resets request_sequence_id to the configured seed convention, and initializes the request descriptor to a benign idle packet. No request is issued until a valid trigger is observed after reset.",
+        "behavior_rules": [
+          "Requests shall not be issued while a request is outstanding unless overwrite is explicitly enabled.",
+          "The parser shall not implement surrogate inference; it only packages transport descriptors.",
+          "All descriptor fields are compact summaries; no full geometry or flow-field payloads are allowed.",
+          "Sequence generation must be deterministic and synchronous.",
+          "Request valid must be deasserted after acceptance or cancellation."
+        ],
+        "rtl_output_file": "cmd_parser.v"
+      },
+      {
+        "name": "request_buffer",
+        "description": "Technology-neutral single-entry request storage and associated metadata for outstanding transaction tracking, mapped to FPGA BRAM or equivalent block memory.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "request_valid_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_descriptor_in",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "request_sequence_id_in",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "request_overwrite_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_ready_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "request_outstanding_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "stored_sequence_id_out",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "stored_request_valid_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "mem_csb",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "mem_we",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "mem_addr",
+            "direction": "output",
+            "width": 7
+          },
+          {
+            "name": "mem_din",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "mem_dout",
+            "direction": "input",
+            "width": 128
+          }
+        ],
+        "functionality": "Stores at least one outstanding request descriptor and its metadata using technology-neutral memory resources suitable for FPGA BRAM mapping. It arbitrates capture of a new request, reports outstanding state, and makes the buffered descriptor available for transmission to the external service.",
+        "responsibilities": [
+          "Buffer one outstanding request descriptor and metadata.",
+          "Expose ready/outstanding status for request issuance control.",
+          "Drive BRAM-style memory control signals for implementation using native block RAM or equivalent.",
+          "Support overwrite policy when explicitly enabled by configuration.",
+          "Keep outstanding metadata coherent with the stored descriptor."
+        ],
+        "must_drive": [
+          "request_ready_out",
+          "request_outstanding_out",
+          "stored_sequence_id_out",
+          "stored_request_valid_out",
+          "mem_csb",
+          "mem_we",
+          "mem_addr",
+          "mem_din"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "request_valid_in",
+          "request_descriptor_in",
+          "request_sequence_id_in",
+          "request_overwrite_enable",
+          "mem_dout"
+        ],
+        "must_not_drive": [
+          "request_valid_in",
+          "request_descriptor_in",
+          "request_sequence_id_in",
+          "request_overwrite_enable",
+          "mem_dout"
+        ],
+        "reset_behavior": "Clears outstanding state, deasserts ready if internal capture is not possible, and initializes memory controls to a non-writing idle condition. Buffered content is treated as invalid after reset.",
+        "behavior_rules": [
+          "The buffer shall use memory resources and shall not be flattened into a register array.",
+          "At most one request may be outstanding unless overwrite is configured.",
+          "No combinational loop may be created between request_valid_in and request_ready_out.",
+          "Stored sequence and validity metadata must remain synchronized with the buffered request descriptor.",
+          "The buffer may expose explicit BRAM control pins to a technology-neutral memory wrapper or directly to a native FPGA memory implementation."
+        ],
+        "rtl_output_file": "request_buffer.v"
+      },
+      {
+        "name": "response_buffer",
+        "description": "Technology-neutral response storage and metadata capture for the compact 128-bit response packet coming from the external surrogate service.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "model_response_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_response_data",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "response_sequence_id_out",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "response_valid_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "response_age_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "response_health_flags_out",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "response_ready_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "mem_csb",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "mem_we",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "mem_addr",
+            "direction": "output",
+            "width": 7
+          },
+          {
+            "name": "mem_din",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "mem_dout",
+            "direction": "input",
+            "width": 128
+          }
+        ],
+        "functionality": "Captures a response descriptor from the external service, stores its compact summary and metadata, and presents explicit validation-relevant fields to the staleness guard and safety logic.",
+        "responsibilities": [
+          "Store one response descriptor and metadata at a time.",
+          "Present response sequence, validity, age/tag, and health/status flags as explicit outputs.",
+          "Use memory resources suitable for FPGA block RAM mapping.",
+          "Handshake cleanly with response ready input from downstream control logic.",
+          "Preserve compact summaries only; no full surrogate payloads are accepted on-chip."
+        ],
+        "must_drive": [
+          "response_sequence_id_out",
+          "response_valid_out",
+          "response_age_out",
+          "response_health_flags_out",
+          "mem_csb",
+          "mem_we",
+          "mem_addr",
+          "mem_din"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "model_response_valid",
+          "model_response_data",
+          "response_ready_in",
+          "mem_dout"
+        ],
+        "must_not_drive": [
+          "model_response_valid",
+          "model_response_data",
+          "response_ready_in",
+          "mem_dout"
+        ],
+        "reset_behavior": "Clears buffered response validity and metadata, and initializes memory controls to a safe idle state. Any prior response is treated as invalid after reset.",
+        "behavior_rules": [
+          "The buffer shall not assume the surrogate is implemented on-chip.",
+          "Only compact response summaries may be stored and forwarded internally.",
+          "The response packet must be captured without creating ready/valid combinational feedback.",
+          "Stored metadata must remain coherent with the stored response packet.",
+          "The buffer may be mapped to FPGA BRAM or equivalent distributed RAM, but not to a flattened flip-flop array."
+        ],
+        "rtl_output_file": "response_buffer.v"
+      },
+      {
+        "name": "staleness_guard",
+        "description": "Validates response sequence matching, response freshness, and timeout-based staleness against the current outstanding request.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "request_outstanding",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_sequence_id",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "response_valid_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_sequence_id_in",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "response_age_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_timeout_threshold",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "response_seen_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "stale_response_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "timeout_error_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "matching_response_out",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Checks whether a received response matches the outstanding request sequence, whether it is valid, and whether its age exceeds the configured timeout threshold. Produces explicit boolean verdicts for downstream safety management.",
+        "responsibilities": [
+          "Compare response sequence ID against the outstanding request sequence ID.",
+          "Reject invalid or stale responses.",
+          "Detect timeout expiration relative to the configured threshold.",
+          "Indicate when a response has been seen for status telemetry.",
+          "Provide deterministic verdicts with no combinational ready/valid loops."
+        ],
+        "must_drive": [
+          "response_seen_out",
+          "stale_response_out",
+          "timeout_error_out",
+          "matching_response_out"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "request_outstanding",
+          "request_sequence_id",
+          "response_valid_in",
+          "response_sequence_id_in",
+          "response_age_in",
+          "cfg_timeout_threshold"
+        ],
+        "must_not_drive": [
+          "request_outstanding",
+          "request_sequence_id",
+          "response_valid_in",
+          "response_sequence_id_in",
+          "response_age_in",
+          "cfg_timeout_threshold"
+        ],
+        "reset_behavior": "All verdict outputs reset low, preventing false acceptance or timeout flags after reset.",
+        "behavior_rules": [
+          "A response is only considered matching when valid, sequence-matched, and not stale relative to threshold.",
+          "Mismatched, invalid, or stale responses must be explicitly flagged.",
+          "Timeout detection must be synchronous and deterministic.",
+          "The module only validates compact response metadata and does not process full surrogate payloads."
+        ],
+        "rtl_output_file": "staleness_guard.v"
+      },
+      {
+        "name": "safety_manager",
+        "description": "Centralized safety and fault management logic that enforces clamp bounds, illegal-state detection, fault latching, and safe-state entry.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_clamp_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_clamp_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_mode",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "cfg_fault_clear",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_seen",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "stale_response",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timeout_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "invalid_response",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "validated_intent_in",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "fault_latched_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "fallback_active_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "clamped_intent_out",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "illegal_state_detected_out",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Applies safety policy to validated aerodynamic intent, clamps the intended command to configured bounds, detects illegal states, and latches faults until explicit clearance and revalidation occur.",
+        "responsibilities": [
+          "Clamp the validated intent to configured minimum and maximum bounds.",
+          "Latch faults on stale, timeout, invalid-response, or illegal-state conditions.",
+          "Maintain fallback-active indication while faulted or unvalidated.",
+          "Honor fault-clear only when the system can re-enter a validated state.",
+          "Emit a safe bounded intent value for the actuator mapper."
+        ],
+        "must_drive": [
+          "fault_latched_out",
+          "fallback_active_out",
+          "clamped_intent_out",
+          "illegal_state_detected_out"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_clamp_min",
+          "cfg_clamp_max",
+          "cfg_fallback_mode",
+          "cfg_fault_clear",
+          "response_seen",
+          "stale_response",
+          "timeout_error",
+          "invalid_response",
+          "validated_intent_in"
+        ],
+        "must_not_drive": [
+          "cfg_clamp_min",
+          "cfg_clamp_max",
+          "cfg_fallback_mode",
+          "cfg_fault_clear",
+          "response_seen",
+          "stale_response",
+          "timeout_error",
+          "invalid_response",
+          "validated_intent_in"
+        ],
+        "reset_behavior": "Fault latch clears on reset, fallback-active asserts to force safe operation, and clamped intent initializes to a deterministic safe value.",
+        "behavior_rules": [
+          "Any fault condition shall cause safe fallback behavior until cleared and revalidated.",
+          "Command clamping must occur before actuator output update.",
+          "Illegal-state detection must be synchronous and deterministic.",
+          "The module must not generate actuator output directly; it only produces a safe bounded intent for downstream mapping.",
+          "Fault clear cannot bypass validation requirements."
+        ],
+        "rtl_output_file": "safety_manager.v"
+      },
+      {
+        "name": "actuator_mapper",
+        "description": "Maps bounded aerodynamic intent or fallback selection into a compact 32-bit actuator command word.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "clamped_intent_in",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "fallback_mode_in",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "fault_latched_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "actuator_command_out",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "safe_command_out",
+            "direction": "output",
+            "width": 32
+          }
+        ],
+        "functionality": "Converts the validated, clamped aerodynamic intent into the final 32-bit actuator command word and provides a deterministic safe command for fallback operation.",
+        "responsibilities": [
+          "Map validated intent to a 32-bit actuator command format.",
+          "Select deterministic safe command output when fallback or faulted.",
+          "Keep output bounded and synchronous.",
+          "Avoid any dependence on full surrogate model data or high-dimensional sensor fields."
+        ],
+        "must_drive": [
+          "actuator_command_out",
+          "safe_command_out"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "clamped_intent_in",
+          "fallback_mode_in",
+          "fault_latched_in"
+        ],
+        "must_not_drive": [
+          "clamped_intent_in",
+          "fallback_mode_in",
+          "fault_latched_in"
+        ],
+        "reset_behavior": "Drives a deterministic safe actuator command on reset and keeps it active until a validated intent is available.",
+        "behavior_rules": [
+          "The output command must be bounded and stable under fallback conditions.",
+          "The module must not implement safety policy; it only consumes safe intent and generates the final command word.",
+          "Safe command selection must be deterministic and configured by fallback mode.",
+          "The command format must remain compact and 32-bit wide."
+        ],
+        "rtl_output_file": "actuator_mapper.v"
+      },
+      {
+        "name": "fallback_controller",
+        "description": "Provides deterministic safe actuator command values for low-drag or neutral safety modes and indicates fallback selection state.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_fallback_mode",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "fault_latched",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fallback_command_out",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "fallback_active_out",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements configured deterministic fallback command generation for safe actuator behavior when the surrogate service is unavailable or when safety logic requires fallback operation.",
+        "responsibilities": [
+          "Generate a deterministic safe actuator command for the selected fallback mode.",
+          "Indicate when fallback is active.",
+          "Remain purely synchronous and bounded.",
+          "Provide low-drag or neutral safe values as configured."
+        ],
+        "must_drive": [
+          "fallback_command_out",
+          "fallback_active_out"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_fallback_mode",
+          "fault_latched"
+        ],
+        "must_not_drive": [
+          "cfg_fallback_mode",
+          "fault_latched"
+        ],
+        "reset_behavior": "Resets to the safe fallback command corresponding to the selected default mode and asserts fallback-active until normal validated operation resumes.",
+        "behavior_rules": [
+          "Fallback behavior must be deterministic and not depend on the external service.",
+          "Fallback output must be safe on reset, timeout, stale response, invalid response, or fault latch.",
+          "The controller must not expose any high-dimensional data or model internals.",
+          "The module only emits compact command values suitable for downstream actuator mapping."
+        ],
+        "rtl_output_file": "fallback_controller.v"
+      },
+      {
+        "name": "status_telemetry",
+        "description": "Aggregates status, fault, sequence, and counter information into compact internal status fields for MMIO readback.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_mode_in",
+            "direction": "input",
+            "width": 3
+          },
+          {
+            "name": "busy_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_outstanding_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_seen_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "stale_response_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timeout_error_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "invalid_response_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fallback_active_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fault_latched_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "last_sequence_id_in",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "request_count_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "accepted_response_count_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rejected_response_count_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "timeout_count_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_status_mode_out",
+            "direction": "output",
+            "width": 3
+          },
+          {
+            "name": "cfg_status_busy_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_request_outstanding_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_response_seen_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_stale_response_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_timeout_error_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_invalid_response_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_fallback_active_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_fault_latched_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_status_last_sequence_id_out",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_status_request_count_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_status_accepted_response_count_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_status_rejected_response_count_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_status_timeout_count_out",
+            "direction": "output",
+            "width": 16
+          }
+        ],
+        "functionality": "Generates compact, firmware-readable status and counter values from internal control and safety states.",
+        "responsibilities": [
+          "Publish busy, outstanding, response_seen, stale_response, timeout, invalid, fallback, fault, and last-sequence information.",
+          "Forward request, accepted-response, rejected-response, and timeout counters for MMIO readback.",
+          "Maintain compact widths only and avoid exposing large payloads.",
+          "Keep status outputs synchronous and stable for firmware sampling."
+        ],
+        "must_drive": [
+          "cfg_status_mode_out",
+          "cfg_status_busy_out",
+          "cfg_status_request_outstanding_out",
+          "cfg_status_response_seen_out",
+          "cfg_status_stale_response_out",
+          "cfg_status_timeout_error_out",
+          "cfg_status_invalid_response_out",
+          "cfg_status_fallback_active_out",
+          "cfg_status_fault_latched_out",
+          "cfg_status_last_sequence_id_out",
+          "cfg_status_request_count_out",
+          "cfg_status_accepted_response_count_out",
+          "cfg_status_rejected_response_count_out",
+          "cfg_status_timeout_count_out"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_mode_in",
+          "busy_in",
+          "request_outstanding_in",
+          "response_seen_in",
+          "stale_response_in",
+          "timeout_error_in",
+          "invalid_response_in",
+          "fallback_active_in",
+          "fault_latched_in",
+          "last_sequence_id_in",
+          "request_count_in",
+          "accepted_response_count_in",
+          "rejected_response_count_in",
+          "timeout_count_in"
+        ],
+        "must_not_drive": [
+          "cfg_mode_in",
+          "busy_in",
+          "request_outstanding_in",
+          "response_seen_in",
+          "stale_response_in",
+          "timeout_error_in",
+          "invalid_response_in",
+          "fallback_active_in",
+          "fault_latched_in",
+          "last_sequence_id_in",
+          "request_count_in",
+          "accepted_response_count_in",
+          "rejected_response_count_in",
+          "timeout_count_in"
+        ],
+        "reset_behavior": "All status and counter outputs reset to zero or benign idle values, ensuring firmware reads a safe, non-alarming state after reset.",
+        "behavior_rules": [
+          "Status fields must reflect the latest synchronous control state and counters.",
+          "Compact counters only are permitted.",
+          "No transport payload or surrogate internals may be exposed.",
+          "Status outputs are read-only and must not feed back combinationally into control decisions."
+        ],
+        "rtl_output_file": "status_telemetry.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "cfg_regs.clk",
+        "cmd_parser.clk",
+        "request_buffer.clk",
+        "response_buffer.clk",
+        "staleness_guard.clk",
+        "safety_manager.clk",
+        "actuator_mapper.clk",
+        "fallback_controller.clk",
+        "status_telemetry.clk"
+      ],
+      "description": "Top-level port clk connected to matching child module port(s)."
+    },
+    {
+      "top_port": "reset_n",
+      "connected_to": [
+        "cfg_regs.reset_n",
+        "cmd_parser.reset_n",
+        "request_buffer.reset_n",
+        "response_buffer.reset_n",
+        "staleness_guard.reset_n",
+        "safety_manager.reset_n",
+        "actuator_mapper.reset_n",
+        "fallback_controller.reset_n",
+        "status_telemetry.reset_n"
+      ],
+      "description": "Top-level port reset_n connected to matching child module port(s)."
+    },
+    {
+      "top_port": "mmio_valid",
+      "connected_to": [
+        "cfg_regs.mmio_valid"
+      ],
+      "description": "Top-level port mmio_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "mmio_write_enable",
+      "connected_to": [
+        "cfg_regs.mmio_write_enable"
+      ],
+      "description": "Top-level port mmio_write_enable connected to matching child module port(s)."
+    },
+    {
+      "top_port": "mmio_addr",
+      "connected_to": [
+        "cfg_regs.mmio_addr"
+      ],
+      "description": "Top-level port mmio_addr connected to matching child module port(s)."
+    },
+    {
+      "top_port": "mmio_wdata",
+      "connected_to": [
+        "cfg_regs.mmio_wdata"
+      ],
+      "description": "Top-level port mmio_wdata connected to matching child module port(s)."
+    },
+    {
+      "top_port": "mmio_rdata",
+      "connected_to": [
+        "cfg_regs.mmio_rdata"
+      ],
+      "description": "Top-level port mmio_rdata connected to matching child module port(s)."
+    },
+    {
+      "top_port": "mmio_ready",
+      "connected_to": [
+        "cfg_regs.mmio_ready"
+      ],
+      "description": "Top-level port mmio_ready connected to matching child module port(s)."
+    },
+    {
+      "top_port": "mmio_rvalid",
+      "connected_to": [
+        "cfg_regs.mmio_rvalid"
+      ],
+      "description": "Top-level port mmio_rvalid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "model_response_valid",
+      "connected_to": [
+        "response_buffer.model_response_valid"
+      ],
+      "description": "Top-level port model_response_valid connected to matching child module port(s)."
+    },
+    {
+      "top_port": "model_response_data",
+      "connected_to": [
+        "response_buffer.model_response_data"
+      ],
+      "description": "Top-level port model_response_data connected to matching child module port(s)."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "cfg_regs_cfg_clamp_max",
+      "width": 16,
+      "source": "cfg_regs.cfg_clamp_max",
+      "destinations": [
+        "safety_manager.cfg_clamp_max"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer cfg_regs.cfg_clamp_max."
+    },
+    {
+      "name": "cfg_regs_cfg_clamp_min",
+      "width": 16,
+      "source": "cfg_regs.cfg_clamp_min",
+      "destinations": [
+        "safety_manager.cfg_clamp_min"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer cfg_regs.cfg_clamp_min."
+    },
+    {
+      "name": "cfg_regs_cfg_command_trigger",
+      "width": 1,
+      "source": "cfg_regs.cfg_command_trigger",
+      "destinations": [
+        "cmd_parser.cfg_command_trigger"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer cfg_regs.cfg_command_trigger."
+    },
+    {
+      "name": "cfg_regs_cfg_fallback_mode",
+      "width": 2,
+      "source": "cfg_regs.cfg_fallback_mode",
+      "destinations": [
+        "safety_manager.cfg_fallback_mode",
+        "fallback_controller.cfg_fallback_mode"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer cfg_regs.cfg_fallback_mode."
+    },
+    {
+      "name": "cfg_regs_cfg_fault_clear",
+      "width": 1,
+      "source": "cfg_regs.cfg_fault_clear",
+      "destinations": [
+        "safety_manager.cfg_fault_clear"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer cfg_regs.cfg_fault_clear."
+    },
+    {
+      "name": "cfg_regs_cfg_mode",
+      "width": 3,
+      "source": "cfg_regs.cfg_mode",
+      "destinations": [
+        "cmd_parser.cfg_mode"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer cfg_regs.cfg_mode."
+    },
+    {
+      "name": "cfg_regs_cfg_overwrite_enable",
+      "width": 1,
+      "source": "cfg_regs.cfg_overwrite_enable",
+      "destinations": [
+        "cmd_parser.cfg_overwrite_enable"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer cfg_regs.cfg_overwrite_enable."
+    },
+    {
+      "name": "cfg_regs_cfg_sequence_seed",
+      "width": 8,
+      "source": "cfg_regs.cfg_sequence_seed",
+      "destinations": [
+        "cmd_parser.cfg_sequence_seed"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer cfg_regs.cfg_sequence_seed."
+    },
+    {
+      "name": "cfg_regs_cfg_timeout_threshold",
+      "width": 16,
+      "source": "cfg_regs.cfg_timeout_threshold",
+      "destinations": [
+        "cmd_parser.cfg_timeout_threshold",
+        "staleness_guard.cfg_timeout_threshold"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer cfg_regs.cfg_timeout_threshold."
+    },
+    {
+      "name": "cfg_regs_cfg_velocity_setpoint",
+      "width": 16,
+      "source": "cfg_regs.cfg_velocity_setpoint",
+      "destinations": [
+        "cmd_parser.cfg_velocity_setpoint"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer cfg_regs.cfg_velocity_setpoint."
+    },
+    {
+      "name": "cmd_parser_request_sequence_id",
+      "width": 8,
+      "source": "cmd_parser.request_sequence_id",
+      "destinations": [
+        "staleness_guard.request_sequence_id"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer cmd_parser.request_sequence_id."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "cfg_regs_cfg_clamp_max",
+      "owner": "cfg_regs.cfg_clamp_max"
+    },
+    {
+      "signal": "cfg_regs_cfg_clamp_min",
+      "owner": "cfg_regs.cfg_clamp_min"
+    },
+    {
+      "signal": "cfg_regs_cfg_command_trigger",
+      "owner": "cfg_regs.cfg_command_trigger"
+    },
+    {
+      "signal": "cfg_regs_cfg_fallback_mode",
+      "owner": "cfg_regs.cfg_fallback_mode"
+    },
+    {
+      "signal": "cfg_regs_cfg_fault_clear",
+      "owner": "cfg_regs.cfg_fault_clear"
+    },
+    {
+      "signal": "cfg_regs_cfg_mode",
+      "owner": "cfg_regs.cfg_mode"
+    },
+    {
+      "signal": "cfg_regs_cfg_overwrite_enable",
+      "owner": "cfg_regs.cfg_overwrite_enable"
+    },
+    {
+      "signal": "cfg_regs_cfg_sequence_seed",
+      "owner": "cfg_regs.cfg_sequence_seed"
+    },
+    {
+      "signal": "cfg_regs_cfg_timeout_threshold",
+      "owner": "cfg_regs.cfg_timeout_threshold"
+    },
+    {
+      "signal": "cfg_regs_cfg_velocity_setpoint",
+      "owner": "cfg_regs.cfg_velocity_setpoint"
+    },
+    {
+      "signal": "cmd_parser_request_sequence_id",
+      "owner": "cmd_parser.request_sequence_id"
+    },
+    {
+      "signal": "mmio_rdata",
+      "owner": "cfg_regs.mmio_rdata"
+    },
+    {
+      "signal": "mmio_ready",
+      "owner": "cfg_regs.mmio_ready"
+    },
+    {
+      "signal": "mmio_rvalid",
+      "owner": "cfg_regs.mmio_rvalid"
+    }
+  ],
+  "register_contract": {}
+}
