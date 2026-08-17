@@ -1,0 +1,3 @@
+❌ Digital Spec Agent failed.
+
+Pass1 JSON parse/normalize failed: Mandatory firmware control-plane top interface is incomplete; missing write-enable
