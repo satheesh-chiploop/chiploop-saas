@@ -1,0 +1,92 @@
+The required synthesizable top module is adaptive_aero_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must implement the selected Physical AI application contract, firmware-mediated command acceptance, validation, safety, timeout, fallback, and bounded actuator-command behavior.
+
+SOFT-CPU MODEL TRANSPORT CONTRACT: external model/reference execution is firmware-mediated through the declared CSR/MMIO command and status registers. Do not invent a hardware streaming transport at the top level when the application contract assigns command acceptance to firmware.
+
+FIRMWARE CONTROL-PLANE CONTRACT (mandatory): this product journey requests generated firmware. The synthesizable top must expose a real firmware-visible CSR/MMIO interface with address, write-data, read-data, transaction-valid/write-enable, and response/ready semantics. DIGITAL_SPEC_JSON.register_contract must describe the implemented registers and fields. Every declared register must be reachable through RTL decode; do not label inaccessible internal state as software-visible. The streaming transport may coexist with, but cannot replace, this interface.
+
+SOFT CPU INTEGRATION CONTRACT: preserve the resolved CPU contract in generated architecture, firmware, and handoff metadata: {"abi": "ilp32", "bus": "wishbone", "clock_mhz": 50.0, "compiler_arch": "rv32imc", "core": "picorv32", "core_label": "PicoRV32", "data_memory_kib": 16, "debug": false, "enabled": true, "estimated_reservation": {"basis": "supabase_governed_reference_estimate", "block_ram_blocks": 12, "logic_cells": 3000, "must_be_replaced_by_complete_system_synthesis": true}, "instruction_memory_kib": 32, "interrupts": true, "isa": "rv32imc", "license": "ISC", "policy_schema": "chiploop.application_intelligence.processor_ip_policy.v2", "profile": "balanced", "schema": "chiploop.fpga.soft_cpu.v1", "selection_mode": "automatic", "target_triple": "rv32imc-unknown-none-elf", "uart": true}. The application RTL must expose the selected bus and MMIO interface. Do not claim the CPU is instantiated or board-ready until its RTL, memory/interconnect, and application RTL are synthesized and routed together.
+Top module: adaptive_aero_control_top.
+
+Purpose: synthesizable FPGA digital-IP wrapper for an intelligent active-aerodynamics controller. The module integrates a PicoRV32 soft CPU, a Wishbone interconnect, register-mapped control/status logic, request/response buffering, timeout supervision, actuator clamping, and safe fallback control. The module does not implement NVIDIA DoMINO inference; it only transports compact request/response metadata and actuator commands.
+
+Implementation target: FPGA prototype. Do not instantiate any ASIC-only macro. Use FPGA-appropriate block RAM inference or vendor BRAM primitives for request/response buffering and any small command queue. Do not expose geometry arrays, tensors, surface-pressure fields, or flow fields at top level. Any model payload must be reduced in software to compact descriptors and scalar outputs.
+
+Top-level ports:
+- input  clk
+- input  rst_n
+- input  uart_rx
+- output uart_tx
+- output irq_o
+- output act_valid
+- output act_safe
+- output [2:0] act_mode
+- output [11:0] act_pos
+- output [11:0] act_neg
+- output [3:0] act_seq
+
+Bus architecture:
+- PicoRV32 shall use Wishbone bus access to a memory map containing control/status registers, request/response windows, timer, and safety monitor registers.
+- Wishbone accesses shall complete with single-cycle or bounded-latency acknowledge logic.
+- Register map shall be 32-bit word addressed and fixed at synthesis time.
+
+Required internal register set:
+1. control register: global enable, clear-fault, fallback override request, software heartbeat enable.
+2. status register: current mode, fault bits, stale-data bit, timeout bit, clamp-active bit, response-ready bit.
+3. freshness register: request sequence counter, last response sequence counter, maximum-age threshold.
+4. timeout register: request-to-response deadline and watchdog threshold.
+5. clamp registers: min/max command bounds for positive and negative actuator channels.
+6. request descriptor registers: compact model request ID, request length, scenario ID, flow condition encoding, geometry reference index or hash.
+7. response summary registers: compact outputs such as drag estimate, lift estimate, quality code, and response age.
+8. safety state register: encoded safe fallback state for actuators.
+
+Request/response transport:
+- Use a compact register-window or small FIFO implemented in FPGA BRAM to stage model requests and responses.
+- Each request shall carry a sequence number, scenario ID, geometry reference identifier, stream velocity encoding, and any other compact metadata needed by software to invoke the CPU-reference workflow.
+- Each response shall carry a matching sequence number, status code, freshness information, and compact scalar outputs. The RTL shall not assume direct access to the full DoMINO payload.
+- The hardware shall reject a response if the sequence number does not match the latest outstanding request or if the age exceeds the programmed threshold.
+
+Safety logic:
+- A dedicated FSM shall supervise system state: RESET, SAFE_FALLBACK, READY, REQUESTED, WAIT_RESPONSE, APPLY_VALIDATED, FAULT.
+- On reset, the FSM shall enter SAFE_FALLBACK and drive actuator safe outputs.
+- If no valid response arrives before timeout, transition to FAULT then SAFE_FALLBACK and assert irq_o.
+- If the firmware requests enable but the command is stale or out of bounds, clamp and/or reject according to policy; set clamp-active and stale-data flags.
+- If clear-fault is asserted and conditions are healthy, the FSM may transition from FAULT/SAFE_FALLBACK to READY.
+- The safe fallback output must be deterministic and programmable only through protected registers; default shall be a low-risk aerodynamic posture.
+
+Actuator command handling:
+- The command formatter shall pack validated aerodynamic commands into act_valid, act_mode, act_pos, act_neg, and act_seq.
+- act_pos and act_neg shall be clamped independently to configured bounds.
+- act_safe shall indicate safe-state drive when fallback is active.
+- act_valid shall assert only for validated, current, in-range commands.
+
+Timing and watchdog:
+- A free-running timer shall provide monotonic timebase for freshness and deadline checks.
+- A watchdog shall detect missing firmware heartbeats and force safe fallback if firmware stops servicing the control loop.
+
+Reset and initialization:
+- All control outputs shall default to safe state on reset.
+- Status and fault registers shall clear only as defined by firmware-controlled clear-fault behavior and safety conditions.
+
+Synthesizability requirements:
+- The design shall use only synthesizable RTL constructs.
+- No unsynthesizable tasks, delays, or behavioral model logic may be used in the top-level digital IP.
+- No inferred large register-array payload memory for bulk model data is allowed; use FPGA BRAM or vendor block RAM for queues/buffers.
+
+Interface constraints:
+- Top-level I/O shall remain compact and shall not exceed the equivalent of 256 scalar pins.
+- Data exchange with the CPU or host shall use Wishbone or a similarly compact bus inside the fabric, not a wide tensor interface.
+
+Firmware/software interaction contract:
+- Firmware running on PicoRV32 is responsible for packaging the CPU-reference model invocation, including geometry reference selection and flow-condition encoding.
+- Firmware shall write request descriptors, poll or wait on irq_o, read response summaries, verify freshness, and command the actuator block.
+- Hardware shall enforce stale-data rejection, timeout handling, clamping, and fallback independently of firmware correctness.
+
+Performance intent:
+- The architecture shall support control-loop operation across 20–55 m/s operating envelope with deterministic fallback behavior and bounded-latency register access.
+- The digital IP must preserve traceability between request sequence, response sequence, and actuator command issuance.
+
+Verification hooks:
+- Expose status flags for stale-data, timeout, clamp-active, fault, and safe-fallback state.
+- Provide a readable sequence number and age counter for scoreboard-based verification.
+- Provide a heartbeat monitor and interrupt indication for fault injection tests.
+FPGA MEMORY CONTRACT (mandatory): describe bulk payload/history/FIFO storage through a technology-neutral memory wrapper that the FPGA flow can map to native block RAM; do not flatten it into registers.
