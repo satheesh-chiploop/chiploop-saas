@@ -1,0 +1,2334 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "Synthesizable FPGA supervisory top integrating a PicoRV32 control plane, Wishbone MMIO register bank, bounded model request/response transport, stale-data monitoring, watchdog timeout supervision, actuator clamp and safe-fallback control, and compact interrupt/status logic. The design provides real firmware-visible control registers and bounded external model transport while never implementing physics, CFD, or tensor inference in RTL.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "reset_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "Single synchronous clock domain at 50 MHz.",
+      "One outstanding model request by default; no unbounded queueing.",
+      "FPGA-only synthesizable implementation with compact MMIO and bounded transport payloads."
+    ]
+  },
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [
+    {
+      "name": "fpga_bram_payload_buffer",
+      "kind": "technology_neutral_bram",
+      "depth": 16,
+      "data_width": 32,
+      "addr_width": 4,
+      "instance_name": "u_payload_bram",
+      "ports": {
+        "clk": "clk",
+        "we": "we",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "requires_mbist": false
+    }
+  ],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level integration point for the control CPU subsystem, Wishbone register window, bounded model transport bridge, stale-data monitor, watchdog supervisor, actuator clamp/fallback controller, and interrupt output. This module owns all top-level external drivers and applies the required model-request/model-response transport directions, firmware-visible CSR/MMIO interface, and safety fallback behavior.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "wb_adr_i",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "wb_dat_i",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "wb_dat_o",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "wb_we_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_stb_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_cyc_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_sel_i",
+          "direction": "input",
+          "width": 4
+        },
+        {
+          "name": "wb_ack_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "wb_err_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "wb_stall_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_req_valid_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_req_ready_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_req_data_o",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "model_resp_valid_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_resp_ready_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_resp_data_i",
+          "direction": "input",
+          "width": 64
+        },
+        {
+          "name": "uart_rx_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "uart_tx_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_o",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "actuator_valid_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "irq_o",
+          "direction": "output",
+          "width": 1
+        }
+      ],
+      "functionality": "Integrates the PicoRV32 firmware control plane with a Wishbone MMIO register bank, bounded request/response transport bridge, stale-data monitor, watchdog/timeout supervisor, and actuator clamp controller. It exposes a firmware-visible CSR/MMIO interface and a compact external model transport in the required directions: model-request valid/data are outputs, request ready is an input; model-response valid/data are inputs, response ready is an output. The top-level actuator output is always driven by the safety controller and falls back deterministically on reset, timeout, stale response, error, invalid data, or firmware hold.",
+      "responsibilities": [
+        "Provide a synthesizable top-level named adaptive_aero_control_top.",
+        "Own all top-level external drivers and never leave required outputs undriven.",
+        "Expose the Wishbone CPU bus and firmware-visible CSR/MMIO control/status window.",
+        "Enforce bounded model transport, sequence validation, timeout handling, stale rejection, and safe fallback.",
+        "Clamp actuator commands to programmable limits and block unsafe values.",
+        "Generate compact interrupt notification to the CPU subsystem.",
+        "Avoid implementing physics, CFD, or tensor inference in RTL."
+      ],
+      "must_drive": [
+        "wb_dat_o",
+        "wb_ack_o",
+        "wb_err_o",
+        "wb_stall_o",
+        "model_req_valid_o",
+        "model_req_data_o",
+        "model_resp_ready_o",
+        "uart_tx_o",
+        "actuator_cmd_o",
+        "actuator_valid_o",
+        "irq_o"
+      ],
+      "must_receive": [
+        "clk",
+        "reset_n",
+        "wb_adr_i",
+        "wb_dat_i",
+        "wb_we_i",
+        "wb_stb_i",
+        "wb_cyc_i",
+        "wb_sel_i",
+        "model_req_ready_i",
+        "model_resp_valid_i",
+        "model_resp_data_i",
+        "uart_rx_i"
+      ],
+      "must_not_drive": [
+        "vehicle_geometry",
+        "flow_conditions",
+        "flow_field",
+        "surface_pressure"
+      ],
+      "reset_behavior": "On reset, clear busy state, invalidate all in-flight request sequences, deassert request valid, deassert response ready until initialized, clear sticky fault indicators, and drive actuator output to the safe fallback command with command valid deasserted until the safety path is initialized.",
+      "behavior_rules": [
+        "Every top-level output must have a real RTL driver.",
+        "Streaming transport payloads remain compact and bounded.",
+        "Firmware-visible registers must be implemented by real RTL decode in the MMIO register bank.",
+        "No large payload arrays or vehicle-state grids may appear as top-level pins.",
+        "Safety fallback dominates all non-safe outputs.",
+        "External model transport directionality follows the mandatory contract regardless of port naming."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "picorv32_subsystem",
+        "description": "PicoRV32 RV32IMC control processor subsystem providing firmware execution, Wishbone master bus access, and interrupt reception. It executes the supervisory firmware that manages request construction, response polling, timeout policy, and fallback state management.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "wb_adr_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_we_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_stb_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_cyc_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_sel_o",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "wb_ack_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_err_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_stall_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "irq_i",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements the resolved PicoRV32-based firmware control plane at the stated architecture contract. Firmware uses the Wishbone bus to access the MMIO register bank for model transport control, status polling, watchdog configuration, clamp values, fallback command management, and fault logging. The CPU subsystem does not directly drive actuator outputs or external model pins.",
+        "responsibilities": [
+          "Execute firmware for request initiation, response polling, policy decisions, and fallback state management.",
+          "Drive Wishbone master transactions toward the application register window.",
+          "Accept interrupt notifications from the application top.",
+          "Maintain the CPU-side control and logging plane."
+        ],
+        "must_drive": [
+          "wb_adr_o",
+          "wb_dat_o",
+          "wb_we_o",
+          "wb_stb_o",
+          "wb_cyc_o",
+          "wb_sel_o"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "wb_dat_i",
+          "wb_ack_i",
+          "wb_err_i",
+          "wb_stall_i",
+          "irq_i"
+        ],
+        "must_not_drive": [
+          "wb_dat_i",
+          "wb_ack_i",
+          "wb_err_i",
+          "wb_stall_i",
+          "irq_i"
+        ],
+        "reset_behavior": "On reset, the CPU subsystem enters architectural reset, deasserts Wishbone activity, and waits for reset release. It does not directly affect actuator outputs or model transport pins.",
+        "behavior_rules": [
+          "The CPU contract remains PicoRV32, RV32IMC, 50 MHz, Wishbone, interrupt-enabled, and firmware-managed.",
+          "Board-ready integration is not claimed until memory and interconnect synthesis are complete.",
+          "Interrupts are informational and not a substitute for safety supervision."
+        ],
+        "rtl_output_file": "picorv32_subsystem.v"
+      },
+      {
+        "name": "aero_mmio_register_bank",
+        "description": "Firmware-visible compact CSR/MMIO register bank implementing request control, request sequence, request length, request data staging, response status, timeout threshold, actuator clamp limits, fallback command, current command, and sticky fault status. It decodes all declared registers and fields and exposes semantic control/status signals to downstream logic.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "wb_adr_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_we_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_stb_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_cyc_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_sel_i",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "wb_ack_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_err_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_stall_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_req_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_req_clear",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_req_type",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_req_seq",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_req_len",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_req_word",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_req_word_we",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_resp_clear",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_timeout_threshold",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_clamp_min",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_clamp_max",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_fallback_cmd",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_hold_request",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_busy",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_done",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_timeout",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_stale",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_safe_fallback_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_current_cmd",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "status_response_seq",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_request_seq",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_clamped",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "irq_pulse",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements the MMIO decode and software-visible register contract. It provides exact reachability for request control, request sequence, request length, request data staging, timeout configuration, clamp limits, fallback command, hold request, status, and sticky fault clear. It also provides a compact interrupt pulse output for response-complete or fault events.",
+        "responsibilities": [
+          "Decode Wishbone transactions to all declared software-visible registers.",
+          "Expose semantic control outputs to the transport bridge and safety controller.",
+          "Return compact status words to firmware.",
+          "Generate write-byte-enable aware register updates where applicable.",
+          "Provide a real firmware-visible control plane, not merely internal signals."
+        ],
+        "must_drive": [
+          "wb_dat_o",
+          "wb_ack_o",
+          "wb_err_o",
+          "wb_stall_o",
+          "cfg_req_valid",
+          "cfg_req_clear",
+          "cfg_req_type",
+          "cfg_req_seq",
+          "cfg_req_len",
+          "cfg_req_word",
+          "cfg_req_word_we",
+          "cfg_resp_clear",
+          "cfg_timeout_threshold",
+          "cfg_clamp_min",
+          "cfg_clamp_max",
+          "cfg_fallback_cmd",
+          "cfg_hold_request",
+          "irq_pulse"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "wb_adr_i",
+          "wb_dat_i",
+          "wb_we_i",
+          "wb_stb_i",
+          "wb_cyc_i",
+          "wb_sel_i",
+          "status_busy",
+          "status_done",
+          "status_error",
+          "status_timeout",
+          "status_stale",
+          "status_safe_fallback_active",
+          "status_current_cmd",
+          "status_response_seq",
+          "status_request_seq",
+          "status_clamped"
+        ],
+        "must_not_drive": [
+          "status_busy",
+          "status_done",
+          "status_error",
+          "status_timeout",
+          "status_stale",
+          "status_safe_fallback_active",
+          "status_current_cmd",
+          "status_response_seq",
+          "status_request_seq",
+          "status_clamped"
+        ],
+        "reset_behavior": "Reset clears software-visible sticky bits, deasserts one-shot control pulses, initializes configuration registers to safe defaults, and returns read data to a benign reset state until firmware writes configuration values.",
+        "behavior_rules": [
+          "Every declared register must be reachable through RTL decode.",
+          "The MMIO interface coexists with streaming transport and does not replace it.",
+          "Registers support byte enables where applicable.",
+          "A clear mechanism is provided for sticky fault status.",
+          "All semantic signals are explicit and not derived implicitly from raw transport buses in downstream modules."
+        ],
+        "rtl_output_file": "aero_mmio_register_bank.v"
+      },
+      {
+        "name": "model_transport_bridge",
+        "description": "Bounded model request/response transport bridge with a small internal holding buffer and explicit request/response sequencing. It accepts compact packets containing request type, sequence ID, length, and 32-bit data words from the MMIO/control plane, emits request-valid/data to the external model service, receives response-valid/data from the external model service, and reports busy, done, error, timeout, stale, and current-command status.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_req_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_req_clear",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_req_type",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_req_seq",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_req_len",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_req_word",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cfg_req_word_we",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_resp_clear",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_hold_request",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_timeout_threshold",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "req_ready_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "req_valid_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "req_data_o",
+            "direction": "output",
+            "width": 64
+          },
+          {
+            "name": "resp_valid_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "resp_ready_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "resp_data_i",
+            "direction": "input",
+            "width": 64
+          },
+          {
+            "name": "status_busy",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_done",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_error",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_timeout",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_stale",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_request_seq",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "status_response_seq",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "status_response_word",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "status_current_cmd",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "status_safe_fallback_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fallback_cmd_i",
+            "direction": "input",
+            "width": 32
+          }
+        ],
+        "functionality": "Manages bounded transport to the external model service. It accepts one outstanding request by default, emits a compact request payload, captures response payloads, detects protocol faults, and produces busy/done/error/timeout/stale status. It never performs inference or physics itself. Request and response directionality follow the mandatory transport contract: request valid/data are outputs; request ready is an input; response valid/data are inputs; response ready is an output.",
+        "responsibilities": [
+          "Stage a finite request packet with sequence ID, type, length, and up to compact data fields.",
+          "Emit model request valid/data only when not busy and when request staging is complete.",
+          "Receive response valid/data from the external model service and assert response ready as required.",
+          "Expose busy, done, error, timeout, stale, request sequence, response sequence, and current command status.",
+          "Forward only validated data toward the actuator/safety path.",
+          "Bound buffering so that no unbounded payload storage is inferred."
+        ],
+        "must_drive": [
+          "req_valid_o",
+          "req_data_o",
+          "resp_ready_o",
+          "status_busy",
+          "status_done",
+          "status_error",
+          "status_timeout",
+          "status_stale",
+          "status_request_seq",
+          "status_response_seq",
+          "status_response_word",
+          "status_current_cmd"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_req_valid",
+          "cfg_req_clear",
+          "cfg_req_type",
+          "cfg_req_seq",
+          "cfg_req_len",
+          "cfg_req_word",
+          "cfg_req_word_we",
+          "cfg_resp_clear",
+          "cfg_hold_request",
+          "cfg_timeout_threshold",
+          "req_ready_i",
+          "resp_valid_i",
+          "resp_data_i",
+          "status_safe_fallback_active",
+          "fallback_cmd_i"
+        ],
+        "must_not_drive": [
+          "req_ready_i",
+          "resp_valid_i",
+          "resp_data_i",
+          "cfg_req_valid",
+          "cfg_req_clear",
+          "cfg_req_type",
+          "cfg_req_seq",
+          "cfg_req_len",
+          "cfg_req_word",
+          "cfg_req_word_we",
+          "cfg_resp_clear",
+          "cfg_hold_request",
+          "cfg_timeout_threshold",
+          "fallback_cmd_i"
+        ],
+        "reset_behavior": "Reset invalidates in-flight request and response state, clears busy/done/error indicators, clears pending sequence tracking, and prevents request emission until a fresh request is staged.",
+        "behavior_rules": [
+          "A new request is blocked while a previous request is active unless the queue depth is explicitly one; default contract is one outstanding request.",
+          "A response is considered valid only if sequence, age, and protocol conditions are satisfied.",
+          "Late, duplicated, out-of-order, or malformed responses are rejected and marked stale.",
+          "The bridge must not drive top-level outputs directly unless routed through the top-level integration path.",
+          "A small internal holding buffer is permitted, but no large register-array payload storage may be inferred."
+        ],
+        "rtl_output_file": "model_transport_bridge.v"
+      },
+      {
+        "name": "stale_data_monitor",
+        "description": "Sequence and deadline supervision block that tracks the most recent accepted request sequence, response sequence, and age relative to a programmable timeout threshold. It rejects stale, duplicated, or out-of-order responses and asserts stale or timeout indicators used by the safety controller.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "request_seq_i",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "response_seq_i",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "busy_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_valid_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_accept_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timeout_threshold_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "deadline_counter_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "stale_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "timeout_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "response_fresh_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "sequence_match_o",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements stale-data discrimination and deadline-based supervision. A response is valid only when sequence matches the active request and the response age is within the configured deadline threshold. Late, duplicated, or out-of-order responses are rejected and flagged stale.",
+        "responsibilities": [
+          "Track active request and response sequences.",
+          "Compare response age against the programmable timeout threshold.",
+          "Assert stale and timeout conditions for downstream safety logic.",
+          "Provide a fresh-response qualification flag for the top-level response accept path."
+        ],
+        "must_drive": [
+          "stale_o",
+          "timeout_o",
+          "response_fresh_o",
+          "sequence_match_o"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "request_seq_i",
+          "response_seq_i",
+          "busy_i",
+          "response_valid_i",
+          "response_accept_i",
+          "timeout_threshold_i",
+          "deadline_counter_i"
+        ],
+        "must_not_drive": [
+          "request_seq_i",
+          "response_seq_i",
+          "busy_i",
+          "response_valid_i",
+          "response_accept_i",
+          "timeout_threshold_i",
+          "deadline_counter_i"
+        ],
+        "reset_behavior": "Reset clears all sequence tracking and timer comparisons, deasserts stale and timeout flags, and returns fresh-response qualification low until a new request is armed.",
+        "behavior_rules": [
+          "A response may only be accepted if it is both sequence-matched and timely.",
+          "Duplicated or out-of-order responses must be rejected as stale.",
+          "This block does not alter actuator outputs directly; it only reports supervision status."
+        ],
+        "rtl_output_file": "stale_data_monitor.v"
+      },
+      {
+        "name": "watchdog_timeout_supervisor",
+        "description": "Free-running timer and per-request deadline controller that asserts timeout when model response latency exceeds the configured threshold. It forces safe fallback through the top-level safety path and clears busy state on expiry.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "busy_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "deadline_threshold_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "arm_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "clear_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timeout_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "deadline_counter_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "expired_o",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Maintains a free-running timer and deadline counter for each active request. When the model response does not arrive before the configured deadline, it asserts timeout and expiry indications to force safe fallback.",
+        "responsibilities": [
+          "Start and stop deadline counting in response to request activity.",
+          "Assert timeout on expiry and make the timeout condition externally visible.",
+          "Provide the current deadline counter value for supervision and stale-data monitoring."
+        ],
+        "must_drive": [
+          "timeout_o",
+          "deadline_counter_o",
+          "expired_o"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "busy_i",
+          "deadline_threshold_i",
+          "arm_i",
+          "clear_i"
+        ],
+        "must_not_drive": [
+          "busy_i",
+          "deadline_threshold_i",
+          "arm_i",
+          "clear_i"
+        ],
+        "reset_behavior": "Reset clears the timer, deasserts timeout/expired indications, and returns the deadline counter to zero.",
+        "behavior_rules": [
+          "Timeout must be bounded and deterministic in synchronous logic.",
+          "The supervisor must not drive actuator outputs directly; it only influences safety selection via status and control paths."
+        ],
+        "rtl_output_file": "watchdog_timeout_supervisor.v"
+      },
+      {
+        "name": "actuator_clamp_safety",
+        "description": "Fixed-point actuator command clamp and safe-fallback selector. It clamps commanded aerodynamic actuator positions or angles between programmable min and max limits, raises a clamped flag on limit hits, and selects deterministic fallback command values on reset, timeout, stale response, protocol error, invalid data, or firmware-requested hold.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cmd_in_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "cmd_valid_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "clamp_min_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "clamp_max_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "fallback_cmd_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "timeout_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "stale_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "error_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "hold_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "safe_fallback_active_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "clamped_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_out_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cmd_valid_o",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Performs deterministic safety selection and clamp enforcement on commanded actuator values. The output is always the conservative fallback command or the clamped valid command, never an unsafe out-of-range value.",
+        "responsibilities": [
+          "Clamp actuator commands to programmable min and max limits.",
+          "Force fallback command on reset, timeout, stale, error, invalid data, or hold request.",
+          "Assert clamped when limits are hit.",
+          "Provide safe_fallback_active to the status plane."
+        ],
+        "must_drive": [
+          "safe_fallback_active_o",
+          "clamped_o",
+          "cmd_out_o",
+          "cmd_valid_o"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cmd_in_i",
+          "cmd_valid_i",
+          "clamp_min_i",
+          "clamp_max_i",
+          "fallback_cmd_i",
+          "timeout_i",
+          "stale_i",
+          "error_i",
+          "hold_i"
+        ],
+        "must_not_drive": [
+          "cmd_in_i",
+          "cmd_valid_i",
+          "clamp_min_i",
+          "clamp_max_i",
+          "fallback_cmd_i",
+          "timeout_i",
+          "stale_i",
+          "error_i",
+          "hold_i"
+        ],
+        "reset_behavior": "Reset immediately selects the fallback command, deasserts valid until the system is ready, and clears clamp indication.",
+        "behavior_rules": [
+          "Fallback selection dominates all non-safe outputs.",
+          "Latency to safe fallback is bounded by one control cycle plus combinational clamp logic.",
+          "Unsafe values must never reach the actuator output."
+        ],
+        "rtl_output_file": "actuator_clamp_safety.v"
+      },
+      {
+        "name": "aero_watchdog_irq",
+        "description": "Compact interrupt generation logic for response completion and fault events. Provides a firmware-visible pulse or level-style notification without affecting safety behavior.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "done_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fault_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "irq_o",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Aggregates response-complete and fault conditions into a compact interrupt indication for the CPU subsystem. The interrupt path is informational and never controls actuator safety directly.",
+        "responsibilities": [
+          "Notify firmware of response completion or fault occurrence.",
+          "Provide a compact single-bit interrupt output.",
+          "Remain nonintrusive to fallback and clamp behavior."
+        ],
+        "must_drive": [
+          "irq_o"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "done_i",
+          "fault_i"
+        ],
+        "must_not_drive": [
+          "done_i",
+          "fault_i"
+        ],
+        "reset_behavior": "Reset deasserts interrupt output.",
+        "behavior_rules": [
+          "Interrupts may be level or pulse compatible with firmware use.",
+          "Safety behavior must remain independent of interrupt assertion."
+        ],
+        "rtl_output_file": "aero_watchdog_irq.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "picorv32_subsystem.clk",
+        "aero_mmio_register_bank.clk",
+        "model_transport_bridge.clk",
+        "stale_data_monitor.clk",
+        "watchdog_timeout_supervisor.clk",
+        "actuator_clamp_safety.clk",
+        "aero_watchdog_irq.clk"
+      ],
+      "description": "Top clock fanout to all synchronous submodules."
+    },
+    {
+      "top_port": "reset_n",
+      "connected_to": [
+        "picorv32_subsystem.reset_n",
+        "aero_mmio_register_bank.reset_n",
+        "model_transport_bridge.reset_n",
+        "stale_data_monitor.reset_n",
+        "watchdog_timeout_supervisor.reset_n",
+        "actuator_clamp_safety.reset_n",
+        "aero_watchdog_irq.reset_n"
+      ],
+      "description": "Top active-low reset fanout to all submodules."
+    },
+    {
+      "top_port": "wb_adr_i",
+      "connected_to": [
+        "aero_mmio_register_bank.wb_adr_i"
+      ],
+      "description": "Wishbone address from CPU master to MMIO register bank."
+    },
+    {
+      "top_port": "wb_dat_i",
+      "connected_to": [
+        "aero_mmio_register_bank.wb_dat_i"
+      ],
+      "description": "Wishbone write data from CPU to MMIO register bank."
+    },
+    {
+      "top_port": "wb_dat_o",
+      "connected_to": [
+        "aero_mmio_register_bank.wb_dat_o"
+      ],
+      "description": "Wishbone read data returned from MMIO register bank to CPU."
+    },
+    {
+      "top_port": "wb_we_i",
+      "connected_to": [
+        "aero_mmio_register_bank.wb_we_i"
+      ],
+      "description": "Wishbone write-enable control from CPU to MMIO register bank."
+    },
+    {
+      "top_port": "wb_stb_i",
+      "connected_to": [
+        "aero_mmio_register_bank.wb_stb_i"
+      ],
+      "description": "Wishbone strobe from CPU to MMIO register bank."
+    },
+    {
+      "top_port": "wb_cyc_i",
+      "connected_to": [
+        "aero_mmio_register_bank.wb_cyc_i"
+      ],
+      "description": "Wishbone cycle valid from CPU to MMIO register bank."
+    },
+    {
+      "top_port": "wb_sel_i",
+      "connected_to": [
+        "aero_mmio_register_bank.wb_sel_i"
+      ],
+      "description": "Wishbone byte select from CPU to MMIO register bank."
+    },
+    {
+      "top_port": "wb_ack_o",
+      "connected_to": [
+        "aero_mmio_register_bank.wb_ack_o"
+      ],
+      "description": "Wishbone acknowledge from MMIO register bank back to CPU."
+    },
+    {
+      "top_port": "wb_err_o",
+      "connected_to": [
+        "aero_mmio_register_bank.wb_err_o"
+      ],
+      "description": "Wishbone error from MMIO register bank back to CPU."
+    },
+    {
+      "top_port": "wb_stall_o",
+      "connected_to": [
+        "aero_mmio_register_bank.wb_stall_o"
+      ],
+      "description": "Wishbone stall from MMIO register bank back to CPU."
+    },
+    {
+      "top_port": "model_req_valid_o",
+      "connected_to": [
+        "model_transport_bridge.req_valid_o"
+      ],
+      "description": "External model request valid driven by the transport bridge through the top-level output driver."
+    },
+    {
+      "top_port": "model_req_ready_i",
+      "connected_to": [
+        "model_transport_bridge.req_ready_i"
+      ],
+      "description": "External model request ready received at the top and consumed by the transport bridge."
+    },
+    {
+      "top_port": "model_req_data_o",
+      "connected_to": [
+        "model_transport_bridge.req_data_o"
+      ],
+      "description": "External model request payload driven by the transport bridge through the top-level output driver."
+    },
+    {
+      "top_port": "model_resp_valid_i",
+      "connected_to": [
+        "model_transport_bridge.resp_valid_i"
+      ],
+      "description": "External model response valid received at the top and consumed by the transport bridge."
+    },
+    {
+      "top_port": "model_resp_ready_o",
+      "connected_to": [
+        "model_transport_bridge.resp_ready_o"
+      ],
+      "description": "External model response ready driven by the transport bridge through the top-level output driver."
+    },
+    {
+      "top_port": "model_resp_data_i",
+      "connected_to": [
+        "model_transport_bridge.resp_data_i"
+      ],
+      "description": "External model response payload received at the top and consumed by the transport bridge."
+    },
+    {
+      "top_port": "uart_rx_i",
+      "connected_to": [
+        "picorv32_subsystem.irq_i"
+      ],
+      "description": "Reserved top-level UART RX pin is present for implementation compatibility; in this contract it is wired only to the CPU interrupt input path for closure and remains nonintrusive to safety behavior."
+    },
+    {
+      "top_port": "uart_tx_o",
+      "connected_to": [
+        "aero_watchdog_irq.irq_o"
+      ],
+      "description": "Optional top-level single-bit telemetry output driven by the interrupt generation path and not safety-critical."
+    },
+    {
+      "top_port": "actuator_cmd_o",
+      "connected_to": [
+        "actuator_clamp_safety.cmd_out_o"
+      ],
+      "description": "Top-level actuator command output driven by the clamp and safe-fallback controller."
+    },
+    {
+      "top_port": "actuator_valid_o",
+      "connected_to": [
+        "actuator_clamp_safety.cmd_valid_o"
+      ],
+      "description": "Top-level actuator command validity output driven by the clamp and safe-fallback controller."
+    },
+    {
+      "top_port": "irq_o",
+      "connected_to": [
+        "aero_watchdog_irq.irq_o"
+      ],
+      "description": "Top-level interrupt output driven by the interrupt generation path."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "cfg_req_valid",
+      "width": 1,
+      "source": "aero_mmio_register_bank.cfg_req_valid",
+      "destinations": [
+        "model_transport_bridge.cfg_req_valid"
+      ],
+      "description": "Firmware request-valid control from MMIO register decode to transport bridge."
+    },
+    {
+      "name": "cfg_req_clear",
+      "width": 1,
+      "source": "aero_mmio_register_bank.cfg_req_clear",
+      "destinations": [
+        "model_transport_bridge.cfg_req_clear"
+      ],
+      "description": "Firmware clear control for request state and sticky request-side bookkeeping."
+    },
+    {
+      "name": "cfg_req_type",
+      "width": 8,
+      "source": "aero_mmio_register_bank.cfg_req_type",
+      "destinations": [
+        "model_transport_bridge.cfg_req_type"
+      ],
+      "description": "Request type field forwarded from MMIO to transport bridge."
+    },
+    {
+      "name": "cfg_req_seq",
+      "width": 16,
+      "source": "aero_mmio_register_bank.cfg_req_seq",
+      "destinations": [
+        "model_transport_bridge.cfg_req_seq"
+      ],
+      "description": "Request sequence identifier used by the transport bridge and stale-data monitor."
+    },
+    {
+      "name": "cfg_req_len",
+      "width": 8,
+      "source": "aero_mmio_register_bank.cfg_req_len",
+      "destinations": [
+        "model_transport_bridge.cfg_req_len"
+      ],
+      "description": "Request length field forwarded from MMIO to transport bridge."
+    },
+    {
+      "name": "cfg_req_word",
+      "width": 32,
+      "source": "aero_mmio_register_bank.cfg_req_word",
+      "destinations": [
+        "model_transport_bridge.cfg_req_word"
+      ],
+      "description": "Request data staging word from MMIO to transport bridge."
+    },
+    {
+      "name": "cfg_req_word_we",
+      "width": 1,
+      "source": "aero_mmio_register_bank.cfg_req_word_we",
+      "destinations": [
+        "model_transport_bridge.cfg_req_word_we"
+      ],
+      "description": "Write-enable for request data staging word."
+    },
+    {
+      "name": "cfg_resp_clear",
+      "width": 1,
+      "source": "aero_mmio_register_bank.cfg_resp_clear",
+      "destinations": [
+        "model_transport_bridge.cfg_resp_clear"
+      ],
+      "description": "Firmware clear control for response state and sticky response bookkeeping."
+    },
+    {
+      "name": "cfg_timeout_threshold",
+      "width": 32,
+      "source": "aero_mmio_register_bank.cfg_timeout_threshold",
+      "destinations": [
+        "model_transport_bridge.cfg_timeout_threshold",
+        "stale_data_monitor.timeout_threshold_i",
+        "watchdog_timeout_supervisor.deadline_threshold_i"
+      ],
+      "description": "Programmable timeout threshold distributed to bridge, stale monitor, and watchdog supervisor."
+    },
+    {
+      "name": "cfg_clamp_min",
+      "width": 32,
+      "source": "aero_mmio_register_bank.cfg_clamp_min",
+      "destinations": [
+        "actuator_clamp_safety.clamp_min_i"
+      ],
+      "description": "Programmable actuator minimum clamp value."
+    },
+    {
+      "name": "cfg_clamp_max",
+      "width": 32,
+      "source": "aero_mmio_register_bank.cfg_clamp_max",
+      "destinations": [
+        "actuator_clamp_safety.clamp_max_i"
+      ],
+      "description": "Programmable actuator maximum clamp value."
+    },
+    {
+      "name": "cfg_fallback_cmd",
+      "width": 32,
+      "source": "aero_mmio_register_bank.cfg_fallback_cmd",
+      "destinations": [
+        "model_transport_bridge.fallback_cmd_i",
+        "actuator_clamp_safety.fallback_cmd_i"
+      ],
+      "description": "Deterministic conservative fallback actuator command."
+    },
+    {
+      "name": "cfg_hold_request",
+      "width": 1,
+      "source": "aero_mmio_register_bank.cfg_hold_request",
+      "destinations": [
+        "model_transport_bridge.cfg_hold_request",
+        "actuator_clamp_safety.hold_i"
+      ],
+      "description": "Firmware-requested hold that forces fallback and suppresses unsafe command propagation."
+    },
+    {
+      "name": "status_busy",
+      "width": 1,
+      "source": "model_transport_bridge.status_busy",
+      "destinations": [
+        "aero_mmio_register_bank.status_busy",
+        "stale_data_monitor.busy_i",
+        "watchdog_timeout_supervisor.busy_i"
+      ],
+      "description": "Busy status from transport bridge to MMIO, stale monitor, and watchdog."
+    },
+    {
+      "name": "status_done",
+      "width": 1,
+      "source": "model_transport_bridge.status_done",
+      "destinations": [
+        "aero_mmio_register_bank.status_done",
+        "aero_watchdog_irq.done_i"
+      ],
+      "description": "Done status from transport bridge to MMIO and IRQ generation path."
+    },
+    {
+      "name": "status_error",
+      "width": 1,
+      "source": "model_transport_bridge.status_error",
+      "destinations": [
+        "aero_mmio_register_bank.status_error",
+        "actuator_clamp_safety.error_i",
+        "aero_watchdog_irq.fault_i"
+      ],
+      "description": "Protocol or data error status distributed to MMIO, safety clamp, and IRQ path."
+    },
+    {
+      "name": "status_timeout",
+      "width": 1,
+      "source": "model_transport_bridge.status_timeout",
+      "destinations": [
+        "aero_mmio_register_bank.status_timeout",
+        "actuator_clamp_safety.timeout_i"
+      ],
+      "description": "Timeout status distributed to software-visible status and safety clamp."
+    },
+    {
+      "name": "status_stale",
+      "width": 1,
+      "source": "model_transport_bridge.status_stale",
+      "destinations": [
+        "aero_mmio_register_bank.status_stale",
+        "actuator_clamp_safety.stale_i"
+      ],
+      "description": "Stale response status distributed to software-visible status and safety clamp."
+    },
+    {
+      "name": "status_request_seq",
+      "width": 16,
+      "source": "model_transport_bridge.status_request_seq",
+      "destinations": [
+        "aero_mmio_register_bank.status_request_seq",
+        "stale_data_monitor.request_seq_i"
+      ],
+      "description": "Active request sequence shared with software-visible status and stale monitor."
+    },
+    {
+      "name": "status_response_seq",
+      "width": 16,
+      "source": "model_transport_bridge.status_response_seq",
+      "destinations": [
+        "aero_mmio_register_bank.status_response_seq",
+        "stale_data_monitor.response_seq_i"
+      ],
+      "description": "Latest response sequence shared with software-visible status and stale monitor."
+    },
+    {
+      "name": "status_response_word",
+      "width": 32,
+      "source": "model_transport_bridge.status_response_word",
+      "destinations": [
+        "actuator_clamp_safety.cmd_in_i"
+      ],
+      "description": "Validated response word forwarded to the actuator clamp and safety controller as the commanded value candidate."
+    },
+    {
+      "name": "status_current_cmd",
+      "width": 32,
+      "source": "model_transport_bridge.status_current_cmd",
+      "destinations": [
+        "aero_mmio_register_bank.status_current_cmd"
+      ],
+      "description": "Current transport-selected command visible to firmware."
+    },
+    {
+      "name": "status_safe_fallback_active",
+      "width": 1,
+      "source": "actuator_clamp_safety.safe_fallback_active_o",
+      "destinations": [
+        "model_transport_bridge.status_safe_fallback_active",
+        "aero_mmio_register_bank.status_safe_fallback_active"
+      ],
+      "description": "Safe fallback active indication distributed to bridge and software-visible status."
+    },
+    {
+      "name": "clamped_o",
+      "width": 1,
+      "source": "actuator_clamp_safety.clamped_o",
+      "destinations": [
+        "aero_mmio_register_bank.status_clamped"
+      ],
+      "description": "Clamp-hit indication presented to firmware."
+    },
+    {
+      "name": "cmd_out_o",
+      "width": 32,
+      "source": "actuator_clamp_safety.cmd_out_o",
+      "destinations": [
+        "adaptive_aero_control_top.actuator_cmd_o"
+      ],
+      "description": "Final actuator command output driven to the top-level port."
+    },
+    {
+      "name": "cmd_valid_o",
+      "width": 1,
+      "source": "actuator_clamp_safety.cmd_valid_o",
+      "destinations": [
+        "adaptive_aero_control_top.actuator_valid_o"
+      ],
+      "description": "Final actuator command valid output driven to the top-level port."
+    },
+    {
+      "name": "deadline_counter_o",
+      "width": 32,
+      "source": "watchdog_timeout_supervisor.deadline_counter_o",
+      "destinations": [
+        "stale_data_monitor.deadline_counter_i"
+      ],
+      "description": "Current deadline counter value fed into stale-data supervision."
+    },
+    {
+      "name": "response_valid_i",
+      "width": 1,
+      "source": "model_transport_bridge.status_done",
+      "destinations": [
+        "stale_data_monitor.response_valid_i"
+      ],
+      "description": "Response-complete indication from transport bridge used by stale-data supervision."
+    },
+    {
+      "name": "response_accept_i",
+      "width": 1,
+      "source": "model_transport_bridge.status_done",
+      "destinations": [
+        "stale_data_monitor.response_accept_i"
+      ],
+      "description": "Response-accept qualification from transport bridge used by stale-data supervision."
+    },
+    {
+      "name": "arm_i",
+      "width": 1,
+      "source": "model_transport_bridge.status_busy",
+      "destinations": [
+        "watchdog_timeout_supervisor.arm_i"
+      ],
+      "description": "Busy status arms the watchdog timeout supervision when a request becomes active."
+    },
+    {
+      "name": "clear_i",
+      "width": 1,
+      "source": "model_transport_bridge.status_done",
+      "destinations": [
+        "watchdog_timeout_supervisor.clear_i"
+      ],
+      "description": "Done status clears the watchdog timeout supervision when the transaction completes."
+    },
+    {
+      "name": "cmd_valid_i",
+      "width": 1,
+      "source": "model_transport_bridge.status_done",
+      "destinations": [
+        "actuator_clamp_safety.cmd_valid_i"
+      ],
+      "description": "Completion indication qualifies the validated command path into the actuator clamp safety controller."
+    },
+    {
+      "name": "wb_dat_i_cpu",
+      "width": 32,
+      "source": "picorv32_subsystem.wb_dat_o",
+      "destinations": [
+        "aero_mmio_register_bank.wb_dat_i"
+      ],
+      "description": "CPU Wishbone write data to MMIO register bank."
+    },
+    {
+      "name": "wb_adr_i_cpu",
+      "width": 32,
+      "source": "picorv32_subsystem.wb_adr_o",
+      "destinations": [
+        "aero_mmio_register_bank.wb_adr_i"
+      ],
+      "description": "CPU Wishbone address to MMIO register bank."
+    },
+    {
+      "name": "wb_we_i_cpu",
+      "width": 1,
+      "source": "picorv32_subsystem.wb_we_o",
+      "destinations": [
+        "aero_mmio_register_bank.wb_we_i"
+      ],
+      "description": "CPU Wishbone write-enable to MMIO register bank."
+    },
+    {
+      "name": "wb_stb_i_cpu",
+      "width": 1,
+      "source": "picorv32_subsystem.wb_stb_o",
+      "destinations": [
+        "aero_mmio_register_bank.wb_stb_i"
+      ],
+      "description": "CPU Wishbone strobe to MMIO register bank."
+    },
+    {
+      "name": "wb_cyc_i_cpu",
+      "width": 1,
+      "source": "picorv32_subsystem.wb_cyc_o",
+      "destinations": [
+        "aero_mmio_register_bank.wb_cyc_i"
+      ],
+      "description": "CPU Wishbone cycle valid to MMIO register bank."
+    },
+    {
+      "name": "wb_sel_i_cpu",
+      "width": 4,
+      "source": "picorv32_subsystem.wb_sel_o",
+      "destinations": [
+        "aero_mmio_register_bank.wb_sel_i"
+      ],
+      "description": "CPU Wishbone byte select to MMIO register bank."
+    },
+    {
+      "name": "wb_dat_o_cpu",
+      "width": 32,
+      "source": "aero_mmio_register_bank.wb_dat_o",
+      "destinations": [
+        "picorv32_subsystem.wb_dat_i"
+      ],
+      "description": "MMIO read data returned to CPU Wishbone bus."
+    },
+    {
+      "name": "wb_ack_o_cpu",
+      "width": 1,
+      "source": "aero_mmio_register_bank.wb_ack_o",
+      "destinations": [
+        "picorv32_subsystem.wb_ack_i"
+      ],
+      "description": "MMIO acknowledge returned to CPU Wishbone bus."
+    },
+    {
+      "name": "wb_err_o_cpu",
+      "width": 1,
+      "source": "aero_mmio_register_bank.wb_err_o",
+      "destinations": [
+        "picorv32_subsystem.wb_err_i"
+      ],
+      "description": "MMIO bus error returned to CPU Wishbone bus."
+    },
+    {
+      "name": "wb_stall_o_cpu",
+      "width": 1,
+      "source": "aero_mmio_register_bank.wb_stall_o",
+      "destinations": [
+        "picorv32_subsystem.wb_stall_i"
+      ],
+      "description": "MMIO stall returned to CPU Wishbone bus."
+    },
+    {
+      "name": "cpu_irq_i",
+      "width": 1,
+      "source": "aero_watchdog_irq.irq_o",
+      "destinations": [
+        "picorv32_subsystem.irq_i"
+      ],
+      "description": "Interrupt from application IRQ generator into CPU subsystem."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "cfg_req_valid",
+      "owner": "aero_mmio_register_bank.cfg_req_valid"
+    },
+    {
+      "signal": "cfg_req_clear",
+      "owner": "aero_mmio_register_bank.cfg_req_clear"
+    },
+    {
+      "signal": "cfg_req_type",
+      "owner": "aero_mmio_register_bank.cfg_req_type"
+    },
+    {
+      "signal": "cfg_req_seq",
+      "owner": "aero_mmio_register_bank.cfg_req_seq"
+    },
+    {
+      "signal": "cfg_req_len",
+      "owner": "aero_mmio_register_bank.cfg_req_len"
+    },
+    {
+      "signal": "cfg_req_word",
+      "owner": "aero_mmio_register_bank.cfg_req_word"
+    },
+    {
+      "signal": "cfg_req_word_we",
+      "owner": "aero_mmio_register_bank.cfg_req_word_we"
+    },
+    {
+      "signal": "cfg_resp_clear",
+      "owner": "aero_mmio_register_bank.cfg_resp_clear"
+    },
+    {
+      "signal": "cfg_timeout_threshold",
+      "owner": "aero_mmio_register_bank.cfg_timeout_threshold"
+    },
+    {
+      "signal": "cfg_clamp_min",
+      "owner": "aero_mmio_register_bank.cfg_clamp_min"
+    },
+    {
+      "signal": "cfg_clamp_max",
+      "owner": "aero_mmio_register_bank.cfg_clamp_max"
+    },
+    {
+      "signal": "cfg_fallback_cmd",
+      "owner": "aero_mmio_register_bank.cfg_fallback_cmd"
+    },
+    {
+      "signal": "cfg_hold_request",
+      "owner": "aero_mmio_register_bank.cfg_hold_request"
+    },
+    {
+      "signal": "status_busy",
+      "owner": "model_transport_bridge.status_busy"
+    },
+    {
+      "signal": "status_done",
+      "owner": "model_transport_bridge.status_done"
+    },
+    {
+      "signal": "status_error",
+      "owner": "model_transport_bridge.status_error"
+    },
+    {
+      "signal": "status_timeout",
+      "owner": "model_transport_bridge.status_timeout"
+    },
+    {
+      "signal": "status_stale",
+      "owner": "model_transport_bridge.status_stale"
+    },
+    {
+      "signal": "status_request_seq",
+      "owner": "model_transport_bridge.status_request_seq"
+    },
+    {
+      "signal": "status_response_seq",
+      "owner": "model_transport_bridge.status_response_seq"
+    },
+    {
+      "signal": "status_response_word",
+      "owner": "model_transport_bridge.status_response_word"
+    },
+    {
+      "signal": "status_current_cmd",
+      "owner": "model_transport_bridge.status_current_cmd"
+    },
+    {
+      "signal": "status_safe_fallback_active",
+      "owner": "actuator_clamp_safety.safe_fallback_active_o"
+    },
+    {
+      "signal": "clamped_o",
+      "owner": "actuator_clamp_safety.clamped_o"
+    },
+    {
+      "signal": "cmd_out_o",
+      "owner": "actuator_clamp_safety.cmd_out_o"
+    },
+    {
+      "signal": "cmd_valid_o",
+      "owner": "actuator_clamp_safety.cmd_valid_o"
+    },
+    {
+      "signal": "timeout_o",
+      "owner": "watchdog_timeout_supervisor.timeout_o"
+    },
+    {
+      "signal": "deadline_counter_o",
+      "owner": "watchdog_timeout_supervisor.deadline_counter_o"
+    },
+    {
+      "signal": "expired_o",
+      "owner": "watchdog_timeout_supervisor.expired_o"
+    },
+    {
+      "signal": "stale_o",
+      "owner": "stale_data_monitor.stale_o"
+    },
+    {
+      "signal": "response_valid_i",
+      "owner": "model_transport_bridge.status_done"
+    },
+    {
+      "signal": "response_accept_i",
+      "owner": "model_transport_bridge.status_done"
+    },
+    {
+      "signal": "response_fresh_o",
+      "owner": "stale_data_monitor.response_fresh_o"
+    },
+    {
+      "signal": "sequence_match_o",
+      "owner": "stale_data_monitor.sequence_match_o"
+    },
+    {
+      "signal": "arm_i",
+      "owner": "model_transport_bridge.status_busy"
+    },
+    {
+      "signal": "clear_i",
+      "owner": "model_transport_bridge.status_done"
+    },
+    {
+      "signal": "irq_pulse",
+      "owner": "aero_mmio_register_bank.irq_pulse"
+    },
+    {
+      "signal": "wb_dat_i_cpu",
+      "owner": "picorv32_subsystem.wb_dat_o"
+    },
+    {
+      "signal": "wb_adr_i_cpu",
+      "owner": "picorv32_subsystem.wb_adr_o"
+    },
+    {
+      "signal": "wb_we_i_cpu",
+      "owner": "picorv32_subsystem.wb_we_o"
+    },
+    {
+      "signal": "wb_stb_i_cpu",
+      "owner": "picorv32_subsystem.wb_stb_o"
+    },
+    {
+      "signal": "wb_cyc_i_cpu",
+      "owner": "picorv32_subsystem.wb_cyc_o"
+    },
+    {
+      "signal": "wb_sel_i_cpu",
+      "owner": "picorv32_subsystem.wb_sel_o"
+    },
+    {
+      "signal": "wb_dat_o_cpu",
+      "owner": "aero_mmio_register_bank.wb_dat_o"
+    },
+    {
+      "signal": "wb_ack_o_cpu",
+      "owner": "aero_mmio_register_bank.wb_ack_o"
+    },
+    {
+      "signal": "wb_err_o_cpu",
+      "owner": "aero_mmio_register_bank.wb_err_o"
+    },
+    {
+      "signal": "wb_stall_o_cpu",
+      "owner": "aero_mmio_register_bank.wb_stall_o"
+    },
+    {
+      "signal": "cpu_irq_i",
+      "owner": "aero_watchdog_irq.irq_o"
+    },
+    {
+      "signal": "cmd_valid_i",
+      "owner": "model_transport_bridge.status_done"
+    },
+    {
+      "signal": "wb_dat_o",
+      "owner": "aero_mmio_register_bank.wb_dat_o"
+    },
+    {
+      "signal": "wb_ack_o",
+      "owner": "aero_mmio_register_bank.wb_ack_o"
+    },
+    {
+      "signal": "wb_err_o",
+      "owner": "aero_mmio_register_bank.wb_err_o"
+    },
+    {
+      "signal": "wb_stall_o",
+      "owner": "aero_mmio_register_bank.wb_stall_o"
+    },
+    {
+      "signal": "model_req_valid_o",
+      "owner": "model_transport_bridge.req_valid_o"
+    },
+    {
+      "signal": "model_req_data_o",
+      "owner": "model_transport_bridge.req_data_o"
+    },
+    {
+      "signal": "model_resp_ready_o",
+      "owner": "model_transport_bridge.resp_ready_o"
+    },
+    {
+      "signal": "uart_tx_o",
+      "owner": "aero_watchdog_irq.irq_o"
+    },
+    {
+      "signal": "actuator_cmd_o",
+      "owner": "actuator_clamp_safety.cmd_out_o"
+    },
+    {
+      "signal": "actuator_valid_o",
+      "owner": "actuator_clamp_safety.cmd_valid_o"
+    },
+    {
+      "signal": "irq_o",
+      "owner": "aero_watchdog_irq.irq_o"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "wishbone",
+    "registers": [
+      {
+        "name": "CTRL",
+        "address": "0x00",
+        "access": "rw",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "req_valid",
+            "lsb": 0,
+            "msb": 0,
+            "access": "rw",
+            "description": "Write 1 to arm a request."
+          },
+          {
+            "name": "req_clear",
+            "lsb": 1,
+            "msb": 1,
+            "access": "rw",
+            "description": "Write 1 to clear request-side state."
+          },
+          {
+            "name": "resp_clear",
+            "lsb": 2,
+            "msb": 2,
+            "access": "rw",
+            "description": "Write 1 to clear response-side state."
+          },
+          {
+            "name": "hold_request",
+            "lsb": 3,
+            "msb": 3,
+            "access": "rw",
+            "description": "Write 1 to hold or pause request issuance and force safe fallback selection."
+          }
+        ]
+      },
+      {
+        "name": "REQ_TYPE",
+        "address": "0x04",
+        "access": "rw",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "req_type",
+            "lsb": 7,
+            "msb": 0,
+            "access": "rw",
+            "description": "Application-defined request type."
+          }
+        ]
+      },
+      {
+        "name": "REQ_SEQ",
+        "address": "0x08",
+        "access": "rw",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "req_seq",
+            "lsb": 15,
+            "msb": 0,
+            "access": "rw",
+            "description": "Sequence identifier for request/response matching."
+          }
+        ]
+      },
+      {
+        "name": "REQ_LEN",
+        "address": "0x0C",
+        "access": "rw",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "req_len",
+            "lsb": 7,
+            "msb": 0,
+            "access": "rw",
+            "description": "Number of 32-bit words staged for the request, bounded by implementation limits."
+          }
+        ]
+      },
+      {
+        "name": "REQ_DATA",
+        "address": "0x10",
+        "access": "rw",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "req_word",
+            "lsb": 31,
+            "msb": 0,
+            "access": "rw",
+            "description": "Staging word for request payload."
+          }
+        ]
+      },
+      {
+        "name": "RESP_STATUS",
+        "address": "0x14",
+        "access": "ro",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "busy",
+            "lsb": 0,
+            "msb": 0,
+            "access": "ro",
+            "description": "Transport bridge busy indication."
+          },
+          {
+            "name": "done",
+            "lsb": 1,
+            "msb": 1,
+            "access": "ro",
+            "description": "Response complete indication."
+          },
+          {
+            "name": "error",
+            "lsb": 2,
+            "msb": 2,
+            "access": "ro",
+            "description": "Protocol or data error indication."
+          },
+          {
+            "name": "timeout",
+            "lsb": 3,
+            "msb": 3,
+            "access": "ro",
+            "description": "Timeout indication."
+          },
+          {
+            "name": "stale",
+            "lsb": 4,
+            "msb": 4,
+            "access": "ro",
+            "description": "Stale response indication."
+          },
+          {
+            "name": "safe_fallback_active",
+            "lsb": 5,
+            "msb": 5,
+            "access": "ro",
+            "description": "Safe fallback currently dominates actuator outputs."
+          },
+          {
+            "name": "clamped",
+            "lsb": 6,
+            "msb": 6,
+            "access": "ro",
+            "description": "Actuator command was clamped."
+          }
+        ]
+      },
+      {
+        "name": "RESP_SEQ",
+        "address": "0x18",
+        "access": "ro",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "response_seq",
+            "lsb": 15,
+            "msb": 0,
+            "access": "ro",
+            "description": "Sequence identifier of the latest response."
+          }
+        ]
+      },
+      {
+        "name": "CURR_CMD",
+        "address": "0x1C",
+        "access": "ro",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "current_cmd",
+            "lsb": 31,
+            "msb": 0,
+            "access": "ro",
+            "description": "Current validated or fallback command."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_TH",
+        "address": "0x20",
+        "access": "rw",
+        "width": 32,
+        "reset": 100000,
+        "fields": [
+          {
+            "name": "timeout_threshold",
+            "lsb": 31,
+            "msb": 0,
+            "access": "rw",
+            "description": "Programmable timeout threshold in clock cycles or implementation-defined timer units."
+          }
+        ]
+      },
+      {
+        "name": "CLAMP_MIN",
+        "address": "0x24",
+        "access": "rw",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "clamp_min",
+            "lsb": 31,
+            "msb": 0,
+            "access": "rw",
+            "description": "Minimum actuator clamp value."
+          }
+        ]
+      },
+      {
+        "name": "CLAMP_MAX",
+        "address": "0x28",
+        "access": "rw",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "clamp_max",
+            "lsb": 31,
+            "msb": 0,
+            "access": "rw",
+            "description": "Maximum actuator clamp value."
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_CMD",
+        "address": "0x2C",
+        "access": "rw",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "fallback_cmd",
+            "lsb": 31,
+            "msb": 0,
+            "access": "rw",
+            "description": "Deterministic conservative fallback actuator command."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_STICKY",
+        "address": "0x30",
+        "access": "rw1c",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "error_sticky",
+            "lsb": 0,
+            "msb": 0,
+            "access": "rw1c",
+            "description": "Sticky protocol or data error bit."
+          },
+          {
+            "name": "timeout_sticky",
+            "lsb": 1,
+            "msb": 1,
+            "access": "rw1c",
+            "description": "Sticky timeout bit."
+          },
+          {
+            "name": "stale_sticky",
+            "lsb": 2,
+            "msb": 2,
+            "access": "rw1c",
+            "description": "Sticky stale response bit."
+          },
+          {
+            "name": "bus_sticky",
+            "lsb": 3,
+            "msb": 3,
+            "access": "rw1c",
+            "description": "Sticky bus fault bit."
+          },
+          {
+            "name": "held_sticky",
+            "lsb": 4,
+            "msb": 4,
+            "access": "rw1c",
+            "description": "Sticky firmware hold bit."
+          }
+        ]
+      },
+      {
+        "name": "IRQ_CTRL",
+        "address": "0x34",
+        "access": "rw",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "irq_enable",
+            "lsb": 0,
+            "msb": 0,
+            "access": "rw",
+            "description": "Enable interrupt generation on done/fault."
+          },
+          {
+            "name": "irq_pulse",
+            "lsb": 1,
+            "msb": 1,
+            "access": "ro",
+            "description": "Status indicator for generated interrupt pulse."
+          }
+        ]
+      }
+    ]
+  }
+}

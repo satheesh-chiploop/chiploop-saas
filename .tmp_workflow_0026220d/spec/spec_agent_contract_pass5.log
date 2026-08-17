@@ -1,2 +1,0 @@
-Digital Spec Agent pass5 contract repair failure:
-Required child input 'adaptive_aero_cpu_subsystem.imem_dout' has no source in top_level_connections or inter_module_signals. Add an explicit top-level input connection or a real child producer. Other required child inputs without sources: 'adaptive_aero_cpu_subsystem.dmem_dout', 'adaptive_aero_stream_bridge.status_fault_flags', 'adaptive_aero_telemetry_mailbox.telemetry_dout', 'adaptive_aero_telemetry_mailbox.status_valid_command'. Repair every listed input in the same response.
