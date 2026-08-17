@@ -1,0 +1,10 @@
+{
+  "source_arch2rtl_workflow_id": null,
+  "parent_workflow_id": "8fe4a83f-7e4a-4a4f-bed2-33cbcb8809c2",
+  "current_workflow_id": "805b1340-97df-49f2-bd4a-a9e858b55354",
+  "current_run_id": "438af7c0-6ff9-4264-92ec-5ec03ac71b43",
+  "current_app": "arch2rtl",
+  "upstream_workflows": {
+    "arch2rtl": "805b1340-97df-49f2-bd4a-a9e858b55354"
+  }
+}

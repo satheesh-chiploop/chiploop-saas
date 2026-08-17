@@ -1,0 +1,2 @@
+Digital Spec Agent pass3 repair failure (contract_repair_pass3):
+Mandatory firmware control-plane top interface is incomplete; missing write-enable
