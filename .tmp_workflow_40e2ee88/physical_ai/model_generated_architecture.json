@@ -1,0 +1,163 @@
+{
+  "architecture_decisions": [
+    "Selected implementation target: FPGA prototype with a soft CPU architecture; no ASIC memory macro integration is required for this path.",
+    "Selected processor: PicoRV32 in rv32imc, matching the supplied fpga_soft_cpu deployment architecture and Wishbone bus preference.",
+    "Kept the surrogate outside RTL: NVIDIA DoMINO Automotive Aero remains a software/GPU or CPU-reference executed model; RTL only manages transport, buffering, and actuator safety.",
+    "Used a compact top-level hardware interface: a bounded Wishbone register window plus a small streaming command/status path, avoiding any tensor or flow-field exposure at the top level.",
+    "Designed a safety-first control shell with explicit stale-data rejection, command clamping, watchdog timeout, and deterministic safe fallback mode.",
+    "Separated responsibilities into CPU firmware and hardware blocks: firmware prepares model requests and interprets responses; RTL enforces protocol integrity and actuator safety before output drive.",
+    "Fixed the control envelope to the supplied 20-55 m/s operating range and the nominal 38.89 m/s reference condition used for validation and calibration.",
+    "Preserved a low I/O count by keeping the full geometry and surrogate payload inside software-managed memory and compact registers rather than at the FPGA pins.",
+    "Selected a Wishbone memory-mapped control/status window as the primary integration interface because it is implementation-friendly for PicoRV32 and bounded to below 64-bit datapath width.",
+    "Defined the hardware to be synthesizable and portable across FPGA boards listed in the evidence, while explicitly excluding any Sky130 hard-macro dependency."
+  ],
+  "blocks": [
+    {
+      "description": "PicoRV32-based firmware engine executing control policy, geometry handling, model request formatting, response parsing, and supervisory state transitions.",
+      "name": "soft_cpu_subsystem",
+      "subblocks": [
+        "PicoRV32 core",
+        "instruction memory",
+        "data memory",
+        "interrupt controller",
+        "uart_debug_console",
+        "wishbone interconnect"
+      ],
+      "type": "processor_subsystem"
+    },
+    {
+      "description": "Memory-mapped control/status registers for mode selection, velocity input, command limits, request launch, status capture, and fault reporting.",
+      "name": "aero_control_regfile",
+      "subblocks": [
+        "mode register",
+        "velocity setpoint register",
+        "command limit registers",
+        "request control register",
+        "status register",
+        "fault summary register",
+        "age/timestamp register"
+      ],
+      "type": "register_block"
+    },
+    {
+      "description": "Compact request/response bridge between firmware and the external CPU/GPU model execution path. Implements message framing, sequence tagging, valid/ready handshaking, and payload length checking.",
+      "name": "model_transport_bridge",
+      "subblocks": [
+        "tx_framing",
+        "rx_deframing",
+        "sequence_counter",
+        "length_checker",
+        "ack_timeout_monitor"
+      ],
+      "type": "protocol_adapter"
+    },
+    {
+      "description": "Hardware safety monitor that rejects stale or malformed model outputs, clamps requested actuator positions, and forces safe fallback on timeout or fault.",
+      "name": "safety_supervisor",
+      "subblocks": [
+        "freshness_checker",
+        "stale_data_detector",
+        "range_clamper",
+        "timeout_fsm",
+        "safe_fallback_mux"
+      ],
+      "type": "safety_controller"
+    },
+    {
+      "description": "Final command formatting for active-aero actuators such as flap or spoiler positions. Produces bounded command words and drive-valid strobes for downstream actuator electronics.",
+      "name": "actuator_command_interface",
+      "subblocks": [
+        "command_format_unit",
+        "output_hold_register",
+        "output_valid",
+        "command_acknowledge"
+      ],
+      "type": "output_stage"
+    },
+    {
+      "description": "External software/GPU runtime path used by firmware to move geometry, flow conditions, and response metadata. Not implemented as RTL compute for the surrogate.",
+      "name": "external_model_io",
+      "subblocks": [
+        "host_request_queue",
+        "host_response_queue",
+        "metadata tags",
+        "transport status"
+      ],
+      "type": "offchip_interface"
+    }
+  ],
+  "interfaces": [
+    {
+      "description": "Wishbone register-mapped control/status window for PicoRV32 firmware access. Used for mode control, velocity input, launch, status readback, and fault inspection.",
+      "direction": "bidirectional",
+      "name": "wishbone_ctrl_if",
+      "width_bits": 32
+    },
+    {
+      "description": "Bounded request stream carrying compact metadata and encoded model parameters to the external software/GPU path. Uses valid/ready handshake and sequence tags.",
+      "direction": "output",
+      "name": "model_req_stream",
+      "width_bits": 64
+    },
+    {
+      "description": "Bounded response stream returning compact result metadata, scores, and actuator-relevant outputs from the external model execution path. Uses valid/ready handshake and sequence tags.",
+      "direction": "input",
+      "name": "model_rsp_stream",
+      "width_bits": 64
+    },
+    {
+      "description": "Final actuator command word for active-aero surfaces. Includes clamped position or mode code plus update-valid indication.",
+      "direction": "output",
+      "name": "actuator_cmd_out",
+      "width_bits": 16
+    },
+    {
+      "description": "Compact fault summary for stale data, timeout, malformed response, range violation, and safe-fallback active status.",
+      "direction": "output",
+      "name": "fault_out",
+      "width_bits": 8
+    },
+    {
+      "description": "Optional debug and bring-up serial interface supplied by the soft CPU subsystem.",
+      "direction": "bidirectional",
+      "name": "uart",
+      "width_bits": 1
+    },
+    {
+      "description": "System clock and active-low reset for the FPGA prototype.",
+      "direction": "bidirectional",
+      "name": "clk_rst",
+      "width_bits": 2
+    }
+  ],
+  "product_name": "Adaptive Aero Control",
+  "product_summary": "FPGA prototype for an intelligent active-aerodynamics controller that runs a soft CPU and a bounded hardware control wrapper around a CPU/GPU-hosted DoMINO surrogate workflow. The RTL does not implement the surrogate itself; it provides request/response transport, validation, freshness checks, timeout handling, actuator clamping, and safe fallback for 20-55 m/s operation using the DrivAerML reference geometry and flow-conditions inputs.",
+  "rtl_spec_text": "Module name: adaptive_aero_control_top.\n\nGoal: synthesizable FPGA top-level for an intelligent active-aerodynamics controller using a soft CPU. The module shall not implement the DoMINO surrogate compute. Instead, it shall provide bounded transport, control/status registers, safety supervision, and actuator command handling.\n\nArchitecture:\n1) Instantiate a PicoRV32-based subsystem connected via Wishbone.\n2) Provide a memory-mapped register window accessible by the CPU. The register block shall be 32-bit wide and shall contain at minimum: control/mode, stream velocity input, max/min actuator clamp values, request sequence, request launch, response sequence, response age, fault summary, and safe-fallback configuration.\n3) Implement a model transport bridge that frames compact request messages and accepts compact response messages. The bridge shall use valid/ready handshake on a bounded data path no wider than 64 bits at the top level. The bridge shall attach sequence numbers and message-length checking. No tensors, arrays, geometry buffers, or flow-field outputs shall be exposed at the top level.\n4) Implement a safety supervisor in hardware. It shall compare response sequence against the outstanding request sequence, detect stale or repeated responses, detect timeout expiration, and force safe fallback on any fault.\n5) Implement actuator command clamping in hardware. Any command from firmware or from the response path shall be limited to the configured minimum and maximum actuator range. The final command presented to outputs shall be the clamped value.\n6) Provide a safe fallback mode. On reset, timeout, malformed response, stale response, or firmware-declared fault, the module shall drive a deterministic safe command and assert a fault flag.\n7) Provide a status path back to firmware indicating busy, request accepted, response valid, response stale, timeout expired, clamp active, and safe fallback active.\n8) Keep all bulk payloads off-chip or in firmware-managed memory. RTL shall not infer payload memories using reg arrays, generic SRAMs, or BRAMs for surrogate data. Only small control/state registers and FSM state are permitted in RTL.\n9) The top-level port set shall remain implementation-friendly and below 256 scalar-equivalent I/O signals. Use a 32-bit Wishbone register interface plus a 64-bit maximum stream interface for model transport.\n10) Timing: the safety monitor and command clamp shall be fully synchronous to clk and shall have deterministic one-cycle or registered behavior. No combinational loops between input request and output actuator command are allowed.\n11) Reset: active-low reset shall initialize mode to safe fallback, clear outstanding request state, clear fault summaries, and set output-valid low.\n12) Firmware interaction: firmware running on PicoRV32 shall write request metadata and read response/status registers. The hardware shall not assume the existence of a GPU inside the FPGA; the external model runtime is off-chip software/GPU.\n13) For FPGA implementation, use vendor-agnostic synthesizable RTL and standard FPGA BRAM only for CPU memories if required by the selected soft CPU subsystem. Do not use Sky130 hard macros on FPGA.\n14) If future ASIC reuse is desired, a separate memory-collateral gate shall be enforced before selecting any Sky130 SRAM macro. For the present FPGA path, no ASIC memory macro instantiation shall be used.\n\nRequired behaviors:\n- Accept a new request only when the bridge is idle and the previous request is fully retired.\n- Tag each request with an incrementing sequence counter.\n- Reject any response whose sequence does not match the outstanding request.\n- Reject any response arriving after timeout expiration.\n- Clamp actuator commands to the configured range and set clamp_active status if clamping occurred.\n- Force safe_fallback_active on reset, timeout, stale response, malformed response, or firmware fault.\n- Provide one-cycle pulse or registered level on request_accepted and response_valid status signals.\n\nSuggested internal registers:\n- CTRL: mode, enable, launch, clear_faults.\n- VELOCITY: encoded stream velocity input in m/s.\n- CMD_MIN / CMD_MAX: actuator bounds.\n- REQ_META: sequence, condition code, reserved.\n- RSP_META: sequence, status, age, reserved.\n- FAULT: bitfield with stale, timeout, malformed, clamp, fallback.\n- OUTPUT: final actuator command and valid bit.\n\nThe module must be fully synthesizable, use only bounded-width buses, and preserve deterministic safe operation under loss of external model service.",
+  "safety_requirements": [
+    "Reject stale model commands based on sequence mismatch or age exceeding the configured timeout window.",
+    "Clamp all actuator commands to the legal active-aero range before output drive.",
+    "Enter safe fallback on transport timeout, malformed response, unsupported mode, or loss of firmware heartbeat.",
+    "Hold the last safe command only if explicitly configured; otherwise transition to the predefined safe position.",
+    "Treat surrogate outputs as advisory only; never allow unvalidated external model data to bypass hardware safety checks.",
+    "Use deterministic reset behavior so the actuator output defaults to safe fallback on power-up and reset.",
+    "Expose fault status to firmware so the soft CPU can log, retry, or degrade gracefully.",
+    "Maintain bounded latency for the safety monitor so stale-data rejection is enforced in hardware, not only in firmware.",
+    "Do not accept geometry or flow-condition payloads that exceed the compact framed message length.",
+    "Do not infer or rely on full surrogate tensor payloads in RTL; only metadata and compact control-relevant outputs are allowed."
+  ],
+  "top_module": "adaptive_aero_control_top",
+  "verification_goals": [
+    "Verify Wishbone register read/write correctness for control, status, and fault registers.",
+    "Verify request framing uses bounded 64-bit or narrower stream payloads with valid/ready handshake.",
+    "Verify request sequence increments monotonically and outstanding sequence tracking is correct.",
+    "Verify stale response rejection when response sequence mismatches the outstanding request.",
+    "Verify timeout expiration causes safe fallback and sets the timeout fault bit.",
+    "Verify malformed or short-length message rejection in the transport bridge.",
+    "Verify actuator command clamping at both minimum and maximum bounds.",
+    "Verify safe fallback on reset and on all listed fault conditions.",
+    "Verify firmware-visible status bits update consistently with hardware safety actions.",
+    "Verify no top-level interface exceeds the required bounded width and the scalar-equivalent I/O count remains below 256.",
+    "Verify the design remains free of surrogate compute assumptions and does not expose tensor or flow-field payloads at the top level.",
+    "Verify deterministic latency of the safety supervisor and final command path under synchronous operation."
+  ]
+}

@@ -1,0 +1,2 @@
+Digital Spec Agent parse/normalize failure:
+Mandatory firmware control-plane top interface is incomplete; missing address, write-data, read-data

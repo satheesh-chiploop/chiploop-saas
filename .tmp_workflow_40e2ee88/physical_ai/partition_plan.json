@@ -1,0 +1,337 @@
+{
+  "application": "intelligent_active_aerodynamics_controller",
+  "decision": "Partitioned for FPGA prototype with a soft-CPU controller and external GPU/CPU-hosted surrogate execution. The surrogate remains in software/gpu_service, while FPGA RTL implements transport, partitioning, supervision, clamping, timeout handling, and safe fallback. Hardware-deployable logic is limited to bounded control/safety functions; the physics surrogate itself is not assigned to FPGA because the model qualification requires a remote GPU worker and no evidence proves RTL deployment readiness.",
+  "decision_factors": [
+    "Model qualification indicates the selected surrogate is remote_nim and requires a GPU worker; inference was not executed and accuracy was not qualified, so the surrogate must remain in software/gpu_service.",
+    "The contract explicitly forbids assuming pretrained inference availability and requires transparent, referenceable baseline behavior.",
+    "The architecture already separates the soft CPU firmware from RTL safety logic and keeps the DoMINO surrogate outside the FPGA.",
+    "The implementation path is fpga_prototype, which favors a deterministic hardware safety shell plus firmware orchestration rather than full model acceleration in RTL.",
+    "Safety requirements demand stale-data rejection, timeout handling, command clamping, and safe fallback with deterministic hardware behavior.",
+    "The system must support resource-constrained embedded control, but the physics model itself is not proven hardware-deployable.",
+    "The FPGA interface constraints favor bounded streams and register windows, matching transport/supervision rather than tensor or flow-field compute.",
+    "ASIC reuse is possible for the control shell only; the surrogate remains external until evidence supports a hardware-deployable implementation."
+  ],
+  "generation_status": "model_generated",
+  "implementation_path": "fpga_prototype",
+  "interfaces": [
+    {
+      "consumer": "software",
+      "description": "STL geometry and metadata ingress for DrivAerML reference geometry validation and preprocessing.",
+      "name": "geometry_input",
+      "producer": "software"
+    },
+    {
+      "consumer": "software/gpu_service",
+      "description": "Stream velocity and runtime environmental parameters used to configure the surrogate and reference runs.",
+      "name": "operating_condition_input",
+      "producer": "cpu_software"
+    },
+    {
+      "consumer": "gpu_service",
+      "description": "Validated state, sequence, and configuration metadata passed to the external DoMINO surrogate execution path.",
+      "name": "surrogate_model_input",
+      "producer": "firmware/cpu_software"
+    },
+    {
+      "consumer": "gpu_service",
+      "description": "Bounded request stream carrying compact metadata and sequence tags to the external surrogate service.",
+      "name": "model_req_stream",
+      "producer": "fpga"
+    },
+    {
+      "consumer": "fpga",
+      "description": "Bounded response stream returning compact results and metadata for hardware validation and command staging.",
+      "name": "model_rsp_stream",
+      "producer": "gpu_service"
+    },
+    {
+      "consumer": "actuator electronics",
+      "description": "Bounded active-aerodynamics actuator command after hardware clamping and safety checks.",
+      "name": "control_command_output",
+      "producer": "fpga"
+    },
+    {
+      "consumer": "firmware/software",
+      "description": "Telemetry reporting freshness, timeout, clamp, fallback, and command validity status.",
+      "name": "status_and_fault_output",
+      "producer": "fpga"
+    },
+    {
+      "consumer": "software/validation",
+      "description": "Reference-path outputs used for comparison, calibration, and acceptance testing.",
+      "name": "reference_result_output",
+      "producer": "software"
+    },
+    {
+      "consumer": "fpga",
+      "description": "32-bit memory-mapped control/status interface for request launch, limits, velocity input, and fault inspection.",
+      "name": "wishbone_ctrl_if",
+      "producer": "firmware"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job_1",
+      "inputs": [
+        "geometry_input",
+        "geometry source metadata"
+      ],
+      "latency_budget": "offline / pre-run, bounded by product startup workflow",
+      "outputs": [
+        "validated_geometry",
+        "geometry_metadata",
+        "geometry_validation_status"
+      ],
+      "rationale": "Target-independent preprocessing is best kept in software because it is file-oriented, transparent, and does not require deterministic hard real-time execution.",
+      "responsibility": "Geometry ingestion and validation of DrivAerML STL input; normalize metadata and prepare reference geometry artifacts for downstream use.",
+      "status": "assigned",
+      "target": "software"
+    },
+    {
+      "id": "job_2",
+      "inputs": [
+        "operating_condition_input",
+        "validated_geometry"
+      ],
+      "latency_budget": "milliseconds, pre-request path",
+      "outputs": [
+        "operating_point_config",
+        "velocity_validity_status",
+        "run_trace_id"
+      ],
+      "rationale": "Velocity selection, validation, and run setup are control-plane functions suited to firmware/host software and should remain transparent and referenceable.",
+      "responsibility": "Operating-point management and envelope enforcement for stream velocity inputs across 20 to 55 m/s; prepare run configuration and maintain traceability.",
+      "status": "assigned",
+      "target": "cpu_software"
+    },
+    {
+      "id": "job_3",
+      "inputs": [
+        "surrogate_model_input",
+        "operating_point_config",
+        "validated_geometry"
+      ],
+      "latency_budget": "application-defined; expected external-service latency with timeout supervision",
+      "outputs": [
+        "surrogate_response",
+        "model_timestamp",
+        "response_sequence",
+        "confidence_or_quality_metadata"
+      ],
+      "rationale": "The qualified model explicitly requires a remote GPU worker; there is no evidence that the surrogate is hardware-deployable, so it stays in GPU/CPU software.",
+      "responsibility": "Execute the NVIDIA DoMINO Automotive Aero surrogate workflow for physics-based aerodynamic estimation and control-relevant response generation.",
+      "status": "assigned",
+      "target": "gpu_service"
+    },
+    {
+      "id": "job_4",
+      "inputs": [
+        "validated_geometry",
+        "operating_point_config"
+      ],
+      "latency_budget": "offline or non-real-time validation window",
+      "outputs": [
+        "reference_result",
+        "reference_metric_values",
+        "comparison_trace"
+      ],
+      "rationale": "The reference path is explicitly for transparency and validation, not latency-critical actuation, so it belongs in software.",
+      "responsibility": "Run the transparent reference path for calibration, comparison, and validation against surrogate outputs; preserve deterministic traceability to the reference workflow.",
+      "status": "assigned",
+      "target": "software"
+    },
+    {
+      "id": "job_5",
+      "inputs": [
+        "model_rsp_stream",
+        "firmware_control_registers",
+        "sequence_and_age_metadata"
+      ],
+      "latency_budget": "deterministic, one-cycle or registered synchronous behavior",
+      "outputs": [
+        "actuator_cmd_out",
+        "fault_out",
+        "safety_status_flags"
+      ],
+      "rationale": "These are the FPGA-appropriate hard real-time safety functions required by the contract and architecture; they are bounded, deterministic, and do not require surrogate compute in RTL.",
+      "responsibility": "Hardware safety supervisor implementing stale-data rejection, timeout detection, command clamping, safe fallback selection, and bounded actuator output staging.",
+      "status": "assigned",
+      "target": "fpga"
+    },
+    {
+      "id": "job_6",
+      "inputs": [
+        "wishbone_ctrl_if",
+        "fault_out",
+        "status_and_fault_output",
+        "reference_result_output"
+      ],
+      "latency_budget": "milliseconds, deterministic control loop cadence",
+      "outputs": [
+        "model_req_stream",
+        "control_register_writes",
+        "firmware_status_logs",
+        "fallback_policy_actions"
+      ],
+      "rationale": "The selected FPGA prototype includes a soft CPU; firmware is the correct layer for orchestration, traceability, and interaction with the external model service.",
+      "responsibility": "Soft-CPU supervision and product orchestration: issue requests, manage sequence numbers, monitor status, log faults, retry or degrade gracefully, and coordinate safe-state behavior.",
+      "status": "assigned",
+      "target": "firmware"
+    },
+    {
+      "id": "job_7",
+      "inputs": [
+        "application_contract",
+        "architecture",
+        "model_qualification"
+      ],
+      "latency_budget": "design-time / architecture-iteration loop",
+      "outputs": [
+        "partition_map",
+        "interface_contracts",
+        "integration_rules"
+      ],
+      "rationale": "Partitioning is implementation-agnostic and should optimize for the current FPGA prototype while preserving possible reuse; fpga_or_asic captures the reusable control-shell nature without claiming surrogate hardware deployment.",
+      "responsibility": "System partitioning and integration of data handling, model transport, supervision, and command generation into a single product flow with clear software/hardware boundaries.",
+      "status": "assigned",
+      "target": "fpga_or_asic"
+    },
+    {
+      "id": "job_8",
+      "inputs": [
+        "model_req_stream",
+        "model_rsp_stream",
+        "request_metadata",
+        "response_metadata"
+      ],
+      "latency_budget": "microseconds to low milliseconds, bounded by external service interaction",
+      "outputs": [
+        "framed_request",
+        "validated_response",
+        "transport_status"
+      ],
+      "rationale": "Transport integrity and framing are hardware-friendly but not the surrogate itself; this is exactly the kind of bounded logic suited to RTL.",
+      "responsibility": "Model transport bridge on FPGA for compact request/response framing, sequence tagging, length checking, and handshake integrity with the external model service.",
+      "status": "assigned",
+      "target": "fpga"
+    },
+    {
+      "id": "job_9",
+      "inputs": [
+        "partition_map",
+        "runtime_measurements",
+        "resource_constraints"
+      ],
+      "latency_budget": "design-time iterative workflow",
+      "outputs": [
+        "optimized_architecture_parameters",
+        "updated_latency_budget",
+        "resource_tradeoff_notes"
+      ],
+      "rationale": "Optimization spans software, firmware, and RTL parameters and is best handled as a host-side compile/analysis loop rather than fixed hardware.",
+      "responsibility": "Architecture optimization loop over latency, memory, and resource limits; tune firmware/hardware partitioning, control cadence, and transport parameters while preserving safety requirements.",
+      "status": "assigned",
+      "target": "software"
+    },
+    {
+      "id": "job_10",
+      "inputs": [
+        "validated_geometry",
+        "operating_point_config",
+        "surrogate_response",
+        "reference_result",
+        "fault_out"
+      ],
+      "latency_budget": "test-run dependent; non-real-time",
+      "outputs": [
+        "test_reports",
+        "acceptance_metrics",
+        "traceability_artifacts"
+      ],
+      "rationale": "Acceptance testing must observe the full system behavior, compare against reference outputs, and produce artifacts; software is the appropriate execution environment.",
+      "responsibility": "Validation and acceptance testing across operating range, stale-command rejection, command bounding, timeout-to-safe fallback, and deterministic traceability.",
+      "status": "assigned",
+      "target": "software"
+    }
+  ],
+  "partition_phases": {
+    "functional": {
+      "status": "completed",
+      "target_independent": true
+    },
+    "target_refinement": {
+      "asic_cpu": null,
+      "candidate_modes": [
+        "fpga_onboard_cpu",
+        "fpga_soft_cpu",
+        "fpga_external_host"
+      ],
+      "firmware_gate": {
+        "ready": false,
+        "reason": "Finalize CPU/host, bus, address map, interrupts, and register-map version before deployable firmware generation."
+      },
+      "requested_mode": "fpga_soft_cpu",
+      "required_contract": {
+        "compute_host": [
+          "location",
+          "cpu_or_mcu",
+          "architecture",
+          "runtime_or_os",
+          "toolchain"
+        ],
+        "hardware_interface": [
+          "bus_or_transport",
+          "base_address",
+          "register_map",
+          "interrupts",
+          "dma_or_shared_memory"
+        ],
+        "target": [
+          "board_and_device",
+          "clock_reset",
+          "memory",
+          "io"
+        ]
+      },
+      "selected_mode": "fpga_soft_cpu",
+      "selection_owner": "fpga_target_explorer",
+      "soft_cpu": {
+        "abi": "ilp32",
+        "bus": "wishbone",
+        "clock_mhz": 50.0,
+        "compiler_arch": "rv32imc",
+        "core": "picorv32",
+        "core_label": "PicoRV32",
+        "data_memory_kib": 16,
+        "debug": false,
+        "enabled": true,
+        "estimated_reservation": {
+          "basis": "supabase_governed_reference_estimate",
+          "block_ram_blocks": 12,
+          "logic_cells": 3000,
+          "must_be_replaced_by_complete_system_synthesis": true
+        },
+        "instruction_memory_kib": 32,
+        "interrupts": true,
+        "isa": "rv32imc",
+        "license": "ISC",
+        "policy_schema": "chiploop.application_intelligence.processor_ip_policy.v2",
+        "profile": "balanced",
+        "schema": "chiploop.fpga.soft_cpu.v1",
+        "selection_mode": "automatic",
+        "target_triple": "rv32imc-unknown-none-elf",
+        "uart": true
+      },
+      "status": "pending_board_selection"
+    }
+  },
+  "schema": "chiploop.application_intelligence.partition.v2",
+  "tradeoffs": [
+    "Keeping the surrogate external preserves fidelity and transparency but adds service latency and dependency on GPU availability.",
+    "FPGA hardware safety supervision improves determinism and fault containment, but it does not reduce surrogate execution latency.",
+    "A soft-CPU + RTL safety shell is more portable and verifiable than a full hardware model implementation, at the cost of higher system integration complexity.",
+    "Software-based reference execution improves traceability and validation coverage, but it does not provide production-time actuation speed.",
+    "Future ASIC reuse could capture the bounded safety/control path, but the current evidence does not justify committing the surrogate to ASIC or FPGA compute.",
+    "Using compact metadata streams instead of full payload exposure simplifies RTL and I/O, but requires firmware/software to manage bulk data and model context off-chip."
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "equation": "drag_force = 0.5 * air_density * velocity^2 * drag_coefficient * frontal_area",
+  "model_type": "analytical_drag_reference",
+  "operating_points": [
+    {
+      "actuator_command_percent": 0.0,
+      "effective_drag_coefficient": 0.3,
+      "estimated_drag_force_n": 161.7,
+      "speed_mps": 20.0
+    },
+    {
+      "actuator_command_percent": 17.5,
+      "effective_drag_coefficient": 0.2958,
+      "estimated_drag_force_n": 329.46,
+      "speed_mps": 28.75
+    },
+    {
+      "actuator_command_percent": 35.0,
+      "effective_drag_coefficient": 0.2916,
+      "estimated_drag_force_n": 552.5592,
+      "speed_mps": 37.5
+    },
+    {
+      "actuator_command_percent": 52.5,
+      "effective_drag_coefficient": 0.2874,
+      "estimated_drag_force_n": 828.3979,
+      "speed_mps": 46.25
+    },
+    {
+      "actuator_command_percent": 70.0,
+      "effective_drag_coefficient": 0.2832,
+      "estimated_drag_force_n": 1154.3763,
+      "speed_mps": 55.0
+    }
+  ],
+  "parameters": {
+    "air_density_kg_m3": 1.225,
+    "baseline_drag_coefficient": 0.3,
+    "frontal_area_m2": 2.2
+  },
+  "purpose": "Exercise application partitioning and controller implementation without claiming pretrained-surrogate predictions.",
+  "schema": "chiploop.physical_ai.cpu_reference.v1",
+  "surrogate_inference_status": "not_executed",
+  "surrogate_model_id": "nvidia.domino.automotive_aero"
+}

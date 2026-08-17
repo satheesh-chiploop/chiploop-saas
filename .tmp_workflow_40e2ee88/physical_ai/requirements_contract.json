@@ -1,0 +1,63 @@
+{
+  "accuracy": {
+    "maximum_error_percent": 3.0
+  },
+  "application": "intelligent_active_aerodynamics_controller",
+  "approved": true,
+  "asic_cpu": {
+    "enabled": false,
+    "schema": "chiploop.asic.cpu_ip.v1"
+  },
+  "deployment_architecture": "fpga_soft_cpu",
+  "deployment_architecture_requested": "fpga_soft_cpu",
+  "execution_mode": "cpu_reference",
+  "implementation_path": "fpga_prototype",
+  "implementation_target": "fpga",
+  "objective": "Build an intelligent active-aerodynamics controller for 20\u201355 m/s operation. Evaluate NVIDIA DoMINO as the physics-based surrogate, establish a transparent reference, partition the system, define and optimize the architecture, and deliver the hardware, firmware, and software with bounded control, stale-data detection, timeout handling, and safe fallback.",
+  "operating_envelope": {
+    "stream_velocity_mps": [
+      20,
+      55
+    ]
+  },
+  "parameters": {
+    "geometry_format": "STL",
+    "geometry_source": "DrivAerML reference geometry",
+    "stream_velocity_mps": 38.89
+  },
+  "physics_domain": "automotive_aerodynamics",
+  "processor_ip_policy_schema": "chiploop.application_intelligence.processor_ip_policy.v2",
+  "safety_constraints": [
+    "Reject stale model commands",
+    "Clamp actuator commands",
+    "Provide a safe fallback"
+  ],
+  "schema": "chiploop.physical_ai.requirements.v1",
+  "soft_cpu": {
+    "abi": "ilp32",
+    "bus": "wishbone",
+    "clock_mhz": 50.0,
+    "compiler_arch": "rv32imc",
+    "core": "picorv32",
+    "core_label": "PicoRV32",
+    "data_memory_kib": 16,
+    "debug": false,
+    "enabled": true,
+    "estimated_reservation": {
+      "basis": "supabase_governed_reference_estimate",
+      "block_ram_blocks": 12,
+      "logic_cells": 3000,
+      "must_be_replaced_by_complete_system_synthesis": true
+    },
+    "instruction_memory_kib": 32,
+    "interrupts": true,
+    "isa": "rv32imc",
+    "license": "ISC",
+    "policy_schema": "chiploop.application_intelligence.processor_ip_policy.v2",
+    "profile": "balanced",
+    "schema": "chiploop.fpga.soft_cpu.v1",
+    "selection_mode": "automatic",
+    "target_triple": "rv32imc-unknown-none-elf",
+    "uart": true
+  }
+}

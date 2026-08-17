@@ -1,0 +1,175 @@
+{
+  "architecture_definition_supported": true,
+  "availability": "requires_gpu_worker",
+  "configuration": {
+    "architecture_definition_supported": true,
+    "checkpoint": "nvidia/domino_drivaerml",
+    "cpu_reference_supported": true,
+    "cpu_reference_type": "analytical_drag_reference",
+    "digital_ip_project_name": "adaptive_aero_control",
+    "digital_ip_top_module": "adaptive_aero_control_top",
+    "processor_ip_policy": {
+      "asic_soc_cpu": {
+        "allowed_buses": [
+          "apb",
+          "axi4_lite",
+          "wishbone",
+          "native"
+        ],
+        "availability": "preview",
+        "cores": {
+          "picorv32": {
+            "default_bus": "apb",
+            "default_isa": "rv32imc",
+            "label": "PicoRV32",
+            "license": "ISC",
+            "profile": "balanced",
+            "supported_isas": [
+              "rv32i",
+              "rv32im",
+              "rv32imc"
+            ]
+          },
+          "serv": {
+            "default_bus": "apb",
+            "default_isa": "rv32i",
+            "label": "SERV",
+            "license": "ISC",
+            "profile": "minimum_area",
+            "supported_isas": [
+              "rv32i",
+              "rv32im"
+            ]
+          },
+          "vexriscv": {
+            "default_bus": "axi4_lite",
+            "default_isa": "rv32imc",
+            "label": "VexRiscv",
+            "license": "MIT",
+            "profile": "performance",
+            "supported_isas": [
+              "rv32i",
+              "rv32im",
+              "rv32imc"
+            ]
+          }
+        },
+        "default_core": "picorv32",
+        "defaults": {
+          "boot_rom_kib": 16,
+          "bus": "automatic",
+          "clock_gating": true,
+          "clock_mhz": 100,
+          "debug": false,
+          "dft_scan_required": true,
+          "interrupts": true,
+          "isa": "automatic",
+          "sram_kib": 64
+        },
+        "integration_gate": {
+          "complete_soc_synthesis_required": true,
+          "cpu_rtl_required": true,
+          "default_status": "pending_cpu_rtl",
+          "memory_macro_mapping_required": true
+        }
+      },
+      "automatic_asic_deployment": "asic_digital_ip",
+      "fpga_soft_cpu": {
+        "allowed_buses": [
+          "wishbone",
+          "axi4_lite",
+          "native"
+        ],
+        "availability": "preview",
+        "cores": {
+          "picorv32": {
+            "default_bus": "wishbone",
+            "default_isa": "rv32imc",
+            "estimated_bram_blocks": 12,
+            "estimated_logic_cells": 3000,
+            "label": "PicoRV32",
+            "license": "ISC",
+            "profile": "balanced",
+            "supported_isas": [
+              "rv32i",
+              "rv32im",
+              "rv32imc"
+            ]
+          },
+          "serv": {
+            "default_bus": "wishbone",
+            "default_isa": "rv32i",
+            "estimated_bram_blocks": 8,
+            "estimated_logic_cells": 900,
+            "label": "SERV",
+            "license": "ISC",
+            "profile": "minimum_area",
+            "supported_isas": [
+              "rv32i",
+              "rv32im"
+            ]
+          },
+          "vexriscv": {
+            "default_bus": "wishbone",
+            "default_isa": "rv32imc",
+            "estimated_bram_blocks": 16,
+            "estimated_logic_cells": 6000,
+            "label": "VexRiscv",
+            "license": "MIT",
+            "profile": "performance",
+            "supported_isas": [
+              "rv32i",
+              "rv32im",
+              "rv32imc"
+            ]
+          }
+        },
+        "default_core": "picorv32",
+        "defaults": {
+          "bus": "automatic",
+          "clock_mhz": 50,
+          "data_memory_kib": 16,
+          "debug": false,
+          "instruction_memory_kib": 32,
+          "interrupts": true,
+          "isa": "automatic",
+          "uart": true
+        }
+      },
+      "schema": "chiploop.application_intelligence.processor_ip_policy.v2"
+    },
+    "reference_application": "intelligent_active_aerodynamics_controller",
+    "reference_fpga_candidate_boards": [
+      "ulx3s_ecp5_45f",
+      "orangecrab_ecp5_85f"
+    ],
+    "reference_fpga_candidate_policy": "application_intelligence_active_aero_v1",
+    "reference_url": "https://huggingface.co/nvidia/domino_drivaerml",
+    "surrogate_inference_claimed": false,
+    "version": 2
+  },
+  "digital_ip_project_name": "adaptive_aero_control",
+  "digital_ip_top_module": "adaptive_aero_control_top",
+  "domain": "automotive_aerodynamics",
+  "executor": null,
+  "gpu_required": true,
+  "implementation_targets": [
+    "gpu_service"
+  ],
+  "inputs": [
+    "vehicle_geometry",
+    "flow_conditions"
+  ],
+  "model_id": "nvidia.domino.automotive_aero",
+  "name": "NVIDIA DoMINO Automotive Aero",
+  "outputs": [
+    "drag_force",
+    "lift_force",
+    "surface_pressure",
+    "flow_field"
+  ],
+  "provider": "NVIDIA",
+  "runtime": "remote_nim",
+  "training_required": false,
+  "updated_at": "2026-08-17T01:09:45.790577+00:00"
+}

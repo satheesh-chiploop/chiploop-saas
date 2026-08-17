@@ -1,0 +1,598 @@
+{
+  "name": "adaptive_aero_control_top",
+  "description": "Top-level intelligent active-aerodynamics controller. Integrates the PicoRV32 Wishbone subsystem, a firmware-visible MMIO register window, a bounded model transport bridge, a hardware safety supervisor, timeout and sequence validation, command clamping, safe fallback behavior, and status reporting. The top-level output actuator command is always a real RTL-driven output and is clamped before presentation.",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "reset_n",
+      "direction": "input",
+      "width": 1,
+      "active_low": true
+    },
+    {
+      "name": "wb_adr_i",
+      "direction": "input",
+      "width": 32
+    },
+    {
+      "name": "wb_dat_i",
+      "direction": "input",
+      "width": 32
+    },
+    {
+      "name": "wb_dat_o",
+      "direction": "output",
+      "width": 32
+    },
+    {
+      "name": "wb_sel_i",
+      "direction": "input",
+      "width": 4
+    },
+    {
+      "name": "wb_we_i",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "wb_cyc_i",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "wb_stb_i",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "wb_ack_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "wb_stall_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "model_req_valid_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "model_req_data_o",
+      "direction": "output",
+      "width": 64
+    },
+    {
+      "name": "model_req_ready_i",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "model_rsp_valid_i",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "model_rsp_data_i",
+      "direction": "input",
+      "width": 64
+    },
+    {
+      "name": "model_rsp_ready_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "actuator_cmd_o",
+      "direction": "output",
+      "width": 16
+    },
+    {
+      "name": "actuator_valid_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "fault_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "busy_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "request_accepted_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "response_valid_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "response_stale_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "timeout_expired_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "clamp_active_o",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "safe_fallback_active_o",
+      "direction": "output",
+      "width": 1
+    }
+  ],
+  "functionality": "Implements a firmware-controlled, safety-supervised actuator command pipeline for active aerodynamics. The module exposes a Wishbone MMIO register window to PicoRV32 firmware and a bounded 64-bit streaming transport to an external off-chip model runtime. Firmware writes control, velocity, clamp limits, timeout, safe fallback, and request metadata into registers, then launches a request. The bridge issues a compact request with an incrementing sequence number, waits for a matching response, validates response length/format, checks sequence consistency and timeout expiration, and updates status. The final actuator command is generated in hardware, clamped to the configured range, and forced to a deterministic safe fallback value on reset or any fault condition. The top-level output ports are driven directly by RTL and are not left floating or driven only by child inputs.",
+  "responsibilities": [
+    "Provide the top-level FPGA integration point for the PicoRV32 Wishbone subsystem and the aero-control application logic.",
+    "Expose a real firmware-visible MMIO register interface with address, write data, read data, write enable, transaction valid, and response/ready semantics.",
+    "Frame and launch compact model requests on a 64-bit maximum request channel using valid/ready semantics.",
+    "Accept compact model responses on a 64-bit maximum response channel using valid/ready semantics.",
+    "Tag each request with an incrementing sequence counter and preserve outstanding-request state.",
+    "Validate response sequence, response age, response length/format, timeout, and retirement conditions in hardware.",
+    "Clamp all actuator commands to configured minimum and maximum bounds in hardware.",
+    "Force safe fallback on reset, timeout, malformed response, stale response, repeated response, or firmware-declared fault.",
+    "Provide firmware-readable busy, request accepted, response valid, response stale, timeout expired, clamp active, and safe fallback status.",
+    "Keep bulk payloads off-chip or in firmware-managed memory; do not expose tensors, arrays, geometry buffers, or flow-field outputs at the top level."
+  ],
+  "must_drive": [
+    "wb_dat_o",
+    "wb_ack_o",
+    "wb_stall_o",
+    "model_req_valid_o",
+    "model_req_data_o",
+    "model_rsp_ready_o",
+    "actuator_cmd_o",
+    "actuator_valid_o",
+    "fault_o",
+    "busy_o",
+    "request_accepted_o",
+    "response_valid_o",
+    "response_stale_o",
+    "timeout_expired_o",
+    "clamp_active_o",
+    "safe_fallback_active_o"
+  ],
+  "must_receive": [
+    "clk",
+    "reset_n",
+    "wb_adr_i",
+    "wb_dat_i",
+    "wb_sel_i",
+    "wb_we_i",
+    "wb_cyc_i",
+    "wb_stb_i",
+    "model_req_ready_i",
+    "model_rsp_valid_i",
+    "model_rsp_data_i"
+  ],
+  "must_not_drive": [
+    "model_req_ready_i",
+    "model_rsp_valid_i",
+    "model_rsp_data_i"
+  ],
+  "reset_behavior": "On active-low reset assertion, initialize mode to safe fallback, clear outstanding request state, clear request/response sequence tracking, clear fault summary bits, deassert output-valid, deassert request-valid, assert response-ready in the idle-safe state as appropriate for the protocol, and drive the deterministic safe actuator command. The safe_fallback status is asserted after reset until firmware explicitly enables normal operation and a valid, non-faulted response path is established.",
+  "behavior_rules": [
+    "The top-level module shall remain fully synthesizable and use only bounded-width scalar or bus signals at the top level.",
+    "The request transport direction contract is mandatory: model_req_valid_o and model_req_data_o are outputs; model_req_ready_i is an input; model_rsp_valid_i and model_rsp_data_i are inputs; model_rsp_ready_o is an output.",
+    "A top-level output must be driven by RTL and must not be connected only to a child input.",
+    "A new request is accepted only when the bridge is idle, no outstanding request is pending, and the previous request has fully retired.",
+    "Each accepted request shall carry an incrementing sequence number in the compact request payload.",
+    "The response shall be accepted only if sequence matches the outstanding request and the response arrives before timeout expiration.",
+    "Any repeated, stale, malformed, or late response shall be rejected and shall force safe fallback.",
+    "Response length checking shall be performed against the compact protocol encoding; malformed length or encoding is a fault.",
+    "Actuator commands originating from firmware or from the response path shall be clamped to the configured minimum and maximum actuator range before being presented at actuator_cmd_o.",
+    "The final actuator output shall be deterministic and synchronous; no combinational loops may exist between request ingress and actuator output.",
+    "Fault conditions shall force safe_fallback_active_o and fault_o high until cleared by firmware and the design is re-armed.",
+    "Status signals may be one-cycle pulses or registered levels, but they must be generated deterministically in synchronous logic.",
+    "The top-level Wishbone/MMIO interface shall be real RTL, reachable through decode, and shall not be replaced by comments or indirect assumptions.",
+    "The CPU subsystem contract is preserved conceptually in the architecture but the top-level contract remains the authoritative integration point; board-ready CPU/memory/interconnect synthesis is not claimed here.",
+    "No ASIC hard macros or Sky130 SRAMs are used for the FPGA path.",
+    "Any future payload/history/FIFO storage must be described only as technology-neutral memory wrapper collateral, not flattened into registers or inferred surrogate payload storage."
+  ],
+  "rtl_output_file": "adaptive_aero_control_top.v",
+  "register_contract": {
+    "bus_type": "wishbone",
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": 0,
+        "width": 32,
+        "access": "rw",
+        "reset": 1,
+        "fields": [
+          {
+            "name": "enable",
+            "lsb": 0,
+            "msb": 0,
+            "access": "rw",
+            "reset": 0,
+            "description": "Enable normal controller operation."
+          },
+          {
+            "name": "launch",
+            "lsb": 1,
+            "msb": 1,
+            "access": "rw1c",
+            "reset": 0,
+            "description": "Firmware request launch pulse; writing 1 requests bridge launch when idle."
+          },
+          {
+            "name": "clear_faults",
+            "lsb": 2,
+            "msb": 2,
+            "access": "rw1c",
+            "reset": 0,
+            "description": "Clear latched fault summary bits and return to armed-safe state."
+          },
+          {
+            "name": "mode",
+            "lsb": 4,
+            "msb": 5,
+            "access": "rw",
+            "reset": 1,
+            "description": "Operating mode; reset value selects safe fallback mode."
+          },
+          {
+            "name": "firmware_fault",
+            "lsb": 8,
+            "msb": 8,
+            "access": "rw",
+            "reset": 0,
+            "description": "Firmware-declared fault request that forces safe fallback."
+          }
+        ]
+      },
+      {
+        "name": "VELOCITY",
+        "offset": 4,
+        "width": 32,
+        "access": "rw",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "stream_velocity_mps",
+            "lsb": 0,
+            "msb": 31,
+            "access": "rw",
+            "reset": 0,
+            "description": "Encoded stream velocity input in meters per second."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MIN",
+        "offset": 8,
+        "width": 32,
+        "access": "rw",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "actuator_min",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 0,
+            "description": "Minimum actuator clamp value."
+          },
+          {
+            "name": "reserved",
+            "lsb": 16,
+            "msb": 31,
+            "access": "ro",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MAX",
+        "offset": 12,
+        "width": 32,
+        "access": "rw",
+        "reset": 65535,
+        "fields": [
+          {
+            "name": "actuator_max",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 65535,
+            "description": "Maximum actuator clamp value."
+          },
+          {
+            "name": "reserved",
+            "lsb": 16,
+            "msb": 31,
+            "access": "ro",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "REQ_META",
+        "offset": 16,
+        "width": 32,
+        "access": "rw",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "sequence_seed",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 0,
+            "description": "Firmware-visible request sequence seed or diagnostic shadow."
+          },
+          {
+            "name": "condition_code",
+            "lsb": 16,
+            "msb": 23,
+            "access": "rw",
+            "reset": 0,
+            "description": "Request condition code."
+          },
+          {
+            "name": "reserved",
+            "lsb": 24,
+            "msb": 31,
+            "access": "ro",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "REQ_LAUNCH",
+        "offset": 20,
+        "width": 32,
+        "access": "wo",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "launch_request",
+            "lsb": 0,
+            "msb": 0,
+            "access": "wo",
+            "reset": 0,
+            "description": "Writing 1 arms and launches a request when the bridge is idle and enabled."
+          },
+          {
+            "name": "reserved",
+            "lsb": 1,
+            "msb": 31,
+            "access": "ro",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "RSP_META",
+        "offset": 24,
+        "width": 32,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "response_sequence",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Sequence number captured from the most recent accepted response."
+          },
+          {
+            "name": "response_status",
+            "lsb": 16,
+            "msb": 23,
+            "access": "ro",
+            "reset": 0,
+            "description": "Decoded response status."
+          },
+          {
+            "name": "response_age",
+            "lsb": 24,
+            "msb": 31,
+            "access": "ro",
+            "reset": 0,
+            "description": "Age of the outstanding request or last response, as implemented."
+          }
+        ]
+      },
+      {
+        "name": "FAULT",
+        "offset": 28,
+        "width": 32,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "stale",
+            "lsb": 0,
+            "msb": 0,
+            "access": "ro",
+            "reset": 0,
+            "description": "Stale or repeated response detected."
+          },
+          {
+            "name": "timeout",
+            "lsb": 1,
+            "msb": 1,
+            "access": "ro",
+            "reset": 0,
+            "description": "Timeout expired waiting for a valid response."
+          },
+          {
+            "name": "malformed",
+            "lsb": 2,
+            "msb": 2,
+            "access": "ro",
+            "reset": 0,
+            "description": "Malformed response or length mismatch detected."
+          },
+          {
+            "name": "clamp",
+            "lsb": 3,
+            "msb": 3,
+            "access": "ro",
+            "reset": 0,
+            "description": "Actuator command clamping occurred."
+          },
+          {
+            "name": "fallback",
+            "lsb": 4,
+            "msb": 4,
+            "access": "ro",
+            "reset": 1,
+            "description": "Safe fallback active."
+          },
+          {
+            "name": "firmware",
+            "lsb": 5,
+            "msb": 5,
+            "access": "ro",
+            "reset": 0,
+            "description": "Firmware-declared fault latched."
+          },
+          {
+            "name": "busy",
+            "lsb": 6,
+            "msb": 6,
+            "access": "ro",
+            "reset": 0,
+            "description": "Bridge busy status."
+          },
+          {
+            "name": "response_valid",
+            "lsb": 7,
+            "msb": 7,
+            "access": "ro",
+            "reset": 0,
+            "description": "Valid response observed and accepted."
+          }
+        ]
+      },
+      {
+        "name": "OUTPUT",
+        "offset": 32,
+        "width": 32,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "actuator_command",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Final clamped actuator command."
+          },
+          {
+            "name": "actuator_valid",
+            "lsb": 16,
+            "msb": 16,
+            "access": "ro",
+            "reset": 0,
+            "description": "Registered output-valid flag."
+          },
+          {
+            "name": "safe_fallback_active",
+            "lsb": 17,
+            "msb": 17,
+            "access": "ro",
+            "reset": 1,
+            "description": "Safe fallback active indicator."
+          },
+          {
+            "name": "request_accepted",
+            "lsb": 18,
+            "msb": 18,
+            "access": "ro",
+            "reset": 0,
+            "description": "Request accepted indicator."
+          },
+          {
+            "name": "response_stale",
+            "lsb": 19,
+            "msb": 19,
+            "access": "ro",
+            "reset": 0,
+            "description": "Stale response indicator."
+          },
+          {
+            "name": "timeout_expired",
+            "lsb": 20,
+            "msb": 20,
+            "access": "ro",
+            "reset": 0,
+            "description": "Timeout expired indicator."
+          },
+          {
+            "name": "clamp_active",
+            "lsb": 21,
+            "msb": 21,
+            "access": "ro",
+            "reset": 0,
+            "description": "Clamp active indicator."
+          },
+          {
+            "name": "busy",
+            "lsb": 22,
+            "msb": 22,
+            "access": "ro",
+            "reset": 0,
+            "description": "Busy indicator."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CFG",
+        "offset": 36,
+        "width": 32,
+        "access": "rw",
+        "reset": 1000,
+        "fields": [
+          {
+            "name": "timeout_cycles",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 1000,
+            "description": "Request timeout in clock cycles."
+          },
+          {
+            "name": "reserved",
+            "lsb": 16,
+            "msb": 31,
+            "access": "ro",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      }
+    ]
+  }
+}

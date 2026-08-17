@@ -1,0 +1,1276 @@
+{
+  "application_intelligence": {
+    "acceptance_gates": [
+      {
+        "metric": "Validated control operation across the full 20 to 55 m/s envelope",
+        "name": "operating_range_coverage",
+        "threshold": "100 percent of test points within range must complete without unhandled fault"
+      },
+      {
+        "metric": "Worst-case application error relative to the defined reference metric",
+        "name": "maximum_error",
+        "threshold": "Less than or equal to 3.0 percent"
+      },
+      {
+        "metric": "Rate of stale commands rejected during injected stale-input tests",
+        "name": "stale_command_rejection",
+        "threshold": "100 percent rejection of injected stale commands"
+      },
+      {
+        "metric": "Actuator commands exceeding configured bounds during validation",
+        "name": "command_bounding",
+        "threshold": "0 occurrences"
+      },
+      {
+        "metric": "Time from timeout detection to safe fallback activation",
+        "name": "timeout_to_safe_fallback",
+        "threshold": "Measurable and within a defined system limit verified in test; limit shall be specified by implementation"
+      },
+      {
+        "metric": "Fallback activation rate under fault-injection scenarios requiring safe mode",
+        "name": "safe_fallback_activation",
+        "threshold": "100 percent activation when required"
+      },
+      {
+        "metric": "Traceability from inputs to outputs through the reference workflow",
+        "name": "deterministic_reference_traceability",
+        "threshold": "Complete traceability demonstrated for all validation runs"
+      }
+    ],
+    "constraints": [
+      "Operating range limited to stream velocities from 20 to 55 m/s.",
+      "Control outputs must be bounded and clamped to allowable actuator limits.",
+      "Stale model commands must be rejected.",
+      "Timeout conditions must transition to a defined safe state.",
+      "A safe fallback mode must be available whenever command validity is uncertain.",
+      "The solution must remain transparent and referenceable, with a clearly defined baseline implementation.",
+      "Application accuracy must not exceed 3.0 percent maximum error relative to the defined reference metric.",
+      "The system must support the supplied geometry format and reference geometry source.",
+      "No assumption may be made that pretrained inference is already available.",
+      "Technology selection is not fixed by this contract; implementation may vary as long as requirements are met."
+    ],
+    "generation_status": "model_generated",
+    "interfaces": [
+      {
+        "description": "Accepts geometry files and associated metadata for the reference aerodynamic shape.",
+        "name": "geometry_input",
+        "type": "data input"
+      },
+      {
+        "description": "Accepts stream velocity and any required run-time environmental parameters.",
+        "name": "operating_condition_input",
+        "type": "data input"
+      },
+      {
+        "description": "Provides validated state and configuration data to the surrogate evaluation workflow.",
+        "name": "surrogate_model_input",
+        "type": "data input"
+      },
+      {
+        "description": "Emits bounded active-aerodynamics commands for downstream actuator use.",
+        "name": "control_command_output",
+        "type": "actuation output"
+      },
+      {
+        "description": "Reports command validity, freshness, timeout status, and fallback state.",
+        "name": "status_and_fault_output",
+        "type": "telemetry output"
+      },
+      {
+        "description": "Provides reference-path results for comparison against the operational workflow.",
+        "name": "reference_result_output",
+        "type": "validation output"
+      }
+    ],
+    "name": "intelligent_active_aerodynamics_controller",
+    "objective": "Develop a transparent, bounded active-aerodynamics control product for automotive airflow over the specified velocity range using a physics-based surrogate workflow, with explicit system partitioning, architecture optimization, and integrated safety handling including stale-data rejection, timeout handling, command clamping, and safe fallback behavior.",
+    "operating_envelope": {
+      "geometry_format": "STL",
+      "geometry_source": "DrivAerML reference geometry",
+      "stream_velocity_mps": {
+        "max": 55,
+        "min": 20,
+        "nominal": 38.89
+      }
+    },
+    "physics_domain": "automotive_aerodynamics",
+    "required_capabilities": [
+      "Ingest geometry and operating-condition inputs for automotive aerodynamic evaluation.",
+      "Evaluate a physics-based surrogate model for active-aerodynamics decision support.",
+      "Provide a transparent reference path for comparison and validation.",
+      "Partition the application into data ingestion, model evaluation, control decision, safety supervision, and actuator command generation functions.",
+      "Detect stale inputs or stale model outputs using age, sequence, or timestamp validity checks.",
+      "Enforce command bounds before actuation.",
+      "Monitor for timeouts and missing updates.",
+      "Transition to a safe fallback command set on fault, timeout, or invalid data.",
+      "Support implementation on a resource-constrained embedded control platform with deterministic behavior requirements.",
+      "Expose runtime status and fault state for integration and verification.",
+      "Allow architecture optimization against latency, memory, and resource limits."
+    ],
+    "schema": "chiploop.application_intelligence.contract.v1",
+    "source_of_truth": "supabase",
+    "workloads": [
+      {
+        "description": "Load the supplied geometry representation, verify format validity, and prepare the aerodynamic model input set.",
+        "name": "geometry_ingestion_and_validation"
+      },
+      {
+        "description": "Evaluate control behavior at discrete and continuous stream velocities across the specified envelope.",
+        "name": "operating_point_evaluation"
+      },
+      {
+        "description": "Execute the selected physics-based surrogate workflow to estimate aerodynamic response under changing conditions.",
+        "name": "physics_based_surrogate_execution"
+      },
+      {
+        "description": "Run a clearly defined reference path for comparison, calibration, and validation against the surrogate-driven outputs.",
+        "name": "transparent_reference_execution"
+      },
+      {
+        "description": "Decompose the application into data handling, model execution, control logic, supervision, and command output functions, then integrate them into a single product flow.",
+        "name": "system_partitioning_and_integration"
+      },
+      {
+        "description": "Continuously inspect input freshness, command validity, and timing behavior, and issue safe fallback actions when violations occur.",
+        "name": "safety_monitoring_and_fault_response"
+      },
+      {
+        "description": "Iterate implementation parameters to satisfy latency, memory, and determinism goals while preserving the required control behavior.",
+        "name": "architecture_optimization"
+      },
+      {
+        "description": "Execute measurable tests covering accuracy, stale-data rejection, command bounding, timeout handling, and safe fallback activation.",
+        "name": "validation_and_acceptance_testing"
+      }
+    ]
+  },
+  "architecture_generation": {
+    "agent_model_policy": {
+      "mode": "standard",
+      "selected_model": "chiploop_default"
+    },
+    "inference_status": "not_executed",
+    "status": "generated"
+  },
+  "asic_cpu": {
+    "enabled": false,
+    "schema": "chiploop.asic.cpu_ip.v1"
+  },
+  "files": {
+    "application_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/application_contract.json",
+    "child_handoff": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/child_handoff.json",
+    "control_policy": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/active_aero_reference/control_policy.json",
+    "cpu_reference_results": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/active_aero_reference/cpu_reference_results.json",
+    "digital_ip_spec": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/surrogate_architecture/digital_ip_spec.json",
+    "loop_state": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/physical_ai_loop_state.json",
+    "model_generated_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/model_generated_architecture.json",
+    "model_generated_architecture_raw": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/model_generated_architecture_raw.txt",
+    "partition_plan": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/partition_plan.json",
+    "product_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/surrogate_architecture/product_architecture.json",
+    "product_map": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/surrogate_architecture/product_map.json",
+    "requirements_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/requirements_contract.json",
+    "selected_physics_model": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/selected_physics_model.json",
+    "surrogate_interface_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/surrogate_architecture/surrogate_interface_contract.json",
+    "surrogate_mapping": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/surrogate_mapping.json",
+    "validation_plan": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/surrogate_architecture/validation_plan.json"
+  },
+  "hem": {
+    "enabled": true,
+    "goal": "product_demo",
+    "mode": "fixed",
+    "stage_toggles": {
+      "firmware_product": true,
+      "fpga_bitstream": true,
+      "fpga_exploration": true
+    },
+    "start_condition": "architecture_passed"
+  },
+  "loop": {
+    "architecture_passed": true,
+    "child_handoff": {
+      "cpu_reference_status": "completed",
+      "digital_ip_spec": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/surrogate_architecture/digital_ip_spec.json",
+      "implementation_path": "fpga_prototype",
+      "inference_status": "not_executed",
+      "model_generated_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/model_generated_architecture.json",
+      "next_loop": "digital_design",
+      "parent_workflow_id": "40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce",
+      "product_architecture": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/surrogate_architecture/product_architecture.json",
+      "return_to_parent": true,
+      "rtl_spec_text": "Module name: adaptive_aero_control_top.\n\nGoal: synthesizable FPGA top-level for an intelligent active-aerodynamics controller using a soft CPU. The module shall not implement the DoMINO surrogate compute. Instead, it shall provide bounded transport, control/status registers, safety supervision, and actuator command handling.\n\nArchitecture:\n1) Instantiate a PicoRV32-based subsystem connected via Wishbone.\n2) Provide a memory-mapped register window accessible by the CPU. The register block shall be 32-bit wide and shall contain at minimum: control/mode, stream velocity input, max/min actuator clamp values, request sequence, request launch, response sequence, response age, fault summary, and safe-fallback configuration.\n3) Implement a model transport bridge that frames compact request messages and accepts compact response messages. The bridge shall use valid/ready handshake on a bounded data path no wider than 64 bits at the top level. The bridge shall attach sequence numbers and message-length checking. No tensors, arrays, geometry buffers, or flow-field outputs shall be exposed at the top level.\n4) Implement a safety supervisor in hardware. It shall compare response sequence against the outstanding request sequence, detect stale or repeated responses, detect timeout expiration, and force safe fallback on any fault.\n5) Implement actuator command clamping in hardware. Any command from firmware or from the response path shall be limited to the configured minimum and maximum actuator range. The final command presented to outputs shall be the clamped value.\n6) Provide a safe fallback mode. On reset, timeout, malformed response, stale response, or firmware-declared fault, the module shall drive a deterministic safe command and assert a fault flag.\n7) Provide a status path back to firmware indicating busy, request accepted, response valid, response stale, timeout expired, clamp active, and safe fallback active.\n8) Keep all bulk payloads off-chip or in firmware-managed memory. RTL shall not infer payload memories using reg arrays, generic SRAMs, or BRAMs for surrogate data. Only small control/state registers and FSM state are permitted in RTL.\n9) The top-level port set shall remain implementation-friendly and below 256 scalar-equivalent I/O signals. Use a 32-bit Wishbone register interface plus a 64-bit maximum stream interface for model transport.\n10) Timing: the safety monitor and command clamp shall be fully synchronous to clk and shall have deterministic one-cycle or registered behavior. No combinational loops between input request and output actuator command are allowed.\n11) Reset: active-low reset shall initialize mode to safe fallback, clear outstanding request state, clear fault summaries, and set output-valid low.\n12) Firmware interaction: firmware running on PicoRV32 shall write request metadata and read response/status registers. The hardware shall not assume the existence of a GPU inside the FPGA; the external model runtime is off-chip software/GPU.\n13) For FPGA implementation, use vendor-agnostic synthesizable RTL and standard FPGA BRAM only for CPU memories if required by the selected soft CPU subsystem. Do not use Sky130 hard macros on FPGA.\n14) If future ASIC reuse is desired, a separate memory-collateral gate shall be enforced before selecting any Sky130 SRAM macro. For the present FPGA path, no ASIC memory macro instantiation shall be used.\n\nRequired behaviors:\n- Accept a new request only when the bridge is idle and the previous request is fully retired.\n- Tag each request with an incrementing sequence counter.\n- Reject any response whose sequence does not match the outstanding request.\n- Reject any response arriving after timeout expiration.\n- Clamp actuator commands to the configured range and set clamp_active status if clamping occurred.\n- Force safe_fallback_active on reset, timeout, stale response, malformed response, or firmware fault.\n- Provide one-cycle pulse or registered level on request_accepted and response_valid status signals.\n\nSuggested internal registers:\n- CTRL: mode, enable, launch, clear_faults.\n- VELOCITY: encoded stream velocity input in m/s.\n- CMD_MIN / CMD_MAX: actuator bounds.\n- REQ_META: sequence, condition code, reserved.\n- RSP_META: sequence, status, age, reserved.\n- FAULT: bitfield with stale, timeout, malformed, clamp, fallback.\n- OUTPUT: final actuator command and valid bit.\n\nThe module must be fully synthesizable, use only bounded-width buses, and preserve deterministic safe operation under loss of external model service.",
+      "schema": "chiploop.physical_ai.architecture_handoff.v1",
+      "source_model_id": "nvidia.domino.automotive_aero",
+      "surrogate_interface_contract": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/40e2ee88-bbfd-4a1c-9edf-ef5ac26e6dce/84da7c52-ebd4-4391-94b2-126aac443a5f/physical_ai/physical_ai/surrogate_architecture/surrogate_interface_contract.json"
+    },
+    "fixed_point_passed": false,
+    "implementation_path": "fpga_prototype",
+    "inference_status": "not_executed",
+    "physics_passed": false,
+    "rtl_smoke_passed": false,
+    "stages": [
+      {
+        "id": "requirements",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "model_selection",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "surrogate_interface",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "architecture_definition",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "cpu_reference",
+        "owner": "physical_ai",
+        "status": "completed"
+      },
+      {
+        "id": "surrogate_inference",
+        "owner": "physical_ai",
+        "status": "not_executed"
+      },
+      {
+        "app_path": "/apps/arch2rtl",
+        "id": "digital_design",
+        "owner": "existing_loop",
+        "status": "ready"
+      },
+      {
+        "app_path": "/apps/verify",
+        "id": "rtl_verification",
+        "owner": "existing_loop",
+        "status": "planned"
+      },
+      {
+        "app_path": "/apps/fpga-implementation",
+        "id": "digital_implementation",
+        "owner": "existing_loop",
+        "status": "not_requested"
+      },
+      {
+        "app_path": "/apps/fpga-target-explorer",
+        "id": "fpga_exploration",
+        "owner": "existing_loop",
+        "status": "planned"
+      }
+    ]
+  },
+  "model_qualification": {
+    "accuracy_qualified": false,
+    "candidate_count": 2,
+    "candidates": [
+      {
+        "availability": "requires_gpu_worker",
+        "domain_match": true,
+        "gpu_required": true,
+        "model_id": "nvidia.domino.automotive_aero",
+        "name": "NVIDIA DoMINO Automotive Aero",
+        "provider": "NVIDIA",
+        "runtime": "remote_nim",
+        "score": 100
+      },
+      {
+        "availability": "ready",
+        "domain_match": false,
+        "gpu_required": false,
+        "model_id": "chiploop.pmsm.dq.v1",
+        "name": "PMSM dq Equation Model",
+        "provider": "ChipLoop",
+        "runtime": "cpu_equation",
+        "score": 0
+      }
+    ],
+    "checkpoint_identified": true,
+    "inference_executed": false,
+    "limitations": [
+      "Surrogate inference and application-specific accuracy are not qualified in this run."
+    ],
+    "qualification_status": "provisionally_compatible",
+    "schema": "chiploop.application_intelligence.model_qualification.v1",
+    "selected_model_id": "nvidia.domino.automotive_aero",
+    "selection_basis": "domain, interface, runtime, availability, and implementation-path compatibility"
+  },
+  "partition": {
+    "application": "intelligent_active_aerodynamics_controller",
+    "decision": "Partitioned for FPGA prototype with a soft-CPU controller and external GPU/CPU-hosted surrogate execution. The surrogate remains in software/gpu_service, while FPGA RTL implements transport, partitioning, supervision, clamping, timeout handling, and safe fallback. Hardware-deployable logic is limited to bounded control/safety functions; the physics surrogate itself is not assigned to FPGA because the model qualification requires a remote GPU worker and no evidence proves RTL deployment readiness.",
+    "decision_factors": [
+      "Model qualification indicates the selected surrogate is remote_nim and requires a GPU worker; inference was not executed and accuracy was not qualified, so the surrogate must remain in software/gpu_service.",
+      "The contract explicitly forbids assuming pretrained inference availability and requires transparent, referenceable baseline behavior.",
+      "The architecture already separates the soft CPU firmware from RTL safety logic and keeps the DoMINO surrogate outside the FPGA.",
+      "The implementation path is fpga_prototype, which favors a deterministic hardware safety shell plus firmware orchestration rather than full model acceleration in RTL.",
+      "Safety requirements demand stale-data rejection, timeout handling, command clamping, and safe fallback with deterministic hardware behavior.",
+      "The system must support resource-constrained embedded control, but the physics model itself is not proven hardware-deployable.",
+      "The FPGA interface constraints favor bounded streams and register windows, matching transport/supervision rather than tensor or flow-field compute.",
+      "ASIC reuse is possible for the control shell only; the surrogate remains external until evidence supports a hardware-deployable implementation."
+    ],
+    "generation_status": "model_generated",
+    "implementation_path": "fpga_prototype",
+    "interfaces": [
+      {
+        "consumer": "software",
+        "description": "STL geometry and metadata ingress for DrivAerML reference geometry validation and preprocessing.",
+        "name": "geometry_input",
+        "producer": "software"
+      },
+      {
+        "consumer": "software/gpu_service",
+        "description": "Stream velocity and runtime environmental parameters used to configure the surrogate and reference runs.",
+        "name": "operating_condition_input",
+        "producer": "cpu_software"
+      },
+      {
+        "consumer": "gpu_service",
+        "description": "Validated state, sequence, and configuration metadata passed to the external DoMINO surrogate execution path.",
+        "name": "surrogate_model_input",
+        "producer": "firmware/cpu_software"
+      },
+      {
+        "consumer": "gpu_service",
+        "description": "Bounded request stream carrying compact metadata and sequence tags to the external surrogate service.",
+        "name": "model_req_stream",
+        "producer": "fpga"
+      },
+      {
+        "consumer": "fpga",
+        "description": "Bounded response stream returning compact results and metadata for hardware validation and command staging.",
+        "name": "model_rsp_stream",
+        "producer": "gpu_service"
+      },
+      {
+        "consumer": "actuator electronics",
+        "description": "Bounded active-aerodynamics actuator command after hardware clamping and safety checks.",
+        "name": "control_command_output",
+        "producer": "fpga"
+      },
+      {
+        "consumer": "firmware/software",
+        "description": "Telemetry reporting freshness, timeout, clamp, fallback, and command validity status.",
+        "name": "status_and_fault_output",
+        "producer": "fpga"
+      },
+      {
+        "consumer": "software/validation",
+        "description": "Reference-path outputs used for comparison, calibration, and acceptance testing.",
+        "name": "reference_result_output",
+        "producer": "software"
+      },
+      {
+        "consumer": "fpga",
+        "description": "32-bit memory-mapped control/status interface for request launch, limits, velocity input, and fault inspection.",
+        "name": "wishbone_ctrl_if",
+        "producer": "firmware"
+      }
+    ],
+    "jobs": [
+      {
+        "id": "job_1",
+        "inputs": [
+          "geometry_input",
+          "geometry source metadata"
+        ],
+        "latency_budget": "offline / pre-run, bounded by product startup workflow",
+        "outputs": [
+          "validated_geometry",
+          "geometry_metadata",
+          "geometry_validation_status"
+        ],
+        "rationale": "Target-independent preprocessing is best kept in software because it is file-oriented, transparent, and does not require deterministic hard real-time execution.",
+        "responsibility": "Geometry ingestion and validation of DrivAerML STL input; normalize metadata and prepare reference geometry artifacts for downstream use.",
+        "status": "assigned",
+        "target": "software"
+      },
+      {
+        "id": "job_2",
+        "inputs": [
+          "operating_condition_input",
+          "validated_geometry"
+        ],
+        "latency_budget": "milliseconds, pre-request path",
+        "outputs": [
+          "operating_point_config",
+          "velocity_validity_status",
+          "run_trace_id"
+        ],
+        "rationale": "Velocity selection, validation, and run setup are control-plane functions suited to firmware/host software and should remain transparent and referenceable.",
+        "responsibility": "Operating-point management and envelope enforcement for stream velocity inputs across 20 to 55 m/s; prepare run configuration and maintain traceability.",
+        "status": "assigned",
+        "target": "cpu_software"
+      },
+      {
+        "id": "job_3",
+        "inputs": [
+          "surrogate_model_input",
+          "operating_point_config",
+          "validated_geometry"
+        ],
+        "latency_budget": "application-defined; expected external-service latency with timeout supervision",
+        "outputs": [
+          "surrogate_response",
+          "model_timestamp",
+          "response_sequence",
+          "confidence_or_quality_metadata"
+        ],
+        "rationale": "The qualified model explicitly requires a remote GPU worker; there is no evidence that the surrogate is hardware-deployable, so it stays in GPU/CPU software.",
+        "responsibility": "Execute the NVIDIA DoMINO Automotive Aero surrogate workflow for physics-based aerodynamic estimation and control-relevant response generation.",
+        "status": "assigned",
+        "target": "gpu_service"
+      },
+      {
+        "id": "job_4",
+        "inputs": [
+          "validated_geometry",
+          "operating_point_config"
+        ],
+        "latency_budget": "offline or non-real-time validation window",
+        "outputs": [
+          "reference_result",
+          "reference_metric_values",
+          "comparison_trace"
+        ],
+        "rationale": "The reference path is explicitly for transparency and validation, not latency-critical actuation, so it belongs in software.",
+        "responsibility": "Run the transparent reference path for calibration, comparison, and validation against surrogate outputs; preserve deterministic traceability to the reference workflow.",
+        "status": "assigned",
+        "target": "software"
+      },
+      {
+        "id": "job_5",
+        "inputs": [
+          "model_rsp_stream",
+          "firmware_control_registers",
+          "sequence_and_age_metadata"
+        ],
+        "latency_budget": "deterministic, one-cycle or registered synchronous behavior",
+        "outputs": [
+          "actuator_cmd_out",
+          "fault_out",
+          "safety_status_flags"
+        ],
+        "rationale": "These are the FPGA-appropriate hard real-time safety functions required by the contract and architecture; they are bounded, deterministic, and do not require surrogate compute in RTL.",
+        "responsibility": "Hardware safety supervisor implementing stale-data rejection, timeout detection, command clamping, safe fallback selection, and bounded actuator output staging.",
+        "status": "assigned",
+        "target": "fpga"
+      },
+      {
+        "id": "job_6",
+        "inputs": [
+          "wishbone_ctrl_if",
+          "fault_out",
+          "status_and_fault_output",
+          "reference_result_output"
+        ],
+        "latency_budget": "milliseconds, deterministic control loop cadence",
+        "outputs": [
+          "model_req_stream",
+          "control_register_writes",
+          "firmware_status_logs",
+          "fallback_policy_actions"
+        ],
+        "rationale": "The selected FPGA prototype includes a soft CPU; firmware is the correct layer for orchestration, traceability, and interaction with the external model service.",
+        "responsibility": "Soft-CPU supervision and product orchestration: issue requests, manage sequence numbers, monitor status, log faults, retry or degrade gracefully, and coordinate safe-state behavior.",
+        "status": "assigned",
+        "target": "firmware"
+      },
+      {
+        "id": "job_7",
+        "inputs": [
+          "application_contract",
+          "architecture",
+          "model_qualification"
+        ],
+        "latency_budget": "design-time / architecture-iteration loop",
+        "outputs": [
+          "partition_map",
+          "interface_contracts",
+          "integration_rules"
+        ],
+        "rationale": "Partitioning is implementation-agnostic and should optimize for the current FPGA prototype while preserving possible reuse; fpga_or_asic captures the reusable control-shell nature without claiming surrogate hardware deployment.",
+        "responsibility": "System partitioning and integration of data handling, model transport, supervision, and command generation into a single product flow with clear software/hardware boundaries.",
+        "status": "assigned",
+        "target": "fpga_or_asic"
+      },
+      {
+        "id": "job_8",
+        "inputs": [
+          "model_req_stream",
+          "model_rsp_stream",
+          "request_metadata",
+          "response_metadata"
+        ],
+        "latency_budget": "microseconds to low milliseconds, bounded by external service interaction",
+        "outputs": [
+          "framed_request",
+          "validated_response",
+          "transport_status"
+        ],
+        "rationale": "Transport integrity and framing are hardware-friendly but not the surrogate itself; this is exactly the kind of bounded logic suited to RTL.",
+        "responsibility": "Model transport bridge on FPGA for compact request/response framing, sequence tagging, length checking, and handshake integrity with the external model service.",
+        "status": "assigned",
+        "target": "fpga"
+      },
+      {
+        "id": "job_9",
+        "inputs": [
+          "partition_map",
+          "runtime_measurements",
+          "resource_constraints"
+        ],
+        "latency_budget": "design-time iterative workflow",
+        "outputs": [
+          "optimized_architecture_parameters",
+          "updated_latency_budget",
+          "resource_tradeoff_notes"
+        ],
+        "rationale": "Optimization spans software, firmware, and RTL parameters and is best handled as a host-side compile/analysis loop rather than fixed hardware.",
+        "responsibility": "Architecture optimization loop over latency, memory, and resource limits; tune firmware/hardware partitioning, control cadence, and transport parameters while preserving safety requirements.",
+        "status": "assigned",
+        "target": "software"
+      },
+      {
+        "id": "job_10",
+        "inputs": [
+          "validated_geometry",
+          "operating_point_config",
+          "surrogate_response",
+          "reference_result",
+          "fault_out"
+        ],
+        "latency_budget": "test-run dependent; non-real-time",
+        "outputs": [
+          "test_reports",
+          "acceptance_metrics",
+          "traceability_artifacts"
+        ],
+        "rationale": "Acceptance testing must observe the full system behavior, compare against reference outputs, and produce artifacts; software is the appropriate execution environment.",
+        "responsibility": "Validation and acceptance testing across operating range, stale-command rejection, command bounding, timeout-to-safe fallback, and deterministic traceability.",
+        "status": "assigned",
+        "target": "software"
+      }
+    ],
+    "partition_phases": {
+      "functional": {
+        "status": "completed",
+        "target_independent": true
+      },
+      "target_refinement": {
+        "asic_cpu": null,
+        "candidate_modes": [
+          "fpga_onboard_cpu",
+          "fpga_soft_cpu",
+          "fpga_external_host"
+        ],
+        "firmware_gate": {
+          "ready": false,
+          "reason": "Finalize CPU/host, bus, address map, interrupts, and register-map version before deployable firmware generation."
+        },
+        "requested_mode": "fpga_soft_cpu",
+        "required_contract": {
+          "compute_host": [
+            "location",
+            "cpu_or_mcu",
+            "architecture",
+            "runtime_or_os",
+            "toolchain"
+          ],
+          "hardware_interface": [
+            "bus_or_transport",
+            "base_address",
+            "register_map",
+            "interrupts",
+            "dma_or_shared_memory"
+          ],
+          "target": [
+            "board_and_device",
+            "clock_reset",
+            "memory",
+            "io"
+          ]
+        },
+        "selected_mode": "fpga_soft_cpu",
+        "selection_owner": "fpga_target_explorer",
+        "soft_cpu": {
+          "abi": "ilp32",
+          "bus": "wishbone",
+          "clock_mhz": 50.0,
+          "compiler_arch": "rv32imc",
+          "core": "picorv32",
+          "core_label": "PicoRV32",
+          "data_memory_kib": 16,
+          "debug": false,
+          "enabled": true,
+          "estimated_reservation": {
+            "basis": "supabase_governed_reference_estimate",
+            "block_ram_blocks": 12,
+            "logic_cells": 3000,
+            "must_be_replaced_by_complete_system_synthesis": true
+          },
+          "instruction_memory_kib": 32,
+          "interrupts": true,
+          "isa": "rv32imc",
+          "license": "ISC",
+          "policy_schema": "chiploop.application_intelligence.processor_ip_policy.v2",
+          "profile": "balanced",
+          "schema": "chiploop.fpga.soft_cpu.v1",
+          "selection_mode": "automatic",
+          "target_triple": "rv32imc-unknown-none-elf",
+          "uart": true
+        },
+        "status": "pending_board_selection"
+      }
+    },
+    "schema": "chiploop.application_intelligence.partition.v2",
+    "tradeoffs": [
+      "Keeping the surrogate external preserves fidelity and transparency but adds service latency and dependency on GPU availability.",
+      "FPGA hardware safety supervision improves determinism and fault containment, but it does not reduce surrogate execution latency.",
+      "A soft-CPU + RTL safety shell is more portable and verifiable than a full hardware model implementation, at the cost of higher system integration complexity.",
+      "Software-based reference execution improves traceability and validation coverage, but it does not provide production-time actuation speed.",
+      "Future ASIC reuse could capture the bounded safety/control path, but the current evidence does not justify committing the surrogate to ASIC or FPGA compute.",
+      "Using compact metadata streams instead of full payload exposure simplifies RTL and I/O, but requires firmware/software to manage bulk data and model context off-chip."
+    ]
+  },
+  "physics_execution": {
+    "architecture": {
+      "architecture_decisions": [
+        "Selected implementation target: FPGA prototype with a soft CPU architecture; no ASIC memory macro integration is required for this path.",
+        "Selected processor: PicoRV32 in rv32imc, matching the supplied fpga_soft_cpu deployment architecture and Wishbone bus preference.",
+        "Kept the surrogate outside RTL: NVIDIA DoMINO Automotive Aero remains a software/GPU or CPU-reference executed model; RTL only manages transport, buffering, and actuator safety.",
+        "Used a compact top-level hardware interface: a bounded Wishbone register window plus a small streaming command/status path, avoiding any tensor or flow-field exposure at the top level.",
+        "Designed a safety-first control shell with explicit stale-data rejection, command clamping, watchdog timeout, and deterministic safe fallback mode.",
+        "Separated responsibilities into CPU firmware and hardware blocks: firmware prepares model requests and interprets responses; RTL enforces protocol integrity and actuator safety before output drive.",
+        "Fixed the control envelope to the supplied 20-55 m/s operating range and the nominal 38.89 m/s reference condition used for validation and calibration.",
+        "Preserved a low I/O count by keeping the full geometry and surrogate payload inside software-managed memory and compact registers rather than at the FPGA pins.",
+        "Selected a Wishbone memory-mapped control/status window as the primary integration interface because it is implementation-friendly for PicoRV32 and bounded to below 64-bit datapath width.",
+        "Defined the hardware to be synthesizable and portable across FPGA boards listed in the evidence, while explicitly excluding any Sky130 hard-macro dependency."
+      ],
+      "blocks": [
+        {
+          "description": "PicoRV32-based firmware engine executing control policy, geometry handling, model request formatting, response parsing, and supervisory state transitions.",
+          "name": "soft_cpu_subsystem",
+          "subblocks": [
+            "PicoRV32 core",
+            "instruction memory",
+            "data memory",
+            "interrupt controller",
+            "uart_debug_console",
+            "wishbone interconnect"
+          ],
+          "type": "processor_subsystem"
+        },
+        {
+          "description": "Memory-mapped control/status registers for mode selection, velocity input, command limits, request launch, status capture, and fault reporting.",
+          "name": "aero_control_regfile",
+          "subblocks": [
+            "mode register",
+            "velocity setpoint register",
+            "command limit registers",
+            "request control register",
+            "status register",
+            "fault summary register",
+            "age/timestamp register"
+          ],
+          "type": "register_block"
+        },
+        {
+          "description": "Compact request/response bridge between firmware and the external CPU/GPU model execution path. Implements message framing, sequence tagging, valid/ready handshaking, and payload length checking.",
+          "name": "model_transport_bridge",
+          "subblocks": [
+            "tx_framing",
+            "rx_deframing",
+            "sequence_counter",
+            "length_checker",
+            "ack_timeout_monitor"
+          ],
+          "type": "protocol_adapter"
+        },
+        {
+          "description": "Hardware safety monitor that rejects stale or malformed model outputs, clamps requested actuator positions, and forces safe fallback on timeout or fault.",
+          "name": "safety_supervisor",
+          "subblocks": [
+            "freshness_checker",
+            "stale_data_detector",
+            "range_clamper",
+            "timeout_fsm",
+            "safe_fallback_mux"
+          ],
+          "type": "safety_controller"
+        },
+        {
+          "description": "Final command formatting for active-aero actuators such as flap or spoiler positions. Produces bounded command words and drive-valid strobes for downstream actuator electronics.",
+          "name": "actuator_command_interface",
+          "subblocks": [
+            "command_format_unit",
+            "output_hold_register",
+            "output_valid",
+            "command_acknowledge"
+          ],
+          "type": "output_stage"
+        },
+        {
+          "description": "External software/GPU runtime path used by firmware to move geometry, flow conditions, and response metadata. Not implemented as RTL compute for the surrogate.",
+          "name": "external_model_io",
+          "subblocks": [
+            "host_request_queue",
+            "host_response_queue",
+            "metadata tags",
+            "transport status"
+          ],
+          "type": "offchip_interface"
+        }
+      ],
+      "interfaces": [
+        {
+          "description": "Wishbone register-mapped control/status window for PicoRV32 firmware access. Used for mode control, velocity input, launch, status readback, and fault inspection.",
+          "direction": "bidirectional",
+          "name": "wishbone_ctrl_if",
+          "width_bits": 32
+        },
+        {
+          "description": "Bounded request stream carrying compact metadata and encoded model parameters to the external software/GPU path. Uses valid/ready handshake and sequence tags.",
+          "direction": "output",
+          "name": "model_req_stream",
+          "width_bits": 64
+        },
+        {
+          "description": "Bounded response stream returning compact result metadata, scores, and actuator-relevant outputs from the external model execution path. Uses valid/ready handshake and sequence tags.",
+          "direction": "input",
+          "name": "model_rsp_stream",
+          "width_bits": 64
+        },
+        {
+          "description": "Final actuator command word for active-aero surfaces. Includes clamped position or mode code plus update-valid indication.",
+          "direction": "output",
+          "name": "actuator_cmd_out",
+          "width_bits": 16
+        },
+        {
+          "description": "Compact fault summary for stale data, timeout, malformed response, range violation, and safe-fallback active status.",
+          "direction": "output",
+          "name": "fault_out",
+          "width_bits": 8
+        },
+        {
+          "description": "Optional debug and bring-up serial interface supplied by the soft CPU subsystem.",
+          "direction": "bidirectional",
+          "name": "uart",
+          "width_bits": 1
+        },
+        {
+          "description": "System clock and active-low reset for the FPGA prototype.",
+          "direction": "bidirectional",
+          "name": "clk_rst",
+          "width_bits": 2
+        }
+      ],
+      "product_name": "Adaptive Aero Control",
+      "product_summary": "FPGA prototype for an intelligent active-aerodynamics controller that runs a soft CPU and a bounded hardware control wrapper around a CPU/GPU-hosted DoMINO surrogate workflow. The RTL does not implement the surrogate itself; it provides request/response transport, validation, freshness checks, timeout handling, actuator clamping, and safe fallback for 20-55 m/s operation using the DrivAerML reference geometry and flow-conditions inputs.",
+      "rtl_spec_text": "Module name: adaptive_aero_control_top.\n\nGoal: synthesizable FPGA top-level for an intelligent active-aerodynamics controller using a soft CPU. The module shall not implement the DoMINO surrogate compute. Instead, it shall provide bounded transport, control/status registers, safety supervision, and actuator command handling.\n\nArchitecture:\n1) Instantiate a PicoRV32-based subsystem connected via Wishbone.\n2) Provide a memory-mapped register window accessible by the CPU. The register block shall be 32-bit wide and shall contain at minimum: control/mode, stream velocity input, max/min actuator clamp values, request sequence, request launch, response sequence, response age, fault summary, and safe-fallback configuration.\n3) Implement a model transport bridge that frames compact request messages and accepts compact response messages. The bridge shall use valid/ready handshake on a bounded data path no wider than 64 bits at the top level. The bridge shall attach sequence numbers and message-length checking. No tensors, arrays, geometry buffers, or flow-field outputs shall be exposed at the top level.\n4) Implement a safety supervisor in hardware. It shall compare response sequence against the outstanding request sequence, detect stale or repeated responses, detect timeout expiration, and force safe fallback on any fault.\n5) Implement actuator command clamping in hardware. Any command from firmware or from the response path shall be limited to the configured minimum and maximum actuator range. The final command presented to outputs shall be the clamped value.\n6) Provide a safe fallback mode. On reset, timeout, malformed response, stale response, or firmware-declared fault, the module shall drive a deterministic safe command and assert a fault flag.\n7) Provide a status path back to firmware indicating busy, request accepted, response valid, response stale, timeout expired, clamp active, and safe fallback active.\n8) Keep all bulk payloads off-chip or in firmware-managed memory. RTL shall not infer payload memories using reg arrays, generic SRAMs, or BRAMs for surrogate data. Only small control/state registers and FSM state are permitted in RTL.\n9) The top-level port set shall remain implementation-friendly and below 256 scalar-equivalent I/O signals. Use a 32-bit Wishbone register interface plus a 64-bit maximum stream interface for model transport.\n10) Timing: the safety monitor and command clamp shall be fully synchronous to clk and shall have deterministic one-cycle or registered behavior. No combinational loops between input request and output actuator command are allowed.\n11) Reset: active-low reset shall initialize mode to safe fallback, clear outstanding request state, clear fault summaries, and set output-valid low.\n12) Firmware interaction: firmware running on PicoRV32 shall write request metadata and read response/status registers. The hardware shall not assume the existence of a GPU inside the FPGA; the external model runtime is off-chip software/GPU.\n13) For FPGA implementation, use vendor-agnostic synthesizable RTL and standard FPGA BRAM only for CPU memories if required by the selected soft CPU subsystem. Do not use Sky130 hard macros on FPGA.\n14) If future ASIC reuse is desired, a separate memory-collateral gate shall be enforced before selecting any Sky130 SRAM macro. For the present FPGA path, no ASIC memory macro instantiation shall be used.\n\nRequired behaviors:\n- Accept a new request only when the bridge is idle and the previous request is fully retired.\n- Tag each request with an incrementing sequence counter.\n- Reject any response whose sequence does not match the outstanding request.\n- Reject any response arriving after timeout expiration.\n- Clamp actuator commands to the configured range and set clamp_active status if clamping occurred.\n- Force safe_fallback_active on reset, timeout, stale response, malformed response, or firmware fault.\n- Provide one-cycle pulse or registered level on request_accepted and response_valid status signals.\n\nSuggested internal registers:\n- CTRL: mode, enable, launch, clear_faults.\n- VELOCITY: encoded stream velocity input in m/s.\n- CMD_MIN / CMD_MAX: actuator bounds.\n- REQ_META: sequence, condition code, reserved.\n- RSP_META: sequence, status, age, reserved.\n- FAULT: bitfield with stale, timeout, malformed, clamp, fallback.\n- OUTPUT: final actuator command and valid bit.\n\nThe module must be fully synthesizable, use only bounded-width buses, and preserve deterministic safe operation under loss of external model service.",
+      "safety_requirements": [
+        "Reject stale model commands based on sequence mismatch or age exceeding the configured timeout window.",
+        "Clamp all actuator commands to the legal active-aero range before output drive.",
+        "Enter safe fallback on transport timeout, malformed response, unsupported mode, or loss of firmware heartbeat.",
+        "Hold the last safe command only if explicitly configured; otherwise transition to the predefined safe position.",
+        "Treat surrogate outputs as advisory only; never allow unvalidated external model data to bypass hardware safety checks.",
+        "Use deterministic reset behavior so the actuator output defaults to safe fallback on power-up and reset.",
+        "Expose fault status to firmware so the soft CPU can log, retry, or degrade gracefully.",
+        "Maintain bounded latency for the safety monitor so stale-data rejection is enforced in hardware, not only in firmware.",
+        "Do not accept geometry or flow-condition payloads that exceed the compact framed message length.",
+        "Do not infer or rely on full surrogate tensor payloads in RTL; only metadata and compact control-relevant outputs are allowed."
+      ],
+      "top_module": "adaptive_aero_control_top",
+      "verification_goals": [
+        "Verify Wishbone register read/write correctness for control, status, and fault registers.",
+        "Verify request framing uses bounded 64-bit or narrower stream payloads with valid/ready handshake.",
+        "Verify request sequence increments monotonically and outstanding sequence tracking is correct.",
+        "Verify stale response rejection when response sequence mismatches the outstanding request.",
+        "Verify timeout expiration causes safe fallback and sets the timeout fault bit.",
+        "Verify malformed or short-length message rejection in the transport bridge.",
+        "Verify actuator command clamping at both minimum and maximum bounds.",
+        "Verify safe fallback on reset and on all listed fault conditions.",
+        "Verify firmware-visible status bits update consistently with hardware safety actions.",
+        "Verify no top-level interface exceeds the required bounded width and the scalar-equivalent I/O count remains below 256.",
+        "Verify the design remains free of surrogate compute assumptions and does not expose tensor or flow-field payloads at the top level.",
+        "Verify deterministic latency of the safety supervisor and final command path under synchronous operation."
+      ]
+    },
+    "control_policy": {
+      "entries": [
+        {
+          "x": 20.0,
+          "y": 0.0
+        },
+        {
+          "x": 28.75,
+          "y": 17.5
+        },
+        {
+          "x": 37.5,
+          "y": 35.0
+        },
+        {
+          "x": 46.25,
+          "y": 52.5
+        },
+        {
+          "x": 55.0,
+          "y": 70.0
+        }
+      ],
+      "format": "piecewise_linear_lut",
+      "input": "vehicle_speed_mps",
+      "output": "actuator_command_percent",
+      "qualification": "cpu_reference_only",
+      "schema": "chiploop.physical_ai.control_policy.v1"
+    },
+    "cpu_reference": {
+      "equation": "drag_force = 0.5 * air_density * velocity^2 * drag_coefficient * frontal_area",
+      "model_type": "analytical_drag_reference",
+      "operating_points": [
+        {
+          "actuator_command_percent": 0.0,
+          "effective_drag_coefficient": 0.3,
+          "estimated_drag_force_n": 161.7,
+          "speed_mps": 20.0
+        },
+        {
+          "actuator_command_percent": 17.5,
+          "effective_drag_coefficient": 0.2958,
+          "estimated_drag_force_n": 329.46,
+          "speed_mps": 28.75
+        },
+        {
+          "actuator_command_percent": 35.0,
+          "effective_drag_coefficient": 0.2916,
+          "estimated_drag_force_n": 552.5592,
+          "speed_mps": 37.5
+        },
+        {
+          "actuator_command_percent": 52.5,
+          "effective_drag_coefficient": 0.2874,
+          "estimated_drag_force_n": 828.3979,
+          "speed_mps": 46.25
+        },
+        {
+          "actuator_command_percent": 70.0,
+          "effective_drag_coefficient": 0.2832,
+          "estimated_drag_force_n": 1154.3763,
+          "speed_mps": 55.0
+        }
+      ],
+      "parameters": {
+        "air_density_kg_m3": 1.225,
+        "baseline_drag_coefficient": 0.3,
+        "frontal_area_m2": 2.2
+      },
+      "purpose": "Exercise application partitioning and controller implementation without claiming pretrained-surrogate predictions.",
+      "schema": "chiploop.physical_ai.cpu_reference.v1",
+      "surrogate_inference_status": "not_executed",
+      "surrogate_model_id": "nvidia.domino.automotive_aero"
+    },
+    "digital_ip_spec": {
+      "blocks": [
+        "register bank",
+        "sensor filter",
+        "feature aggregator",
+        "command limiter",
+        "safety state machine",
+        "watchdog",
+        "telemetry FIFO"
+      ],
+      "clock": {
+        "name": "clk",
+        "target_frequency_mhz": 100
+      },
+      "downstream_loop": "Digital Design Loop",
+      "interfaces": [
+        "AXI4-Lite control/status",
+        "streaming pressure-sensor input",
+        "speed and yaw inputs",
+        "actuator command output",
+        "interrupt"
+      ],
+      "name": "adaptive_aero_control_ip",
+      "project_name": "adaptive_aero_control",
+      "purpose": "Low-latency sensor aggregation, safety monitoring, and active-aero actuator control around an external GPU surrogate.",
+      "requirements": [
+        "Fail safe when surrogate command is stale or invalid",
+        "Clamp every actuator command to software-programmable limits",
+        "Expose timestamp, validity, fault, and model-version registers",
+        "Permit deterministic fallback control without the GPU service"
+      ],
+      "reset": {
+        "active_low": true,
+        "name": "reset_n"
+      },
+      "schema": "chiploop.digital_ip.spec.v1",
+      "surrogate_is_not_rtl": true,
+      "top_module": "adaptive_aero_control_top"
+    },
+    "execution_mode": "cpu_reference",
+    "implementation_path": "fpga_prototype",
+    "inference_status": "not_executed",
+    "interface": {
+      "checkpoint": "nvidia/domino_drivaerml",
+      "inference": {
+        "future_runtimes": [
+          "NVIDIA-hosted NIM",
+          "ChipLoop GPU worker"
+        ],
+        "reason": "Architecture-definition mode does not require a GPU worker or hosted NIM.",
+        "status": "not_executed"
+      },
+      "inputs": [
+        "vehicle_geometry",
+        "flow_conditions"
+      ],
+      "model_id": "nvidia.domino.automotive_aero",
+      "model_name": "NVIDIA DoMINO Automotive Aero",
+      "outputs": [
+        "drag_force",
+        "lift_force",
+        "surface_pressure",
+        "flow_field"
+      ],
+      "provider": "NVIDIA",
+      "reference_conditions": {
+        "geometry_format": "STL",
+        "geometry_source": "DrivAerML reference geometry",
+        "stream_velocity_mps": 38.89
+      },
+      "reference_url": "https://huggingface.co/nvidia/domino_drivaerml",
+      "schema": "chiploop.physical_ai.surrogate_interface.v1"
+    },
+    "product_map": {
+      "implementation_path": "fpga_prototype",
+      "milestones": [
+        {
+          "id": "m1",
+          "name": "Architecture and digital-IP contract",
+          "status": "completed"
+        },
+        {
+          "id": "m2",
+          "name": "RTL and verification",
+          "status": "ready"
+        },
+        {
+          "id": "m3",
+          "name": "Digital IP / ASIC implementation",
+          "status": "not_requested"
+        },
+        {
+          "id": "m3_fpga",
+          "name": "FPGA prototype",
+          "status": "planned"
+        },
+        {
+          "id": "m4",
+          "name": "Surrogate-backed validation",
+          "status": "blocked_on_inference_runtime"
+        },
+        {
+          "id": "m5",
+          "name": "Optional FPGA prototype",
+          "status": "optional"
+        }
+      ],
+      "product": "AI-assisted active aerodynamics controller",
+      "schema": "chiploop.physical_ai.product_map.v1"
+    },
+    "status": "cpu_reference_ready",
+    "validation": {
+      "architecture_gate": "passed",
+      "cpu_reference_gate": "passed",
+      "digital_ip_tests": [
+        "register access",
+        "stale-command timeout",
+        "limit clamping",
+        "fallback transition",
+        "fault interrupt",
+        "telemetry ordering"
+      ],
+      "required_before_validated_mode": [
+        "Connect NVIDIA NIM or GPU worker",
+        "Run reference geometry",
+        "Persist real predictions",
+        "Compare against CFD reference evidence"
+      ],
+      "schema": "chiploop.physical_ai.validation_plan.v1",
+      "surrogate_inference_gate": "not_executed"
+    }
+  },
+  "physics_model": {
+    "architecture_definition_supported": true,
+    "availability": "requires_gpu_worker",
+    "configuration": {
+      "architecture_definition_supported": true,
+      "checkpoint": "nvidia/domino_drivaerml",
+      "cpu_reference_supported": true,
+      "cpu_reference_type": "analytical_drag_reference",
+      "digital_ip_project_name": "adaptive_aero_control",
+      "digital_ip_top_module": "adaptive_aero_control_top",
+      "processor_ip_policy": {
+        "asic_soc_cpu": {
+          "allowed_buses": [
+            "apb",
+            "axi4_lite",
+            "wishbone",
+            "native"
+          ],
+          "availability": "preview",
+          "cores": {
+            "picorv32": {
+              "default_bus": "apb",
+              "default_isa": "rv32imc",
+              "label": "PicoRV32",
+              "license": "ISC",
+              "profile": "balanced",
+              "supported_isas": [
+                "rv32i",
+                "rv32im",
+                "rv32imc"
+              ]
+            },
+            "serv": {
+              "default_bus": "apb",
+              "default_isa": "rv32i",
+              "label": "SERV",
+              "license": "ISC",
+              "profile": "minimum_area",
+              "supported_isas": [
+                "rv32i",
+                "rv32im"
+              ]
+            },
+            "vexriscv": {
+              "default_bus": "axi4_lite",
+              "default_isa": "rv32imc",
+              "label": "VexRiscv",
+              "license": "MIT",
+              "profile": "performance",
+              "supported_isas": [
+                "rv32i",
+                "rv32im",
+                "rv32imc"
+              ]
+            }
+          },
+          "default_core": "picorv32",
+          "defaults": {
+            "boot_rom_kib": 16,
+            "bus": "automatic",
+            "clock_gating": true,
+            "clock_mhz": 100,
+            "debug": false,
+            "dft_scan_required": true,
+            "interrupts": true,
+            "isa": "automatic",
+            "sram_kib": 64
+          },
+          "integration_gate": {
+            "complete_soc_synthesis_required": true,
+            "cpu_rtl_required": true,
+            "default_status": "pending_cpu_rtl",
+            "memory_macro_mapping_required": true
+          }
+        },
+        "automatic_asic_deployment": "asic_digital_ip",
+        "fpga_soft_cpu": {
+          "allowed_buses": [
+            "wishbone",
+            "axi4_lite",
+            "native"
+          ],
+          "availability": "preview",
+          "cores": {
+            "picorv32": {
+              "default_bus": "wishbone",
+              "default_isa": "rv32imc",
+              "estimated_bram_blocks": 12,
+              "estimated_logic_cells": 3000,
+              "label": "PicoRV32",
+              "license": "ISC",
+              "profile": "balanced",
+              "supported_isas": [
+                "rv32i",
+                "rv32im",
+                "rv32imc"
+              ]
+            },
+            "serv": {
+              "default_bus": "wishbone",
+              "default_isa": "rv32i",
+              "estimated_bram_blocks": 8,
+              "estimated_logic_cells": 900,
+              "label": "SERV",
+              "license": "ISC",
+              "profile": "minimum_area",
+              "supported_isas": [
+                "rv32i",
+                "rv32im"
+              ]
+            },
+            "vexriscv": {
+              "default_bus": "wishbone",
+              "default_isa": "rv32imc",
+              "estimated_bram_blocks": 16,
+              "estimated_logic_cells": 6000,
+              "label": "VexRiscv",
+              "license": "MIT",
+              "profile": "performance",
+              "supported_isas": [
+                "rv32i",
+                "rv32im",
+                "rv32imc"
+              ]
+            }
+          },
+          "default_core": "picorv32",
+          "defaults": {
+            "bus": "automatic",
+            "clock_mhz": 50,
+            "data_memory_kib": 16,
+            "debug": false,
+            "instruction_memory_kib": 32,
+            "interrupts": true,
+            "isa": "automatic",
+            "uart": true
+          }
+        },
+        "schema": "chiploop.application_intelligence.processor_ip_policy.v2"
+      },
+      "reference_application": "intelligent_active_aerodynamics_controller",
+      "reference_fpga_candidate_boards": [
+        "ulx3s_ecp5_45f",
+        "orangecrab_ecp5_85f"
+      ],
+      "reference_fpga_candidate_policy": "application_intelligence_active_aero_v1",
+      "reference_url": "https://huggingface.co/nvidia/domino_drivaerml",
+      "surrogate_inference_claimed": false,
+      "version": 2
+    },
+    "digital_ip_project_name": "adaptive_aero_control",
+    "digital_ip_top_module": "adaptive_aero_control_top",
+    "domain": "automotive_aerodynamics",
+    "executor": null,
+    "gpu_required": true,
+    "implementation_targets": [
+      "gpu_service"
+    ],
+    "inputs": [
+      "vehicle_geometry",
+      "flow_conditions"
+    ],
+    "model_id": "nvidia.domino.automotive_aero",
+    "name": "NVIDIA DoMINO Automotive Aero",
+    "outputs": [
+      "drag_force",
+      "lift_force",
+      "surface_pressure",
+      "flow_field"
+    ],
+    "provider": "NVIDIA",
+    "runtime": "remote_nim",
+    "training_required": false,
+    "updated_at": "2026-08-17T01:09:45.790577+00:00"
+  },
+  "requirements": {
+    "accuracy": {
+      "maximum_error_percent": 3.0
+    },
+    "application": "intelligent_active_aerodynamics_controller",
+    "approved": true,
+    "asic_cpu": {
+      "enabled": false,
+      "schema": "chiploop.asic.cpu_ip.v1"
+    },
+    "deployment_architecture": "fpga_soft_cpu",
+    "deployment_architecture_requested": "fpga_soft_cpu",
+    "execution_mode": "cpu_reference",
+    "implementation_path": "fpga_prototype",
+    "implementation_target": "fpga",
+    "objective": "Build an intelligent active-aerodynamics controller for 20\u201355 m/s operation. Evaluate NVIDIA DoMINO as the physics-based surrogate, establish a transparent reference, partition the system, define and optimize the architecture, and deliver the hardware, firmware, and software with bounded control, stale-data detection, timeout handling, and safe fallback.",
+    "operating_envelope": {
+      "stream_velocity_mps": [
+        20,
+        55
+      ]
+    },
+    "parameters": {
+      "geometry_format": "STL",
+      "geometry_source": "DrivAerML reference geometry",
+      "stream_velocity_mps": 38.89
+    },
+    "physics_domain": "automotive_aerodynamics",
+    "processor_ip_policy_schema": "chiploop.application_intelligence.processor_ip_policy.v2",
+    "safety_constraints": [
+      "Reject stale model commands",
+      "Clamp actuator commands",
+      "Provide a safe fallback"
+    ],
+    "schema": "chiploop.physical_ai.requirements.v1",
+    "soft_cpu": {
+      "abi": "ilp32",
+      "bus": "wishbone",
+      "clock_mhz": 50.0,
+      "compiler_arch": "rv32imc",
+      "core": "picorv32",
+      "core_label": "PicoRV32",
+      "data_memory_kib": 16,
+      "debug": false,
+      "enabled": true,
+      "estimated_reservation": {
+        "basis": "supabase_governed_reference_estimate",
+        "block_ram_blocks": 12,
+        "logic_cells": 3000,
+        "must_be_replaced_by_complete_system_synthesis": true
+      },
+      "instruction_memory_kib": 32,
+      "interrupts": true,
+      "isa": "rv32imc",
+      "license": "ISC",
+      "policy_schema": "chiploop.application_intelligence.processor_ip_policy.v2",
+      "profile": "balanced",
+      "schema": "chiploop.fpga.soft_cpu.v1",
+      "selection_mode": "automatic",
+      "target_triple": "rv32imc-unknown-none-elf",
+      "uart": true
+    }
+  },
+  "schema": "chiploop.physical_ai.workflow_result.v1",
+  "soft_cpu": {
+    "abi": "ilp32",
+    "bus": "wishbone",
+    "clock_mhz": 50.0,
+    "compiler_arch": "rv32imc",
+    "core": "picorv32",
+    "core_label": "PicoRV32",
+    "data_memory_kib": 16,
+    "debug": false,
+    "enabled": true,
+    "estimated_reservation": {
+      "basis": "supabase_governed_reference_estimate",
+      "block_ram_blocks": 12,
+      "logic_cells": 3000,
+      "must_be_replaced_by_complete_system_synthesis": true
+    },
+    "instruction_memory_kib": 32,
+    "interrupts": true,
+    "isa": "rv32imc",
+    "license": "ISC",
+    "policy_schema": "chiploop.application_intelligence.processor_ip_policy.v2",
+    "profile": "balanced",
+    "schema": "chiploop.fpga.soft_cpu.v1",
+    "selection_mode": "automatic",
+    "target_triple": "rv32imc-unknown-none-elf",
+    "uart": true
+  },
+  "status": "ready_for_digital_design"
+}
