@@ -1,0 +1,2592 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level synthesizable controller integrating the soft CPU subsystem, Wishbone MMIO control/status register bank, streaming transport, validator, stale-data monitor, watchdog, clamp, fallback controller, telemetry mailbox, and interrupt output. This module is the authoritative design top and must drive all externally-visible control and safety behavior.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cmd_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cmd_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "cmd_payload",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "rsp_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "rsp_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rsp_payload",
+          "direction": "output",
+          "width": 128
+        },
+        {
+          "name": "wb_adr_i",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "wb_dat_i",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "wb_dat_o",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "wb_we_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_stb_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_cyc_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_sel_i",
+          "direction": "input",
+          "width": 4
+        },
+        {
+          "name": "wb_ack_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "wb_err_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "irq_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "uart_rx",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "uart_tx",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_o",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_valid_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_fallback_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_event_o",
+          "direction": "output",
+          "width": 1
+        }
+      ],
+      "functionality": "Provide the complete safety-oriented active-aerodynamics control top. The top fans out clock/reset to all synchronous submodules, arbitrates CPU MMIO access to the control/status register bank, exposes a Wishbone-compatible firmware-visible CSR interface, ingests streaming command packets, validates sequence/mode/integrity/age constraints, rejects stale or illegal packets, clamps accepted actuator commands to programmable bounds, generates deterministic fallback commands when required, stores compact telemetry words in BRAM-backed mailbox storage, and reports faults through interrupt/status outputs. The external model request/response transport contract is honored by treating cmd_valid/cmd_payload as model-request ingress, cmd_ready as request-backpressure output, rsp_valid/rsp_payload as model-response egress, and rsp_ready as response-backpressure input. The top must never depend on a GPU runtime and must never expose geometry or flow-field payloads.",
+      "responsibilities": [
+        "Instantiate and integrate the PicoRV32-based soft CPU subsystem with Wishbone bus access.",
+        "Implement firmware-visible MMIO/CSR decode for mode, enable, freshness threshold, watchdog threshold, actuator bounds, sequence tracking, fault clear, status readback, and telemetry access.",
+        "Terminate and validate bounded streaming command packets and produce bounded response/status packets.",
+        "Enforce packet integrity, monotonic sequence progression, mode legality, and age/freshness checks before actuator acceptance.",
+        "Assert stale_reject, timeout_fault, sequence_error, integrity_error, mode_error, clamp_active, and fallback_active status bits as required.",
+        "Force safe fallback on reset, stale data, invalid command, or timeout.",
+        "Generate an interrupt/event output to firmware for timeout and fault conditions.",
+        "Drive all externally-visible outputs from real RTL logic; no required output may be left undriven or connected only to child inputs.",
+        "Keep total scalar-equivalent I/O count below 256 and avoid exposing geometry arrays or bulk model data pins."
+      ],
+      "must_drive": [
+        "cmd_ready",
+        "rsp_valid",
+        "rsp_payload",
+        "wb_dat_o",
+        "wb_ack_o",
+        "wb_err_o",
+        "irq_o",
+        "uart_tx",
+        "actuator_cmd_o",
+        "actuator_valid_o",
+        "actuator_fallback_o",
+        "status_event_o"
+      ],
+      "must_receive": [
+        "clk",
+        "reset_n",
+        "cmd_valid",
+        "cmd_payload",
+        "rsp_ready",
+        "wb_adr_i",
+        "wb_dat_i",
+        "wb_we_i",
+        "wb_stb_i",
+        "wb_cyc_i",
+        "wb_sel_i",
+        "uart_rx"
+      ],
+      "must_not_drive": [
+        "cmd_valid",
+        "cmd_payload",
+        "rsp_ready",
+        "wb_adr_i",
+        "wb_dat_i",
+        "wb_we_i",
+        "wb_stb_i",
+        "wb_cyc_i",
+        "wb_sel_i",
+        "uart_rx"
+      ],
+      "reset_behavior": "On reset, clear all latched faults, invalidate the current command, clear telemetry write pointers, deassert interrupts, set command acceptance to safe-blocked state, initialize actuator output to a deterministic safe fallback, and deassert response validity until the first qualified packet or firmware action. All registers that are software-visible must reset to safe defaults that favor conservative behavior.",
+      "behavior_rules": [
+        "All synchronous state updates occur on clk rising edges only.",
+        "Command acceptance requires cmd_valid and cmd_ready, successful integrity check, legal mode, monotonic sequence progression, and freshness within threshold.",
+        "Validated commands are clamped to configured min/max before becoming active actuator commands.",
+        "Rejection of any command must not update the active actuator command path except by selecting or maintaining fallback behavior.",
+        "Watchdog expiration must force timeout_fault, latch the fault, raise irq_o/status_event_o, and route the output to fallback.",
+        "Status/fault bits must remain latched until explicitly cleared by firmware via CSR write.",
+        "Streaming response packets must report compact status only, not raw flow fields or geometry.",
+        "Telemetry storage must be BRAM-backed and limited to compact status words only.",
+        "No semantic control signal may be inferred implicitly from transport buses; all register outputs used internally must be explicit ports on the control/status wrapper.",
+        "Any top-level output must have a real RTL driver owned by the top-level integration, not a child-input-only connection."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "adaptive_aero_cpu_subsystem",
+        "description": "Soft CPU subsystem wrapping PicoRV32 with Wishbone bus, instruction/data memories, and optional UART handling for firmware orchestration, logging, model-request issuance, and CSR access.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_adr_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_we_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_stb_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_cyc_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_sel_o",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "wb_ack_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_err_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "irq_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "uart_rx",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "uart_tx",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "imem_csb",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "imem_web",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "imem_addr",
+            "direction": "output",
+            "width": 13
+          },
+          {
+            "name": "imem_din",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "imem_dout",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "dmem_csb",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "dmem_web",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "dmem_addr",
+            "direction": "output",
+            "width": 12
+          },
+          {
+            "name": "dmem_din",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "dmem_dout",
+            "direction": "input",
+            "width": 32
+          }
+        ],
+        "functionality": "Instantiate and configure PicoRV32 for rv32imc, 50 MHz operation, Wishbone bus, interrupts enabled, UART enabled, and firmware-visible control of the application. The subsystem presents the CPU master Wishbone port and local instruction/data memory ports suitable for BRAM wrappers. It is responsible for firmware execution only and does not implement application safety policy in hardware.",
+        "responsibilities": [
+          "Run firmware that manages high-level policy, logging, and remote model orchestration.",
+          "Expose a Wishbone master interface to the top-level MMIO fabric.",
+          "Provide interrupt reception for fault/timeouts.",
+          "Provide UART connectivity for development/debug use by firmware.",
+          "Attach to technology-neutral BRAM memories for instruction and data storage."
+        ],
+        "must_drive": [
+          "wb_adr_o",
+          "wb_dat_o",
+          "wb_we_o",
+          "wb_stb_o",
+          "wb_cyc_o",
+          "wb_sel_o",
+          "uart_tx",
+          "imem_csb",
+          "imem_web",
+          "imem_addr",
+          "imem_din",
+          "dmem_csb",
+          "dmem_web",
+          "dmem_addr",
+          "dmem_din"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "wb_dat_i",
+          "wb_ack_i",
+          "wb_err_i",
+          "irq_i",
+          "uart_rx",
+          "imem_dout",
+          "dmem_dout"
+        ],
+        "must_not_drive": [
+          "wb_dat_i",
+          "wb_ack_i",
+          "wb_err_i",
+          "irq_i",
+          "uart_rx",
+          "imem_dout",
+          "dmem_dout"
+        ],
+        "reset_behavior": "Reset CPU pipeline/control state, deassert bus transactions, and release firmware to a known boot/reset vector state. UART and memory ports must return to inactive-safe defaults on reset.",
+        "behavior_rules": [
+          "CPU configuration must match rv32imc, Wishbone, interrupts enabled, UART enabled, and 50 MHz target timing intent.",
+          "The subsystem must not claim board-ready integration beyond the instantiated CPU, memories, and application fabric.",
+          "Firmware may request model execution externally, but RTL must remain functional and safe when no model response exists.",
+          "Instruction and data memory are implemented through BRAM abstractions only."
+        ],
+        "rtl_output_file": "adaptive_aero_cpu_subsystem.v"
+      },
+      {
+        "name": "adaptive_aero_register_bank",
+        "description": "Firmware-visible control/status register block with Wishbone-compatible 32-bit transactions, explicit semantic register outputs, status readback, and fault clear handling.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_adr_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_we_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_stb_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_cyc_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_sel_i",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "wb_ack_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_err_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_mode_select",
+            "direction": "output",
+            "width": 3
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_freshness_threshold",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_watchdog_threshold",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_min",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_max",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_sequence_seed",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_fault_clear",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_fallback_select",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "status_valid_command",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_stale_reject",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_timeout_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_clamp_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_fallback_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_sequence_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_integrity_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_mode_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_last_accepted_sequence",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_current_mode",
+            "direction": "input",
+            "width": 3
+          },
+          {
+            "name": "status_active_actuator_cmd",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_irq_pending",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_word_o",
+            "direction": "output",
+            "width": 32
+          }
+        ],
+        "functionality": "Decode 32-bit Wishbone accesses into a small set of explicit semantic control outputs and readable status inputs. Implement software-visible mode selection, enable, freshness threshold, watchdog threshold, actuator bounds, sequence seed/tracking, fault clear, fallback selection, and compact status readback. Every declared register must be reachable through RTL decode; inaccessible internal state must not be exposed as software-visible.",
+        "responsibilities": [
+          "Translate Wishbone transactions into explicit configuration outputs.",
+          "Latch and present status/fault bits for firmware readback.",
+          "Provide write-to-clear fault control via cfg_fault_clear.",
+          "Expose a compact aggregated status word for polling and debug.",
+          "Keep register set small and deterministic for FPGA synthesis."
+        ],
+        "must_drive": [
+          "cfg_mode_select",
+          "cfg_enable",
+          "cfg_freshness_threshold",
+          "cfg_watchdog_threshold",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_sequence_seed",
+          "cfg_fault_clear",
+          "cfg_fallback_select",
+          "wb_dat_o",
+          "wb_ack_o",
+          "wb_err_o",
+          "status_word_o"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "wb_adr_i",
+          "wb_dat_i",
+          "wb_we_i",
+          "wb_stb_i",
+          "wb_cyc_i",
+          "wb_sel_i",
+          "status_valid_command",
+          "status_stale_reject",
+          "status_timeout_fault",
+          "status_clamp_active",
+          "status_fallback_active",
+          "status_sequence_error",
+          "status_integrity_error",
+          "status_mode_error",
+          "status_last_accepted_sequence",
+          "status_current_mode",
+          "status_active_actuator_cmd",
+          "status_irq_pending"
+        ],
+        "must_not_drive": [
+          "status_valid_command",
+          "status_stale_reject",
+          "status_timeout_fault",
+          "status_clamp_active",
+          "status_fallback_active",
+          "status_sequence_error",
+          "status_integrity_error",
+          "status_mode_error",
+          "status_last_accepted_sequence",
+          "status_current_mode",
+          "status_active_actuator_cmd",
+          "status_irq_pending"
+        ],
+        "reset_behavior": "Initialize configuration outputs to safe conservative defaults, such as enabled low, minimum threshold settings, conservative actuator bounds, neutral fallback selection, and cleared fault-clear pulse. Read data returns reset-safe values after reset deassertion.",
+        "behavior_rules": [
+          "All declared registers must be reachable via decode and return deterministic readback values.",
+          "The register bank must not store bulk payloads, arrays, or model data.",
+          "Fault bits are latched until cleared by firmware write actions.",
+          "Status word composition must remain stable and readable by firmware/testbench.",
+          "The register bank may be the sole source of configuration semantic outputs consumed by other RTL blocks."
+        ],
+        "rtl_output_file": "adaptive_aero_register_bank.v"
+      },
+      {
+        "name": "adaptive_aero_stream_bridge",
+        "description": "Bounded streaming command/response bridge that accepts compact command packets, emits compact response/status packets, and provides ready/valid backpressure in the required direction contract.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cmd_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cmd_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_payload",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "rsp_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "rsp_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rsp_payload",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "parsed_command_id",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "parsed_sequence",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "parsed_age",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "parsed_actuator_request",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "parsed_mode",
+            "direction": "output",
+            "width": 3
+          },
+          {
+            "name": "parsed_integrity",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "command_accept",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "command_reject",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_fault_flags",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "status_active_actuator_cmd",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_last_accepted_sequence",
+            "direction": "input",
+            "width": 16
+          }
+        ],
+        "functionality": "Deserialize compact command packets from the external model/software workflow and serialize compact response/status packets back toward software. Maintain the mandatory transport direction contract: request valid/data are inputs to the top-level stream bridge, request ready is a top-level output, response valid/data are top-level outputs, and response ready is a top-level input. Packet content includes at minimum command ID, sequence number, age/timestamp, actuator request, mode, and integrity marker.",
+        "responsibilities": [
+          "Provide ready/valid handshake for command and response transport.",
+          "Bound transport payload width to 128 bits.",
+          "Extract fields needed by validator, clamp, and telemetry subsystems.",
+          "Emit compact response packets containing status only, not raw flow/model data.",
+          "Support backpressure from downstream response consumers."
+        ],
+        "must_drive": [
+          "cmd_ready",
+          "rsp_valid",
+          "rsp_payload",
+          "parsed_command_id",
+          "parsed_sequence",
+          "parsed_age",
+          "parsed_actuator_request",
+          "parsed_mode",
+          "parsed_integrity"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cmd_valid",
+          "cmd_payload",
+          "rsp_ready",
+          "command_accept",
+          "command_reject",
+          "status_fault_flags",
+          "status_active_actuator_cmd",
+          "status_last_accepted_sequence"
+        ],
+        "must_not_drive": [
+          "cmd_valid",
+          "cmd_payload",
+          "rsp_ready",
+          "command_accept",
+          "command_reject",
+          "status_fault_flags",
+          "status_active_actuator_cmd",
+          "status_last_accepted_sequence"
+        ],
+        "reset_behavior": "Deassert cmd_ready and rsp_valid on reset, clear parsed field outputs to zero, and return to a safe idle transport state. No packet shall be accepted until reset is fully released.",
+        "behavior_rules": [
+          "Command packets must be compact and bounded to 128 bits.",
+          "Response packets must carry compact status only.",
+          "The bridge must not implement model inference or preserve raw geometry/flow-field data.",
+          "The bridge must support deterministic backpressure and fixed-latency packet staging compatible with FPGA synthesis."
+        ],
+        "rtl_output_file": "adaptive_aero_stream_bridge.v"
+      },
+      {
+        "name": "adaptive_aero_command_validator",
+        "description": "Command validation and safety decision block that checks integrity, sequence monotonicity, mode legality, freshness, and produces explicit accept/reject and fault-status outputs.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "parsed_command_id",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "parsed_sequence",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "parsed_age",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "parsed_actuator_request",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "parsed_mode",
+            "direction": "input",
+            "width": 3
+          },
+          {
+            "name": "parsed_integrity",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_freshness_threshold",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_sequence_seed",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_mode_select",
+            "direction": "input",
+            "width": 3
+          },
+          {
+            "name": "status_last_accepted_sequence",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "command_accept",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "command_reject",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "valid_command",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "stale_reject",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "sequence_error",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "integrity_error",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "mode_error",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "validated_actuator_request",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "validated_mode",
+            "direction": "output",
+            "width": 3
+          },
+          {
+            "name": "validated_sequence",
+            "direction": "output",
+            "width": 16
+          }
+        ],
+        "functionality": "Compare packet fields against expected sequence progression, legal mode configuration, enable state, and integrity marker. Reject invalid commands without updating the active actuator path. Assert explicit fault/status outputs for stale, sequence, integrity, and mode violations. Provide validated semantic outputs to downstream clamp/fallback logic only when acceptance conditions are met.",
+        "responsibilities": [
+          "Enforce command acceptance rule requiring valid input, integrity pass, legal mode, monotonic sequence, and freshness within threshold.",
+          "Generate explicit accept/reject control signals.",
+          "Flag stale packets for fallback routing.",
+          "Flag sequence, integrity, and mode errors as separate status bits.",
+          "Present validated command fields only after successful checks."
+        ],
+        "must_drive": [
+          "command_accept",
+          "command_reject",
+          "valid_command",
+          "stale_reject",
+          "sequence_error",
+          "integrity_error",
+          "mode_error",
+          "validated_actuator_request",
+          "validated_mode",
+          "validated_sequence"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "parsed_command_id",
+          "parsed_sequence",
+          "parsed_age",
+          "parsed_actuator_request",
+          "parsed_mode",
+          "parsed_integrity",
+          "cfg_enable",
+          "cfg_freshness_threshold",
+          "cfg_sequence_seed",
+          "cfg_mode_select",
+          "status_last_accepted_sequence"
+        ],
+        "must_not_drive": [
+          "parsed_command_id",
+          "parsed_sequence",
+          "parsed_age",
+          "parsed_actuator_request",
+          "parsed_mode",
+          "parsed_integrity",
+          "cfg_enable",
+          "cfg_freshness_threshold",
+          "cfg_sequence_seed",
+          "cfg_mode_select",
+          "status_last_accepted_sequence"
+        ],
+        "reset_behavior": "Return all outputs to a rejected/invalid state, clear error flags, and prevent any command acceptance until a valid command arrives after reset. Sequence tracking must restart from the programmed seed and safe default assumptions.",
+        "behavior_rules": [
+          "A command is accepted only when all required conditions pass.",
+          "Invalid packets shall be rejected without updating active actuator state.",
+          "Fault outputs must be explicit and deterministic.",
+          "Validation must complete within a small fixed number of cycles after packet acceptance.",
+          "Semantic outputs must be traceable and not inferred implicitly from transport buses."
+        ],
+        "rtl_output_file": "adaptive_aero_command_validator.v"
+      },
+      {
+        "name": "adaptive_aero_stale_watchdog",
+        "description": "Freshness and timeout monitor that compares packet age against a programmable limit and tracks a heartbeat/watchdog window to force safe fallback on timeout.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "parsed_age",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "command_accept",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "heartbeat_pulse",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_freshness_threshold",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_watchdog_threshold",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "stale_reject",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timeout_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "watchdog_expired",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "freshness_ok",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Evaluate whether packet age/timestamp exceeds the freshness threshold and whether commanded activity or firmware heartbeat has stalled beyond the watchdog threshold. Assert timeout_fault and watchdog_expired when no valid command or heartbeat is observed within the programmed window. Provide freshness status for downstream logic.",
+        "responsibilities": [
+          "Detect stale command age violations.",
+          "Detect watchdog timeout/loss of heartbeat or valid command activity.",
+          "Provide a direct timeout fault signal to trigger fallback and interrupt generation.",
+          "Support deterministic synchronous reset and restart of timer state."
+        ],
+        "must_drive": [
+          "timeout_fault",
+          "watchdog_expired",
+          "freshness_ok"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "parsed_age",
+          "command_accept",
+          "heartbeat_pulse",
+          "cfg_freshness_threshold",
+          "cfg_watchdog_threshold",
+          "stale_reject"
+        ],
+        "must_not_drive": [
+          "parsed_age",
+          "command_accept",
+          "heartbeat_pulse",
+          "cfg_freshness_threshold",
+          "cfg_watchdog_threshold",
+          "stale_reject"
+        ],
+        "reset_behavior": "Reset timers and counters to safe idle values, deassert timeout_fault and watchdog_expired, and report freshness_ok low until a valid packet or heartbeat establishes activity.",
+        "behavior_rules": [
+          "Stale rejection must be separately observable from timeout faults.",
+          "Timeout must force fallback and be visible to software via interrupt/status.",
+          "The monitor must be synchronous and FPGA-friendly.",
+          "No raw payload buffering is permitted."
+        ],
+        "rtl_output_file": "adaptive_aero_stale_watchdog.v"
+      },
+      {
+        "name": "adaptive_aero_clamp_fallback",
+        "description": "Actuator clamping and safe fallback controller that saturates validated requests to configured bounds and emits deterministic fallback commands when validation fails, stale data is detected, or watchdog timeout occurs.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_actuator_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_select",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "validated_actuator_request",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "validated_mode",
+            "direction": "input",
+            "width": 3
+          },
+          {
+            "name": "validated_sequence",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "valid_command",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "stale_reject",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timeout_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "sequence_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "integrity_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "mode_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "active_actuator_cmd",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "clamp_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "fallback_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "current_mode",
+            "direction": "output",
+            "width": 3
+          },
+          {
+            "name": "last_accepted_sequence",
+            "direction": "output",
+            "width": 16
+          }
+        ],
+        "functionality": "Clamp validated actuator outputs to programmable minimum and maximum bounds, and select a deterministic conservative fallback command when validation, freshness, or timeout conditions fail. The selected fallback command must be safe neutral or conservative according to cfg_fallback_select. Clamp activity shall be visible in status. Active actuator command and mode/sequence tracking are updated only when accepted and valid.",
+        "responsibilities": [
+          "Apply saturation to requested actuator output before committing active output.",
+          "Generate fallback command on any validation, stale, or timeout fault path as configured.",
+          "Expose clamp and fallback visibility to firmware and telemetry.",
+          "Maintain current mode and accepted sequence tracking for status readback."
+        ],
+        "must_drive": [
+          "active_actuator_cmd",
+          "actuator_valid",
+          "clamp_active",
+          "fallback_active",
+          "current_mode",
+          "last_accepted_sequence"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_fallback_select",
+          "validated_actuator_request",
+          "validated_mode",
+          "validated_sequence",
+          "valid_command",
+          "stale_reject",
+          "timeout_fault",
+          "sequence_error",
+          "integrity_error",
+          "mode_error"
+        ],
+        "must_not_drive": [
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_fallback_select",
+          "validated_actuator_request",
+          "validated_mode",
+          "validated_sequence",
+          "valid_command",
+          "stale_reject",
+          "timeout_fault",
+          "sequence_error",
+          "integrity_error",
+          "mode_error"
+        ],
+        "reset_behavior": "On reset, drive a deterministic safe fallback command, deassert actuator_valid, clear clamp/fallback indicators, and reset current mode/sequence to safe defaults. Outputs must favor conservative actuator behavior until a qualified command is accepted.",
+        "behavior_rules": [
+          "Clamp outputs before registering them as active actuator commands.",
+          "Fallback must activate on validation failure, stale rejection, or timeout fault.",
+          "The fallback command must be deterministic and controlled by configuration.",
+          "Clamp activity must be reflected in status and telemetry.",
+          "No unsafe actuator state may persist after reset."
+        ],
+        "rtl_output_file": "adaptive_aero_clamp_fallback.v"
+      },
+      {
+        "name": "adaptive_aero_telemetry_mailbox",
+        "description": "Small BRAM-backed mailbox/FIFO for compact status words only. Stores fault status, last accepted sequence, clamp indicator, current mode, and related compact telemetry, but never raw flow fields or model payloads.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "telemetry_csb",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "telemetry_web",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "telemetry_addr",
+            "direction": "output",
+            "width": 6
+          },
+          {
+            "name": "telemetry_din",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "telemetry_dout",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "status_valid_command",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_stale_reject",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_timeout_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_clamp_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_fallback_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_sequence_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_integrity_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_mode_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_last_accepted_sequence",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_current_mode",
+            "direction": "input",
+            "width": 3
+          },
+          {
+            "name": "status_active_actuator_cmd",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_irq_pending",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "telemetry_word_o",
+            "direction": "output",
+            "width": 32
+          }
+        ],
+        "functionality": "Maintain a compact BRAM-backed mailbox containing status words for firmware polling and observability. The mailbox stores only compact control/status data, including fault summary, last accepted sequence, clamp indicator, current mode, and interrupt pending state. It must not store raw flow fields, model tensors, or geometry arrays.",
+        "responsibilities": [
+          "Provide BRAM-friendly telemetry storage abstraction.",
+          "Publish compact status words for firmware and simulation visibility.",
+          "Support small FIFO/mailbox-like access patterns without flattening into large registers.",
+          "Preserve only safe metadata and diagnostics."
+        ],
+        "must_drive": [
+          "telemetry_csb",
+          "telemetry_web",
+          "telemetry_addr",
+          "telemetry_din",
+          "telemetry_word_o"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "telemetry_dout",
+          "status_valid_command",
+          "status_stale_reject",
+          "status_timeout_fault",
+          "status_clamp_active",
+          "status_fallback_active",
+          "status_sequence_error",
+          "status_integrity_error",
+          "status_mode_error",
+          "status_last_accepted_sequence",
+          "status_current_mode",
+          "status_active_actuator_cmd",
+          "status_irq_pending"
+        ],
+        "must_not_drive": [
+          "telemetry_dout",
+          "status_valid_command",
+          "status_stale_reject",
+          "status_timeout_fault",
+          "status_clamp_active",
+          "status_fallback_active",
+          "status_sequence_error",
+          "status_integrity_error",
+          "status_mode_error",
+          "status_last_accepted_sequence",
+          "status_current_mode",
+          "status_active_actuator_cmd",
+          "status_irq_pending"
+        ],
+        "reset_behavior": "Clear mailbox pointers and telemetry output to safe zero/idle values on reset. No stale telemetry should be presented as current after reset until repopulated by valid status updates.",
+        "behavior_rules": [
+          "Telemetry must be BRAM-backed and technology-neutral.",
+          "Do not buffer raw model payloads or flow-field state.",
+          "Status words only; compact and synthesis-friendly.",
+          "Mailbox activity must remain observable to firmware and verification.",
+          "Memory wrapper mapping may be technology-neutral and not ASIC SRAM macro dependent unless a later flow substitutes a concrete BRAM implementation."
+        ],
+        "rtl_output_file": "adaptive_aero_telemetry_mailbox.v"
+      },
+      {
+        "name": "adaptive_aero_irq_ctrl",
+        "description": "Interrupt/event aggregation for timeout and fault conditions, producing a firmware-visible interrupt output and compact status event indication.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timeout_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "stale_reject",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "sequence_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "integrity_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "mode_error",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "clamp_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fallback_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "irq_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_event_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "irq_pending",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Aggregate timeout and fault conditions into a single firmware-visible interrupt and status-event indication. The controller provides a sticky pending status until cleared by firmware-controlled system action through the register bank/fault-clear path.",
+        "responsibilities": [
+          "Generate interrupt output for timeout and fault conditions.",
+          "Expose a status event indication for firmware/debug observability.",
+          "Provide sticky pending reporting suitable for polling and interrupt service routines."
+        ],
+        "must_drive": [
+          "irq_o",
+          "status_event_o",
+          "irq_pending"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "timeout_fault",
+          "stale_reject",
+          "sequence_error",
+          "integrity_error",
+          "mode_error",
+          "clamp_active",
+          "fallback_active"
+        ],
+        "must_not_drive": [
+          "timeout_fault",
+          "stale_reject",
+          "sequence_error",
+          "integrity_error",
+          "mode_error",
+          "clamp_active",
+          "fallback_active"
+        ],
+        "reset_behavior": "Deassert interrupt outputs and clear pending state on reset. Any fault after reset must reassert interrupt/event outputs deterministically.",
+        "behavior_rules": [
+          "Timeout and fault conditions must be visible to firmware.",
+          "Interrupts must remain bounded and deterministic.",
+          "No external model execution is required for interrupt behavior.",
+          "Status-event output may be used for lightweight testbench observability."
+        ],
+        "rtl_output_file": "adaptive_aero_irq_ctrl.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_cpu_subsystem.clk",
+        "adaptive_aero_register_bank.clk",
+        "adaptive_aero_stream_bridge.clk",
+        "adaptive_aero_command_validator.clk",
+        "adaptive_aero_stale_watchdog.clk",
+        "adaptive_aero_clamp_fallback.clk",
+        "adaptive_aero_telemetry_mailbox.clk",
+        "adaptive_aero_irq_ctrl.clk"
+      ],
+      "description": "Fan out the single synchronous clock to all submodules."
+    },
+    {
+      "top_port": "reset_n",
+      "connected_to": [
+        "adaptive_aero_cpu_subsystem.reset_n",
+        "adaptive_aero_register_bank.reset_n",
+        "adaptive_aero_stream_bridge.reset_n",
+        "adaptive_aero_command_validator.reset_n",
+        "adaptive_aero_stale_watchdog.reset_n",
+        "adaptive_aero_clamp_fallback.reset_n",
+        "adaptive_aero_telemetry_mailbox.reset_n",
+        "adaptive_aero_irq_ctrl.reset_n"
+      ],
+      "description": "Fan out the active-low synchronous reset to all submodules."
+    },
+    {
+      "top_port": "cmd_valid",
+      "connected_to": [
+        "adaptive_aero_stream_bridge.cmd_valid"
+      ],
+      "description": "External request-valid input enters the streaming bridge."
+    },
+    {
+      "top_port": "cmd_payload",
+      "connected_to": [
+        "adaptive_aero_stream_bridge.cmd_payload"
+      ],
+      "description": "External request payload enters the streaming bridge."
+    },
+    {
+      "top_port": "rsp_ready",
+      "connected_to": [
+        "adaptive_aero_stream_bridge.rsp_ready"
+      ],
+      "description": "External response-ready backpressure input enters the streaming bridge."
+    },
+    {
+      "top_port": "wb_adr_i",
+      "connected_to": [
+        "adaptive_aero_register_bank.wb_adr_i"
+      ],
+      "description": "Wishbone address input from firmware routes to the register bank."
+    },
+    {
+      "top_port": "wb_dat_i",
+      "connected_to": [
+        "adaptive_aero_register_bank.wb_dat_i"
+      ],
+      "description": "Wishbone write data input from firmware routes to the register bank."
+    },
+    {
+      "top_port": "wb_we_i",
+      "connected_to": [
+        "adaptive_aero_register_bank.wb_we_i"
+      ],
+      "description": "Wishbone write enable input from firmware routes to the register bank."
+    },
+    {
+      "top_port": "wb_stb_i",
+      "connected_to": [
+        "adaptive_aero_register_bank.wb_stb_i"
+      ],
+      "description": "Wishbone strobe input from firmware routes to the register bank."
+    },
+    {
+      "top_port": "wb_cyc_i",
+      "connected_to": [
+        "adaptive_aero_register_bank.wb_cyc_i"
+      ],
+      "description": "Wishbone cycle input from firmware routes to the register bank."
+    },
+    {
+      "top_port": "wb_sel_i",
+      "connected_to": [
+        "adaptive_aero_register_bank.wb_sel_i"
+      ],
+      "description": "Wishbone byte select input from firmware routes to the register bank."
+    },
+    {
+      "top_port": "uart_rx",
+      "connected_to": [
+        "adaptive_aero_cpu_subsystem.uart_rx"
+      ],
+      "description": "Firmware UART receive input routes to the CPU subsystem."
+    },
+    {
+      "top_port": "wb_dat_o",
+      "connected_to": [
+        "adaptive_aero_register_bank.wb_dat_o"
+      ],
+      "description": "Wishbone read data is driven by the register bank."
+    },
+    {
+      "top_port": "wb_ack_o",
+      "connected_to": [
+        "adaptive_aero_register_bank.wb_ack_o"
+      ],
+      "description": "Wishbone acknowledge is driven by the register bank."
+    },
+    {
+      "top_port": "wb_err_o",
+      "connected_to": [
+        "adaptive_aero_register_bank.wb_err_o"
+      ],
+      "description": "Wishbone error response is driven by the register bank."
+    },
+    {
+      "top_port": "irq_o",
+      "connected_to": [
+        "adaptive_aero_irq_ctrl.irq_o"
+      ],
+      "description": "Firmware interrupt output is driven by the interrupt controller."
+    },
+    {
+      "top_port": "uart_tx",
+      "connected_to": [
+        "adaptive_aero_cpu_subsystem.uart_tx"
+      ],
+      "description": "Firmware UART transmit output is driven by the CPU subsystem."
+    },
+    {
+      "top_port": "actuator_cmd_o",
+      "connected_to": [
+        "adaptive_aero_clamp_fallback.active_actuator_cmd"
+      ],
+      "description": "The commanded actuator output is driven by the clamp/fallback controller."
+    },
+    {
+      "top_port": "actuator_valid_o",
+      "connected_to": [
+        "adaptive_aero_clamp_fallback.actuator_valid"
+      ],
+      "description": "The actuator-valid indication is driven by the clamp/fallback controller."
+    },
+    {
+      "top_port": "actuator_fallback_o",
+      "connected_to": [
+        "adaptive_aero_clamp_fallback.fallback_active"
+      ],
+      "description": "The actuator fallback indication is driven by the clamp/fallback controller."
+    },
+    {
+      "top_port": "status_event_o",
+      "connected_to": [
+        "adaptive_aero_irq_ctrl.status_event_o"
+      ],
+      "description": "Status event output is driven by the interrupt controller."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "cfg_mode_select",
+      "width": 3,
+      "source": "adaptive_aero_register_bank.cfg_mode_select",
+      "destinations": [
+        "adaptive_aero_command_validator.cfg_mode_select"
+      ],
+      "description": "Software-selected operating mode."
+    },
+    {
+      "name": "cfg_enable",
+      "width": 1,
+      "source": "adaptive_aero_register_bank.cfg_enable",
+      "destinations": [
+        "adaptive_aero_command_validator.cfg_enable"
+      ],
+      "description": "Software enable for command acceptance."
+    },
+    {
+      "name": "cfg_freshness_threshold",
+      "width": 16,
+      "source": "adaptive_aero_register_bank.cfg_freshness_threshold",
+      "destinations": [
+        "adaptive_aero_command_validator.cfg_freshness_threshold",
+        "adaptive_aero_stale_watchdog.cfg_freshness_threshold"
+      ],
+      "description": "Programmable freshness threshold shared by validation and freshness monitoring."
+    },
+    {
+      "name": "cfg_watchdog_threshold",
+      "width": 16,
+      "source": "adaptive_aero_register_bank.cfg_watchdog_threshold",
+      "destinations": [
+        "adaptive_aero_stale_watchdog.cfg_watchdog_threshold"
+      ],
+      "description": "Programmable watchdog timeout threshold."
+    },
+    {
+      "name": "cfg_actuator_min",
+      "width": 16,
+      "source": "adaptive_aero_register_bank.cfg_actuator_min",
+      "destinations": [
+        "adaptive_aero_clamp_fallback.cfg_actuator_min"
+      ],
+      "description": "Minimum actuator clamp bound."
+    },
+    {
+      "name": "cfg_actuator_max",
+      "width": 16,
+      "source": "adaptive_aero_register_bank.cfg_actuator_max",
+      "destinations": [
+        "adaptive_aero_clamp_fallback.cfg_actuator_max"
+      ],
+      "description": "Maximum actuator clamp bound."
+    },
+    {
+      "name": "cfg_sequence_seed",
+      "width": 16,
+      "source": "adaptive_aero_register_bank.cfg_sequence_seed",
+      "destinations": [
+        "adaptive_aero_command_validator.cfg_sequence_seed"
+      ],
+      "description": "Sequence seed for monotonic progression checking."
+    },
+    {
+      "name": "cfg_fault_clear",
+      "width": 1,
+      "source": "adaptive_aero_register_bank.cfg_fault_clear",
+      "destinations": [
+        "adaptive_aero_irq_ctrl.reset_n"
+      ],
+      "description": "Fault-clear control pulse path used to clear sticky event state in the interrupt/fault subsystem through controlled software action semantics."
+    },
+    {
+      "name": "cfg_fallback_select",
+      "width": 2,
+      "source": "adaptive_aero_register_bank.cfg_fallback_select",
+      "destinations": [
+        "adaptive_aero_clamp_fallback.cfg_fallback_select"
+      ],
+      "description": "Selects the conservative fallback actuator state."
+    },
+    {
+      "name": "parsed_command_id",
+      "width": 8,
+      "source": "adaptive_aero_stream_bridge.parsed_command_id",
+      "destinations": [
+        "adaptive_aero_command_validator.parsed_command_id"
+      ],
+      "description": "Command identifier extracted from the streaming packet."
+    },
+    {
+      "name": "parsed_sequence",
+      "width": 16,
+      "source": "adaptive_aero_stream_bridge.parsed_sequence",
+      "destinations": [
+        "adaptive_aero_command_validator.parsed_sequence"
+      ],
+      "description": "Command sequence extracted from the streaming packet and used by validation and accepted-state tracking."
+    },
+    {
+      "name": "parsed_age",
+      "width": 16,
+      "source": "adaptive_aero_stream_bridge.parsed_age",
+      "destinations": [
+        "adaptive_aero_command_validator.parsed_age",
+        "adaptive_aero_stale_watchdog.parsed_age"
+      ],
+      "description": "Packet age or timestamp extracted from the streaming packet."
+    },
+    {
+      "name": "parsed_actuator_request",
+      "width": 16,
+      "source": "adaptive_aero_stream_bridge.parsed_actuator_request",
+      "destinations": [
+        "adaptive_aero_command_validator.parsed_actuator_request"
+      ],
+      "description": "Requested actuator value extracted from the streaming packet."
+    },
+    {
+      "name": "parsed_mode",
+      "width": 3,
+      "source": "adaptive_aero_stream_bridge.parsed_mode",
+      "destinations": [
+        "adaptive_aero_command_validator.parsed_mode"
+      ],
+      "description": "Requested mode extracted from the streaming packet."
+    },
+    {
+      "name": "parsed_integrity",
+      "width": 8,
+      "source": "adaptive_aero_stream_bridge.parsed_integrity",
+      "destinations": [
+        "adaptive_aero_command_validator.parsed_integrity"
+      ],
+      "description": "Integrity marker extracted from the streaming packet."
+    },
+    {
+      "name": "command_accept",
+      "width": 1,
+      "source": "adaptive_aero_command_validator.command_accept",
+      "destinations": [
+        "adaptive_aero_stream_bridge.command_accept",
+        "adaptive_aero_stale_watchdog.command_accept"
+      ],
+      "description": "Acceptance pulse for valid command qualification."
+    },
+    {
+      "name": "command_reject",
+      "width": 1,
+      "source": "adaptive_aero_command_validator.command_reject",
+      "destinations": [
+        "adaptive_aero_stream_bridge.command_reject"
+      ],
+      "description": "Rejection pulse for invalid command qualification."
+    },
+    {
+      "name": "valid_command",
+      "width": 1,
+      "source": "adaptive_aero_command_validator.valid_command",
+      "destinations": [
+        "adaptive_aero_clamp_fallback.valid_command",
+        "adaptive_aero_register_bank.status_valid_command"
+      ],
+      "description": "Qualified valid-command indication."
+    },
+    {
+      "name": "stale_reject",
+      "width": 1,
+      "source": "adaptive_aero_command_validator.stale_reject",
+      "destinations": [
+        "adaptive_aero_stale_watchdog.stale_reject",
+        "adaptive_aero_clamp_fallback.stale_reject",
+        "adaptive_aero_register_bank.status_stale_reject"
+      ],
+      "description": "Stale-data rejection status."
+    },
+    {
+      "name": "sequence_error",
+      "width": 1,
+      "source": "adaptive_aero_command_validator.sequence_error",
+      "destinations": [
+        "adaptive_aero_clamp_fallback.sequence_error",
+        "adaptive_aero_irq_ctrl.sequence_error",
+        "adaptive_aero_register_bank.status_sequence_error"
+      ],
+      "description": "Sequence monotonicity violation status."
+    },
+    {
+      "name": "integrity_error",
+      "width": 1,
+      "source": "adaptive_aero_command_validator.integrity_error",
+      "destinations": [
+        "adaptive_aero_clamp_fallback.integrity_error",
+        "adaptive_aero_irq_ctrl.integrity_error",
+        "adaptive_aero_register_bank.status_integrity_error"
+      ],
+      "description": "Integrity check violation status."
+    },
+    {
+      "name": "mode_error",
+      "width": 1,
+      "source": "adaptive_aero_command_validator.mode_error",
+      "destinations": [
+        "adaptive_aero_clamp_fallback.mode_error",
+        "adaptive_aero_irq_ctrl.mode_error",
+        "adaptive_aero_register_bank.status_mode_error"
+      ],
+      "description": "Mode legality violation status."
+    },
+    {
+      "name": "validated_actuator_request",
+      "width": 16,
+      "source": "adaptive_aero_command_validator.validated_actuator_request",
+      "destinations": [
+        "adaptive_aero_clamp_fallback.validated_actuator_request"
+      ],
+      "description": "Validated actuator request forwarded to clamp/fallback logic."
+    },
+    {
+      "name": "validated_mode",
+      "width": 3,
+      "source": "adaptive_aero_command_validator.validated_mode",
+      "destinations": [
+        "adaptive_aero_clamp_fallback.validated_mode"
+      ],
+      "description": "Validated mode forwarded to downstream safety handling and status readback."
+    },
+    {
+      "name": "validated_sequence",
+      "width": 16,
+      "source": "adaptive_aero_command_validator.validated_sequence",
+      "destinations": [
+        "adaptive_aero_clamp_fallback.validated_sequence"
+      ],
+      "description": "Validated sequence forwarded to accepted-state tracking."
+    },
+    {
+      "name": "timeout_fault",
+      "width": 1,
+      "source": "adaptive_aero_stale_watchdog.timeout_fault",
+      "destinations": [
+        "adaptive_aero_clamp_fallback.timeout_fault",
+        "adaptive_aero_irq_ctrl.timeout_fault",
+        "adaptive_aero_register_bank.status_timeout_fault"
+      ],
+      "description": "Watchdog timeout fault propagated to fallback and interrupt logic."
+    },
+    {
+      "name": "active_actuator_cmd",
+      "width": 16,
+      "source": "adaptive_aero_clamp_fallback.active_actuator_cmd",
+      "destinations": [
+        "adaptive_aero_register_bank.status_active_actuator_cmd",
+        "adaptive_aero_telemetry_mailbox.status_active_actuator_cmd"
+      ],
+      "description": "Current active actuator command after clamp or fallback selection."
+    },
+    {
+      "name": "clamp_active",
+      "width": 1,
+      "source": "adaptive_aero_clamp_fallback.clamp_active",
+      "destinations": [
+        "adaptive_aero_irq_ctrl.clamp_active",
+        "adaptive_aero_register_bank.status_clamp_active",
+        "adaptive_aero_telemetry_mailbox.status_clamp_active"
+      ],
+      "description": "Clamp saturation activity indication."
+    },
+    {
+      "name": "fallback_active",
+      "width": 1,
+      "source": "adaptive_aero_clamp_fallback.fallback_active",
+      "destinations": [
+        "adaptive_aero_irq_ctrl.fallback_active",
+        "adaptive_aero_register_bank.status_fallback_active",
+        "adaptive_aero_telemetry_mailbox.status_fallback_active"
+      ],
+      "description": "Fallback activation indication."
+    },
+    {
+      "name": "current_mode",
+      "width": 3,
+      "source": "adaptive_aero_clamp_fallback.current_mode",
+      "destinations": [
+        "adaptive_aero_register_bank.status_current_mode",
+        "adaptive_aero_telemetry_mailbox.status_current_mode"
+      ],
+      "description": "Current active mode after validation and fallback selection."
+    },
+    {
+      "name": "last_accepted_sequence",
+      "width": 16,
+      "source": "adaptive_aero_clamp_fallback.last_accepted_sequence",
+      "destinations": [
+        "adaptive_aero_register_bank.status_last_accepted_sequence",
+        "adaptive_aero_telemetry_mailbox.status_last_accepted_sequence"
+      ],
+      "description": "Last accepted sequence number for status readback and telemetry."
+    },
+    {
+      "name": "irq_pending",
+      "width": 1,
+      "source": "adaptive_aero_irq_ctrl.irq_pending",
+      "destinations": [
+        "adaptive_aero_register_bank.status_irq_pending"
+      ],
+      "description": "Sticky interrupt-pending indication reflected to firmware."
+    },
+    {
+      "name": "wb_master_adr",
+      "width": 32,
+      "source": "adaptive_aero_cpu_subsystem.wb_adr_o",
+      "destinations": [
+        "adaptive_aero_register_bank.wb_adr_i"
+      ],
+      "description": "CPU Wishbone address to register bank."
+    },
+    {
+      "name": "wb_master_dat_w",
+      "width": 32,
+      "source": "adaptive_aero_cpu_subsystem.wb_dat_o",
+      "destinations": [
+        "adaptive_aero_register_bank.wb_dat_i"
+      ],
+      "description": "CPU Wishbone write data to register bank."
+    },
+    {
+      "name": "wb_master_we",
+      "width": 1,
+      "source": "adaptive_aero_cpu_subsystem.wb_we_o",
+      "destinations": [
+        "adaptive_aero_register_bank.wb_we_i"
+      ],
+      "description": "CPU Wishbone write enable to register bank."
+    },
+    {
+      "name": "wb_master_stb",
+      "width": 1,
+      "source": "adaptive_aero_cpu_subsystem.wb_stb_o",
+      "destinations": [
+        "adaptive_aero_register_bank.wb_stb_i"
+      ],
+      "description": "CPU Wishbone strobe to register bank."
+    },
+    {
+      "name": "wb_master_cyc",
+      "width": 1,
+      "source": "adaptive_aero_cpu_subsystem.wb_cyc_o",
+      "destinations": [
+        "adaptive_aero_register_bank.wb_cyc_i"
+      ],
+      "description": "CPU Wishbone cycle to register bank."
+    },
+    {
+      "name": "wb_master_sel",
+      "width": 4,
+      "source": "adaptive_aero_cpu_subsystem.wb_sel_o",
+      "destinations": [
+        "adaptive_aero_register_bank.wb_sel_i"
+      ],
+      "description": "CPU Wishbone byte selects to register bank."
+    },
+    {
+      "name": "wb_slave_dat_r",
+      "width": 32,
+      "source": "adaptive_aero_register_bank.wb_dat_o",
+      "destinations": [
+        "adaptive_aero_cpu_subsystem.wb_dat_i"
+      ],
+      "description": "Register-bank read data returned to the CPU subsystem."
+    },
+    {
+      "name": "wb_slave_ack",
+      "width": 1,
+      "source": "adaptive_aero_register_bank.wb_ack_o",
+      "destinations": [
+        "adaptive_aero_cpu_subsystem.wb_ack_i"
+      ],
+      "description": "Wishbone acknowledge returned to CPU subsystem."
+    },
+    {
+      "name": "wb_slave_err",
+      "width": 1,
+      "source": "adaptive_aero_register_bank.wb_err_o",
+      "destinations": [
+        "adaptive_aero_cpu_subsystem.wb_err_i"
+      ],
+      "description": "Wishbone error returned to CPU subsystem."
+    },
+    {
+      "name": "cpu_irq",
+      "width": 1,
+      "source": "adaptive_aero_irq_ctrl.irq_o",
+      "destinations": [
+        "adaptive_aero_cpu_subsystem.irq_i"
+      ],
+      "description": "Interrupt request from fault/timeout aggregation to CPU subsystem."
+    },
+    {
+      "name": "adaptive_aero_command_validator_stale_reject",
+      "width": 1,
+      "source": "adaptive_aero_command_validator.stale_reject",
+      "destinations": [
+        "adaptive_aero_irq_ctrl.stale_reject"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_command_validator.stale_reject."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "cfg_mode_select",
+      "owner": "adaptive_aero_register_bank.cfg_mode_select"
+    },
+    {
+      "signal": "cfg_enable",
+      "owner": "adaptive_aero_register_bank.cfg_enable"
+    },
+    {
+      "signal": "cfg_freshness_threshold",
+      "owner": "adaptive_aero_register_bank.cfg_freshness_threshold"
+    },
+    {
+      "signal": "cfg_watchdog_threshold",
+      "owner": "adaptive_aero_register_bank.cfg_watchdog_threshold"
+    },
+    {
+      "signal": "cfg_actuator_min",
+      "owner": "adaptive_aero_register_bank.cfg_actuator_min"
+    },
+    {
+      "signal": "cfg_actuator_max",
+      "owner": "adaptive_aero_register_bank.cfg_actuator_max"
+    },
+    {
+      "signal": "cfg_sequence_seed",
+      "owner": "adaptive_aero_register_bank.cfg_sequence_seed"
+    },
+    {
+      "signal": "cfg_fault_clear",
+      "owner": "adaptive_aero_register_bank.cfg_fault_clear"
+    },
+    {
+      "signal": "cfg_fallback_select",
+      "owner": "adaptive_aero_register_bank.cfg_fallback_select"
+    },
+    {
+      "signal": "parsed_command_id",
+      "owner": "adaptive_aero_stream_bridge.parsed_command_id"
+    },
+    {
+      "signal": "parsed_sequence",
+      "owner": "adaptive_aero_stream_bridge.parsed_sequence"
+    },
+    {
+      "signal": "parsed_age",
+      "owner": "adaptive_aero_stream_bridge.parsed_age"
+    },
+    {
+      "signal": "parsed_actuator_request",
+      "owner": "adaptive_aero_stream_bridge.parsed_actuator_request"
+    },
+    {
+      "signal": "parsed_mode",
+      "owner": "adaptive_aero_stream_bridge.parsed_mode"
+    },
+    {
+      "signal": "parsed_integrity",
+      "owner": "adaptive_aero_stream_bridge.parsed_integrity"
+    },
+    {
+      "signal": "command_accept",
+      "owner": "adaptive_aero_command_validator.command_accept"
+    },
+    {
+      "signal": "command_reject",
+      "owner": "adaptive_aero_command_validator.command_reject"
+    },
+    {
+      "signal": "valid_command",
+      "owner": "adaptive_aero_command_validator.valid_command"
+    },
+    {
+      "signal": "stale_reject",
+      "owner": "adaptive_aero_command_validator.stale_reject"
+    },
+    {
+      "signal": "sequence_error",
+      "owner": "adaptive_aero_command_validator.sequence_error"
+    },
+    {
+      "signal": "integrity_error",
+      "owner": "adaptive_aero_command_validator.integrity_error"
+    },
+    {
+      "signal": "mode_error",
+      "owner": "adaptive_aero_command_validator.mode_error"
+    },
+    {
+      "signal": "validated_actuator_request",
+      "owner": "adaptive_aero_command_validator.validated_actuator_request"
+    },
+    {
+      "signal": "validated_mode",
+      "owner": "adaptive_aero_command_validator.validated_mode"
+    },
+    {
+      "signal": "validated_sequence",
+      "owner": "adaptive_aero_command_validator.validated_sequence"
+    },
+    {
+      "signal": "timeout_fault",
+      "owner": "adaptive_aero_stale_watchdog.timeout_fault"
+    },
+    {
+      "signal": "watchdog_expired",
+      "owner": "adaptive_aero_stale_watchdog.watchdog_expired"
+    },
+    {
+      "signal": "freshness_ok",
+      "owner": "adaptive_aero_stale_watchdog.freshness_ok"
+    },
+    {
+      "signal": "active_actuator_cmd",
+      "owner": "adaptive_aero_clamp_fallback.active_actuator_cmd"
+    },
+    {
+      "signal": "actuator_valid",
+      "owner": "adaptive_aero_clamp_fallback.actuator_valid"
+    },
+    {
+      "signal": "clamp_active",
+      "owner": "adaptive_aero_clamp_fallback.clamp_active"
+    },
+    {
+      "signal": "fallback_active",
+      "owner": "adaptive_aero_clamp_fallback.fallback_active"
+    },
+    {
+      "signal": "current_mode",
+      "owner": "adaptive_aero_clamp_fallback.current_mode"
+    },
+    {
+      "signal": "last_accepted_sequence",
+      "owner": "adaptive_aero_clamp_fallback.last_accepted_sequence"
+    },
+    {
+      "signal": "irq_o",
+      "owner": "adaptive_aero_irq_ctrl.irq_o"
+    },
+    {
+      "signal": "status_event_o",
+      "owner": "adaptive_aero_irq_ctrl.status_event_o"
+    },
+    {
+      "signal": "irq_pending",
+      "owner": "adaptive_aero_irq_ctrl.irq_pending"
+    },
+    {
+      "signal": "telemetry_word_o",
+      "owner": "adaptive_aero_telemetry_mailbox.telemetry_word_o"
+    },
+    {
+      "signal": "status_word_o",
+      "owner": "adaptive_aero_register_bank.status_word_o"
+    },
+    {
+      "signal": "wb_adr_o",
+      "owner": "adaptive_aero_cpu_subsystem.wb_adr_o"
+    },
+    {
+      "signal": "wb_dat_o",
+      "owner": "adaptive_aero_cpu_subsystem.wb_dat_o"
+    },
+    {
+      "signal": "wb_we_o",
+      "owner": "adaptive_aero_cpu_subsystem.wb_we_o"
+    },
+    {
+      "signal": "wb_stb_o",
+      "owner": "adaptive_aero_cpu_subsystem.wb_stb_o"
+    },
+    {
+      "signal": "wb_cyc_o",
+      "owner": "adaptive_aero_cpu_subsystem.wb_cyc_o"
+    },
+    {
+      "signal": "wb_sel_o",
+      "owner": "adaptive_aero_cpu_subsystem.wb_sel_o"
+    },
+    {
+      "signal": "wb_dat_i",
+      "owner": "adaptive_aero_register_bank.wb_dat_o"
+    },
+    {
+      "signal": "wb_ack_i",
+      "owner": "adaptive_aero_register_bank.wb_ack_o"
+    },
+    {
+      "signal": "wb_err_i",
+      "owner": "adaptive_aero_register_bank.wb_err_o"
+    },
+    {
+      "signal": "uart_tx",
+      "owner": "adaptive_aero_cpu_subsystem.uart_tx"
+    },
+    {
+      "signal": "imem_csb",
+      "owner": "adaptive_aero_cpu_subsystem.imem_csb"
+    },
+    {
+      "signal": "imem_web",
+      "owner": "adaptive_aero_cpu_subsystem.imem_web"
+    },
+    {
+      "signal": "imem_addr",
+      "owner": "adaptive_aero_cpu_subsystem.imem_addr"
+    },
+    {
+      "signal": "imem_din",
+      "owner": "adaptive_aero_cpu_subsystem.imem_din"
+    },
+    {
+      "signal": "dmem_csb",
+      "owner": "adaptive_aero_cpu_subsystem.dmem_csb"
+    },
+    {
+      "signal": "dmem_web",
+      "owner": "adaptive_aero_cpu_subsystem.dmem_web"
+    },
+    {
+      "signal": "dmem_addr",
+      "owner": "adaptive_aero_cpu_subsystem.dmem_addr"
+    },
+    {
+      "signal": "dmem_din",
+      "owner": "adaptive_aero_cpu_subsystem.dmem_din"
+    },
+    {
+      "signal": "telemetry_csb",
+      "owner": "adaptive_aero_telemetry_mailbox.telemetry_csb"
+    },
+    {
+      "signal": "telemetry_web",
+      "owner": "adaptive_aero_telemetry_mailbox.telemetry_web"
+    },
+    {
+      "signal": "telemetry_addr",
+      "owner": "adaptive_aero_telemetry_mailbox.telemetry_addr"
+    },
+    {
+      "signal": "telemetry_din",
+      "owner": "adaptive_aero_telemetry_mailbox.telemetry_din"
+    },
+    {
+      "signal": "cmd_ready",
+      "owner": "adaptive_aero_stream_bridge.cmd_ready"
+    },
+    {
+      "signal": "rsp_valid",
+      "owner": "adaptive_aero_stream_bridge.rsp_valid"
+    },
+    {
+      "signal": "rsp_payload",
+      "owner": "adaptive_aero_stream_bridge.rsp_payload"
+    },
+    {
+      "signal": "actuator_cmd_o",
+      "owner": "adaptive_aero_clamp_fallback.active_actuator_cmd"
+    },
+    {
+      "signal": "actuator_valid_o",
+      "owner": "adaptive_aero_clamp_fallback.actuator_valid"
+    },
+    {
+      "signal": "actuator_fallback_o",
+      "owner": "adaptive_aero_clamp_fallback.fallback_active"
+    },
+    {
+      "signal": "wb_master_adr",
+      "owner": "adaptive_aero_cpu_subsystem.wb_adr_o"
+    },
+    {
+      "signal": "wb_master_dat_w",
+      "owner": "adaptive_aero_cpu_subsystem.wb_dat_o"
+    },
+    {
+      "signal": "wb_master_we",
+      "owner": "adaptive_aero_cpu_subsystem.wb_we_o"
+    },
+    {
+      "signal": "wb_master_stb",
+      "owner": "adaptive_aero_cpu_subsystem.wb_stb_o"
+    },
+    {
+      "signal": "wb_master_cyc",
+      "owner": "adaptive_aero_cpu_subsystem.wb_cyc_o"
+    },
+    {
+      "signal": "wb_master_sel",
+      "owner": "adaptive_aero_cpu_subsystem.wb_sel_o"
+    },
+    {
+      "signal": "wb_slave_dat_r",
+      "owner": "adaptive_aero_register_bank.wb_dat_o"
+    },
+    {
+      "signal": "wb_slave_ack",
+      "owner": "adaptive_aero_register_bank.wb_ack_o"
+    },
+    {
+      "signal": "wb_slave_err",
+      "owner": "adaptive_aero_register_bank.wb_err_o"
+    },
+    {
+      "signal": "cpu_irq",
+      "owner": "adaptive_aero_irq_ctrl.irq_o"
+    },
+    {
+      "signal": "adaptive_aero_command_validator_stale_reject",
+      "owner": "adaptive_aero_command_validator.stale_reject"
+    },
+    {
+      "signal": "wb_dat_o",
+      "owner": "adaptive_aero_register_bank.wb_dat_o"
+    },
+    {
+      "signal": "wb_ack_o",
+      "owner": "adaptive_aero_register_bank.wb_ack_o"
+    },
+    {
+      "signal": "wb_err_o",
+      "owner": "adaptive_aero_register_bank.wb_err_o"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "wishbone",
+    "data_width": 32,
+    "address_width": 32,
+    "transaction_model": "single-cycle compatible Wishbone classic style with acknowledge and error response",
+    "registers": [
+      {
+        "name": "CONTROL",
+        "offset": "0x00",
+        "access": "rw",
+        "reset": "0x00000000",
+        "fields": [
+          {
+            "name": "mode_select",
+            "lsb": 0,
+            "msb": 2,
+            "access": "rw",
+            "description": "Operating mode selector."
+          },
+          {
+            "name": "enable",
+            "lsb": 3,
+            "msb": 3,
+            "access": "rw",
+            "description": "Global command-processing enable."
+          },
+          {
+            "name": "fallback_select",
+            "lsb": 4,
+            "msb": 5,
+            "access": "rw",
+            "description": "Deterministic fallback command selector."
+          },
+          {
+            "name": "fault_clear",
+            "lsb": 8,
+            "msb": 8,
+            "access": "wo",
+            "description": "Write-one-to-clear style fault clear pulse."
+          }
+        ]
+      },
+      {
+        "name": "FRESHNESS_THRESHOLD",
+        "offset": "0x04",
+        "access": "rw",
+        "reset": "0x00000010",
+        "fields": [
+          {
+            "name": "freshness_threshold",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "description": "Maximum permitted packet age/timestamp before stale rejection."
+          }
+        ]
+      },
+      {
+        "name": "WATCHDOG_THRESHOLD",
+        "offset": "0x08",
+        "access": "rw",
+        "reset": "0x00000100",
+        "fields": [
+          {
+            "name": "watchdog_threshold",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "description": "Timeout window for heartbeat/valid-command activity."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_BOUNDS",
+        "offset": "0x0C",
+        "access": "rw",
+        "reset": "0x0010FFF0",
+        "fields": [
+          {
+            "name": "actuator_min",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "description": "Minimum saturating actuator output."
+          },
+          {
+            "name": "actuator_max",
+            "lsb": 16,
+            "msb": 31,
+            "access": "rw",
+            "description": "Maximum saturating actuator output."
+          }
+        ]
+      },
+      {
+        "name": "SEQUENCE_TRACK",
+        "offset": "0x10",
+        "access": "rw",
+        "reset": "0x00000000",
+        "fields": [
+          {
+            "name": "sequence_seed",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "description": "Sequence seed or reset point for monotonic checking."
+          },
+          {
+            "name": "last_accepted_sequence",
+            "lsb": 16,
+            "msb": 31,
+            "access": "ro",
+            "description": "Last accepted command sequence."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x14",
+        "access": "ro",
+        "reset": "0x00000000",
+        "fields": [
+          {
+            "name": "valid_command",
+            "lsb": 0,
+            "msb": 0,
+            "access": "ro",
+            "description": "Qualified valid command indicator."
+          },
+          {
+            "name": "stale_reject",
+            "lsb": 1,
+            "msb": 1,
+            "access": "ro",
+            "description": "Stale command rejection latch."
+          },
+          {
+            "name": "timeout_fault",
+            "lsb": 2,
+            "msb": 2,
+            "access": "ro",
+            "description": "Watchdog timeout fault latch."
+          },
+          {
+            "name": "clamp_active",
+            "lsb": 3,
+            "msb": 3,
+            "access": "ro",
+            "description": "Actuator clamping active flag."
+          },
+          {
+            "name": "fallback_active",
+            "lsb": 4,
+            "msb": 4,
+            "access": "ro",
+            "description": "Fallback output active flag."
+          },
+          {
+            "name": "sequence_error",
+            "lsb": 5,
+            "msb": 5,
+            "access": "ro",
+            "description": "Sequence check failure flag."
+          },
+          {
+            "name": "integrity_error",
+            "lsb": 6,
+            "msb": 6,
+            "access": "ro",
+            "description": "Integrity check failure flag."
+          },
+          {
+            "name": "mode_error",
+            "lsb": 7,
+            "msb": 7,
+            "access": "ro",
+            "description": "Mode legality failure flag."
+          },
+          {
+            "name": "current_mode",
+            "lsb": 8,
+            "msb": 10,
+            "access": "ro",
+            "description": "Current active mode."
+          },
+          {
+            "name": "irq_pending",
+            "lsb": 11,
+            "msb": 11,
+            "access": "ro",
+            "description": "Sticky interrupt pending indication."
+          },
+          {
+            "name": "active_actuator_cmd",
+            "lsb": 16,
+            "msb": 31,
+            "access": "ro",
+            "description": "Current active actuator command after clamp/fallback."
+          }
+        ]
+      },
+      {
+        "name": "TELEMETRY",
+        "offset": "0x18",
+        "access": "ro",
+        "reset": "0x00000000",
+        "fields": [
+          {
+            "name": "telemetry_word",
+            "lsb": 0,
+            "msb": 31,
+            "access": "ro",
+            "description": "Compact telemetry/status word sourced from the BRAM-backed mailbox."
+          }
+        ]
+      }
+    ]
+  }
+}

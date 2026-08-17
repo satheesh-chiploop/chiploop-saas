@@ -1,0 +1,65 @@
+The required synthesizable top module is adaptive_aero_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must implement the selected Physical AI application contract, external model request/response transport, validation, safety, timeout, fallback, and bounded actuator-command behavior.
+
+EXTERNAL MODEL TRANSPORT DIRECTION CONTRACT (mandatory; this takes precedence over ambiguous ingress/egress wording in upstream prose): the RTL emits model-request valid/data as outputs and receives model-request ready as an input. The RTL receives model-response valid/data as inputs and emits model-response ready as an output. Apply this rule by data flow even when application-specific ports use cmd_*, req_*, rsp_*, or response_* names. A top-level output must have a real RTL driver; never connect a required top-level output only to a child input.
+
+FIRMWARE CONTROL-PLANE CONTRACT (mandatory): this product journey requests generated firmware. The synthesizable top must expose a real firmware-visible CSR/MMIO interface with address, write-data, read-data, transaction-valid/write-enable, and response/ready semantics. DIGITAL_SPEC_JSON.register_contract must describe the implemented registers and fields. Every declared register must be reachable through RTL decode; do not label inaccessible internal state as software-visible. The streaming transport may coexist with, but cannot replace, this interface.
+
+SOFT CPU INTEGRATION CONTRACT: preserve the resolved CPU contract in generated architecture, firmware, and handoff metadata: {"abi": "ilp32", "bus": "wishbone", "clock_mhz": 50.0, "compiler_arch": "rv32imc", "core": "picorv32", "core_label": "PicoRV32", "data_memory_kib": 16, "debug": false, "enabled": true, "estimated_reservation": {"basis": "supabase_governed_reference_estimate", "block_ram_blocks": 12, "logic_cells": 3000, "must_be_replaced_by_complete_system_synthesis": true}, "instruction_memory_kib": 32, "interrupts": true, "isa": "rv32imc", "license": "ISC", "policy_schema": "chiploop.application_intelligence.processor_ip_policy.v2", "profile": "balanced", "schema": "chiploop.fpga.soft_cpu.v1", "selection_mode": "automatic", "target_triple": "rv32imc-unknown-none-elf", "uart": true}. The application RTL must expose the selected bus and MMIO interface. Do not claim the CPU is instantiated or board-ready until its RTL, memory/interconnect, and application RTL are synthesized and routed together.
+Design a synthesizable FPGA digital IP top module named adaptive_aero_control_top for an intelligent active-aerodynamics controller. The module shall integrate a PicoRV32 soft CPU subsystem with Wishbone bus, a small memory-mapped register bank, bounded streaming command/response paths, watchdog logic, command validation, actuator clamping, telemetry buffering, and safe fallback control. The selected NVIDIA DoMINO Automotive Aero model is external to RTL and shall not be implemented as tensors, geometry processing, or flow-field computation in hardware.
+
+Top-level interface requirements:
+1) The top module shall use a compact FPGA-friendly interface. Do not expose vehicle geometry arrays, flow fields, or surrogate payloads as individual pins.
+2) Provide a streaming command input and streaming response output, each with valid/ready handshake and payload width no greater than 128 bits.
+3) Provide a small register-mapped control/status window for CPU access using Wishbone-compatible 32-bit transactions.
+4) Keep the total scalar-equivalent top-level I/O count below 256.
+5) Include clk and reset inputs.
+
+Functional blocks:
+A) Soft CPU subsystem: instantiate PicoRV32 configured for rv32imc, Wishbone bus, interrupts enabled, UART enabled, 50 MHz target clock. CPU firmware is responsible for high-level policy, model orchestration, logging, and parameter updates. The RTL shall not depend on any GPU runtime.
+B) Control register bank: implement 32-bit registers for mode select, enable, freshness threshold, watchdog threshold, actuator min/max bounds, sequence tracking, fault clear, and status readback.
+C) Streaming bridge: accept command packets from software and provide response/status packets back to software. Implement backpressure using ready/valid. Packets shall include at minimum command ID, sequence number, age or timestamp field, actuator request, mode field, and checksum/parity or equivalent integrity marker.
+D) Command validator: compare packet fields against expected sequence progression, mode legality, and integrity marker. Invalid packets shall be rejected without updating the actuator command path.
+E) Stale-data monitor: compare packet age or timestamp against a programmable freshness limit. If the packet is stale, assert stale_reject and route the system to fallback.
+F) Watchdog timeout unit: if no valid command or heartbeat is observed within the programmed timeout window, assert timeout_fault and force safe fallback.
+G) Actuator limit clamp: saturate requested actuator outputs to configured min/max limits. Clamp activity shall be visible in status.
+H) Safe fallback controller: generate a deterministic conservative actuator command when validation fails, stale data is detected, or timeout occurs. Fallback command shall be selected by register configuration and default to a safe neutral or conservative aerodynamic state.
+I) Telemetry buffer: implement a small FPGA BRAM-backed mailbox/FIFO for compact status words only. Do not buffer raw flow fields. Telemetry shall include fault status, last accepted sequence, clamp indicator, and current mode.
+J) UART console: optional development/debug peripheral attached to CPU firmware only.
+
+Memory and storage rules:
+1) FPGA implementation shall use BRAM abstractions for local buffering. Do not infer ASIC SRAM macros.
+2) Do not implement payload storage as register arrays beyond small control/status registers and FSM state.
+3) Bulk model payloads, if any in software workflow, remain outside RTL.
+
+Clocking and resets:
+1) Use synchronous design style for all data-path and control logic.
+2) All state machines shall have deterministic reset states.
+3) On reset, clear fault latches, mark command invalid, and drive actuator output to safe fallback.
+
+Command handling rules:
+1) A command is accepted only when valid=1 and ready=1, integrity check passes, mode is legal, sequence is monotonic, and age is within threshold.
+2) On acceptance, update last_accepted_sequence, status flags, and actuator command registers.
+3) On rejection, preserve last safe output or enter fallback according to configuration.
+4) Clamp outputs before registering them as active actuator commands.
+
+Safety and diagnostics:
+1) Expose status bits for valid_command, stale_reject, timeout_fault, clamp_active, fallback_active, sequence_error, integrity_error, and mode_error.
+2) Latch fault bits until cleared by software write.
+3) Provide an interrupt output or status event to the CPU for timeout and fault conditions.
+
+Timing and implementation targets:
+1) The design shall be fully synthesizable for FPGA prototype flows.
+2) The controller shall support 20-55 m/s operating envelope as an application context; the RTL itself only enforces control safety and command transport.
+3) Bound the control path latency so that command validation and fallback decision complete within a small fixed number of cycles after packet acceptance.
+4) The RTL shall be structured for clean Arch2RTL decomposition into CPU subsystem, register bank, validator, watchdog, clamp, fallback, and telemetry blocks.
+
+Firmware/software contract:
+1) Firmware running on the soft CPU may call out to analytical CPU-reference or remote GPU-hosted surrogate workflows, but such execution is outside RTL.
+2) The hardware interface must remain stable regardless of whether surrogate inference is executed, not executed, or unavailable.
+3) If no fresh model data is available, hardware shall remain safe and continue fallback operation.
+
+Verification hooks:
+1) Include assertions or comparable checkable conditions for stale rejection, timeout entry, clamp saturation, and fallback activation.
+2) Ensure reset-to-safe-state behavior is testable in simulation.
+3) Provide readable status registers for software and testbench observability.
+FPGA MEMORY CONTRACT (mandatory): describe bulk payload/history/FIFO storage through a technology-neutral memory wrapper that the FPGA flow can map to native block RAM; do not flatten it into registers.
