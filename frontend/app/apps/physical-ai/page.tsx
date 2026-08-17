@@ -9,10 +9,14 @@ import WorkflowEvidenceDashboard from "@/components/WorkflowEvidenceDashboard";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "/api";
 const supabase = createClientComponentClient();
 
-type PhysicsModel = { model_id: string; name: string; provider: string; domain: string; runtime: string; availability: string; gpu_required: boolean };
+type ProcessorCorePolicy = { label?: string; profile?: string; default_isa?: string; default_bus?: string };
+type ProcessorPolicySection = { availability?: string; default_core?: string; defaults?: Record<string, string | number | boolean>; cores?: Record<string, ProcessorCorePolicy> };
+type ProcessorIpPolicy = { schema?: string; automatic_asic_deployment?: string; fpga_soft_cpu?: ProcessorPolicySection; asic_soc_cpu?: ProcessorPolicySection };
+type PhysicsModel = { model_id: string; name: string; provider: string; domain: string; runtime: string; availability: string; gpu_required: boolean; configuration?: { processor_ip_policy?: ProcessorIpPolicy } };
 type ExecutionMode = "architecture" | "cpu_reference" | "validated";
 type ImplementationPath = "architecture_only" | "digital_ip_asic" | "fpga_prototype" | "fpga_then_asic";
 type DeploymentArchitecture = "automatic" | "fpga_onboard_cpu" | "fpga_soft_cpu" | "fpga_external_host" | "asic_digital_ip" | "asic_soc" | "asic_companion";
+type SoftCpuCore = string;
 
 const paths: Array<{ key: ImplementationPath; title: string; body: string }> = [
   { key: "architecture_only", title: "Architecture only", body: "Stop after the architecture and digital-IP plan." },
@@ -70,6 +74,27 @@ export default function PhysicalAiStudioPage() {
   const [executionMode, setExecutionMode] = useState<ExecutionMode>("validated");
   const [implementationPath, setImplementationPath] = useState<ImplementationPath>("fpga_prototype");
   const [deploymentArchitecture, setDeploymentArchitecture] = useState<DeploymentArchitecture>("automatic");
+  const [softCpuAdvanced, setSoftCpuAdvanced] = useState(false);
+  const [softCpuCore, setSoftCpuCore] = useState<SoftCpuCore>("automatic");
+  const [softCpuIsa, setSoftCpuIsa] = useState("automatic");
+  const [softCpuBus, setSoftCpuBus] = useState("automatic");
+  const [softCpuClockMhz, setSoftCpuClockMhz] = useState(50);
+  const [softCpuInstructionKib, setSoftCpuInstructionKib] = useState(32);
+  const [softCpuDataKib, setSoftCpuDataKib] = useState(16);
+  const [softCpuInterrupts, setSoftCpuInterrupts] = useState(true);
+  const [softCpuUart, setSoftCpuUart] = useState(true);
+  const [softCpuDebug, setSoftCpuDebug] = useState(false);
+  const [asicCpuAdvanced, setAsicCpuAdvanced] = useState(false);
+  const [asicCpuCore, setAsicCpuCore] = useState<SoftCpuCore>("automatic");
+  const [asicCpuIsa, setAsicCpuIsa] = useState("automatic");
+  const [asicCpuBus, setAsicCpuBus] = useState("automatic");
+  const [asicCpuClockMhz, setAsicCpuClockMhz] = useState(100);
+  const [asicBootRomKib, setAsicBootRomKib] = useState(16);
+  const [asicSramKib, setAsicSramKib] = useState(64);
+  const [asicCpuInterrupts, setAsicCpuInterrupts] = useState(true);
+  const [asicCpuDebug, setAsicCpuDebug] = useState(false);
+  const [asicClockGating, setAsicClockGating] = useState(true);
+  const [asicDftScan, setAsicDftScan] = useState(true);
   const [agentMode, setAgentMode] = useState<"standard" | "smart">("standard");
   const [standardModel, setStandardModel] = useState("chiploop_default");
   const [hemEnabled, setHemEnabled] = useState(true);
@@ -139,6 +164,11 @@ export default function PhysicalAiStudioPage() {
   }, [token, workflowId]);
 
   const selected = models.find((model) => model.model_id === modelId);
+  const processorPolicy = selected?.configuration?.processor_ip_policy;
+  const fpgaCpuPolicy = processorPolicy?.fpga_soft_cpu;
+  const asicCpuPolicy = processorPolicy?.asic_soc_cpu;
+  const fpgaCoreOptions = Object.entries(fpgaCpuPolicy?.cores || {});
+  const asicCoreOptions = Object.entries(asicCpuPolicy?.cores || {});
   const journeyLogs = useMemo(() => {
     const sections = runLogs.trim() ? [runLogs.trim()] : [];
     for (const child of hemChildren) {
@@ -165,7 +195,7 @@ export default function PhysicalAiStudioPage() {
       { key: "fpga_external_host", title: "External host", body: "Use a PC, Mac, MCU, or embedded host over a board transport." },
     ] as const;
     return [
-      { key: "automatic", title: "Choose automatically", body: "Select the ASIC integration model from the requirements." },
+      { key: "automatic", title: "Choose automatically", body: "Recommended: deliver reusable Digital IP unless an embedded CPU is explicitly required." },
       { key: "asic_digital_ip", title: "Digital IP", body: "Deliver reusable IP; the customer supplies the CPU." },
       { key: "asic_soc", title: "ASIC SoC", body: "Include an embedded CPU, interconnect, firmware, and software." },
       { key: "asic_companion", title: "Companion ASIC", body: "Use an external processor through a defined transport." },
@@ -180,6 +210,14 @@ export default function PhysicalAiStudioPage() {
     if (!token || !selected || running) return;
     if (executionMode === "validated" && !validatedAvailable) {
       setError("Validated surrogate execution needs a connected NIM or GPU worker. Choose Architecture mode for this model.");
+      return;
+    }
+    if (deploymentArchitecture === "fpga_soft_cpu" && !fpgaCpuPolicy) {
+      setError("Supabase processor_ip_policy.fpga_soft_cpu is missing. Apply the processor policy migration before running this journey.");
+      return;
+    }
+    if (deploymentArchitecture === "asic_soc" && !asicCpuPolicy) {
+      setError("Supabase processor_ip_policy.asic_soc_cpu is missing. Apply the processor policy migration before running this journey.");
       return;
     }
     setRunning(true);
@@ -198,6 +236,16 @@ export default function PhysicalAiStudioPage() {
           execution_mode: executionMode,
           implementation_path: implementationPath,
           deployment_architecture: deploymentArchitecture,
+          soft_cpu_config: softCpuAdvanced ? {
+            core: softCpuCore, isa: softCpuIsa, bus: softCpuBus, clock_mhz: softCpuClockMhz,
+            instruction_memory_kib: softCpuInstructionKib, data_memory_kib: softCpuDataKib,
+            interrupts: softCpuInterrupts, uart: softCpuUart, debug: softCpuDebug,
+          } : { core: "automatic", isa: "automatic", bus: "automatic" },
+          asic_cpu_config: asicCpuAdvanced ? {
+            core: asicCpuCore, isa: asicCpuIsa, bus: asicCpuBus, clock_mhz: asicCpuClockMhz,
+            boot_rom_kib: asicBootRomKib, sram_kib: asicSramKib, interrupts: asicCpuInterrupts,
+            debug: asicCpuDebug, clock_gating: asicClockGating, dft_scan_required: asicDftScan,
+          } : { core: "automatic", isa: "automatic", bus: "automatic" },
           implementation_target: implementationPath.includes("fpga") ? "fpga" : "asic",
           generate_architecture_with_model: true,
           parameters: motor
@@ -248,7 +296,9 @@ export default function PhysicalAiStudioPage() {
 
     <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/50 p-5 sm:p-6"><div className="text-xs font-bold uppercase text-lime-300">4 · Choose where the design goes</div><div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">{paths.map((path) => <button type="button" key={path.key} onClick={() => setImplementationPath(path.key)} className={`rounded-xl border p-4 text-left ${implementationPath === path.key ? "border-lime-400 bg-lime-500/10" : "border-slate-700 bg-slate-950"}`}><div className="font-semibold">{path.title}</div><div className="mt-2 text-xs leading-5 text-slate-400">{path.body}</div></button>)}</div><div className="mt-6 border-t border-slate-800 pt-5"><div className="mb-3 flex items-center justify-between gap-3"><div><div className="text-sm font-semibold text-white">Your connected journey</div><div className="mt-1 text-xs text-slate-400">Each stage hands validated results to the next.</div></div><span className="shrink-0 rounded-full border border-slate-700 bg-slate-950 px-3 py-1 text-xs text-slate-400">{stages.length} stages</span></div><ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">{stages.map((stage, index) => <li key={stage} className="group relative min-w-0 rounded-xl border border-slate-700/80 bg-slate-950/80 px-3 py-3 transition-colors hover:border-fuchsia-400/50 hover:bg-fuchsia-500/5"><div className="flex min-w-0 items-center gap-2.5"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-fuchsia-400/40 bg-fuchsia-500/10 text-xs font-bold text-fuchsia-200">{index + 1}</span><span className="min-w-0 text-[13px] font-medium leading-4 text-slate-100">{stage}</span></div></li>)}</ol></div></section>
 
-    {implementationPath !== "architecture_only" && <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><div className="text-xs font-bold uppercase text-amber-300">5 · CPU and host architecture</div><p className="mt-2 text-sm text-slate-400">Functional partitioning happens first. This choice controls target refinement and the firmware gate.</p><div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">{deploymentOptions.map((option) => <button type="button" key={option.key} onClick={() => setDeploymentArchitecture(option.key)} className={`rounded-xl border p-4 text-left ${deploymentArchitecture === option.key ? "border-amber-400 bg-amber-500/10" : "border-slate-700 bg-slate-950"}`}><div className="font-semibold">{option.title}</div><div className="mt-2 text-xs leading-5 text-slate-400">{option.body}</div></button>)}</div></section>}
+    {implementationPath !== "architecture_only" && <section className="mt-6 rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><div className="text-xs font-bold uppercase text-amber-300">5 · CPU and host architecture</div><p className="mt-2 text-sm text-slate-400">Functional partitioning happens first. Automatic choices are safe defaults; experienced users can override them.</p><div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">{deploymentOptions.map((option) => <button type="button" key={option.key} onClick={() => setDeploymentArchitecture(option.key)} className={`rounded-xl border p-4 text-left ${deploymentArchitecture === option.key ? "border-amber-400 bg-amber-500/10" : "border-slate-700 bg-slate-950"}`}><div className="font-semibold">{option.title}</div><div className="mt-2 text-xs leading-5 text-slate-400">{option.body}</div></button>)}</div>{deploymentArchitecture === "fpga_soft_cpu" && <div className="mt-5 rounded-xl border border-amber-400/25 bg-slate-950 p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><div className="font-semibold">Soft CPU configuration</div><p className="mt-1 text-xs text-slate-400">Automatic selects balanced PicoRV32 defaults and records the resolved ISA, memory, bus, and peripherals with the run.</p></div><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={softCpuAdvanced} onChange={(event) => setSoftCpuAdvanced(event.target.checked)} />Advanced overrides</label></div>{!softCpuAdvanced ? <div className="mt-4 rounded-lg border border-lime-400/20 bg-lime-500/5 p-3 text-sm text-lime-200">Recommended automatic profile · PicoRV32 · RV32IMC · Wishbone · 50 MHz · 32 KiB instruction / 16 KiB data memory</div> : <div className="mt-4 grid gap-4 md:grid-cols-3"><label className="text-xs text-slate-300">CPU core<select value={softCpuCore} onChange={(event) => setSoftCpuCore(event.target.value as SoftCpuCore)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-900 p-3"><option value="automatic">Automatic (recommended)</option>{fpgaCoreOptions.map(([key, core]) => <option key={key} value={key}>{core.label || key} — {core.profile || "policy profile"}</option>)}</select></label><label className="text-xs text-slate-300">ISA<select value={softCpuIsa} onChange={(event) => setSoftCpuIsa(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-900 p-3"><option value="automatic">Automatic</option><option value="rv32i">RV32I</option><option value="rv32im">RV32IM</option><option value="rv32imc">RV32IMC</option></select></label><label className="text-xs text-slate-300">Bus<select value={softCpuBus} onChange={(event) => setSoftCpuBus(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-900 p-3"><option value="automatic">Automatic</option><option value="wishbone">Wishbone</option><option value="axi4_lite">AXI4-Lite</option><option value="native">Native</option></select></label><label className="text-xs text-slate-300">CPU clock (MHz)<input type="number" min={1} value={softCpuClockMhz} onChange={(event) => setSoftCpuClockMhz(Number(event.target.value) || 50)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-900 p-3" /></label><label className="text-xs text-slate-300">Instruction memory (KiB)<input type="number" min={4} value={softCpuInstructionKib} onChange={(event) => setSoftCpuInstructionKib(Number(event.target.value) || 32)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-900 p-3" /></label><label className="text-xs text-slate-300">Data memory (KiB)<input type="number" min={4} value={softCpuDataKib} onChange={(event) => setSoftCpuDataKib(Number(event.target.value) || 16)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-900 p-3" /></label><div className="flex flex-wrap gap-4 md:col-span-3">{[["Interrupts", softCpuInterrupts, setSoftCpuInterrupts], ["UART", softCpuUart, setSoftCpuUart], ["Debug", softCpuDebug, setSoftCpuDebug]].map(([label, value, setter]) => <label key={String(label)} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={Boolean(value)} onChange={(event) => (setter as (value: boolean) => void)(event.target.checked)} />{String(label)}</label>)}</div></div>}</div>}</section>}
+
+    {deploymentArchitecture === "asic_soc" && <section className="mt-6 rounded-2xl border border-violet-400/25 bg-slate-900/50 p-6"><div className="flex flex-wrap items-center justify-between gap-3"><div><div className="text-xs font-bold uppercase text-violet-300">ASIC SoC CPU IP</div><h2 className="mt-2 text-lg font-semibold">Embedded processor configuration</h2><p className="mt-1 text-xs text-slate-400">Automatic uses a balanced PicoRV32/APB profile. Full tapeout readiness remains gated until CPU RTL and memory macros are included in complete-SoC synthesis.</p></div><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={asicCpuAdvanced} onChange={(event) => setAsicCpuAdvanced(event.target.checked)} />Advanced overrides</label></div>{!asicCpuAdvanced ? <div className="mt-4 rounded-lg border border-lime-400/20 bg-lime-500/5 p-3 text-sm text-lime-200">Recommended automatic profile · PicoRV32 · RV32IMC · APB · 100 MHz · 16 KiB boot ROM / 64 KiB SRAM · scan and clock gating enabled</div> : <div className="mt-5 grid gap-4 md:grid-cols-3"><label className="text-xs">CPU IP<select value={asicCpuCore} onChange={(event) => setAsicCpuCore(event.target.value as SoftCpuCore)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="automatic">Automatic</option>{asicCoreOptions.map(([key, core]) => <option key={key} value={key}>{core.label || key} — {core.profile || "policy profile"}</option>)}</select></label><label className="text-xs">ISA<select value={asicCpuIsa} onChange={(event) => setAsicCpuIsa(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="automatic">Automatic</option><option value="rv32i">RV32I</option><option value="rv32im">RV32IM</option><option value="rv32imc">RV32IMC</option></select></label><label className="text-xs">Peripheral bus<select value={asicCpuBus} onChange={(event) => setAsicCpuBus(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="automatic">Automatic</option><option value="apb">APB</option><option value="axi4_lite">AXI4-Lite</option><option value="wishbone">Wishbone</option><option value="native">Native</option></select></label><label className="text-xs">CPU clock (MHz)<input type="number" min={1} value={asicCpuClockMhz} onChange={(event) => setAsicCpuClockMhz(Number(event.target.value) || 100)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label><label className="text-xs">Boot ROM (KiB)<input type="number" min={4} value={asicBootRomKib} onChange={(event) => setAsicBootRomKib(Number(event.target.value) || 16)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label><label className="text-xs">SRAM (KiB)<input type="number" min={8} value={asicSramKib} onChange={(event) => setAsicSramKib(Number(event.target.value) || 64)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label><div className="flex flex-wrap gap-4 md:col-span-3">{[["Interrupts", asicCpuInterrupts, setAsicCpuInterrupts], ["Debug", asicCpuDebug, setAsicCpuDebug], ["Clock gating", asicClockGating, setAsicClockGating], ["DFT scan", asicDftScan, setAsicDftScan]].map(([label, value, setter]) => <label key={String(label)} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={Boolean(value)} onChange={(event) => (setter as (value: boolean) => void)(event.target.checked)} />{String(label)}</label>)}</div></div>}</section>}
 
     {implementationPath !== "architecture_only" && <section className="mt-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-6"><HemAutomaticRunControls enabled={hemEnabled} adaptive={hemAdaptive} onEnabledChange={setHemEnabled} onAdaptiveChange={setHemAdaptive} currentStageLabel="Physical AI architecture" nextStageLabel="RTL generation" /><p className="mt-4 text-sm text-slate-400">When enabled, ChipLoop continues automatically through the selected path. When disabled, the completed dashboard shows the next workflow button.</p></section>}
     {error && <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200">{error}</div>}
