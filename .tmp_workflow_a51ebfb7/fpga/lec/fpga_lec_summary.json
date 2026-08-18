@@ -1,0 +1,84 @@
+{
+  "agent": "FPGA RTL-to-Netlist Equivalence Agent",
+  "comparison": "two_stage_rtl_generic_and_generic_mapped_equivalence",
+  "enabled": true,
+  "failure_kind": "proof_incomplete",
+  "family": "ecp5",
+  "gate_status": "fail",
+  "generic_lec": {
+    "command": {
+      "cmd": [
+        "/usr/bin/yosys",
+        "-s",
+        "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/lec/fpga_rtl_to_generic_lec.ys"
+      ],
+      "error": null,
+      "executable": "/usr/bin/yosys",
+      "log": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/lec/fpga_rtl_to_generic_lec.log",
+      "ok": false,
+      "profile_id": "chiploop_saas_default",
+      "returncode": 1,
+      "status": "failed",
+      "stderr_tail": "ERROR: Found 744 unproven $equiv cells in 'equiv_status -assert'.\n",
+      "stdout_tail": "iv $auto$equiv_make.cc:294:find_same_wires$3769: \\u_core.u_fsm.response_req_id_r_gold [1] \\u_core.u_fsm.response_req_id_r_gate [1]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2947: \\u_core.u_fsm.model_req_desc_r_gold [40] \\u_core.u_fsm._065__gate [40]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3914: \\u_core.u_mmio.wb_dat_o_r_gold [27] \\u_core.u_mmio.wb_dat_o_r_gate [27]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$4240: \\u_core.u_mmio.wb_dat_o_r_gold [12] \\u_core.u_mmio.wb_dat_o_r_gate [12]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3912: \\u_core.u_mmio.wb_dat_o_r_gold [25] \\u_core.u_mmio.wb_dat_o_r_gate [25]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3188: \\u_core.u_mmio.r_timestamp_gold [3] \\u_core.u_mmio.r_timestamp_gate [3]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3910: \\u_core.u_mmio.wb_dat_o_r_gold [23] \\u_core.u_mmio.wb_dat_o_r_gate [23]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$4232: \\u_core.u_mmio.wb_dat_o_r_gold [4] \\u_core.u_mmio.wb_dat_o_r_gate [4]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3908: \\u_core.u_mmio.wb_dat_o_r_gold [21] \\u_core.u_mmio.wb_dat_o_r_gate [21]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3186: \\u_core.u_mmio.r_timestamp_gold [1] \\u_core.u_mmio.r_timestamp_gate [1]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3986: \\u_core.u_safety.actuator_cmd_r_gold [14] \\u_core.u_safety.actuator_cmd_r_gate [14]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3982: \\u_core.u_safety.actuator_cmd_r_gold [10] \\u_core.u_safety.actuator_cmd_r_gate [10]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3978: \\u_core.u_safety.actuator_cmd_r_gold [6] \\u_core.u_safety.actuator_cmd_r_gate [6]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3974: \\u_core.u_safety.actuator_cmd_r_gold [2] \\u_core.u_safety.actuator_cmd_r_gate [2]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3906: \\u_core.u_mmio.wb_dat_o_r_gold [19] \\u_core.u_mmio.wb_dat_o_r_gate [19]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2928: \\u_core.u_fsm.model_req_desc_r_gold [21] \\u_core.u_fsm._065__gate [21]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3904: \\u_core.u_mmio.wb_dat_o_r_gold [17] \\u_core.u_mmio.wb_dat_o_r_gate [17]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2926: \\u_core.u_fsm.model_req_desc_r_gold [19] \\u_core.u_fsm._065__gate [19]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3902: \\u_core.u_mmio.wb_dat_o_r_gold [15] \\u_core.u_mmio.wb_dat_o_r_gate [15]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2924: \\u_core.u_fsm.model_req_desc_r_gold [17] \\u_core.u_fsm._065__gate [17]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3900: \\u_core.u_mmio.wb_dat_o_r_gold [13] \\u_core.u_mmio.wb_dat_o_r_gate [13]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2922: \\u_core.u_fsm.model_req_desc_r_gold [15] \\u_core.u_fsm._065__gate [15]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3898: \\u_core.u_mmio.wb_dat_o_r_gold [11] \\u_core.u_mmio.wb_dat_o_r_gate [11]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2810: \\u_core.u_mmio.r_oper_en_max_gold [4] \\u_core.u_mmio.r_oper_en_max_gate [4]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2326: \\u_core.u_mmio.r_timestamp_gold [17] \\u_core.u_mmio.r_timestamp_gate [17]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2622: \\u_core.u_fsm.age_counter_r_gold [0] \\u_core.u_fsm.age_counter_r_gate [0]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3103: \\u_core.u_fsm.next_state_gold [7] \\u_core.u_fsm.next_state_gate [7]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3684: \\u_core.u_mmio.r_timestamp_gold [26] \\u_core.u_mmio.r_timestamp_gate [26]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2986: \\rx_active_gold [80] \\rx_active_gate [80]\n  Unproven $equiv $auto$equiv_make.cc:294:find_s"
+    },
+    "failure_kind": "proof_incomplete",
+    "gate": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+    "gold": [
+      "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v",
+      "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v",
+      "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v",
+      "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v",
+      "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+    ],
+    "log": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/lec/fpga_rtl_to_generic_lec.log",
+    "proven": false,
+    "reason": "Yosys could not prove 744 equivalence points after induction depths 12.",
+    "script": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/lec/fpga_rtl_to_generic_lec.ys",
+    "status": "inconclusive",
+    "timeout_seconds": 410,
+    "unproven_points": 744
+  },
+  "generic_netlist": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+  "generic_proven": false,
+  "induction_depth": 12,
+  "induction_depths_attempted": [
+    12
+  ],
+  "mapped_lec": {
+    "failure_kind": "upstream_proof_failed",
+    "gate": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+    "gold": [
+      "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v"
+    ],
+    "proven": false,
+    "reason": "Mapped-netlist LEC was not started because RTL-to-generic LEC did not pass.",
+    "status": "blocked",
+    "unproven_points": null
+  },
+  "mapped_lec_strategy": {
+    "flip_flops": 931,
+    "large_design": false,
+    "mapped_cells": 3011,
+    "reason": "monolithic proof selected",
+    "requested": "auto",
+    "selected": "monolithic",
+    "shared_partitions": [
+      "adaptive_aero_control_top",
+      "adaptive_aero_control_top_actuator_safety",
+      "adaptive_aero_control_top_mmio",
+      "adaptive_aero_control_top_request_fsm"
+    ]
+  },
+  "mapped_netlist": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "mapped_proven": false,
+  "netlist": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "proven": false,
+  "reason": "Yosys could not prove 744 equivalence points after induction depths 12.",
+  "required": true,
+  "rtl_file_count": 5,
+  "status": "inconclusive",
+  "tool": "Yosys",
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "unproven_points": 744
+}

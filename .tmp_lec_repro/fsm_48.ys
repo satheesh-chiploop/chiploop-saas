@@ -1,0 +1,30 @@
+read_verilog -sv C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top.v
+read_verilog -sv C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_actuator_safety.v
+read_verilog -sv C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_mmio.v
+read_verilog -sv C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v
+read_verilog -sv C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv
+prep -flatten -top adaptive_aero_control_top_request_fsm
+async2sync
+memory
+opt_clean
+rename -hide w:*_next
+rename adaptive_aero_control_top_request_fsm gold
+design -stash gold
+design -reset
+read_verilog -sv C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v
+prep -flatten -top adaptive_aero_control_top_request_fsm
+async2sync
+memory
+opt_clean
+rename -hide w:*_next
+rename adaptive_aero_control_top_request_fsm gate
+design -stash gate
+design -reset
+design -copy-from gold gold
+design -copy-from gate *
+equiv_make gold gate equiv
+hierarchy -top equiv
+equiv_struct
+equiv_simple -undef -short
+equiv_induct -undef -seq 48
+equiv_status -assert

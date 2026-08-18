@@ -1,0 +1,641 @@
+{
+  "agent_count": 18,
+  "bitstream": {},
+  "constraint_cdc_signoff": {
+    "advisories": [],
+    "agent": "FPGA Constraint and CDC/RDC Signoff Agent",
+    "cdc_rdc_findings": [],
+    "constraint_format": "lpf",
+    "constraint_path": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/constraints/adaptive_aero_control_top_spi_fpga_top.lpf",
+    "detected_async_resets": [
+      "reset_n",
+      "spi_cs_n"
+    ],
+    "detected_clocks": [
+      "clk",
+      "spi_sclk"
+    ],
+    "enabled": true,
+    "errors": [],
+    "required": true,
+    "rtl_file_count": 5,
+    "signoff": {
+      "all_clocks_defined": true,
+      "all_top_level_ports_constrained": true,
+      "cdc_rdc_review_complete": false
+    },
+    "status": "review",
+    "target_frequency_mhz": 50.0,
+    "tool": "ChipLoop structural RTL/constraint analysis",
+    "unconstrained_ports": [],
+    "unsafe_crossing_count": 0,
+    "warnings": [
+      "Multiple RTL clock signals were detected; provide CDC classifications or run structural CDC analysis.",
+      "Asynchronous reset usage was detected; reset release synchronization requires review."
+    ]
+  },
+  "failure": {
+    "agent": "FPGA RTL-to-Netlist Equivalence Agent",
+    "error_type": "RuntimeError",
+    "message": "FPGA RTL-to-netlist LEC did not pass: Yosys could not prove 744 equivalence points after induction depths 12.",
+    "status": "failed"
+  },
+  "hardware_validation": {},
+  "hem": {
+    "enabled": false,
+    "mode": "fixed",
+    "policy": "fpga_fixed_policy_metadata"
+  },
+  "lec": {
+    "agent": "FPGA RTL-to-Netlist Equivalence Agent",
+    "comparison": "two_stage_rtl_generic_and_generic_mapped_equivalence",
+    "enabled": true,
+    "failure_kind": "proof_incomplete",
+    "family": "ecp5",
+    "gate_status": "fail",
+    "generic_lec": {
+      "command": {
+        "cmd": [
+          "/usr/bin/yosys",
+          "-s",
+          "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/lec/fpga_rtl_to_generic_lec.ys"
+        ],
+        "error": null,
+        "executable": "/usr/bin/yosys",
+        "log": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/lec/fpga_rtl_to_generic_lec.log",
+        "ok": false,
+        "profile_id": "chiploop_saas_default",
+        "returncode": 1,
+        "status": "failed",
+        "stderr_tail": "ERROR: Found 744 unproven $equiv cells in 'equiv_status -assert'.\n",
+        "stdout_tail": "iv $auto$equiv_make.cc:294:find_same_wires$3769: \\u_core.u_fsm.response_req_id_r_gold [1] \\u_core.u_fsm.response_req_id_r_gate [1]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2947: \\u_core.u_fsm.model_req_desc_r_gold [40] \\u_core.u_fsm._065__gate [40]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3914: \\u_core.u_mmio.wb_dat_o_r_gold [27] \\u_core.u_mmio.wb_dat_o_r_gate [27]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$4240: \\u_core.u_mmio.wb_dat_o_r_gold [12] \\u_core.u_mmio.wb_dat_o_r_gate [12]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3912: \\u_core.u_mmio.wb_dat_o_r_gold [25] \\u_core.u_mmio.wb_dat_o_r_gate [25]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3188: \\u_core.u_mmio.r_timestamp_gold [3] \\u_core.u_mmio.r_timestamp_gate [3]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3910: \\u_core.u_mmio.wb_dat_o_r_gold [23] \\u_core.u_mmio.wb_dat_o_r_gate [23]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$4232: \\u_core.u_mmio.wb_dat_o_r_gold [4] \\u_core.u_mmio.wb_dat_o_r_gate [4]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3908: \\u_core.u_mmio.wb_dat_o_r_gold [21] \\u_core.u_mmio.wb_dat_o_r_gate [21]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3186: \\u_core.u_mmio.r_timestamp_gold [1] \\u_core.u_mmio.r_timestamp_gate [1]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3986: \\u_core.u_safety.actuator_cmd_r_gold [14] \\u_core.u_safety.actuator_cmd_r_gate [14]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3982: \\u_core.u_safety.actuator_cmd_r_gold [10] \\u_core.u_safety.actuator_cmd_r_gate [10]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3978: \\u_core.u_safety.actuator_cmd_r_gold [6] \\u_core.u_safety.actuator_cmd_r_gate [6]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3974: \\u_core.u_safety.actuator_cmd_r_gold [2] \\u_core.u_safety.actuator_cmd_r_gate [2]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3906: \\u_core.u_mmio.wb_dat_o_r_gold [19] \\u_core.u_mmio.wb_dat_o_r_gate [19]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2928: \\u_core.u_fsm.model_req_desc_r_gold [21] \\u_core.u_fsm._065__gate [21]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3904: \\u_core.u_mmio.wb_dat_o_r_gold [17] \\u_core.u_mmio.wb_dat_o_r_gate [17]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2926: \\u_core.u_fsm.model_req_desc_r_gold [19] \\u_core.u_fsm._065__gate [19]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3902: \\u_core.u_mmio.wb_dat_o_r_gold [15] \\u_core.u_mmio.wb_dat_o_r_gate [15]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2924: \\u_core.u_fsm.model_req_desc_r_gold [17] \\u_core.u_fsm._065__gate [17]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3900: \\u_core.u_mmio.wb_dat_o_r_gold [13] \\u_core.u_mmio.wb_dat_o_r_gate [13]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2922: \\u_core.u_fsm.model_req_desc_r_gold [15] \\u_core.u_fsm._065__gate [15]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3898: \\u_core.u_mmio.wb_dat_o_r_gold [11] \\u_core.u_mmio.wb_dat_o_r_gate [11]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2810: \\u_core.u_mmio.r_oper_en_max_gold [4] \\u_core.u_mmio.r_oper_en_max_gate [4]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2326: \\u_core.u_mmio.r_timestamp_gold [17] \\u_core.u_mmio.r_timestamp_gate [17]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2622: \\u_core.u_fsm.age_counter_r_gold [0] \\u_core.u_fsm.age_counter_r_gate [0]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3103: \\u_core.u_fsm.next_state_gold [7] \\u_core.u_fsm.next_state_gate [7]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$3684: \\u_core.u_mmio.r_timestamp_gold [26] \\u_core.u_mmio.r_timestamp_gate [26]\n  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$2986: \\rx_active_gold [80] \\rx_active_gate [80]\n  Unproven $equiv $auto$equiv_make.cc:294:find_s"
+      },
+      "failure_kind": "proof_incomplete",
+      "gate": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+      "gold": [
+        "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v",
+        "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v",
+        "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v",
+        "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v",
+        "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+      ],
+      "log": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/lec/fpga_rtl_to_generic_lec.log",
+      "proven": false,
+      "reason": "Yosys could not prove 744 equivalence points after induction depths 12.",
+      "script": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/lec/fpga_rtl_to_generic_lec.ys",
+      "status": "inconclusive",
+      "timeout_seconds": 410,
+      "unproven_points": 744
+    },
+    "generic_netlist": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+    "generic_proven": false,
+    "induction_depth": 12,
+    "induction_depths_attempted": [
+      12
+    ],
+    "mapped_lec": {
+      "failure_kind": "upstream_proof_failed",
+      "gate": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+      "gold": [
+        "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v"
+      ],
+      "proven": false,
+      "reason": "Mapped-netlist LEC was not started because RTL-to-generic LEC did not pass.",
+      "status": "blocked",
+      "unproven_points": null
+    },
+    "mapped_lec_strategy": {
+      "flip_flops": 931,
+      "large_design": false,
+      "mapped_cells": 3011,
+      "reason": "monolithic proof selected",
+      "requested": "auto",
+      "selected": "monolithic",
+      "shared_partitions": [
+        "adaptive_aero_control_top",
+        "adaptive_aero_control_top_actuator_safety",
+        "adaptive_aero_control_top_mmio",
+        "adaptive_aero_control_top_request_fsm"
+      ]
+    },
+    "mapped_netlist": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+    "mapped_proven": false,
+    "netlist": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+    "proven": false,
+    "reason": "Yosys could not prove 744 equivalence points after induction depths 12.",
+    "required": true,
+    "rtl_file_count": 5,
+    "status": "inconclusive",
+    "tool": "Yosys",
+    "top_module": "adaptive_aero_control_top_spi_fpga_top",
+    "unproven_points": 744
+  },
+  "participating_agents": [
+    "FPGA RTL Handoff Ingest Agent",
+    "FPGA RTL Quality Gate Agent",
+    "Digital RTL Linting Agent",
+    "Digital CDC Analysis Agent",
+    "Digital Reset Integrity Agent",
+    "Digital Synthesis Readiness Agent",
+    "Digital DQA Summary Agent",
+    "Digital Verification Handoff Ingest Agent",
+    "Digital Functional Coverage Agent",
+    "Digital Testbench Generator Agent",
+    "Digital Assertions (SVA) Agent",
+    "Digital Simulation Control Agent",
+    "Digital Simulation Execution Agent",
+    "Digital Simulation Summary Coverage Agent",
+    "FPGA Constraint Setup Agent",
+    "FPGA Constraint and CDC/RDC Signoff Agent",
+    "FPGA Yosys Synthesis Agent",
+    "FPGA RTL-to-Netlist Equivalence Agent"
+  ],
+  "place_route": {},
+  "power_device_qualification": {},
+  "routed_result": {
+    "error_count": null,
+    "logic_utilization_percent": null,
+    "logical_cells_available": 44000,
+    "logical_cells_used": null,
+    "max_frequency_mhz": null,
+    "routed_flip_flops": null,
+    "routed_lut4_cells": null,
+    "routed_resource": null,
+    "timing_met": null,
+    "timing_violation_count": null,
+    "tns_ns": null,
+    "utilization_source": null,
+    "warning_count": null,
+    "wns_ns": null
+  },
+  "rtl_file_count": 5,
+  "rtl_quality": {
+    "agent": "FPGA RTL Quality Gate Agent",
+    "pass1": {
+      "rtl_file_count": 5,
+      "status": "pass",
+      "suffix": "pass1",
+      "tools": {
+        "iverilog": {
+          "available": true,
+          "cmd": [
+            "iverilog",
+            "-g2012",
+            "-tnull",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+          ],
+          "log": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/quality/iverilog_pass1.log",
+          "ok": true,
+          "returncode": 0
+        },
+        "verilator": {
+          "available": true,
+          "cmd": [
+            "verilator",
+            "--lint-only",
+            "-Wall",
+            "-Wno-fatal",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+          ],
+          "log": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/quality/verilator_pass1.log",
+          "ok": true,
+          "returncode": 0
+        }
+      }
+    },
+    "pass2": {
+      "rtl_file_count": 5,
+      "status": "pass",
+      "suffix": "pass2",
+      "tools": {
+        "iverilog": {
+          "available": true,
+          "cmd": [
+            "iverilog",
+            "-g2012",
+            "-tnull",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+          ],
+          "log": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/quality/iverilog_pass2.log",
+          "ok": true,
+          "returncode": 0
+        },
+        "verilator": {
+          "available": true,
+          "cmd": [
+            "verilator",
+            "--lint-only",
+            "-Wall",
+            "-Wno-fatal",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v",
+            "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+          ],
+          "log": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/quality/verilator_pass2.log",
+          "ok": true,
+          "returncode": 0
+        }
+      }
+    },
+    "repair": {
+      "applied": false,
+      "enabled": true
+    },
+    "repair_enabled": true,
+    "rtl_file_count": 5,
+    "rtl_files": [
+      "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v",
+      "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v",
+      "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v",
+      "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v",
+      "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+    ],
+    "status": "pass"
+  },
+  "smart_context": {
+    "enabled": false,
+    "mode": "smart"
+  },
+  "status": "failed",
+  "synthesis": {
+    "agent": "FPGA Yosys Synthesis Agent",
+    "block_ram_bits_available": 1944000,
+    "block_ram_blocks_available": 108,
+    "block_ram_blocks_used": 0,
+    "block_ram_primitive": "DP16KD",
+    "block_ram_utilization_percent": 0.0,
+    "carry_cells": 112,
+    "cell_type_counts": {
+      "$specify2": 18,
+      "CCU2C": 112,
+      "L6MUX21": 82,
+      "LUT4": 1638,
+      "PFUMX": 226,
+      "TRELLIS_FF": 931,
+      "adaptive_aero_control_top": 1,
+      "adaptive_aero_control_top_actuator_safety": 1,
+      "adaptive_aero_control_top_mmio": 1,
+      "adaptive_aero_control_top_request_fsm": 1
+    },
+    "closure_iteration": 0,
+    "combinational_cells": 2062,
+    "command": {
+      "cmd": [
+        "/usr/bin/yosys",
+        "-s",
+        "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/synth_ecp5.ys"
+      ],
+      "error": null,
+      "executable": "/usr/bin/yosys",
+      "log": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/yosys_synth.log",
+      "ok": true,
+      "profile_id": "chiploop_saas_default",
+      "returncode": 0,
+      "status": "success",
+      "stderr_tail": "",
+      "stdout_tail": "re bits:    1119\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:                471\n     CCU2C                          72\n     L6MUX21                        18\n     LUT4                          283\n     PFUMX                          64\n     TRELLIS_FF                     34\n\n=== adaptive_aero_control_top_mmio ===\n\n   Number of wires:                651\n   Number of wire bits:           1537\n   Number of public wires:         651\n   Number of public wire bits:    1537\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:               1001\n     L6MUX21                        44\n     LUT4                          619\n     PFUMX                          88\n     TRELLIS_FF                    250\n\n=== adaptive_aero_control_top_request_fsm ===\n\n   Number of wires:                454\n   Number of wire bits:           1376\n   Number of public wires:         454\n   Number of public wire bits:    1376\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:                635\n     CCU2C                          40\n     L6MUX21                        20\n     LUT4                          361\n     PFUMX                          74\n     TRELLIS_FF                    140\n\n=== adaptive_aero_control_top_spi_fpga_top ===\n\n   Number of wires:                408\n   Number of wire bits:           1260\n   Number of public wires:         408\n   Number of public wire bits:    1260\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:                883\n     LUT4                          375\n     TRELLIS_FF                    507\n     adaptive_aero_control_top       1\n\n=== design hierarchy ===\n\n   adaptive_aero_control_top_spi_fpga_top      1\n     adaptive_aero_control_top       1\n       adaptive_aero_control_top_actuator_safety      1\n       adaptive_aero_control_top_mmio      1\n       adaptive_aero_control_top_request_fsm      1\n\n   Number of wires:               1879\n   Number of wire bits:           5907\n   Number of public wires:        1879\n   Number of public wire bits:    5907\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:               2989\n     CCU2C                         112\n     L6MUX21                        82\n     LUT4                         1638\n     PFUMX                         226\n     TRELLIS_FF                    931\n\n12.47. Executing CHECK pass (checking for obvious problems).\nChecking module adaptive_aero_control_top...\nChecking module adaptive_aero_control_top_actuator_safety...\nChecking module adaptive_aero_control_top_mmio...\nChecking module adaptive_aero_control_top_request_fsm...\nChecking module adaptive_aero_control_top_spi_fpga_top...\nFound and reported 0 problems.\n\n12.48. Executing JSON backend.\n\n13. Executing Verilog backend.\n\n13.1. Executing BMUXMAP pass.\n\n13.2. Executing DEMUXMAP pass.\nDumping module `\\adaptive_aero_control_top'.\nDumping module `\\adaptive_aero_control_top_actuator_safety'.\nDumping module `\\adaptive_aero_control_top_mmio'.\nDumping module `\\adaptive_aero_control_top_request_fsm'.\nDumping module `\\adaptive_aero_control_top_spi_fpga_top'.\n\n14. Executing Verilog backend.\n\n14.1. Executing BMUXMAP pass.\n\n14.2. Executing DEMUXMAP pass.\nDumping module `\\adaptive_aero_control_top'.\nDumping module `\\adaptive_aero_control_top_actuator_safety'.\nDumping module `\\adaptive_aero_control_top_mmio'.\nDumping module `\\adaptive_aero_control_top_request_fsm'.\nDumping module `\\adaptive_aero_control_top_spi_fpga_top'.\n\nEnd of script. Logfile hash: 43197da6dd, CPU: user 3.97s system 0.08s, MEM: 192.36 MB peak\nYosys 0.33 (git sha1 2584903a060)\nTime spent: 25% 1x abc (1 sec), 12% 7x techmap (0 sec), ...\n"
+    },
+    "equivalence_netlist": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+    "fabric_mapped_cells": 2681,
+    "flatten_enabled": false,
+    "flip_flops": 931,
+    "json_netlist": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5.json",
+    "logic_utilization_percent": 5.839,
+    "logical_cells_available": 44000,
+    "logical_cells_used": 2569,
+    "lut4_cells": 1638,
+    "mapped_equivalence_netlist": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+    "memory_intent": {
+      "declarations": [],
+      "estimated_bits": 0,
+      "requires_block_ram": false,
+      "threshold_bits": 4096
+    },
+    "memory_mapping_gate": {
+      "enforced": false,
+      "mapped": false,
+      "primitive": "DP16KD",
+      "required": false,
+      "status": "pass",
+      "supported": true
+    },
+    "rtl_file_count": 5,
+    "status": "completed",
+    "tool_effort": {
+      "capability_checked": true,
+      "effective_options": [
+        "-noflatten"
+      ],
+      "flatten": false,
+      "goal": "balanced_timing",
+      "mode": "balanced",
+      "requested": [
+        "technology_mapping",
+        "preserve_hierarchy"
+      ],
+      "retime": false,
+      "strategy": "baseline",
+      "tool_version": null
+    },
+    "top_module": "adaptive_aero_control_top_spi_fpga_top",
+    "total_mapped_cells": 3011,
+    "verilog_netlist": "/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_netlist.v"
+  },
+  "synthesis_closure": {},
+  "synthesis_estimate": {
+    "block_ram_bits_available": 1944000,
+    "block_ram_blocks_available": 108,
+    "block_ram_blocks_used": 0,
+    "block_ram_primitive": "DP16KD",
+    "block_ram_utilization_percent": 0.0,
+    "carry_cells": 112,
+    "combinational_cells": 2062,
+    "fabric_mapped_cells": 2681,
+    "flip_flops": 931,
+    "logic_utilization_percent": 5.839,
+    "logical_cells_available": 44000,
+    "logical_cells_used": 2569,
+    "lut4_cells": 1638,
+    "memory_mapping_gate": {
+      "enforced": false,
+      "mapped": false,
+      "primitive": "DP16KD",
+      "required": false,
+      "status": "pass",
+      "supported": true
+    },
+    "total_mapped_cells": 3011
+  },
+  "target": {
+    "bitstream_ext": ".bit",
+    "bitstream_tool": "ecppack",
+    "board": "ulx3s_ecp5_45f",
+    "compute_host": {
+      "external_host_supported": true,
+      "hard_cpu": null,
+      "soft_cpu_supported": true
+    },
+    "constraint_format": "lpf",
+    "default_frequency_mhz": 25.0,
+    "device": "45k",
+    "family": "ecp5",
+    "label": "Lattice ULX3S ECP5-45F",
+    "nextpnr_device_flag": "--45k",
+    "nextpnr_package": "CABGA381",
+    "nextpnr_tool": "nextpnr-ecp5",
+    "package": "CABGA381",
+    "pnr_output_ext": ".config",
+    "programmer_board": "ulx3s",
+    "resources": {
+      "block_ram_bits": 1944000,
+      "block_ram_blocks": 108,
+      "block_ram_primitive": "DP16KD",
+      "dsp_blocks": 72,
+      "io_cells": 245,
+      "logic_cells": 44000
+    },
+    "support_tier": "production",
+    "supported": true,
+    "target_frequency_mhz": 50.0,
+    "vendor": "lattice"
+  },
+  "timing_closure": {},
+  "timing_drc": {},
+  "timing_rtl_repair": {},
+  "timing_summary": {
+    "max_frequency_mhz": null,
+    "target_frequency_mhz": 50.0,
+    "timing_met": null,
+    "timing_violation_count": null,
+    "tns_ns": null,
+    "wns_ns": null
+  },
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "type": "fpga_dashboard",
+  "utilization": {
+    "logic_utilization_percent": null,
+    "logical_cells_available": 44000,
+    "logical_cells_used": null,
+    "routed_flip_flops": null,
+    "routed_lut4_cells": null,
+    "routed_resource": null,
+    "source": null
+  },
+  "verification": {
+    "coverage": {
+      "assertions": {
+        "assertion_failures": 0,
+        "assertion_pass_pct": null,
+        "assertions_generated": 0,
+        "status": "missing"
+      },
+      "bins_hit": 10,
+      "code": {
+        "branch_coverage_pct": 0.76,
+        "branch_found": 6579,
+        "branch_hit": 50,
+        "condition_coverage_pct": 0.76,
+        "condition_found": 6579,
+        "condition_hit": 50,
+        "condition_source": "verilator_lcov_branch_proxy",
+        "line_coverage_pct": 37.82,
+        "line_found": 505,
+        "line_hit": 191,
+        "missed_toggle_points": [
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=reset_n:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_issue:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_issue:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_allow_multi_outstanding:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_allow_multi_outstanding:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[0]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[0]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[1]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[1]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[2]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[2]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[3]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[3]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[4]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[4]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[5]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[5]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[6]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[6]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          },
+          {
+            "file": "adaptive_aero_control_top_request_fsm.v",
+            "point": "comment=cfg_request_id[7]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm"
+          }
+        ],
+        "status": "ok",
+        "toggle_coverage_pct": 5.46,
+        "toggle_found": 6462,
+        "toggle_hit": 353,
+        "toggle_source": "verilator_coverage_annotate_points",
+        "tool": "verilator_coverage"
+      },
+      "functional": {
+        "bins_hit": 10,
+        "coverage_pct": 71.43,
+        "gap_count": 4,
+        "gaps": [
+          {
+            "coverage_point": "outputs.fault_indicator",
+            "group": "outputs",
+            "hit_bins": 1,
+            "missing_bins": [
+              "nonzero"
+            ],
+            "seen_values": [
+              0
+            ],
+            "signal": "fault_indicator",
+            "total_bins": 2,
+            "type": "functional_bin_gap"
+          },
+          {
+            "coverage_point": "outputs.spi_miso",
+            "group": "outputs",
+            "hit_bins": 1,
+            "missing_bins": [
+              "nonzero"
+            ],
+            "seen_values": [
+              0
+            ],
+            "signal": "spi_miso",
+            "total_bins": 2,
+            "type": "functional_bin_gap"
+          },
+          {
+            "coverage_point": "inputs.clk",
+            "group": "inputs",
+            "hit_bins": 1,
+            "missing_bins": [
+              "zero"
+            ],
+            "seen_values": [
+              1
+            ],
+            "signal": "clk",
+            "total_bins": 2,
+            "type": "functional_bin_gap"
+          },
+          {
+            "coverage_point": "inputs.reset_n",
+            "group": "inputs",
+            "hit_bins": 1,
+            "missing_bins": [
+              "zero"
+            ],
+            "seen_values": [
+              1
+            ],
+            "signal": "reset_n",
+            "total_bins": 2,
+            "type": "functional_bin_gap"
+          }
+        ],
+        "status": "ok",
+        "total_bins": 14
+      },
+      "functional_coverage_pct": 71.43,
+      "status": "ok",
+      "total_bins": 14
+    },
+    "formal": {
+      "attempted": null,
+      "available": null,
+      "reason": null,
+      "returncode": null,
+      "status": "not_enabled"
+    },
+    "golden_model": {
+      "status": "not_enabled",
+      "top_module": null
+    },
+    "simulation": {
+      "fail": 0,
+      "pass": 2,
+      "total": 2
+    },
+    "toolchain": {
+      "code_coverage": "verilator_coverage",
+      "formal": "none",
+      "formal_solver": null,
+      "golden_model": "none",
+      "simulator": "verilator"
+    },
+    "type": "simulation_summary_coverage"
+  }
+}

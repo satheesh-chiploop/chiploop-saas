@@ -1,0 +1,1453 @@
+/----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2025  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.56 (git sha1 9c447ad9d4b1ea589369364eea38b4d70da2c599, x86_64-w64-mingw32-g++ 15.2.0 -march=nocona -msahf -mtune=generic -O2 -fstack-protector-strong -O3)
+
+-- Executing script file `C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\fpga_generic_partition_adaptive_aero_control_top_request_fsm.ys' --
+
+1. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top.v
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_actuator_safety.v
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_actuator_safety.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_actuator_safety'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_mmio.v
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_mmio.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_mmio'.
+Successfully finished Verilog frontend.
+
+4. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_request_fsm'.
+Successfully finished Verilog frontend.
+
+5. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_spi_fpga_top'.
+Successfully finished Verilog frontend.
+
+6. Executing PREP pass.
+
+6.1. Executing HIERARCHY pass (managing design hierarchy).
+
+6.1.1. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_request_fsm
+
+6.1.2. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_request_fsm
+Removing unused module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed 1 unused modules.
+
+6.2. Executing PROC pass (convert processes to netlists).
+
+6.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+Cleaned up 1 empty switch.
+
+6.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108 in module adaptive_aero_control_top_request_fsm.
+Marked 9 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86 in module adaptive_aero_control_top_request_fsm.
+Removed a total of 0 dead cases.
+
+6.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 18 redundant assignments.
+Promoted 22 assignments to connections.
+
+6.2.4. Executing PROC_INIT pass (extract init attributes).
+
+6.2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+
+6.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~9 debug messages>
+
+6.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+     1/18: $0\model_rsp_ready_r[0:0]
+     2/18: $0\model_req_valid_r[0:0]
+     3/18: $0\model_req_desc_r[63:0]
+     4/18: $0\fault_summary_r[15:0]
+     5/18: $0\age_counter_r[31:0]
+     6/18: $0\selected_cmd_valid_r[0:0]
+     7/18: $0\selected_cmd_r[15:0]
+     8/18: $0\irq_pulse_r[0:0]
+     9/18: $0\fallback_active_r[0:0]
+    10/18: $0\service_error_r[0:0]
+    11/18: $0\envelope_violation_r[0:0]
+    12/18: $0\timeout_expired_r[0:0]
+    13/18: $0\stale_reject_r[0:0]
+    14/18: $0\response_received_r[0:0]
+    15/18: $0\pending_r[0:0]
+    16/18: $0\response_req_id_r[7:0]
+    17/18: $0\outstanding_req_id_r[7:0]
+    18/18: $0\state_r[7:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+     1/61: $8\next_state[7:0]
+     2/61: $3\selected_cmd_next[15:0]
+     3/61: $3\selected_cmd_valid_next[0:0]
+     4/61: $4\next_age_counter[31:0]
+     5/61: $7\next_state[7:0]
+     6/61: $7\next_pending[0:0]
+     7/61: $1\next_outstanding_req_id[7:0]
+     8/61: $6\next_fault_summary[15:0] [15:5]
+     9/61: $6\next_fault_summary[15:0] [4]
+    10/61: $6\next_fault_summary[15:0] [3:2]
+    11/61: $6\next_fault_summary[15:0] [1]
+    12/61: $6\next_fault_summary[15:0] [0]
+    13/61: $3\next_age_counter[31:0]
+    14/61: $6\next_irq_pulse[0:0]
+    15/61: $2\selected_cmd_valid_next[0:0]
+    16/61: $2\selected_cmd_next[15:0]
+    17/61: $6\next_pending[0:0]
+    18/61: $6\next_state[7:0]
+    19/61: $6\next_fallback_active[0:0]
+    20/61: $2\next_service_error[0:0]
+    21/61: $2\next_stale_reject[0:0]
+    22/61: $5\next_fault_summary[15:0]
+    23/61: $2\next_age_counter[31:0]
+    24/61: $5\next_irq_pulse[0:0]
+    25/61: $5\next_fallback_active[0:0]
+    26/61: $1\next_service_error[0:0]
+    27/61: $1\next_stale_reject[0:0]
+    28/61: $5\next_pending[0:0]
+    29/61: $5\next_state[7:0]
+    30/61: $1\selected_cmd_valid_next[0:0]
+    31/61: $1\selected_cmd_next[15:0]
+    32/61: $1\next_response_received[0:0]
+    33/61: $1\response_ok[0:0]
+    34/61: $1\id_match[0:0]
+    35/61: $1\next_response_req_id[7:0]
+    36/61: $4\next_fault_summary[2:2]
+    37/61: $4\next_irq_pulse[0:0]
+    38/61: $4\next_pending[0:0]
+    39/61: $4\next_state[7:0]
+    40/61: $4\next_fallback_active[0:0]
+    41/61: $1\next_envelope_violation[0:0]
+    42/61: $3\next_fault_summary[3:3]
+    43/61: $3\next_pending[0:0]
+    44/61: $3\next_state[7:0]
+    45/61: $3\next_irq_pulse[0:0]
+    46/61: $3\next_fallback_active[0:0]
+    47/61: $2\next_fault_summary[0:0]
+    48/61: $2\next_pending[0:0]
+    49/61: $2\next_state[7:0]
+    50/61: $2\next_irq_pulse[0:0]
+    51/61: $2\next_fallback_active[0:0]
+    52/61: $2\next_timeout_expired[0:0]
+    53/61: $2\timeout_bad[0:0]
+    54/61: $1\timeout_bad[0:0]
+    55/61: $1\next_fault_summary[0:0]
+    56/61: $1\next_irq_pulse[0:0]
+    57/61: $1\next_fallback_active[0:0]
+    58/61: $1\next_timeout_expired[0:0]
+    59/61: $1\next_pending[0:0]
+    60/61: $1\next_state[7:0]
+    61/61: $1\next_age_counter[31:0]
+
+6.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\selected_cmd_next' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\selected_cmd_valid_next' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_state' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_outstanding_req_id' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_response_req_id' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_pending' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_response_received' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_stale_reject' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_timeout_expired' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_envelope_violation' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_service_error' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_fallback_active' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_irq_pulse' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_age_counter' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_fault_summary' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\req_desc_comb' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\cmd_raw' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\envelope_bad' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\timeout_bad' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\id_match' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\response_ok' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\issue_req' from process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+
+6.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\state_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$368' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\outstanding_req_id_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$373' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\response_req_id_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$378' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\pending_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$383' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\response_received_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$388' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\stale_reject_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$393' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\timeout_expired_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$398' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\envelope_violation_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$403' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\service_error_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$408' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\fallback_active_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$413' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\irq_pulse_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$418' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\selected_cmd_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$423' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\selected_cmd_valid_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$428' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\age_counter_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$433' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\fault_summary_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$438' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\model_req_desc_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$443' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\model_req_valid_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$448' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\model_rsp_ready_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+  created $adff cell `$procdff$453' with positive edge clock and positive level reset.
+
+6.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+6.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:237$108'.
+Found and cleaned up 9 empty switches in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:137$86'.
+Cleaned up 9 empty switches.
+
+6.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+<suppressed ~37 debug messages>
+
+6.3. Executing FLATTEN pass (flatten design).
+
+6.4. Executing FUTURE pass.
+
+6.5. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+
+6.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Removed 21 unused cells and 239 unused wires.
+<suppressed ~24 debug messages>
+
+6.7. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_request_fsm...
+Found and reported 0 problems.
+
+6.8. Executing OPT pass (performing simple optimizations).
+
+6.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+
+6.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+6.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 2/2 on $mux $procmux$145.
+    dead port 2/2 on $mux $procmux$151.
+    dead port 2/2 on $mux $procmux$157.
+    dead port 2/2 on $mux $procmux$163.
+    dead port 2/2 on $mux $procmux$169.
+    dead port 2/2 on $mux $procmux$175.
+    dead port 2/2 on $mux $procmux$180.
+    dead port 2/2 on $mux $procmux$186.
+    dead port 2/2 on $mux $procmux$192.
+    dead port 2/2 on $mux $procmux$197.
+    dead port 2/2 on $mux $procmux$203.
+    dead port 2/2 on $mux $procmux$209.
+    dead port 2/2 on $mux $procmux$215.
+    dead port 2/2 on $mux $procmux$221.
+    dead port 2/2 on $mux $procmux$302.
+    dead port 2/2 on $mux $procmux$308.
+    dead port 2/2 on $mux $procmux$314.
+    dead port 2/2 on $mux $procmux$320.
+    dead port 2/2 on $mux $procmux$326.
+    dead port 2/2 on $mux $procmux$332.
+    dead port 2/2 on $mux $procmux$338.
+Removed 21 multiplexer ports.
+<suppressed ~22 debug messages>
+
+6.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+Performed a total of 0 changes.
+
+6.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+<suppressed ~18 debug messages>
+Removed a total of 6 cells.
+
+6.8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Removed 0 unused cells and 26 unused wires.
+<suppressed ~1 debug messages>
+
+6.8.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+
+6.8.8. Rerunning OPT passes. (Maybe there is more to do..)
+
+6.8.9. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~22 debug messages>
+
+6.8.10. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+Performed a total of 0 changes.
+
+6.8.11. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Removed a total of 0 cells.
+
+6.8.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+
+6.8.13. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+
+6.8.14. Finished OPT passes. (There is nothing left to do.)
+
+6.9. Executing WREDUCE pass (reducing word size of cells).
+Removed top 7 bits (of 8) from mux cell adaptive_aero_control_top_request_fsm.$procmux$201 ($mux).
+Removed top 7 bits (of 8) from port B of cell adaptive_aero_control_top_request_fsm.$eq$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:161$88 ($eq).
+Removed top 31 bits (of 32) from port B of cell adaptive_aero_control_top_request_fsm.$add$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:162$89 ($add).
+Removed top 6 bits (of 8) from port B of cell adaptive_aero_control_top_request_fsm.$eq$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:227$106 ($eq).
+Removed top 6 bits (of 8) from port B of cell adaptive_aero_control_top_request_fsm.$eq$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:232$107 ($eq).
+Removed top 7 bits (of 8) from wire adaptive_aero_control_top_request_fsm.$6\next_state[7:0].
+Removed top 8 bits (of 64) from wire adaptive_aero_control_top_request_fsm.req_desc_comb.
+
+6.10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Removed 0 unused cells and 2 unused wires.
+<suppressed ~1 debug messages>
+
+6.11. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+6.12. Executing OPT pass (performing simple optimizations).
+
+6.12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+
+6.12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+<suppressed ~3 debug messages>
+Removed a total of 1 cells.
+
+6.12.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+6.12.4. Finished fast OPT passes.
+
+6.13. Printing statistics.
+
+=== adaptive_aero_control_top_request_fsm ===
+
+   Number of wires:                123
+   Number of wire bits:            947
+   Number of public wires:          72
+   Number of public wire bits:     685
+   Number of ports:                 34
+   Number of port bits:            350
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 87
+     $add                            1
+     $adff                          18
+     $eq                             4
+     $ge                             1
+     $gt                             1
+     $logic_and                      7
+     $logic_not                      4
+     $mux                           50
+     $reduce_bool                    1
+
+6.14. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_request_fsm...
+Found and reported 0 problems.
+
+7. Executing ASYNC2SYNC pass.
+Replacing adaptive_aero_control_top_request_fsm.$procdff$368 ($adff): ARST=\reset_n, D=\next_state, Q=\state_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$373 ($adff): ARST=\reset_n, D=\next_outstanding_req_id, Q=\outstanding_req_id_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$378 ($adff): ARST=\reset_n, D=\next_response_req_id, Q=\response_req_id_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$383 ($adff): ARST=\reset_n, D=\next_pending, Q=\pending_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$388 ($adff): ARST=\reset_n, D=\next_response_received, Q=\response_received_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$393 ($adff): ARST=\reset_n, D=\next_service_error, Q=\stale_reject_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$398 ($adff): ARST=\reset_n, D=\next_timeout_expired, Q=\timeout_expired_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$403 ($adff): ARST=\reset_n, D=\next_envelope_violation, Q=\envelope_violation_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$408 ($adff): ARST=\reset_n, D=\next_service_error, Q=\service_error_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$413 ($adff): ARST=\reset_n, D=\next_fallback_active, Q=\fallback_active_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$418 ($adff): ARST=\reset_n, D=\next_irq_pulse, Q=\irq_pulse_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$423 ($adff): ARST=\reset_n, D=\selected_cmd_next, Q=\selected_cmd_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$428 ($adff): ARST=\reset_n, D=\selected_cmd_valid_next, Q=\selected_cmd_valid_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$433 ($adff): ARST=\reset_n, D=\next_age_counter, Q=\age_counter_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$438 ($adff): ARST=\reset_n, D=\next_fault_summary, Q=\fault_summary_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$443 ($adff): ARST=\reset_n, D={ 8'00000000 \cfg_timestamp \cfg_geometry_handle [15:8] \cfg_flow_handle [15:8] \cfg_request_id }, Q=\model_req_desc_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$448 ($adff): ARST=\reset_n, D=\model_req_valid_r, Q=\model_req_valid_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$453 ($adff): ARST=\reset_n, D=\model_rsp_ready_r, Q=\model_rsp_ready_r
+
+8. Executing MEMORY pass.
+
+8.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+8.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+8.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+8.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+8.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+
+8.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+8.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+8.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+
+8.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+8.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Renaming module \adaptive_aero_control_top_request_fsm to \gold.
+
+10. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v' to AST representation.
+Warning: Encountered `parallel_case' comment! Such legacy hot comments are supported by Yosys, but are not part of any formal language specification. Using the Verilog `parallel_case' attribute or the SystemVerilog `unique' or `priority' keywords is recommended!
+Generating RTLIL representation for module `\adaptive_aero_control_top'.
+Generating RTLIL representation for module `\adaptive_aero_control_top_actuator_safety'.
+Generating RTLIL representation for module `\adaptive_aero_control_top_mmio'.
+Generating RTLIL representation for module `\adaptive_aero_control_top_request_fsm'.
+Generating RTLIL representation for module `\adaptive_aero_control_top_spi_fpga_top'.
+Successfully finished Verilog frontend.
+
+11. Executing PREP pass.
+
+11.1. Executing HIERARCHY pass (managing design hierarchy).
+
+11.1.1. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_request_fsm
+
+11.1.2. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_request_fsm
+Removing unused module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed 1 unused modules.
+
+11.2. Executing PROC pass (convert processes to netlists).
+
+11.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+11.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:977$740 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:974$738 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:971$736 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:968$734 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:965$732 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:962$730 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:959$728 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:956$726 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:928$699 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:924$697 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:920$695 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:917$693 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:914$691 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:911$689 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:907$687 in module adaptive_aero_control_top_request_fsm.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:902$685 in module adaptive_aero_control_top_request_fsm.
+Removed a total of 0 dead cases.
+
+11.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 10 redundant assignments.
+Promoted 0 assignments to connections.
+
+11.2.4. Executing PROC_INIT pass (extract init attributes).
+
+11.2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:977$740'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:974$738'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:971$736'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:968$734'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:965$732'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:962$730'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:959$728'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:956$726'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:928$699'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:924$697'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:920$695'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:917$693'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:914$691'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:911$689'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:907$687'.
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:902$685'.
+
+11.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~6 debug messages>
+
+11.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:977$740'.
+     1/1: $0\age_counter_r[31:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:974$738'.
+     1/1: $0\selected_cmd_valid_r[0:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:971$736'.
+     1/1: $0\irq_pulse_r[0:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:968$734'.
+     1/1: $0\fallback_active_r[0:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:965$732'.
+     1/1: $0\service_error_r[0:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:962$730'.
+     1/1: $0\envelope_violation_r[0:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:959$728'.
+     1/1: $0\response_received_r[0:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:956$726'.
+     1/1: $0\state_r[7:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:928$699'.
+     1/1: $0\timeout_expired_r[0:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:924$697'.
+     1/1: $0\_065_[55:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:920$695'.
+     1/1: $0\pending_r[0:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:917$693'.
+     1/1: $0\selected_cmd_r[15:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:914$691'.
+     1/1: $0\response_req_id_r[7:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:911$689'.
+     1/1: $0\outstanding_req_id_r[7:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:907$687'.
+     1/1: $0\_060_[2:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:902$685'.
+     1/1: $0\_059_[12:0]
+
+11.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+11.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\age_counter_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:977$740'.
+  created $adff cell `$procdff$824' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\selected_cmd_valid_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:974$738'.
+  created $adff cell `$procdff$829' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\irq_pulse_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:971$736'.
+  created $adff cell `$procdff$834' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\fallback_active_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:968$734'.
+  created $adff cell `$procdff$839' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\service_error_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:965$732'.
+  created $adff cell `$procdff$844' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\envelope_violation_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:962$730'.
+  created $adff cell `$procdff$849' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\response_received_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:959$728'.
+  created $adff cell `$procdff$854' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\state_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:956$726'.
+  created $adff cell `$procdff$859' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\timeout_expired_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:928$699'.
+  created $adff cell `$procdff$864' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\_065_' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:924$697'.
+  created $adff cell `$procdff$869' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\pending_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:920$695'.
+  created $adff cell `$procdff$874' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\selected_cmd_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:917$693'.
+  created $adff cell `$procdff$879' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\response_req_id_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:914$691'.
+  created $adff cell `$procdff$884' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\outstanding_req_id_r' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:911$689'.
+  created $adff cell `$procdff$889' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\_060_' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:907$687'.
+  created $adff cell `$procdff$894' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\_059_' using process `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:902$685'.
+  created $adff cell `$procdff$899' with positive edge clock and positive level reset.
+
+11.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+11.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:977$740'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:974$738'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:971$736'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:968$734'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:965$732'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:962$730'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:959$728'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:956$726'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:928$699'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:928$699'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:924$697'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:920$695'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:920$695'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:917$693'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:917$693'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:914$691'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:914$691'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:911$689'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:911$689'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:907$687'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:902$685'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:902$685'.
+Cleaned up 6 empty switches.
+
+11.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+<suppressed ~32 debug messages>
+
+11.3. Executing FLATTEN pass (flatten design).
+
+11.4. Executing FUTURE pass.
+
+11.5. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+
+11.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Removed 32 unused cells and 143 unused wires.
+<suppressed ~33 debug messages>
+
+11.7. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_request_fsm...
+Found and reported 0 problems.
+
+11.8. Executing OPT pass (performing simple optimizations).
+
+11.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+
+11.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Removed a total of 0 cells.
+
+11.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~24 debug messages>
+
+11.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+Performed a total of 0 changes.
+
+11.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Removed a total of 0 cells.
+
+11.8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+
+11.8.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+
+11.8.8. Finished OPT passes. (There is nothing left to do.)
+
+11.9. Executing WREDUCE pass (reducing word size of cells).
+Removed top 31 bits (of 32) from port B of cell adaptive_aero_control_top_request_fsm.$add$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:900$684 ($add).
+Removed top 7 bits (of 8) from port B of cell adaptive_aero_control_top_request_fsm.$eq$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:938$708 ($eq).
+Removed top 6 bits (of 8) from port B of cell adaptive_aero_control_top_request_fsm.$eq$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:940$710 ($eq).
+Removed top 6 bits (of 8) from port B of cell adaptive_aero_control_top_request_fsm.$eq$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:941$711 ($eq).
+Removed top 7 bits (of 8) from mux cell adaptive_aero_control_top_request_fsm.$ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:992$754 ($mux).
+Removed top 12 bits (of 16) from mux cell adaptive_aero_control_top_request_fsm.$ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:995$757 ($mux).
+Removed top 7 bits (of 8) from wire adaptive_aero_control_top_request_fsm._031_.
+Removed top 12 bits (of 16) from wire adaptive_aero_control_top_request_fsm.next_fault_summary.
+Removed top 8 bits (of 64) from wire adaptive_aero_control_top_request_fsm.req_desc_comb.
+
+11.10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Removed 0 unused cells and 3 unused wires.
+<suppressed ~1 debug messages>
+
+11.11. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+11.12. Executing OPT pass (performing simple optimizations).
+
+11.12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+
+11.12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+<suppressed ~3 debug messages>
+Removed a total of 1 cells.
+
+11.12.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+11.12.4. Finished fast OPT passes.
+
+11.13. Printing statistics.
+
+=== adaptive_aero_control_top_request_fsm ===
+
+   Number of wires:                135
+   Number of wire bits:           1043
+   Number of public wires:         129
+   Number of public wire bits:     996
+   Number of ports:                 34
+   Number of port bits:            350
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 94
+     $add                            1
+     $adff                          16
+     $eq                             4
+     $ge                             1
+     $gt                             1
+     $logic_and                      7
+     $logic_not                      4
+     $mux                           52
+     $reduce_and                     3
+     $reduce_or                      5
+
+11.14. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_request_fsm...
+Found and reported 0 problems.
+
+12. Executing ASYNC2SYNC pass.
+Replacing adaptive_aero_control_top_request_fsm.$procdff$824 ($adff): ARST=\reset_n, D=\next_age_counter, Q=\age_counter_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$829 ($adff): ARST=\reset_n, D=\selected_cmd_valid_next, Q=\selected_cmd_valid_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$834 ($adff): ARST=\reset_n, D=\next_irq_pulse, Q=\irq_pulse_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$839 ($adff): ARST=\reset_n, D=\next_fallback_active, Q=\fallback_active_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$844 ($adff): ARST=\reset_n, D=\next_service_error, Q=\service_error_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$849 ($adff): ARST=\reset_n, D=\next_envelope_violation, Q=\envelope_violation_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$854 ($adff): ARST=\reset_n, D=\next_response_received, Q=\response_received_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$859 ($adff): ARST=\reset_n, D=\next_state, Q=\state_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$864 ($adff): ARST=\reset_n, D=$0\timeout_expired_r[0:0], Q=\timeout_expired_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$869 ($adff): ARST=\reset_n, D={ \cfg_timestamp \cfg_geometry_handle [15:8] \cfg_flow_handle [15:8] \cfg_request_id }, Q=\_065_
+Replacing adaptive_aero_control_top_request_fsm.$procdff$874 ($adff): ARST=\reset_n, D=$0\pending_r[0:0], Q=\pending_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$879 ($adff): ARST=\reset_n, D=$0\selected_cmd_r[15:0], Q=\selected_cmd_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$884 ($adff): ARST=\reset_n, D=$0\response_req_id_r[7:0], Q=\response_req_id_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$889 ($adff): ARST=\reset_n, D=$0\outstanding_req_id_r[7:0], Q=\outstanding_req_id_r
+Replacing adaptive_aero_control_top_request_fsm.$procdff$894 ($adff): ARST=\reset_n, D={ \next_fault_summary [3:2] \next_fault_summary [0] }, Q=\_060_
+Replacing adaptive_aero_control_top_request_fsm.$procdff$899 ($adff): ARST=\reset_n, D=$0\_059_[12:0], Q=\_059_
+
+13. Executing MEMORY pass.
+
+13.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+13.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+13.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+13.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+13.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+13.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+
+13.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+13.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+13.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+
+13.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+13.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Renaming module \adaptive_aero_control_top_request_fsm to \gate.
+
+15. Executing EQUIV_MAKE pass (creating equiv checking module).
+Presumably equivalent wires: age_counter_r_gold (\age_counter_r_gold), age_counter_r_gate (\age_counter_r_gate) -> age_counter_r
+Presumably equivalent wires: cfg_allow_multi_outstanding_gold (\cfg_allow_multi_outstanding_gold), cfg_allow_multi_outstanding_gate (\cfg_allow_multi_outstanding_gate) -> cfg_allow_multi_outstanding
+Presumably equivalent wires: cfg_command_mode_gold (\cfg_command_mode_gold), cfg_command_mode_gate (\cfg_command_mode_gate) -> cfg_command_mode
+Presumably equivalent wires: cfg_flow_handle_gold (\cfg_flow_handle_gold), cfg_flow_handle_gate (\cfg_flow_handle_gate) -> cfg_flow_handle
+Presumably equivalent wires: cfg_force_safe_mode_gold (\cfg_force_safe_mode_gold), cfg_force_safe_mode_gate (\cfg_force_safe_mode_gate) -> cfg_force_safe_mode
+Presumably equivalent wires: cfg_geometry_handle_gold (\cfg_geometry_handle_gold), cfg_geometry_handle_gate (\cfg_geometry_handle_gate) -> cfg_geometry_handle
+Presumably equivalent wires: cfg_oper_en_max_gold (\cfg_oper_en_max_gold), cfg_oper_en_max_gate (\cfg_oper_en_max_gate) -> cfg_oper_en_max
+Presumably equivalent wires: cfg_oper_en_min_gold (\cfg_oper_en_min_gold), cfg_oper_en_min_gate (\cfg_oper_en_min_gate) -> cfg_oper_en_min
+Presumably equivalent wires: cfg_request_id_gold (\cfg_request_id_gold), cfg_request_id_gate (\cfg_request_id_gate) -> cfg_request_id
+Presumably equivalent wires: cfg_request_issue_gold (\cfg_request_issue_gold), cfg_request_issue_gate (\cfg_request_issue_gate) -> cfg_request_issue
+Presumably equivalent wires: cfg_status_flags_gold (\cfg_status_flags_gold), cfg_status_flags_gate (\cfg_status_flags_gate) -> cfg_status_flags
+Presumably equivalent wires: cfg_timeout_cycles_gold (\cfg_timeout_cycles_gold), cfg_timeout_cycles_gate (\cfg_timeout_cycles_gate) -> cfg_timeout_cycles
+Presumably equivalent wires: cfg_timestamp_gold (\cfg_timestamp_gold), cfg_timestamp_gate (\cfg_timestamp_gate) -> cfg_timestamp
+Presumably equivalent wires: clk_gold (\clk_gold), clk_gate (\clk_gate) -> clk
+Presumably equivalent wires: cmd_raw_gold ({ \cfg_oper_en_min_gold [7:0] \cfg_oper_en_max_gold [7:0] }), cmd_raw_gate ({ \cfg_oper_en_min_gate [7:0] \cfg_oper_en_max_gate [7:0] }) -> cmd_raw
+Presumably equivalent wires: envelope_bad_gold (\envelope_bad_gold), envelope_bad_gate (\envelope_bad_gate) -> envelope_bad
+Presumably equivalent wires: envelope_violation_r_gold (\envelope_violation_r_gold), envelope_violation_r_gate (\envelope_violation_r_gate) -> envelope_violation_r
+Presumably equivalent wires: fallback_active_r_gold (\fallback_active_r_gold), fallback_active_r_gate (\fallback_active_r_gate) -> fallback_active_r
+Presumably equivalent wires: fault_summary_r_gold (\fault_summary_r_gold), fault_summary_r_gate ({ \_059__gate [12:1] \_060__gate [2:1] \_059__gate [0] \_060__gate [0] }) -> fault_summary_r
+Presumably equivalent wires: irq_pulse_r_gold (\irq_pulse_r_gold), irq_pulse_r_gate (\irq_pulse_r_gate) -> irq_pulse_r
+Presumably equivalent wires: issue_req_gold (\cfg_request_issue_gold), issue_req_gate (\cfg_request_issue_gate) -> issue_req
+Presumably equivalent wires: model_req_desc_o_gold (\model_req_desc_r_gold), model_req_desc_o_gate ({ 8'00000000 \_065__gate }) -> model_req_desc_o
+Presumably equivalent wires: model_req_desc_r_gold (\model_req_desc_r_gold), model_req_desc_r_gate ({ 8'00000000 \_065__gate }) -> model_req_desc_r
+Presumably equivalent wires: model_req_ready_i_gold (\model_req_ready_i_gold), model_req_ready_i_gate (\model_req_ready_i_gate) -> model_req_ready_i
+Presumably equivalent wires: model_req_valid_o_gold (\model_req_valid_r_gold), model_req_valid_o_gate (1'0) -> model_req_valid_o
+Presumably equivalent wires: model_req_valid_r_gold (\model_req_valid_r_gold), model_req_valid_r_gate (1'0) -> model_req_valid_r
+Presumably equivalent wires: model_rsp_desc_i_gold (\model_rsp_desc_i_gold), model_rsp_desc_i_gate (\model_rsp_desc_i_gate) -> model_rsp_desc_i
+Presumably equivalent wires: model_rsp_ready_o_gold (\model_rsp_ready_r_gold), model_rsp_ready_o_gate (1'1) -> model_rsp_ready_o
+Presumably equivalent wires: model_rsp_ready_r_gold (\model_rsp_ready_r_gold), model_rsp_ready_r_gate (1'1) -> model_rsp_ready_r
+Presumably equivalent wires: model_rsp_valid_i_gold (\model_rsp_valid_i_gold), model_rsp_valid_i_gate (\model_rsp_valid_i_gate) -> model_rsp_valid_i
+Presumably equivalent wires: outstanding_req_id_r_gold (\outstanding_req_id_r_gold), outstanding_req_id_r_gate (\outstanding_req_id_r_gate) -> outstanding_req_id_r
+Presumably equivalent wires: pending_r_gold (\pending_r_gold), pending_r_gate (\pending_r_gate) -> pending_r
+Presumably equivalent wires: reg_envelope_violation_gold (\envelope_violation_r_gold), reg_envelope_violation_gate (\envelope_violation_r_gate) -> reg_envelope_violation
+Presumably equivalent wires: reg_fallback_active_gold (\fallback_active_r_gold), reg_fallback_active_gate (\fallback_active_r_gate) -> reg_fallback_active
+Presumably equivalent wires: reg_fault_summary_gold (\fault_summary_r_gold), reg_fault_summary_gate ({ \_059__gate [12:1] \_060__gate [2:1] \_059__gate [0] \_060__gate [0] }) -> reg_fault_summary
+Presumably equivalent wires: reg_irq_pulse_gold (\irq_pulse_r_gold), reg_irq_pulse_gate (\irq_pulse_r_gate) -> reg_irq_pulse
+Presumably equivalent wires: reg_outstanding_req_id_gold (\outstanding_req_id_r_gold), reg_outstanding_req_id_gate (\outstanding_req_id_r_gate) -> reg_outstanding_req_id
+Presumably equivalent wires: reg_pending_gold (\pending_r_gold), reg_pending_gate (\pending_r_gate) -> reg_pending
+Presumably equivalent wires: reg_response_received_gold (\response_received_r_gold), reg_response_received_gate (\response_received_r_gate) -> reg_response_received
+Presumably equivalent wires: reg_response_req_id_gold (\response_req_id_r_gold), reg_response_req_id_gate (\response_req_id_r_gate) -> reg_response_req_id
+Presumably equivalent wires: reg_service_error_gold (\service_error_r_gold), reg_service_error_gate (\service_error_r_gate) -> reg_service_error
+Presumably equivalent wires: reg_stale_reject_gold (\stale_reject_r_gold), reg_stale_reject_gate (\service_error_r_gate) -> reg_stale_reject
+Presumably equivalent wires: reg_state_gold (\state_r_gold), reg_state_gate (\state_r_gate) -> reg_state
+Presumably equivalent wires: reg_timeout_expired_gold (\timeout_expired_r_gold), reg_timeout_expired_gate (\timeout_expired_r_gate) -> reg_timeout_expired
+Presumably equivalent wires: req_desc_comb_gold ({ \cfg_timestamp_gold \cfg_geometry_handle_gold [15:8] \cfg_flow_handle_gold [15:8] \cfg_request_id_gold }), req_desc_comb_gate ({ \cfg_timestamp_gate \cfg_geometry_handle_gate [15:8] \cfg_flow_handle_gate [15:8] \cfg_request_id_gate }) -> req_desc_comb
+Presumably equivalent wires: reset_n_gold (\reset_n_gold), reset_n_gate (\reset_n_gate) -> reset_n
+Presumably equivalent wires: response_received_r_gold (\response_received_r_gold), response_received_r_gate (\response_received_r_gate) -> response_received_r
+Presumably equivalent wires: response_req_id_r_gold (\response_req_id_r_gold), response_req_id_r_gate (\response_req_id_r_gate) -> response_req_id_r
+Presumably equivalent wires: selected_cmd_o_gold (\selected_cmd_r_gold), selected_cmd_o_gate (\selected_cmd_r_gate) -> selected_cmd_o
+Presumably equivalent wires: selected_cmd_r_gold (\selected_cmd_r_gold), selected_cmd_r_gate (\selected_cmd_r_gate) -> selected_cmd_r
+Presumably equivalent wires: selected_cmd_valid_o_gold (\selected_cmd_valid_r_gold), selected_cmd_valid_o_gate (\selected_cmd_valid_r_gate) -> selected_cmd_valid_o
+Presumably equivalent wires: selected_cmd_valid_r_gold (\selected_cmd_valid_r_gold), selected_cmd_valid_r_gate (\selected_cmd_valid_r_gate) -> selected_cmd_valid_r
+Presumably equivalent wires: service_error_r_gold (\service_error_r_gold), service_error_r_gate (\service_error_r_gate) -> service_error_r
+Presumably equivalent wires: stale_reject_r_gold (\stale_reject_r_gold), stale_reject_r_gate (\service_error_r_gate) -> stale_reject_r
+Presumably equivalent wires: state_r_gold (\state_r_gold), state_r_gate (\state_r_gate) -> state_r
+Presumably equivalent wires: timeout_bad_gold (\timeout_bad_gold), timeout_bad_gate (\timeout_bad_gate) -> timeout_bad
+Presumably equivalent wires: timeout_expired_r_gold (\timeout_expired_r_gold), timeout_expired_r_gate (\timeout_expired_r_gate) -> timeout_expired_r
+Changing input A of cell $eq$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:938$708_gate ($eq): \state_r_gate -> \state_r
+Changing input B of cell $eq$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:939$709_gate ($eq): \outstanding_req_id_r_gate -> \reg_outstanding_req_id
+Changing input A of cell $ge$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:942$712_gate ($ge): \age_counter_r_gate -> \age_counter_r
+Changing input A of cell $logic_not$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:951$721_gate ($logic_not): \timeout_bad_gate -> \timeout_bad
+Changing input A of cell $logic_not$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:952$722_gate ($logic_not): \pending_r_gate -> \reg_pending
+Changing input A of cell $logic_not$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:954$724_gate ($logic_not): \envelope_bad_gate -> \envelope_bad
+Changing input A of cell $procmux$808_gate ($mux): \timeout_expired_r_gate -> \timeout_expired_r
+Changing input A of cell $procmux$810_gate ($mux): \pending_r_gate -> \reg_pending
+Changing input A of cell $procmux$812_gate ($mux): \selected_cmd_r_gate -> \selected_cmd_r
+Changing input A of cell $procmux$814_gate ($mux): \response_req_id_r_gate -> \response_req_id_r
+Changing input A of cell $procmux$816_gate ($mux): \outstanding_req_id_r_gate -> \reg_outstanding_req_id
+Changing input A of cell $procmux$818_gate ($mux): \_059__gate -> { \reg_fault_summary [15:4] \reg_fault_summary [1] }
+Changing input A of cell $reduce_or$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:933$703_gate ($reduce_or): { \_041__gate \_052__gate \envelope_bad_gate \cfg_force_safe_mode_gate \model_rsp_valid_i_gate } -> { \_041__gate \_052__gate \envelope_bad \cfg_force_safe_mode_gate \model_rsp_valid_i_gate }
+Changing input A of cell $reduce_or$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:934$704_gate ($reduce_or): { \_046__gate \_052__gate \envelope_bad_gate \cfg_force_safe_mode_gate \model_rsp_valid_i_gate } -> { \_046__gate \_052__gate \envelope_bad \cfg_force_safe_mode_gate \model_rsp_valid_i_gate }
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1005$767_gate ($mux): \_060__gate [1] -> \reg_fault_summary [2]
+Changing input S of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1005$767_gate ($mux): \envelope_bad_gate -> \envelope_bad
+Changing input S of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1006$768_gate ($mux): \envelope_bad_gate -> \envelope_bad
+Changing input S of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1007$769_gate ($mux): \envelope_bad_gate -> \envelope_bad
+Changing input S of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1008$770_gate ($mux): \envelope_bad_gate -> \envelope_bad
+Changing input S of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1009$771_gate ($mux): \envelope_bad_gate -> \envelope_bad
+Changing input S of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1010$772_gate ($mux): \envelope_bad_gate -> \envelope_bad
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1011$773_gate ($mux): \_060__gate [2] -> \reg_fault_summary [3]
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1014$776_gate ($mux): \timeout_bad_gate -> \timeout_bad
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1016$778_gate ($mux): \_060__gate [0] -> \reg_fault_summary [0]
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1018$780_gate ($mux): \state_r_gate -> \state_r
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1019$781_gate ($mux): \fallback_active_r_gate -> \reg_fallback_active
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1022$784_gate ($mux): \_060__gate [0] -> \reg_fault_summary [0]
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1023$785_gate ($mux): \fallback_active_r_gate -> \reg_fallback_active
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1025$787_gate ($mux): \state_r_gate -> \state_r
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1026$788_gate ($mux): \age_counter_r_gate -> \age_counter_r
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:986$748_gate ($mux): \_059__gate [12:2] -> \reg_fault_summary [15:5]
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:995$757_gate ($mux): { \_018__gate \_023__gate \_059__gate [0] \_002__gate } -> { \_018__gate \_023__gate \reg_fault_summary [1] \_002__gate }
+Changing input A of cell $add$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:900$684_gate ($add): \age_counter_r_gate -> \age_counter_r
+Changing input A of cell $eq$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:161$88_gold ($eq): \state_r_gold -> \state_r
+Changing input B of cell $eq$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:193$93_gold ($eq): \outstanding_req_id_r_gold -> \reg_outstanding_req_id
+Changing input A of cell $ge$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:163$91_gold ($ge): \age_counter_r_gold -> \age_counter_r
+Changing input A of cell $logic_not$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:194$94_gold ($logic_not): \timeout_bad_gold -> \timeout_bad
+Changing input A of cell $logic_not$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:194$96_gold ($logic_not): \envelope_bad_gold -> \envelope_bad
+Changing input A of cell $logic_not$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:216$100_gold ($logic_not): \pending_r_gold -> \reg_pending
+Changing input D of cell $procdff$448_gold ($sdff): \model_req_valid_r_gold -> 1'0
+Changing input D of cell $procdff$453_gold ($sdff): \model_rsp_ready_r_gold -> 1'1
+Changing input A of cell $procmux$139_gold ($mux): \outstanding_req_id_r_gold -> \reg_outstanding_req_id
+Changing input A of cell $procmux$143_gold ($mux): \fault_summary_r_gold [15:5] -> \reg_fault_summary [15:5]
+Changing input A of cell $procmux$190_gold ($mux): \selected_cmd_r_gold -> \selected_cmd_r
+Changing input A of cell $procmux$224_gold ($mux): { \fault_summary_r_gold [15:4] $3\next_fault_summary[3:3]_gold $4\next_fault_summary[2:2]_gold \fault_summary_r_gold [1] $1\next_fault_summary[0:0]_gold } -> { \reg_fault_summary [15:4] $3\next_fault_summary[3:3]_gold $4\next_fault_summary[2:2]_gold \reg_fault_summary [1] $1\next_fault_summary[0:0]_gold }
+Changing input A of cell $procmux$251_gold ($mux): \selected_cmd_r_gold -> \selected_cmd_r
+Changing input A of cell $procmux$263_gold ($mux): \response_req_id_r_gold -> \response_req_id_r
+Changing input A of cell $procmux$266_gold ($mux): \fault_summary_r_gold [2] -> \reg_fault_summary [2]
+Changing input S of cell $procmux$266_gold ($mux): \envelope_bad_gold -> \envelope_bad
+Changing input S of cell $procmux$269_gold ($mux): \envelope_bad_gold -> \envelope_bad
+Changing input S of cell $procmux$272_gold ($mux): \envelope_bad_gold -> \envelope_bad
+Changing input S of cell $procmux$275_gold ($mux): \envelope_bad_gold -> \envelope_bad
+Changing input S of cell $procmux$278_gold ($mux): \envelope_bad_gold -> \envelope_bad
+Changing input S of cell $procmux$281_gold ($mux): \envelope_bad_gold -> \envelope_bad
+Changing input A of cell $procmux$284_gold ($mux): \fault_summary_r_gold [3] -> \reg_fault_summary [3]
+Changing input A of cell $procmux$293_gold ($mux): \timeout_bad_gold -> \timeout_bad
+Changing input A of cell $procmux$300_gold ($mux): \fault_summary_r_gold [0] -> \reg_fault_summary [0]
+Changing input A of cell $procmux$306_gold ($mux): \pending_r_gold -> \reg_pending
+Changing input A of cell $procmux$312_gold ($mux): \state_r_gold -> \state_r
+Changing input A of cell $procmux$324_gold ($mux): \fallback_active_r_gold -> \reg_fallback_active
+Changing input A of cell $procmux$330_gold ($mux): \timeout_expired_r_gold -> \timeout_expired_r
+Changing input A of cell $procmux$344_gold ($mux): \fault_summary_r_gold [0] -> \reg_fault_summary [0]
+Changing input A of cell $procmux$350_gold ($mux): \fallback_active_r_gold -> \reg_fallback_active
+Changing input A of cell $procmux$353_gold ($mux): \timeout_expired_r_gold -> \timeout_expired_r
+Changing input A of cell $procmux$356_gold ($mux): \pending_r_gold -> \reg_pending
+Changing input A of cell $procmux$359_gold ($mux): \state_r_gold -> \state_r
+Changing input A of cell $procmux$362_gold ($mux): \age_counter_r_gold -> \age_counter_r
+Changing input A of cell $add$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v:162$89_gold ($add): \age_counter_r_gold -> \age_counter_r
+
+16. Executing HIERARCHY pass (managing design hierarchy).
+
+16.1. Analyzing design hierarchy..
+Top module:  \equiv
+
+16.2. Analyzing design hierarchy..
+Top module:  \equiv
+Removing unused module `\gate'.
+Removing unused module `\gold'.
+Removed 2 unused modules.
+
+17. Executing EQUIV_STRUCT pass.
+Running equiv_struct on module equiv:
+  Starting iteration 1.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1315 and $auto$equiv_make.cc:257:find_same_wires$1204.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1313 and $auto$equiv_make.cc:257:find_same_wires$1203.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1312 and $auto$equiv_make.cc:257:find_same_wires$1202.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1311 and $auto$equiv_make.cc:257:find_same_wires$1201.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1310 and $auto$equiv_make.cc:257:find_same_wires$1200.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1309 and $auto$equiv_make.cc:257:find_same_wires$1199.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1308 and $auto$equiv_make.cc:257:find_same_wires$1198.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1307 and $auto$equiv_make.cc:257:find_same_wires$1197.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1306 and $auto$equiv_make.cc:257:find_same_wires$1196.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1305 and $auto$equiv_make.cc:257:find_same_wires$1195.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1304 and $auto$equiv_make.cc:257:find_same_wires$1194.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1303 and $auto$equiv_make.cc:257:find_same_wires$1302.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1301 and $auto$equiv_make.cc:257:find_same_wires$1285.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1300 and $auto$equiv_make.cc:257:find_same_wires$1284.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1299 and $auto$equiv_make.cc:257:find_same_wires$1283.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1298 and $auto$equiv_make.cc:257:find_same_wires$1282.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1297 and $auto$equiv_make.cc:257:find_same_wires$1281.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1296 and $auto$equiv_make.cc:257:find_same_wires$1280.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1295 and $auto$equiv_make.cc:257:find_same_wires$1279.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1294 and $auto$equiv_make.cc:257:find_same_wires$1278.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1293 and $auto$equiv_make.cc:257:find_same_wires$1277.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1292 and $auto$equiv_make.cc:257:find_same_wires$1276.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1291 and $auto$equiv_make.cc:257:find_same_wires$1275.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1290 and $auto$equiv_make.cc:257:find_same_wires$1274.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1289 and $auto$equiv_make.cc:257:find_same_wires$1273.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1288 and $auto$equiv_make.cc:257:find_same_wires$1272.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1287 and $auto$equiv_make.cc:257:find_same_wires$1271.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1286 and $auto$equiv_make.cc:257:find_same_wires$1270.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1269 and $auto$equiv_make.cc:257:find_same_wires$1193.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1268 and $auto$equiv_make.cc:257:find_same_wires$1192.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1267 and $auto$equiv_make.cc:257:find_same_wires$1191.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1266 and $auto$equiv_make.cc:257:find_same_wires$1190.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1265 and $auto$equiv_make.cc:257:find_same_wires$1189.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1264 and $auto$equiv_make.cc:257:find_same_wires$1188.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1263 and $auto$equiv_make.cc:257:find_same_wires$1187.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1262 and $auto$equiv_make.cc:257:find_same_wires$1186.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1261 and $auto$equiv_make.cc:257:find_same_wires$1185.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1184 and $auto$equiv_make.cc:294:find_same_wires$1156.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1183 and $auto$equiv_make.cc:294:find_same_wires$1155.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1182 and $auto$equiv_make.cc:294:find_same_wires$1154.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1181 and $auto$equiv_make.cc:294:find_same_wires$1153.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1180 and $auto$equiv_make.cc:294:find_same_wires$1152.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1179 and $auto$equiv_make.cc:294:find_same_wires$1151.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1178 and $auto$equiv_make.cc:294:find_same_wires$1150.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1177 and $auto$equiv_make.cc:294:find_same_wires$1149.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1176 and $auto$equiv_make.cc:294:find_same_wires$1148.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1175 and $auto$equiv_make.cc:294:find_same_wires$1014.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1174 and $auto$equiv_make.cc:294:find_same_wires$1013.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1173 and $auto$equiv_make.cc:294:find_same_wires$1012.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1172 and $auto$equiv_make.cc:294:find_same_wires$1011.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1171 and $auto$equiv_make.cc:294:find_same_wires$1010.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1170 and $auto$equiv_make.cc:294:find_same_wires$1009.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1169 and $auto$equiv_make.cc:294:find_same_wires$1008.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1168 and $auto$equiv_make.cc:294:find_same_wires$1007.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1167 and $auto$equiv_make.cc:294:find_same_wires$1006.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1166 and $auto$equiv_make.cc:294:find_same_wires$1005.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1165 and $auto$equiv_make.cc:294:find_same_wires$1004.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1164 and $auto$equiv_make.cc:294:find_same_wires$1003.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1163 and $auto$equiv_make.cc:294:find_same_wires$1002.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1162 and $auto$equiv_make.cc:294:find_same_wires$1001.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1161 and $auto$equiv_make.cc:294:find_same_wires$1000.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1160 and $auto$equiv_make.cc:294:find_same_wires$999.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1159 and $auto$equiv_make.cc:294:find_same_wires$998.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1158 and $auto$equiv_make.cc:294:find_same_wires$997.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:257:find_same_wires$1157 and $auto$equiv_make.cc:294:find_same_wires$996.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1147 and $auto$equiv_make.cc:257:find_same_wires$1146.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1145 and $auto$equiv_make.cc:257:find_same_wires$1144.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1143 and $auto$equiv_make.cc:257:find_same_wires$1079.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1142 and $auto$equiv_make.cc:257:find_same_wires$1078.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1141 and $auto$equiv_make.cc:257:find_same_wires$1077.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1140 and $auto$equiv_make.cc:257:find_same_wires$1076.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1139 and $auto$equiv_make.cc:257:find_same_wires$1075.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1138 and $auto$equiv_make.cc:257:find_same_wires$1074.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1137 and $auto$equiv_make.cc:257:find_same_wires$1073.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1136 and $auto$equiv_make.cc:257:find_same_wires$1072.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1135 and $auto$equiv_make.cc:257:find_same_wires$1071.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1134 and $auto$equiv_make.cc:257:find_same_wires$1070.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1133 and $auto$equiv_make.cc:257:find_same_wires$1069.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1132 and $auto$equiv_make.cc:257:find_same_wires$1068.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1131 and $auto$equiv_make.cc:257:find_same_wires$1067.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1130 and $auto$equiv_make.cc:257:find_same_wires$1066.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1129 and $auto$equiv_make.cc:257:find_same_wires$1065.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1128 and $auto$equiv_make.cc:257:find_same_wires$1064.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1127 and $auto$equiv_make.cc:257:find_same_wires$1063.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1126 and $auto$equiv_make.cc:257:find_same_wires$1062.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1125 and $auto$equiv_make.cc:257:find_same_wires$1061.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1124 and $auto$equiv_make.cc:257:find_same_wires$1060.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1123 and $auto$equiv_make.cc:257:find_same_wires$1059.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1122 and $auto$equiv_make.cc:257:find_same_wires$1058.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1121 and $auto$equiv_make.cc:257:find_same_wires$1057.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1120 and $auto$equiv_make.cc:257:find_same_wires$1056.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1119 and $auto$equiv_make.cc:257:find_same_wires$1055.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1118 and $auto$equiv_make.cc:257:find_same_wires$1054.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1117 and $auto$equiv_make.cc:257:find_same_wires$1053.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1116 and $auto$equiv_make.cc:257:find_same_wires$1052.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1115 and $auto$equiv_make.cc:257:find_same_wires$1051.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1114 and $auto$equiv_make.cc:257:find_same_wires$1050.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1113 and $auto$equiv_make.cc:257:find_same_wires$1049.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1112 and $auto$equiv_make.cc:257:find_same_wires$1048.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1111 and $auto$equiv_make.cc:257:find_same_wires$1047.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1110 and $auto$equiv_make.cc:257:find_same_wires$1046.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1109 and $auto$equiv_make.cc:257:find_same_wires$1045.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1108 and $auto$equiv_make.cc:257:find_same_wires$1044.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1107 and $auto$equiv_make.cc:257:find_same_wires$1043.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1106 and $auto$equiv_make.cc:257:find_same_wires$1042.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1105 and $auto$equiv_make.cc:257:find_same_wires$1041.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1104 and $auto$equiv_make.cc:257:find_same_wires$1040.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1103 and $auto$equiv_make.cc:257:find_same_wires$1039.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1102 and $auto$equiv_make.cc:257:find_same_wires$1038.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1101 and $auto$equiv_make.cc:257:find_same_wires$1037.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1100 and $auto$equiv_make.cc:257:find_same_wires$1036.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1099 and $auto$equiv_make.cc:257:find_same_wires$1035.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1098 and $auto$equiv_make.cc:257:find_same_wires$1034.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1097 and $auto$equiv_make.cc:257:find_same_wires$1033.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1096 and $auto$equiv_make.cc:257:find_same_wires$1032.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1095 and $auto$equiv_make.cc:257:find_same_wires$1031.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1094 and $auto$equiv_make.cc:257:find_same_wires$1030.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1093 and $auto$equiv_make.cc:257:find_same_wires$1029.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1092 and $auto$equiv_make.cc:257:find_same_wires$1028.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1091 and $auto$equiv_make.cc:257:find_same_wires$1027.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1090 and $auto$equiv_make.cc:257:find_same_wires$1026.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1089 and $auto$equiv_make.cc:257:find_same_wires$1025.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1088 and $auto$equiv_make.cc:257:find_same_wires$1024.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1087 and $auto$equiv_make.cc:257:find_same_wires$1023.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1086 and $auto$equiv_make.cc:257:find_same_wires$1022.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1085 and $auto$equiv_make.cc:257:find_same_wires$1021.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1084 and $auto$equiv_make.cc:257:find_same_wires$1020.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1083 and $auto$equiv_make.cc:257:find_same_wires$1019.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1082 and $auto$equiv_make.cc:257:find_same_wires$1018.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1081 and $auto$equiv_make.cc:257:find_same_wires$1017.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1080 and $auto$equiv_make.cc:257:find_same_wires$1016.
+  Starting iteration 2.
+    Nothing to merge.
+  Performed a total of 131 merges in module equiv.
+
+18. Executing EQUIV_SIMPLE pass.
+Found 238 unproven $equiv cells (23 groups) in equiv:
+ Grouping SAT models for \reg_fault_summary:
+  Trying to prove $equiv for \reg_fault_summary [0]: failed.
+  Trying to prove $equiv for \reg_fault_summary [1]: success!
+  Trying to prove $equiv for \reg_fault_summary [2]: success!
+  Trying to prove $equiv for \reg_fault_summary [3]: success!
+  Trying to prove $equiv for \reg_fault_summary [4]: success!
+  Trying to prove $equiv for \reg_fault_summary [5]: success!
+  Trying to prove $equiv for \reg_fault_summary [6]: success!
+  Trying to prove $equiv for \reg_fault_summary [7]: success!
+  Trying to prove $equiv for \reg_fault_summary [8]: success!
+  Trying to prove $equiv for \reg_fault_summary [9]: success!
+  Trying to prove $equiv for \reg_fault_summary [10]: success!
+  Trying to prove $equiv for \reg_fault_summary [11]: success!
+  Trying to prove $equiv for \reg_fault_summary [12]: success!
+  Trying to prove $equiv for \reg_fault_summary [13]: success!
+  Trying to prove $equiv for \reg_fault_summary [14]: success!
+  Trying to prove $equiv for \reg_fault_summary [15]: success!
+ Grouping SAT models for \reg_outstanding_req_id:
+  Trying to prove $equiv for \reg_outstanding_req_id [0]: success!
+  Trying to prove $equiv for \reg_outstanding_req_id [1]: success!
+  Trying to prove $equiv for \reg_outstanding_req_id [2]: success!
+  Trying to prove $equiv for \reg_outstanding_req_id [3]: success!
+  Trying to prove $equiv for \reg_outstanding_req_id [4]: success!
+  Trying to prove $equiv for \reg_outstanding_req_id [5]: success!
+  Trying to prove $equiv for \reg_outstanding_req_id [6]: success!
+  Trying to prove $equiv for \reg_outstanding_req_id [7]: success!
+  Trying to prove $equiv for \reg_pending: success!
+  Trying to prove $equiv for \reg_fallback_active: failed.
+  Trying to prove $equiv for \reg_envelope_violation: success!
+  Trying to prove $equiv for \reg_irq_pulse: success!
+ Grouping SAT models for \state_r:
+  Trying to prove $equiv for \state_r [0]: failed.
+  Trying to prove $equiv for \state_r [1]: failed.
+  Trying to prove $equiv for \state_r [2]: failed.
+  Trying to prove $equiv for \state_r [3]: failed.
+  Trying to prove $equiv for \state_r [4]: failed.
+  Trying to prove $equiv for \state_r [5]: failed.
+  Trying to prove $equiv for \state_r [6]: failed.
+  Trying to prove $equiv for \state_r [7]: failed.
+ Grouping SAT models for \response_req_id_r:
+  Trying to prove $equiv for \response_req_id_r [0]: success!
+  Trying to prove $equiv for \response_req_id_r [1]: success!
+  Trying to prove $equiv for \response_req_id_r [2]: success!
+  Trying to prove $equiv for \response_req_id_r [3]: success!
+  Trying to prove $equiv for \response_req_id_r [4]: success!
+  Trying to prove $equiv for \response_req_id_r [5]: success!
+  Trying to prove $equiv for \response_req_id_r [6]: success!
+  Trying to prove $equiv for \response_req_id_r [7]: success!
+  Trying to prove $equiv for \response_received_r: success!
+  Trying to prove $equiv for \stale_reject_r: success!
+  Trying to prove $equiv for \timeout_expired_r: success!
+  Trying to prove $equiv for \service_error_r: success!
+ Grouping SAT models for \selected_cmd_r:
+  Trying to prove $equiv for \selected_cmd_r [0]: failed.
+  Trying to prove $equiv for \selected_cmd_r [1]: failed.
+  Trying to prove $equiv for \selected_cmd_r [2]: failed.
+  Trying to prove $equiv for \selected_cmd_r [3]: failed.
+  Trying to prove $equiv for \selected_cmd_r [4]: failed.
+  Trying to prove $equiv for \selected_cmd_r [5]: failed.
+  Trying to prove $equiv for \selected_cmd_r [6]: failed.
+  Trying to prove $equiv for \selected_cmd_r [7]: failed.
+  Trying to prove $equiv for \selected_cmd_r [8]: failed.
+  Trying to prove $equiv for \selected_cmd_r [9]: failed.
+  Trying to prove $equiv for \selected_cmd_r [10]: failed.
+  Trying to prove $equiv for \selected_cmd_r [11]: failed.
+  Trying to prove $equiv for \selected_cmd_r [12]: failed.
+  Trying to prove $equiv for \selected_cmd_r [13]: failed.
+  Trying to prove $equiv for \selected_cmd_r [14]: failed.
+  Trying to prove $equiv for \selected_cmd_r [15]: failed.
+  Trying to prove $equiv for \selected_cmd_valid_r: success!
+ Grouping SAT models for \age_counter_r:
+  Trying to prove $equiv for \age_counter_r [0]: failed.
+  Trying to prove $equiv for \age_counter_r [1]: failed.
+  Trying to prove $equiv for \age_counter_r [2]: failed.
+  Trying to prove $equiv for \age_counter_r [3]: failed.
+  Trying to prove $equiv for \age_counter_r [4]: failed.
+  Trying to prove $equiv for \age_counter_r [5]: failed.
+  Trying to prove $equiv for \age_counter_r [6]: failed.
+  Trying to prove $equiv for \age_counter_r [7]: failed.
+  Trying to prove $equiv for \age_counter_r [8]: failed.
+  Trying to prove $equiv for \age_counter_r [9]: failed.
+  Trying to prove $equiv for \age_counter_r [10]: failed.
+  Trying to prove $equiv for \age_counter_r [11]: failed.
+  Trying to prove $equiv for \age_counter_r [12]: failed.
+  Trying to prove $equiv for \age_counter_r [13]: failed.
+  Trying to prove $equiv for \age_counter_r [14]: failed.
+  Trying to prove $equiv for \age_counter_r [15]: failed.
+  Trying to prove $equiv for \age_counter_r [16]: failed.
+  Trying to prove $equiv for \age_counter_r [17]: failed.
+  Trying to prove $equiv for \age_counter_r [18]: failed.
+  Trying to prove $equiv for \age_counter_r [19]: failed.
+  Trying to prove $equiv for \age_counter_r [20]: failed.
+  Trying to prove $equiv for \age_counter_r [21]: failed.
+  Trying to prove $equiv for \age_counter_r [22]: failed.
+  Trying to prove $equiv for \age_counter_r [23]: failed.
+  Trying to prove $equiv for \age_counter_r [24]: failed.
+  Trying to prove $equiv for \age_counter_r [25]: failed.
+  Trying to prove $equiv for \age_counter_r [26]: failed.
+  Trying to prove $equiv for \age_counter_r [27]: failed.
+  Trying to prove $equiv for \age_counter_r [28]: failed.
+  Trying to prove $equiv for \age_counter_r [29]: failed.
+  Trying to prove $equiv for \age_counter_r [30]: failed.
+  Trying to prove $equiv for \age_counter_r [31]: failed.
+ Grouping SAT models for \model_req_desc_r:
+  Trying to prove $equiv for \model_req_desc_r [0]: success!
+  Trying to prove $equiv for \model_req_desc_r [1]: success!
+  Trying to prove $equiv for \model_req_desc_r [2]: success!
+  Trying to prove $equiv for \model_req_desc_r [3]: success!
+  Trying to prove $equiv for \model_req_desc_r [4]: success!
+  Trying to prove $equiv for \model_req_desc_r [5]: success!
+  Trying to prove $equiv for \model_req_desc_r [6]: success!
+  Trying to prove $equiv for \model_req_desc_r [7]: success!
+  Trying to prove $equiv for \model_req_desc_r [8]: success!
+  Trying to prove $equiv for \model_req_desc_r [9]: success!
+  Trying to prove $equiv for \model_req_desc_r [10]: success!
+  Trying to prove $equiv for \model_req_desc_r [11]: success!
+  Trying to prove $equiv for \model_req_desc_r [12]: success!
+  Trying to prove $equiv for \model_req_desc_r [13]: success!
+  Trying to prove $equiv for \model_req_desc_r [14]: success!
+  Trying to prove $equiv for \model_req_desc_r [15]: success!
+  Trying to prove $equiv for \model_req_desc_r [16]: success!
+  Trying to prove $equiv for \model_req_desc_r [17]: success!
+  Trying to prove $equiv for \model_req_desc_r [18]: success!
+  Trying to prove $equiv for \model_req_desc_r [19]: success!
+  Trying to prove $equiv for \model_req_desc_r [20]: success!
+  Trying to prove $equiv for \model_req_desc_r [21]: success!
+  Trying to prove $equiv for \model_req_desc_r [22]: success!
+  Trying to prove $equiv for \model_req_desc_r [23]: success!
+  Trying to prove $equiv for \model_req_desc_r [24]: success!
+  Trying to prove $equiv for \model_req_desc_r [25]: success!
+  Trying to prove $equiv for \model_req_desc_r [26]: success!
+  Trying to prove $equiv for \model_req_desc_r [27]: success!
+  Trying to prove $equiv for \model_req_desc_r [28]: success!
+  Trying to prove $equiv for \model_req_desc_r [29]: success!
+  Trying to prove $equiv for \model_req_desc_r [30]: success!
+  Trying to prove $equiv for \model_req_desc_r [31]: success!
+  Trying to prove $equiv for \model_req_desc_r [32]: success!
+  Trying to prove $equiv for \model_req_desc_r [33]: success!
+  Trying to prove $equiv for \model_req_desc_r [34]: success!
+  Trying to prove $equiv for \model_req_desc_r [35]: success!
+  Trying to prove $equiv for \model_req_desc_r [36]: success!
+  Trying to prove $equiv for \model_req_desc_r [37]: success!
+  Trying to prove $equiv for \model_req_desc_r [38]: success!
+  Trying to prove $equiv for \model_req_desc_r [39]: success!
+  Trying to prove $equiv for \model_req_desc_r [40]: success!
+  Trying to prove $equiv for \model_req_desc_r [41]: success!
+  Trying to prove $equiv for \model_req_desc_r [42]: success!
+  Trying to prove $equiv for \model_req_desc_r [43]: success!
+  Trying to prove $equiv for \model_req_desc_r [44]: success!
+  Trying to prove $equiv for \model_req_desc_r [45]: success!
+  Trying to prove $equiv for \model_req_desc_r [46]: success!
+  Trying to prove $equiv for \model_req_desc_r [47]: success!
+  Trying to prove $equiv for \model_req_desc_r [48]: success!
+  Trying to prove $equiv for \model_req_desc_r [49]: success!
+  Trying to prove $equiv for \model_req_desc_r [50]: success!
+  Trying to prove $equiv for \model_req_desc_r [51]: success!
+  Trying to prove $equiv for \model_req_desc_r [52]: success!
+  Trying to prove $equiv for \model_req_desc_r [53]: success!
+  Trying to prove $equiv for \model_req_desc_r [54]: success!
+  Trying to prove $equiv for \model_req_desc_r [55]: success!
+  Trying to prove $equiv for \model_req_desc_r [56]: success!
+  Trying to prove $equiv for \model_req_desc_r [57]: success!
+  Trying to prove $equiv for \model_req_desc_r [58]: success!
+  Trying to prove $equiv for \model_req_desc_r [59]: success!
+  Trying to prove $equiv for \model_req_desc_r [60]: success!
+  Trying to prove $equiv for \model_req_desc_r [61]: success!
+  Trying to prove $equiv for \model_req_desc_r [62]: success!
+  Trying to prove $equiv for \model_req_desc_r [63]: success!
+  Trying to prove $equiv for \model_req_valid_r: success!
+  Trying to prove $equiv for \model_rsp_ready_r: success!
+ Grouping SAT models for \req_desc_comb:
+  Trying to prove $equiv for \req_desc_comb [0]: success!
+  Trying to prove $equiv for \req_desc_comb [1]: success!
+  Trying to prove $equiv for \req_desc_comb [2]: success!
+  Trying to prove $equiv for \req_desc_comb [3]: success!
+  Trying to prove $equiv for \req_desc_comb [4]: success!
+  Trying to prove $equiv for \req_desc_comb [5]: success!
+  Trying to prove $equiv for \req_desc_comb [6]: success!
+  Trying to prove $equiv for \req_desc_comb [7]: success!
+  Trying to prove $equiv for \req_desc_comb [8]: success!
+  Trying to prove $equiv for \req_desc_comb [9]: success!
+  Trying to prove $equiv for \req_desc_comb [10]: success!
+  Trying to prove $equiv for \req_desc_comb [11]: success!
+  Trying to prove $equiv for \req_desc_comb [12]: success!
+  Trying to prove $equiv for \req_desc_comb [13]: success!
+  Trying to prove $equiv for \req_desc_comb [14]: success!
+  Trying to prove $equiv for \req_desc_comb [15]: success!
+  Trying to prove $equiv for \req_desc_comb [16]: success!
+  Trying to prove $equiv for \req_desc_comb [17]: success!
+  Trying to prove $equiv for \req_desc_comb [18]: success!
+  Trying to prove $equiv for \req_desc_comb [19]: success!
+  Trying to prove $equiv for \req_desc_comb [20]: success!
+  Trying to prove $equiv for \req_desc_comb [21]: success!
+  Trying to prove $equiv for \req_desc_comb [22]: success!
+  Trying to prove $equiv for \req_desc_comb [23]: success!
+  Trying to prove $equiv for \req_desc_comb [24]: success!
+  Trying to prove $equiv for \req_desc_comb [25]: success!
+  Trying to prove $equiv for \req_desc_comb [26]: success!
+  Trying to prove $equiv for \req_desc_comb [27]: success!
+  Trying to prove $equiv for \req_desc_comb [28]: success!
+  Trying to prove $equiv for \req_desc_comb [29]: success!
+  Trying to prove $equiv for \req_desc_comb [30]: success!
+  Trying to prove $equiv for \req_desc_comb [31]: success!
+  Trying to prove $equiv for \req_desc_comb [32]: success!
+  Trying to prove $equiv for \req_desc_comb [33]: success!
+  Trying to prove $equiv for \req_desc_comb [34]: success!
+  Trying to prove $equiv for \req_desc_comb [35]: success!
+  Trying to prove $equiv for \req_desc_comb [36]: success!
+  Trying to prove $equiv for \req_desc_comb [37]: success!
+  Trying to prove $equiv for \req_desc_comb [38]: success!
+  Trying to prove $equiv for \req_desc_comb [39]: success!
+  Trying to prove $equiv for \req_desc_comb [40]: success!
+  Trying to prove $equiv for \req_desc_comb [41]: success!
+  Trying to prove $equiv for \req_desc_comb [42]: success!
+  Trying to prove $equiv for \req_desc_comb [43]: success!
+  Trying to prove $equiv for \req_desc_comb [44]: success!
+  Trying to prove $equiv for \req_desc_comb [45]: success!
+  Trying to prove $equiv for \req_desc_comb [46]: success!
+  Trying to prove $equiv for \req_desc_comb [47]: success!
+  Trying to prove $equiv for \req_desc_comb [48]: success!
+  Trying to prove $equiv for \req_desc_comb [49]: success!
+  Trying to prove $equiv for \req_desc_comb [50]: success!
+  Trying to prove $equiv for \req_desc_comb [51]: success!
+  Trying to prove $equiv for \req_desc_comb [52]: success!
+  Trying to prove $equiv for \req_desc_comb [53]: success!
+  Trying to prove $equiv for \req_desc_comb [54]: success!
+  Trying to prove $equiv for \req_desc_comb [55]: success!
+ Grouping SAT models for \cmd_raw:
+  Trying to prove $equiv for \cmd_raw [0]: success!
+  Trying to prove $equiv for \cmd_raw [1]: success!
+  Trying to prove $equiv for \cmd_raw [2]: success!
+  Trying to prove $equiv for \cmd_raw [3]: success!
+  Trying to prove $equiv for \cmd_raw [4]: success!
+  Trying to prove $equiv for \cmd_raw [5]: success!
+  Trying to prove $equiv for \cmd_raw [6]: success!
+  Trying to prove $equiv for \cmd_raw [7]: success!
+  Trying to prove $equiv for \cmd_raw [8]: success!
+  Trying to prove $equiv for \cmd_raw [9]: success!
+  Trying to prove $equiv for \cmd_raw [10]: success!
+  Trying to prove $equiv for \cmd_raw [11]: success!
+  Trying to prove $equiv for \cmd_raw [12]: success!
+  Trying to prove $equiv for \cmd_raw [13]: success!
+  Trying to prove $equiv for \cmd_raw [14]: success!
+  Trying to prove $equiv for \cmd_raw [15]: success!
+  Trying to prove $equiv for \envelope_bad: success!
+  Trying to prove $equiv for \timeout_bad: success!
+  Trying to prove $equiv for \issue_req: success!
+Proved 180 previously unproven $equiv cells.
+
+19. Executing EQUIV_INDUCT pass.
+Found 58 unproven $equiv cells in module equiv:
+  Undef modelling: force def on 315 initial reg values and 149 inputs.
+  Proving existence of base case for step 1. (77029 clauses over 28952 variables)
+  Proving induction step 1. (171538 clauses over 63835 variables)
+  Proof for induction step holds. Entire workset of 58 cells proven!
+Proved 58 previously unproven $equiv cells.
+
+20. Executing EQUIV_STATUS pass.
+Found 238 $equiv cells in equiv:
+  Of those cells 238 are proven and 0 are unproven.
+  Equivalence successfully proven!
+
+Warnings: 1 unique messages, 1 total
+End of script. Logfile hash: c9f1881a28
+Yosys 0.56 (git sha1 9c447ad9d4b1ea589369364eea38b4d70da2c599, x86_64-w64-mingw32-g++ 15.2.0 -march=nocona -msahf -mtune=generic -O2 -fstack-protector-strong -O3)
+Time spent: 2% 15x opt_clean (0 sec), 2% 12x read_verilog (0 sec), ...

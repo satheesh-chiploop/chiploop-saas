@@ -1,0 +1,2252 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Executing script file `synth.ys' --
+
+1. Executing Verilog-2005 frontend: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv
+Parsing SystemVerilog input from `/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_spi_fpga_top'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v
+Parsing SystemVerilog input from `/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v
+Parsing SystemVerilog input from `/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_actuator_safety'.
+Successfully finished Verilog frontend.
+
+4. Executing Verilog-2005 frontend: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v
+Parsing SystemVerilog input from `/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_mmio'.
+Successfully finished Verilog frontend.
+
+5. Executing Verilog-2005 frontend: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v
+Parsing SystemVerilog input from `/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_request_fsm'.
+Successfully finished Verilog frontend.
+
+6. Executing HIERARCHY pass (managing design hierarchy).
+
+6.1. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Used module:     \adaptive_aero_control_top
+Used module:         \adaptive_aero_control_top_actuator_safety
+Used module:         \adaptive_aero_control_top_request_fsm
+Used module:         \adaptive_aero_control_top_mmio
+
+6.2. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Used module:     \adaptive_aero_control_top
+Used module:         \adaptive_aero_control_top_actuator_safety
+Used module:         \adaptive_aero_control_top_request_fsm
+Used module:         \adaptive_aero_control_top_mmio
+Removed 0 unused modules.
+
+7. Executing PROC pass (convert processes to netlists).
+
+7.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+Cleaned up 1 empty switch.
+
+7.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118 in module adaptive_aero_control_top_request_fsm.
+Marked 9 switch rules as full_case in process $proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96 in module adaptive_aero_control_top_request_fsm.
+Marked 2 switch rules as full_case in process $proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93 in module adaptive_aero_control_top_mmio.
+Marked 3 switch rules as full_case in process $proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:87$35 in module adaptive_aero_control_top_actuator_safety.
+Marked 1 switch rules as full_case in process $proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:61$5 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:52$2 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:48$1 in module adaptive_aero_control_top_spi_fpga_top.
+Removed a total of 0 dead cases.
+
+7.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 30 redundant assignments.
+Promoted 23 assignments to connections.
+
+7.4. Executing PROC_INIT pass (extract init attributes).
+
+7.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \reset_n in `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+Found async reset \reset_n in `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+Found async reset \reset_n in `\adaptive_aero_control_top_actuator_safety.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:87$35'.
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:61$5'.
+Found async reset \spi_cs_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:48$1'.
+
+7.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~21 debug messages>
+
+7.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+     1/18: $0\model_rsp_ready_r[0:0]
+     2/18: $0\model_req_valid_r[0:0]
+     3/18: $0\model_req_desc_r[63:0]
+     4/18: $0\fault_summary_r[15:0]
+     5/18: $0\age_counter_r[31:0]
+     6/18: $0\selected_cmd_valid_r[0:0]
+     7/18: $0\selected_cmd_r[15:0]
+     8/18: $0\irq_pulse_r[0:0]
+     9/18: $0\fallback_active_r[0:0]
+    10/18: $0\service_error_r[0:0]
+    11/18: $0\envelope_violation_r[0:0]
+    12/18: $0\timeout_expired_r[0:0]
+    13/18: $0\stale_reject_r[0:0]
+    14/18: $0\response_received_r[0:0]
+    15/18: $0\pending_r[0:0]
+    16/18: $0\response_req_id_r[7:0]
+    17/18: $0\outstanding_req_id_r[7:0]
+    18/18: $0\state_r[7:0]
+Creating decoders for process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+     1/61: $8\next_state[7:0]
+     2/61: $3\selected_cmd_next[15:0]
+     3/61: $3\selected_cmd_valid_next[0:0]
+     4/61: $4\next_age_counter[31:0]
+     5/61: $7\next_state[7:0]
+     6/61: $7\next_pending[0:0]
+     7/61: $1\next_outstanding_req_id[7:0]
+     8/61: $6\next_fault_summary[15:0] [15:5]
+     9/61: $6\next_fault_summary[15:0] [4]
+    10/61: $6\next_fault_summary[15:0] [3:2]
+    11/61: $6\next_fault_summary[15:0] [1]
+    12/61: $6\next_fault_summary[15:0] [0]
+    13/61: $3\next_age_counter[31:0]
+    14/61: $6\next_irq_pulse[0:0]
+    15/61: $2\selected_cmd_valid_next[0:0]
+    16/61: $2\selected_cmd_next[15:0]
+    17/61: $6\next_pending[0:0]
+    18/61: $6\next_state[7:0]
+    19/61: $6\next_fallback_active[0:0]
+    20/61: $2\next_service_error[0:0]
+    21/61: $2\next_stale_reject[0:0]
+    22/61: $5\next_fault_summary[15:0]
+    23/61: $2\next_age_counter[31:0]
+    24/61: $5\next_irq_pulse[0:0]
+    25/61: $5\next_fallback_active[0:0]
+    26/61: $1\next_service_error[0:0]
+    27/61: $1\next_stale_reject[0:0]
+    28/61: $5\next_pending[0:0]
+    29/61: $5\next_state[7:0]
+    30/61: $1\selected_cmd_valid_next[0:0]
+    31/61: $1\selected_cmd_next[15:0]
+    32/61: $1\next_response_received[0:0]
+    33/61: $1\response_ok[0:0]
+    34/61: $1\id_match[0:0]
+    35/61: $1\next_response_req_id[7:0]
+    36/61: $4\next_fault_summary[2:2]
+    37/61: $4\next_irq_pulse[0:0]
+    38/61: $4\next_pending[0:0]
+    39/61: $4\next_state[7:0]
+    40/61: $4\next_fallback_active[0:0]
+    41/61: $1\next_envelope_violation[0:0]
+    42/61: $3\next_fault_summary[3:3]
+    43/61: $3\next_pending[0:0]
+    44/61: $3\next_state[7:0]
+    45/61: $3\next_irq_pulse[0:0]
+    46/61: $3\next_fallback_active[0:0]
+    47/61: $2\next_fault_summary[0:0]
+    48/61: $2\next_pending[0:0]
+    49/61: $2\next_state[7:0]
+    50/61: $2\next_irq_pulse[0:0]
+    51/61: $2\next_fallback_active[0:0]
+    52/61: $2\next_timeout_expired[0:0]
+    53/61: $2\timeout_bad[0:0]
+    54/61: $1\timeout_bad[0:0]
+    55/61: $1\next_fault_summary[0:0]
+    56/61: $1\next_irq_pulse[0:0]
+    57/61: $1\next_fallback_active[0:0]
+    58/61: $1\next_timeout_expired[0:0]
+    59/61: $1\next_pending[0:0]
+    60/61: $1\next_state[7:0]
+    61/61: $1\next_age_counter[31:0]
+Creating decoders for process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+     1/20: $0\wb_dat_o_r[31:0]
+     2/20: $0\wb_err_o_r[0:0]
+     3/20: $0\wb_ack_o_r[0:0]
+     4/20: $0\r_status_flags[7:0]
+     5/20: $0\r_command_mode[3:0]
+     6/20: $0\r_timestamp[31:0]
+     7/20: $0\r_flow_handle[15:0]
+     8/20: $0\r_geometry_handle[15:0]
+     9/20: $0\r_request_id[7:0]
+    10/20: $0\r_request_issue[0:0]
+    11/20: $0\r_allow_multi_outstanding[0:0]
+    12/20: $0\r_force_safe_mode[0:0]
+    13/20: $0\r_fallback_cmd[15:0]
+    14/20: $0\r_rate_limit_step[15:0]
+    15/20: $0\r_rate_limit_en[0:0]
+    16/20: $0\r_clamp_max[15:0]
+    17/20: $0\r_clamp_min[15:0]
+    18/20: $0\r_timeout_cycles[31:0]
+    19/20: $0\r_oper_en_max[15:0]
+    20/20: $0\r_oper_en_min[15:0]
+Creating decoders for process `\adaptive_aero_control_top_actuator_safety.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:87$35'.
+     1/4: $0\actuator_cmd_valid_r[0:0]
+     2/4: $0\actuator_cmd_r[15:0]
+     3/4: $0\reg_clamp_active_r[0:0]
+     4/4: $0\last_accepted_cmd_r[15:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:0$9'.
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:61$5'.
+     1/5: $0\tx_snapshot[118:0]
+     2/5: $0\spi_cs_prev[0:0]
+     3/5: $0\spi_cs_sync[0:0]
+     4/5: $0\spi_cs_meta[0:0]
+     5/5: $0\rx_active[132:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:52$2'.
+     1/2: $0\tx_shift[118:0]
+     2/2: $0\rx_shift[132:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:48$1'.
+     1/1: $0\spi_active[0:0]
+
+7.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\selected_cmd_next' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\selected_cmd_valid_next' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_state' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_outstanding_req_id' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_response_req_id' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_pending' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_response_received' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_stale_reject' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_timeout_expired' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_envelope_violation' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_service_error' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_fallback_active' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_irq_pulse' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_age_counter' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\next_fault_summary' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\req_desc_comb' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\cmd_raw' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\envelope_bad' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\timeout_bad' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\id_match' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\response_ok' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_request_fsm.\issue_req' from process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+No latch inferred for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_miso' from process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:0$9'.
+
+7.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\state_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$570' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\outstanding_req_id_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$571' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\response_req_id_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$572' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\pending_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$573' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\response_received_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$574' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\stale_reject_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$575' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\timeout_expired_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$576' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\envelope_violation_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$577' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\service_error_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$578' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\fallback_active_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$579' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\irq_pulse_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$580' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\selected_cmd_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$581' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\selected_cmd_valid_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$582' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\age_counter_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$583' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\fault_summary_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$584' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\model_req_desc_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$585' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\model_req_valid_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$586' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_request_fsm.\model_rsp_ready_r' using process `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+  created $adff cell `$procdff$587' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_oper_en_min' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$588' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_oper_en_max' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$589' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_timeout_cycles' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$590' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_clamp_min' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$591' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_clamp_max' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$592' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_rate_limit_en' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$593' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_rate_limit_step' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$594' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_fallback_cmd' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$595' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_force_safe_mode' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$596' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_allow_multi_outstanding' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$597' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_request_issue' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$598' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_request_id' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$599' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_geometry_handle' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$600' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_flow_handle' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$601' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_timestamp' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$602' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_command_mode' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$603' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\r_status_flags' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$604' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\wb_dat_o_r' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$605' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\wb_ack_o_r' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$606' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_mmio.\wb_err_o_r' using process `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+  created $adff cell `$procdff$607' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_actuator_safety.\last_accepted_cmd_r' using process `\adaptive_aero_control_top_actuator_safety.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:87$35'.
+  created $adff cell `$procdff$608' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_actuator_safety.\actuator_cmd_r' using process `\adaptive_aero_control_top_actuator_safety.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:87$35'.
+  created $adff cell `$procdff$609' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_actuator_safety.\actuator_cmd_valid_r' using process `\adaptive_aero_control_top_actuator_safety.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:87$35'.
+  created $adff cell `$procdff$610' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_actuator_safety.\reg_clamp_active_r' using process `\adaptive_aero_control_top_actuator_safety.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:87$35'.
+  created $adff cell `$procdff$611' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\rx_active' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:61$5'.
+  created $adff cell `$procdff$612' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\tx_snapshot' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:61$5'.
+  created $adff cell `$procdff$613' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_meta' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:61$5'.
+  created $adff cell `$procdff$614' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_sync' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:61$5'.
+  created $adff cell `$procdff$615' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_prev' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:61$5'.
+  created $adff cell `$procdff$616' with positive edge clock and negative level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\rx_shift' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:52$2'.
+  created $dff cell `$procdff$617' with positive edge clock.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\tx_shift' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:52$2'.
+  created $dff cell `$procdff$618' with positive edge clock.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_active' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:48$1'.
+  created $adff cell `$procdff$619' with positive edge clock and positive level reset.
+
+7.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+7.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:237$118'.
+Found and cleaned up 9 empty switches in `\adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+Removing empty process `adaptive_aero_control_top_request_fsm.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:137$96'.
+Found and cleaned up 3 empty switches in `\adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+Removing empty process `adaptive_aero_control_top_mmio.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:156$93'.
+Found and cleaned up 6 empty switches in `\adaptive_aero_control_top_actuator_safety.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:87$35'.
+Removing empty process `adaptive_aero_control_top_actuator_safety.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:87$35'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:0$9'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:61$5'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:61$5'.
+Found and cleaned up 2 empty switches in `\adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:52$2'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:52$2'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:48$1'.
+Cleaned up 21 empty switches.
+
+7.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+<suppressed ~1 debug messages>
+Optimizing module adaptive_aero_control_top_mmio.
+<suppressed ~2 debug messages>
+Optimizing module adaptive_aero_control_top_actuator_safety.
+<suppressed ~1 debug messages>
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+<suppressed ~3 debug messages>
+
+8. Executing OPT pass (performing simple optimizations).
+
+8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+<suppressed ~6 debug messages>
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+<suppressed ~54 debug messages>
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+<suppressed ~3 debug messages>
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 21 cells.
+
+8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 2/2 on $mux $procmux$338.
+    dead port 2/2 on $mux $procmux$332.
+    dead port 2/2 on $mux $procmux$326.
+    dead port 2/2 on $mux $procmux$320.
+    dead port 2/2 on $mux $procmux$314.
+    dead port 2/2 on $mux $procmux$308.
+    dead port 2/2 on $mux $procmux$302.
+    dead port 1/2 on $mux $procmux$260.
+    dead port 2/2 on $mux $procmux$260.
+    dead port 1/2 on $mux $procmux$257.
+    dead port 2/2 on $mux $procmux$257.
+    dead port 2/2 on $mux $procmux$221.
+    dead port 2/2 on $mux $procmux$215.
+    dead port 2/2 on $mux $procmux$209.
+    dead port 2/2 on $mux $procmux$203.
+    dead port 2/2 on $mux $procmux$197.
+    dead port 2/2 on $mux $procmux$192.
+    dead port 2/2 on $mux $procmux$186.
+    dead port 2/2 on $mux $procmux$180.
+    dead port 2/2 on $mux $procmux$175.
+    dead port 2/2 on $mux $procmux$169.
+    dead port 2/2 on $mux $procmux$163.
+    dead port 2/2 on $mux $procmux$157.
+    dead port 2/2 on $mux $procmux$151.
+    dead port 2/2 on $mux $procmux$145.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 25 multiplexer ports.
+<suppressed ~52 debug messages>
+
+8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+    New ctrl vector for $pmux cell $procmux$418: $auto$opt_reduce.cc:134:opt_pmux$621
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 1 changes.
+
+8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+<suppressed ~21 debug messages>
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 7 cells.
+
+8.6. Executing OPT_DFF pass (perform DFF optimizations).
+Handling D = Q on $procdff$586 ($adff) from module adaptive_aero_control_top_request_fsm (removing D path).
+Handling D = Q on $procdff$587 ($adff) from module adaptive_aero_control_top_request_fsm (removing D path).
+Adding EN signal on $procdff$584 ($adff) from module adaptive_aero_control_top_request_fsm (D = { $6\next_fault_summary[15:0] [15:4] $6\next_fault_summary[15:0] [1] }, Q = { \fault_summary_r [15:4] \fault_summary_r [1] }).
+Adding EN signal on $procdff$571 ($adff) from module adaptive_aero_control_top_request_fsm (D = \cfg_request_id, Q = \outstanding_req_id_r).
+Adding EN signal on $procdff$572 ($adff) from module adaptive_aero_control_top_request_fsm (D = \model_rsp_desc_i [7:0], Q = \response_req_id_r).
+Adding EN signal on $procdff$573 ($adff) from module adaptive_aero_control_top_request_fsm (D = $procmux$136_Y, Q = \pending_r).
+Adding EN signal on $procdff$576 ($adff) from module adaptive_aero_control_top_request_fsm (D = $2\next_timeout_expired[0:0], Q = \timeout_expired_r).
+Adding EN signal on $procdff$581 ($adff) from module adaptive_aero_control_top_request_fsm (D = $procmux$124_Y, Q = \selected_cmd_r).
+Setting constant 1-bit at position 0 on $procdff$587 ($dlatch) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 56 on $procdff$585 ($adff) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 57 on $procdff$585 ($adff) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 58 on $procdff$585 ($adff) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 59 on $procdff$585 ($adff) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 60 on $procdff$585 ($adff) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 61 on $procdff$585 ($adff) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 62 on $procdff$585 ($adff) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 63 on $procdff$585 ($adff) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 0 on $procdff$586 ($dlatch) from module adaptive_aero_control_top_request_fsm.
+Adding EN signal on $procdff$590 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i, Q = \r_timeout_cycles).
+Adding EN signal on $procdff$591 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [15:0], Q = \r_clamp_min).
+Adding EN signal on $procdff$592 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [15:0], Q = \r_clamp_max).
+Adding EN signal on $procdff$593 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [3], Q = \r_rate_limit_en).
+Adding EN signal on $procdff$594 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [15:0], Q = \r_rate_limit_step).
+Adding EN signal on $procdff$595 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [15:0], Q = \r_fallback_cmd).
+Adding EN signal on $procdff$596 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [1], Q = \r_force_safe_mode).
+Adding EN signal on $procdff$597 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [2], Q = \r_allow_multi_outstanding).
+Adding EN signal on $procdff$598 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [0], Q = \r_request_issue).
+Adding EN signal on $procdff$599 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [15:8], Q = \r_request_id).
+Adding EN signal on $procdff$600 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [31:16], Q = \r_geometry_handle).
+Adding EN signal on $procdff$601 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [15:0], Q = \r_flow_handle).
+Adding EN signal on $procdff$602 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i, Q = \r_timestamp).
+Adding EN signal on $procdff$603 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [19:16], Q = \r_command_mode).
+Adding EN signal on $procdff$604 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [31:24], Q = \r_status_flags).
+Adding EN signal on $procdff$588 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [15:0], Q = \r_oper_en_min).
+Adding EN signal on $procdff$589 ($adff) from module adaptive_aero_control_top_mmio (D = \wb_dat_i [15:0], Q = \r_oper_en_max).
+Adding EN signal on $procdff$608 ($adff) from module adaptive_aero_control_top_actuator_safety (D = $procmux$559_Y, Q = \last_accepted_cmd_r).
+Adding EN signal on $procdff$612 ($adff) from module adaptive_aero_control_top_spi_fpga_top (D = \rx_shift, Q = \rx_active).
+Adding EN signal on $procdff$617 ($dff) from module adaptive_aero_control_top_spi_fpga_top (D = { \rx_shift [131:0] \spi_mosi }, Q = \rx_shift).
+Adding EN signal on $procdff$618 ($dff) from module adaptive_aero_control_top_spi_fpga_top (D = $procmux$564_Y, Q = \tx_shift).
+
+8.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 48 unused cells and 378 unused wires.
+<suppressed ~61 debug messages>
+
+8.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+<suppressed ~2 debug messages>
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+8.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+8.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~32 debug messages>
+
+8.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+8.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+<suppressed ~15 debug messages>
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 5 cells.
+
+8.13. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $auto$ff.cc:266:slice$633 ($adffe) from module adaptive_aero_control_top_request_fsm (D = 1'1, Q = \timeout_expired_r).
+
+8.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 1 unused cells and 6 unused wires.
+<suppressed ~3 debug messages>
+
+8.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+8.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+8.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~31 debug messages>
+
+8.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+8.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+8.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+8.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+8.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+8.23. Finished OPT passes. (There is nothing left to do.)
+
+9. Executing FSM pass (extract and optimize FSM).
+
+9.1. Executing FSM_DETECT pass (finding FSMs in design).
+Not marking adaptive_aero_control_top_request_fsm.state_r as FSM state register:
+    Register is connected to module port.
+    Users of register don't seem to benefit from recoding.
+
+9.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+9.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+9.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+9.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+9.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+9.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+9.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+10. Executing OPT pass (performing simple optimizations).
+
+10.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+10.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+10.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~31 debug messages>
+
+10.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+10.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+10.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+10.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+10.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+10.9. Finished OPT passes. (There is nothing left to do.)
+
+11. Executing MEMORY pass.
+
+11.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+11.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+11.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+11.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+11.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+11.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+11.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+11.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+11.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+11.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+11.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+12. Executing OPT pass (performing simple optimizations).
+
+12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+12.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~31 debug messages>
+
+12.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+12.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+12.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+12.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+12.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+12.9. Finished OPT passes. (There is nothing left to do.)
+
+13. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top...
+Checking module adaptive_aero_control_top_actuator_safety...
+Checking module adaptive_aero_control_top_mmio...
+Checking module adaptive_aero_control_top_request_fsm...
+Checking module adaptive_aero_control_top_spi_fpga_top...
+Found and reported 0 problems.
+
+14. Executing SYNTH pass.
+
+14.1. Executing HIERARCHY pass (managing design hierarchy).
+
+14.1.1. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Used module:     \adaptive_aero_control_top
+Used module:         \adaptive_aero_control_top_request_fsm
+Used module:         \adaptive_aero_control_top_mmio
+Used module:         \adaptive_aero_control_top_actuator_safety
+
+14.1.2. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Used module:     \adaptive_aero_control_top
+Used module:         \adaptive_aero_control_top_request_fsm
+Used module:         \adaptive_aero_control_top_mmio
+Used module:         \adaptive_aero_control_top_actuator_safety
+Removed 0 unused modules.
+
+14.2. Executing PROC pass (convert processes to netlists).
+
+14.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+14.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+14.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 0 assignments to connections.
+
+14.2.4. Executing PROC_INIT pass (extract init attributes).
+
+14.2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+14.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+14.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+
+14.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+14.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+14.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+14.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+14.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.3. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.5. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top...
+Checking module adaptive_aero_control_top_actuator_safety...
+Checking module adaptive_aero_control_top_mmio...
+Checking module adaptive_aero_control_top_request_fsm...
+Checking module adaptive_aero_control_top_spi_fpga_top...
+Found and reported 0 problems.
+
+14.6. Executing OPT pass (performing simple optimizations).
+
+14.6.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.6.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+14.6.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~31 debug messages>
+
+14.6.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+14.6.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+14.6.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+14.6.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.6.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.6.9. Finished OPT passes. (There is nothing left to do.)
+
+14.7. Executing FSM pass (extract and optimize FSM).
+
+14.7.1. Executing FSM_DETECT pass (finding FSMs in design).
+Not marking adaptive_aero_control_top_request_fsm.state_r as FSM state register:
+    Register is connected to module port.
+    Users of register don't seem to benefit from recoding.
+
+14.7.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+14.7.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+14.7.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.7.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+14.7.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+14.7.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+14.7.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+14.8. Executing OPT pass (performing simple optimizations).
+
+14.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+14.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~31 debug messages>
+
+14.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+14.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+14.8.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+14.8.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.8.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.8.9. Finished OPT passes. (There is nothing left to do.)
+
+14.9. Executing WREDUCE pass (reducing word size of cells).
+Removed top 1 bits (of 2) from port B of cell adaptive_aero_control_top_actuator_safety.$auto$opt_dff.cc:195:make_patterns_logic$695 ($ne).
+Removed top 5 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:123$57 ($ne).
+Removed top 4 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:123$59 ($ne).
+Removed top 4 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:124$61 ($ne).
+Removed top 3 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:124$63 ($ne).
+Removed top 3 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:124$65 ($ne).
+Removed top 3 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:125$67 ($ne).
+Removed top 3 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:125$69 ($ne).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:125$71 ($ne).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:126$73 ($ne).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:126$75 ($ne).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:126$77 ($ne).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:127$79 ($ne).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:127$81 ($ne).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:127$83 ($ne).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:128$85 ($ne).
+Removed top 1 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:128$87 ($ne).
+Removed top 1 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:128$89 ($ne).
+Removed top 1 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$ne$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:129$91 ($ne).
+Removed top 1 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$366_CMP0 ($eq).
+Removed top 1 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$367_CMP0 ($eq).
+Removed top 1 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$368_CMP0 ($eq).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$369_CMP0 ($eq).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$370_CMP0 ($eq).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$371_CMP0 ($eq).
+Removed top 5 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$383_CMP0 ($eq).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$396_CMP0 ($eq).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$401_CMP0 ($eq).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$419_CMP0 ($eq).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$455_CMP0 ($eq).
+Removed top 2 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$463_CMP0 ($eq).
+Removed top 4 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$477_CMP0 ($eq).
+Removed top 3 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$486_CMP0 ($eq).
+Removed top 3 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$496_CMP0 ($eq).
+Removed top 3 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$507_CMP0 ($eq).
+Removed top 3 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$519_CMP0 ($eq).
+Removed top 4 bits (of 8) from port B of cell adaptive_aero_control_top_mmio.$procmux$532_CMP0 ($eq).
+Removed top 7 bits (of 8) from port B of cell adaptive_aero_control_top_request_fsm.$eq$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:161$98 ($eq).
+Removed top 31 bits (of 32) from port B of cell adaptive_aero_control_top_request_fsm.$add$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:162$99 ($add).
+Removed top 6 bits (of 8) from port B of cell adaptive_aero_control_top_request_fsm.$eq$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:227$116 ($eq).
+Removed top 6 bits (of 8) from port B of cell adaptive_aero_control_top_request_fsm.$eq$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:232$117 ($eq).
+Removed top 2 bits (of 3) from port B of cell adaptive_aero_control_top_request_fsm.$auto$opt_dff.cc:195:make_patterns_logic$638 ($ne).
+Removed top 7 bits (of 8) from mux cell adaptive_aero_control_top_request_fsm.$procmux$201 ($mux).
+Removed top 2 bits (of 6) from port B of cell adaptive_aero_control_top_request_fsm.$auto$opt_dff.cc:195:make_patterns_logic$630 ($ne).
+Removed top 12 bits (of 16) from mux cell adaptive_aero_control_top_request_fsm.$procmux$224 ($mux).
+Removed top 7 bits (of 8) from wire adaptive_aero_control_top_request_fsm.$6\next_state[7:0].
+Removed top 8 bits (of 64) from wire adaptive_aero_control_top_request_fsm.model_req_desc_r.
+Removed top 12 bits (of 16) from wire adaptive_aero_control_top_request_fsm.next_fault_summary.
+Removed top 8 bits (of 64) from wire adaptive_aero_control_top_request_fsm.req_desc_comb.
+
+14.10. Executing PEEPOPT pass (run peephole optimizers).
+
+14.11. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 0 unused cells and 4 unused wires.
+<suppressed ~1 debug messages>
+
+14.12. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module adaptive_aero_control_top:
+  created 0 $alu and 0 $macc cells.
+Extracting $alu and $macc cells in module adaptive_aero_control_top_actuator_safety:
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:75$29 ($add).
+  creating $macc model for $sub$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:68$17 ($sub).
+  creating $macc model for $sub$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:69$18 ($sub).
+  creating $macc model for $sub$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:76$30 ($sub).
+  creating $alu model for $macc $sub$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:76$30.
+  creating $alu model for $macc $sub$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:69$18.
+  creating $alu model for $macc $sub$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:68$17.
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:75$29.
+  creating $alu model for $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:70$19 ($gt): merged with $sub$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:68$17.
+  creating $alu model for $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:70$20 ($gt): new $alu
+  creating $alu model for $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:71$23 ($gt): new $alu
+  creating $alu model for $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:74$27 ($gt): new $alu
+  creating $alu model for $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:79$34 ($gt): new $alu
+  creating $alu model for $lt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:71$22 ($lt): merged with $sub$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:68$17.
+  creating $alu model for $lt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:78$33 ($lt): new $alu
+  creating $alu cell for $lt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:78$33: $auto$alumacc.cc:485:replace_alu$711
+  creating $alu cell for $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:79$34: $auto$alumacc.cc:485:replace_alu$716
+  creating $alu cell for $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:74$27: $auto$alumacc.cc:485:replace_alu$727
+  creating $alu cell for $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:71$23: $auto$alumacc.cc:485:replace_alu$738
+  creating $alu cell for $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:70$20: $auto$alumacc.cc:485:replace_alu$743
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:75$29: $auto$alumacc.cc:485:replace_alu$748
+  creating $alu cell for $sub$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:68$17, $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:70$19, $lt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:71$22: $auto$alumacc.cc:485:replace_alu$751
+  creating $alu cell for $sub$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:69$18: $auto$alumacc.cc:485:replace_alu$762
+  creating $alu cell for $sub$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_actuator_safety.v:76$30: $auto$alumacc.cc:485:replace_alu$765
+  created 9 $alu and 0 $macc cells.
+Extracting $alu and $macc cells in module adaptive_aero_control_top_mmio:
+  created 0 $alu and 0 $macc cells.
+Extracting $alu and $macc cells in module adaptive_aero_control_top_request_fsm:
+  creating $macc model for $add$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:162$99 ($add).
+  creating $alu model for $macc $add$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:162$99.
+  creating $alu model for $ge$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:163$101 ($ge): new $alu
+  creating $alu model for $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:155$97 ($gt): new $alu
+  creating $alu cell for $gt$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:155$97: $auto$alumacc.cc:485:replace_alu$770
+  creating $alu cell for $ge$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:163$101: $auto$alumacc.cc:485:replace_alu$775
+  creating $alu cell for $add$/root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:162$99: $auto$alumacc.cc:485:replace_alu$788
+  created 3 $alu and 0 $macc cells.
+Extracting $alu and $macc cells in module adaptive_aero_control_top_spi_fpga_top:
+  created 0 $alu and 0 $macc cells.
+
+14.13. Executing SHARE pass (SAT-based resource sharing).
+
+14.14. Executing OPT pass (performing simple optimizations).
+
+14.14.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+<suppressed ~2 debug messages>
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+<suppressed ~7 debug messages>
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.14.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+14.14.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~31 debug messages>
+
+14.14.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+14.14.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+<suppressed ~3 debug messages>
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 1 cells.
+
+14.14.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $auto$ff.cc:266:slice$622 ($adffe) from module adaptive_aero_control_top_request_fsm (D = 11'00000000000, Q = \fault_summary_r [15:5]).
+Setting constant 0-bit at position 0 on $auto$ff.cc:266:slice$791 ($adffe) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 1 on $auto$ff.cc:266:slice$791 ($adffe) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 2 on $auto$ff.cc:266:slice$791 ($adffe) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 3 on $auto$ff.cc:266:slice$791 ($adffe) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 4 on $auto$ff.cc:266:slice$791 ($adffe) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 5 on $auto$ff.cc:266:slice$791 ($adffe) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 6 on $auto$ff.cc:266:slice$791 ($adffe) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 7 on $auto$ff.cc:266:slice$791 ($adffe) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 8 on $auto$ff.cc:266:slice$791 ($adffe) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 9 on $auto$ff.cc:266:slice$791 ($adffe) from module adaptive_aero_control_top_request_fsm.
+Setting constant 0-bit at position 10 on $auto$ff.cc:266:slice$791 ($adffe) from module adaptive_aero_control_top_request_fsm.
+
+14.14.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 3 unused cells and 13 unused wires.
+<suppressed ~5 debug messages>
+
+14.14.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.14.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+14.14.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~30 debug messages>
+
+14.14.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+14.14.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+14.14.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+14.14.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.14.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.14.16. Finished OPT passes. (There is nothing left to do.)
+
+14.15. Executing MEMORY pass.
+
+14.15.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+14.15.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+14.15.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+14.15.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+14.15.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+14.15.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.15.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+14.15.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+14.15.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.15.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+14.16. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.17. Executing OPT pass (performing simple optimizations).
+
+14.17.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+<suppressed ~4 debug messages>
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+<suppressed ~23 debug messages>
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.17.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+<suppressed ~6 debug messages>
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 2 cells.
+
+14.17.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+14.17.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 0 unused cells and 15 unused wires.
+<suppressed ~2 debug messages>
+
+14.17.5. Finished fast OPT passes.
+
+14.18. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+14.19. Executing OPT pass (performing simple optimizations).
+
+14.19.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.19.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+14.19.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~24 debug messages>
+
+14.19.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+    Consolidated identical input bits for $mux cell $procmux$564:
+      Old ports: A={ \tx_snapshot [117:0] 1'0 }, B={ \tx_shift [117:0] 1'0 }, Y=$procmux$564_Y
+      New ports: A=\tx_snapshot [117:0], B=\tx_shift [117:0], Y=$procmux$564_Y [118:1]
+      New connections: $procmux$564_Y [0] = 1'0
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 1 changes.
+
+14.19.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+14.19.6. Executing OPT_SHARE pass.
+
+14.19.7. Executing OPT_DFF pass (perform DFF optimizations).
+
+14.19.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.19.9. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.19.10. Rerunning OPT passes. (Maybe there is more to do..)
+
+14.19.11. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~24 debug messages>
+
+14.19.12. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+14.19.13. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+14.19.14. Executing OPT_SHARE pass.
+
+14.19.15. Executing OPT_DFF pass (perform DFF optimizations).
+Setting constant 0-bit at position 0 on $auto$ff.cc:266:slice$698 ($dffe) from module adaptive_aero_control_top_spi_fpga_top.
+
+14.19.16. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.19.17. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.19.18. Rerunning OPT passes. (Maybe there is more to do..)
+
+14.19.19. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~24 debug messages>
+
+14.19.20. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+14.19.21. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+14.19.22. Executing OPT_SHARE pass.
+
+14.19.23. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $auto$ff.cc:266:slice$795 ($dffe) from module adaptive_aero_control_top_spi_fpga_top (D = \tx_snapshot [0], Q = \tx_shift [1], rval = 1'0).
+
+14.19.24. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.19.25. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.19.26. Rerunning OPT passes. (Maybe there is more to do..)
+
+14.19.27. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \adaptive_aero_control_top_actuator_safety..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_mmio..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_request_fsm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~24 debug messages>
+
+14.19.28. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top.
+  Optimizing cells in module \adaptive_aero_control_top_actuator_safety.
+  Optimizing cells in module \adaptive_aero_control_top_mmio.
+  Optimizing cells in module \adaptive_aero_control_top_request_fsm.
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+14.19.29. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+14.19.30. Executing OPT_SHARE pass.
+
+14.19.31. Executing OPT_DFF pass (perform DFF optimizations).
+
+14.19.32. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+14.19.33. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.19.34. Finished OPT passes. (There is nothing left to do.)
+
+14.20. Executing TECHMAP pass (map to technology primitives).
+
+14.20.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/techmap.v
+Parsing Verilog input from `/usr/bin/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `\$__div_mod_u'.
+Generating RTLIL representation for module `\$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `\$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_pmux'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Successfully finished Verilog frontend.
+
+14.20.2. Continuing TECHMAP pass.
+Using extmapper simplemap for cells of type $logic_not.
+Using extmapper simplemap for cells of type $logic_and.
+Using extmapper simplemap for cells of type $mux.
+Using extmapper simplemap for cells of type $dffe.
+Using extmapper simplemap for cells of type $adffe.
+Using extmapper simplemap for cells of type $adff.
+Using extmapper simplemap for cells of type $sdffce.
+Using extmapper simplemap for cells of type $reduce_and.
+Using extmapper simplemap for cells of type $not.
+Using template $paramod$6df0329addda9228fcc2546de2aaf14ad26c98e1\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $or.
+Using template $paramod$fbc7873bff55778c0b3173955b7e4bce1d9d6834\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $eq.
+Using extmapper simplemap for cells of type $reduce_bool.
+Using template $paramod$6a42b6fefed750f8a1c58eab59479d960557103c\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $ne.
+Using extmapper simplemap for cells of type $and.
+Using extmapper simplemap for cells of type $reduce_or.
+Using extmapper simplemap for cells of type $xor.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000010000 for cells of type $lcu.
+Using extmapper simplemap for cells of type $pos.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000100000 for cells of type $lcu.
+Using template $paramod$03296670be27cffe6cdd8fc48f398f1ff0a6bd54\_90_pmux for cells of type $pmux.
+Using extmapper simplemap for cells of type $logic_or.
+No more expansions possible.
+<suppressed ~1731 debug messages>
+
+14.21. Executing OPT pass (performing simple optimizations).
+
+14.21.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+<suppressed ~192 debug messages>
+Optimizing module adaptive_aero_control_top_mmio.
+<suppressed ~936 debug messages>
+Optimizing module adaptive_aero_control_top_request_fsm.
+<suppressed ~338 debug messages>
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.21.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+<suppressed ~207 debug messages>
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+<suppressed ~888 debug messages>
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+<suppressed ~105 debug messages>
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 400 cells.
+
+14.21.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+14.21.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 390 unused cells and 1040 unused wires.
+<suppressed ~393 debug messages>
+
+14.21.5. Finished fast OPT passes.
+
+14.22. Executing ABC pass (technology mapping using ABC).
+
+14.22.1. Extracting gate netlist of module `\adaptive_aero_control_top' to `<abc-temp-dir>/input.blif'..
+Extracted 0 gates and 0 wires to a netlist network with 0 inputs and 0 outputs.
+Don't call ABC as there is nothing to map.
+Removing temp directory.
+
+14.22.2. Extracting gate netlist of module `\adaptive_aero_control_top_actuator_safety' to `<abc-temp-dir>/input.blif'..
+Extracted 1136 gates and 1258 wires to a netlist network with 120 inputs and 35 outputs.
+
+14.22.2.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_library <abc-temp-dir>/stdcells.genlib 
+ABC: Entered genlib library with 13 gates from file "<abc-temp-dir>/stdcells.genlib".
+ABC: + strash 
+ABC: + dretime 
+ABC: + map 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+14.22.2.2. Re-integrating ABC results.
+ABC RESULTS:               NOT cells:      112
+ABC RESULTS:               NOR cells:       27
+ABC RESULTS:               AND cells:        9
+ABC RESULTS:              NAND cells:       37
+ABC RESULTS:            ANDNOT cells:      370
+ABC RESULTS:              XNOR cells:       48
+ABC RESULTS:             ORNOT cells:       69
+ABC RESULTS:               XOR cells:      169
+ABC RESULTS:                OR cells:      135
+ABC RESULTS:               MUX cells:      114
+ABC RESULTS:        internal signals:     1103
+ABC RESULTS:           input signals:      120
+ABC RESULTS:          output signals:       35
+Removing temp directory.
+
+14.22.3. Extracting gate netlist of module `\adaptive_aero_control_top_mmio' to `<abc-temp-dir>/input.blif'..
+Extracted 683 gates and 976 wires to a netlist network with 292 inputs and 46 outputs.
+
+14.22.3.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_library <abc-temp-dir>/stdcells.genlib 
+ABC: Entered genlib library with 13 gates from file "<abc-temp-dir>/stdcells.genlib".
+ABC: + strash 
+ABC: + dretime 
+ABC: + map 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+14.22.3.2. Re-integrating ABC results.
+ABC RESULTS:              NAND cells:        9
+ABC RESULTS:               AND cells:        5
+ABC RESULTS:               NOR cells:        5
+ABC RESULTS:             ORNOT cells:       52
+ABC RESULTS:                OR cells:      222
+ABC RESULTS:            ANDNOT cells:      366
+ABC RESULTS:        internal signals:      638
+ABC RESULTS:           input signals:      292
+ABC RESULTS:          output signals:       46
+Removing temp directory.
+
+14.22.4. Extracting gate netlist of module `\adaptive_aero_control_top_request_fsm' to `<abc-temp-dir>/input.blif'..
+Extracted 686 gates and 832 wires to a netlist network with 144 inputs and 70 outputs.
+
+14.22.4.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_library <abc-temp-dir>/stdcells.genlib 
+ABC: Entered genlib library with 13 gates from file "<abc-temp-dir>/stdcells.genlib".
+ABC: + strash 
+ABC: + dretime 
+ABC: + map 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+14.22.4.2. Re-integrating ABC results.
+ABC RESULTS:               NOR cells:        5
+ABC RESULTS:              XNOR cells:       31
+ABC RESULTS:              NAND cells:       24
+ABC RESULTS:               NOT cells:       34
+ABC RESULTS:               XOR cells:       56
+ABC RESULTS:             ORNOT cells:       86
+ABC RESULTS:            ANDNOT cells:      230
+ABC RESULTS:               AND cells:       12
+ABC RESULTS:               MUX cells:       78
+ABC RESULTS:                OR cells:       96
+ABC RESULTS:        internal signals:      618
+ABC RESULTS:           input signals:      144
+ABC RESULTS:          output signals:       70
+Removing temp directory.
+
+14.22.5. Extracting gate netlist of module `\adaptive_aero_control_top_spi_fpga_top' to `<abc-temp-dir>/input.blif'..
+Extracted 120 gates and 359 wires to a netlist network with 239 inputs and 119 outputs.
+
+14.22.5.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_library <abc-temp-dir>/stdcells.genlib 
+ABC: Entered genlib library with 13 gates from file "<abc-temp-dir>/stdcells.genlib".
+ABC: + strash 
+ABC: + dretime 
+ABC: + map 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+14.22.5.2. Re-integrating ABC results.
+ABC RESULTS:            ANDNOT cells:        1
+ABC RESULTS:               MUX cells:      118
+ABC RESULTS:        internal signals:        1
+ABC RESULTS:           input signals:      239
+ABC RESULTS:          output signals:      119
+Removing temp directory.
+
+14.23. Executing OPT pass (performing simple optimizations).
+
+14.23.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top.
+Optimizing module adaptive_aero_control_top_actuator_safety.
+<suppressed ~17 debug messages>
+Optimizing module adaptive_aero_control_top_mmio.
+Optimizing module adaptive_aero_control_top_request_fsm.
+<suppressed ~74 debug messages>
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+14.23.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top'.
+Finding identical cells in module `\adaptive_aero_control_top_actuator_safety'.
+<suppressed ~3 debug messages>
+Finding identical cells in module `\adaptive_aero_control_top_mmio'.
+Finding identical cells in module `\adaptive_aero_control_top_request_fsm'.
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 1 cells.
+
+14.23.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+14.23.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top..
+Finding unused cells or wires in module \adaptive_aero_control_top_actuator_safety..
+Finding unused cells or wires in module \adaptive_aero_control_top_mmio..
+Finding unused cells or wires in module \adaptive_aero_control_top_request_fsm..
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 1 unused cells and 1706 unused wires.
+<suppressed ~18 debug messages>
+
+14.23.5. Finished fast OPT passes.
+
+14.24. Executing HIERARCHY pass (managing design hierarchy).
+
+14.24.1. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Used module:     \adaptive_aero_control_top
+Used module:         \adaptive_aero_control_top_request_fsm
+Used module:         \adaptive_aero_control_top_mmio
+Used module:         \adaptive_aero_control_top_actuator_safety
+
+14.24.2. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Used module:     \adaptive_aero_control_top
+Used module:         \adaptive_aero_control_top_request_fsm
+Used module:         \adaptive_aero_control_top_mmio
+Used module:         \adaptive_aero_control_top_actuator_safety
+Removed 0 unused modules.
+
+14.25. Printing statistics.
+
+=== adaptive_aero_control_top ===
+
+   Number of wires:                 54
+   Number of wire bits:            615
+   Number of public wires:          54
+   Number of public wire bits:     615
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                  3
+     adaptive_aero_control_top_actuator_safety      1
+     adaptive_aero_control_top_mmio      1
+     adaptive_aero_control_top_request_fsm      1
+
+=== adaptive_aero_control_top_actuator_safety ===
+
+   Number of wires:               1084
+   Number of wire bits:           1294
+   Number of public wires:          26
+   Number of public wire bits:     206
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               1122
+     $_ANDNOT_                     370
+     $_AND_                          9
+     $_DFFE_PN0P_                   16
+     $_DFF_PN0_                     18
+     $_MUX_                        114
+     $_NAND_                        37
+     $_NOR_                         27
+     $_NOT_                        111
+     $_ORNOT_                       69
+     $_OR_                         135
+     $_XNOR_                        48
+     $_XOR_                        168
+
+=== adaptive_aero_control_top_mmio ===
+
+   Number of wires:                692
+   Number of wire bits:           1365
+   Number of public wires:          65
+   Number of public wire bits:     707
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                909
+     $_ANDNOT_                     366
+     $_AND_                          5
+     $_DFFE_PN0P_                  177
+     $_DFFE_PN1P_                   39
+     $_DFF_PN0_                     34
+     $_NAND_                         9
+     $_NOR_                          5
+     $_ORNOT_                       52
+     $_OR_                         222
+
+=== adaptive_aero_control_top_request_fsm ===
+
+   Number of wires:                654
+   Number of wire bits:           1233
+   Number of public wires:          69
+   Number of public wire bits:     648
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                792
+     $_ANDNOT_                     230
+     $_AND_                         12
+     $_DFFE_PN0P_                   35
+     $_DFF_PN0_                    105
+     $_MUX_                         78
+     $_NAND_                        24
+     $_NOR_                          5
+     $_NOT_                         34
+     $_ORNOT_                       86
+     $_OR_                          96
+     $_XNOR_                        31
+     $_XOR_                         56
+
+=== adaptive_aero_control_top_spi_fpga_top ===
+
+   Number of wires:                152
+   Number of wire bits:           1004
+   Number of public wires:          34
+   Number of public wire bits:     886
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                627
+     $_ANDNOT_                       1
+     $_DFFE_PN0P_                  133
+     $_DFFE_PN_                    250
+     $_DFF_PN0_                    119
+     $_DFF_PN1_                      3
+     $_DFF_PP0_                      1
+     $_MUX_                        118
+     $_SDFFCE_PP0N_                  1
+     adaptive_aero_control_top       1
+
+=== design hierarchy ===
+
+   adaptive_aero_control_top_spi_fpga_top      1
+     adaptive_aero_control_top       1
+       adaptive_aero_control_top_actuator_safety      1
+       adaptive_aero_control_top_mmio      1
+       adaptive_aero_control_top_request_fsm      1
+
+   Number of wires:               2636
+   Number of wire bits:           5511
+   Number of public wires:         248
+   Number of public wire bits:    3062
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               3449
+     $_ANDNOT_                     967
+     $_AND_                         26
+     $_DFFE_PN0P_                  361
+     $_DFFE_PN1P_                   39
+     $_DFFE_PN_                    250
+     $_DFF_PN0_                    276
+     $_DFF_PN1_                      3
+     $_DFF_PP0_                      1
+     $_MUX_                        310
+     $_NAND_                        70
+     $_NOR_                         37
+     $_NOT_                        145
+     $_ORNOT_                      207
+     $_OR_                         453
+     $_SDFFCE_PP0N_                  1
+     $_XNOR_                        79
+     $_XOR_                        224
+
+14.26. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top...
+Checking module adaptive_aero_control_top_actuator_safety...
+Checking module adaptive_aero_control_top_mmio...
+Checking module adaptive_aero_control_top_request_fsm...
+Checking module adaptive_aero_control_top_spi_fpga_top...
+Found and reported 0 problems.
+
+15. Printing statistics.
+
+=== adaptive_aero_control_top ===
+
+   Number of wires:                 54
+   Number of wire bits:            615
+   Number of public wires:          54
+   Number of public wire bits:     615
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                  3
+     adaptive_aero_control_top_actuator_safety      1
+     adaptive_aero_control_top_mmio      1
+     adaptive_aero_control_top_request_fsm      1
+
+=== adaptive_aero_control_top_actuator_safety ===
+
+   Number of wires:               1084
+   Number of wire bits:           1294
+   Number of public wires:          26
+   Number of public wire bits:     206
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               1122
+     $_ANDNOT_                     370
+     $_AND_                          9
+     $_DFFE_PN0P_                   16
+     $_DFF_PN0_                     18
+     $_MUX_                        114
+     $_NAND_                        37
+     $_NOR_                         27
+     $_NOT_                        111
+     $_ORNOT_                       69
+     $_OR_                         135
+     $_XNOR_                        48
+     $_XOR_                        168
+
+=== adaptive_aero_control_top_mmio ===
+
+   Number of wires:                692
+   Number of wire bits:           1365
+   Number of public wires:          65
+   Number of public wire bits:     707
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                909
+     $_ANDNOT_                     366
+     $_AND_                          5
+     $_DFFE_PN0P_                  177
+     $_DFFE_PN1P_                   39
+     $_DFF_PN0_                     34
+     $_NAND_                         9
+     $_NOR_                          5
+     $_ORNOT_                       52
+     $_OR_                         222
+
+=== adaptive_aero_control_top_request_fsm ===
+
+   Number of wires:                654
+   Number of wire bits:           1233
+   Number of public wires:          69
+   Number of public wire bits:     648
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                792
+     $_ANDNOT_                     230
+     $_AND_                         12
+     $_DFFE_PN0P_                   35
+     $_DFF_PN0_                    105
+     $_MUX_                         78
+     $_NAND_                        24
+     $_NOR_                          5
+     $_NOT_                         34
+     $_ORNOT_                       86
+     $_OR_                          96
+     $_XNOR_                        31
+     $_XOR_                         56
+
+=== adaptive_aero_control_top_spi_fpga_top ===
+
+   Number of wires:                152
+   Number of wire bits:           1004
+   Number of public wires:          34
+   Number of public wire bits:     886
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                627
+     $_ANDNOT_                       1
+     $_DFFE_PN0P_                  133
+     $_DFFE_PN_                    250
+     $_DFF_PN0_                    119
+     $_DFF_PN1_                      3
+     $_DFF_PP0_                      1
+     $_MUX_                        118
+     $_SDFFCE_PP0N_                  1
+     adaptive_aero_control_top       1
+
+=== design hierarchy ===
+
+   adaptive_aero_control_top_spi_fpga_top      1
+     adaptive_aero_control_top       1
+       adaptive_aero_control_top_actuator_safety      1
+       adaptive_aero_control_top_mmio      1
+       adaptive_aero_control_top_request_fsm      1
+
+   Number of wires:               2636
+   Number of wire bits:           5511
+   Number of public wires:         248
+   Number of public wire bits:    3062
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               3449
+     $_ANDNOT_                     967
+     $_AND_                         26
+     $_DFFE_PN0P_                  361
+     $_DFFE_PN1P_                   39
+     $_DFFE_PN_                    250
+     $_DFF_PN0_                    276
+     $_DFF_PN1_                      3
+     $_DFF_PP0_                      1
+     $_MUX_                        310
+     $_NAND_                        70
+     $_NOR_                         37
+     $_NOT_                        145
+     $_ORNOT_                      207
+     $_OR_                         453
+     $_SDFFCE_PP0N_                  1
+     $_XNOR_                        79
+     $_XOR_                        224
+
+End of script. Logfile hash: 0f91bb7de7, CPU: user 2.32s system 0.04s, MEM: 192.36 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 22% 30x opt_expr (0 sec), 15% 1x abc (0 sec), ...

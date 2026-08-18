@@ -1,0 +1,87 @@
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v:160:6: Instance pin connected by name with empty reference: 'selected_cmd_o'
+  160 |     .selected_cmd_o(),
+      |      ^~~~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v:161:6: Instance pin connected by name with empty reference: 'selected_cmd_valid_o'
+  161 |     .selected_cmd_valid_o()
+      |      ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v:61:13: Signal is not used: 'reg_version'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   61 | wire [31:0] reg_version;
+      |             ^~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v:62:13: Signal is not used: 'reg_capabilities'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   62 | wire [31:0] reg_capabilities;
+      |             ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v:77:13: Signal is not used: 'last_accepted_cmd_o'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   77 | wire [15:0] last_accepted_cmd_o;
+      |             ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v:78:13: Signal is not driven, nor used: 'selected_cmd_o'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   78 | wire [15:0] selected_cmd_o;
+      |             ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v:79:6: Signal is not driven, nor used: 'selected_cmd_valid_o'
+                                                                                                                                                       : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   79 | wire selected_cmd_valid_o;
+      |      ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top.v:80:6: Signal is not driven, nor used: 'adaptive_aero_control_top_request_fsm_reg_stale_reject'
+                                                                                                                                                       : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   80 | wire adaptive_aero_control_top_request_fsm_reg_stale_reject;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:49:14: Bits of signal are not used: 'wb_adr_i'[31:8]
+                                                                                                                                                             : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_mmio'
+   49 | input [31:0] wb_adr_i;
+      |              ^~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_mmio.v:115:6: Signal is not used: 'read_access'
+                                                                                                                                                             : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_mmio'
+  115 | wire read_access;
+      |      ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:41:7: Signal is not used: 'cfg_allow_multi_outstanding'
+                                                                                                                                                                   : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm'
+   41 | input cfg_allow_multi_outstanding;
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:43:14: Bits of signal are not used: 'cfg_geometry_handle'[7:0]
+                                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm'
+   43 | input [15:0] cfg_geometry_handle;
+      |              ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:44:14: Bits of signal are not used: 'cfg_flow_handle'[7:0]
+                                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm'
+   44 | input [15:0] cfg_flow_handle;
+      |              ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:46:13: Signal is not used: 'cfg_command_mode'
+                                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm'
+   46 | input [3:0] cfg_command_mode;
+      |             ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:47:13: Signal is not used: 'cfg_status_flags'
+                                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm'
+   47 | input [7:0] cfg_status_flags;
+      |             ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:54:7: Signal is not used: 'model_req_ready_i'
+                                                                                                                                                                   : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm'
+   54 | input model_req_ready_i;
+      |       ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:55:14: Bits of signal are not used: 'model_rsp_desc_i'[63:32,15:8]
+                                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm'
+   55 | input [63:0] model_rsp_desc_i;
+      |              ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:112:12: Signal is not used: 'cmd_raw'
+                                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm'
+  112 | reg [15:0] cmd_raw;
+      |            ^~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/upstream/adaptive_aero_control_top_request_fsm.v:117:5: Signal is not used: 'issue_req'
+                                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_fsm'
+  117 | reg issue_req;
+      |     ^~~~~~~~~
+%Warning-SYNCASYNCNET: /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:7:16: Signal flopped as both synchronous and async: 'spi_cs_n'
+                       /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:49:9: ... Location of async usage
+   49 |     if (spi_cs_n) spi_active <= 1'b0;
+      |         ^~~~~~~~
+                       /root/chiploop-backend/backend/workflows/a51ebfb7-58cb-4cd5-b6ef-3c5de6453605/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:53:10: ... Location of sync usage
+   53 |     if (!spi_cs_n) begin
+      |          ^~~~~~~~
+                       ... For warning description see https://verilator.org/warn/SYNCASYNCNET?v=5.047
+                       ... Use "/* verilator lint_off SYNCASYNCNET */" and lint_on around source to disable this message.

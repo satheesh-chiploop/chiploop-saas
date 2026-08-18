@@ -1,0 +1,1694 @@
+/----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2025  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.56 (git sha1 9c447ad9d4b1ea589369364eea38b4d70da2c599, x86_64-w64-mingw32-g++ 15.2.0 -march=nocona -msahf -mtune=generic -O2 -fstack-protector-strong -O3)
+
+-- Executing script file `C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\fpga_generic_top_connectivity_lec.ys' --
+
+1. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top.v
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_actuator_safety.v
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_actuator_safety.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_actuator_safety'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_mmio.v
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_mmio.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_mmio'.
+Successfully finished Verilog frontend.
+
+4. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_request_fsm.v' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_request_fsm'.
+Successfully finished Verilog frontend.
+
+5. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv' to AST representation.
+Generating RTLIL representation for module `\adaptive_aero_control_top_spi_fpga_top'.
+Successfully finished Verilog frontend.
+
+6. Executing PREP pass.
+
+6.1. Executing HIERARCHY pass (managing design hierarchy).
+
+6.1.1. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+
+6.1.2. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Removed 0 unused modules.
+
+6.2. Executing PROC pass (convert processes to netlists).
+
+6.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+6.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:61$114 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:52$111 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:48$110 in module adaptive_aero_control_top_spi_fpga_top.
+Removed a total of 0 dead cases.
+
+6.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 5 redundant assignments.
+Promoted 1 assignment to connection.
+
+6.2.4. Executing PROC_INIT pass (extract init attributes).
+
+6.2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:61$114'.
+Found async reset \spi_cs_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:48$110'.
+
+6.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~3 debug messages>
+
+6.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:0$118'.
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:61$114'.
+     1/5: $0\tx_snapshot[118:0]
+     2/5: $0\spi_cs_prev[0:0]
+     3/5: $0\spi_cs_sync[0:0]
+     4/5: $0\spi_cs_meta[0:0]
+     5/5: $0\rx_active[132:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:52$111'.
+     1/2: $0\tx_shift[118:0]
+     2/2: $0\rx_shift[132:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:48$110'.
+     1/1: $0\spi_active[0:0]
+
+6.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_miso' from process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:0$118'.
+
+6.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\rx_active' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:61$114'.
+  created $adff cell `$procdff$133' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\tx_snapshot' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:61$114'.
+  created $adff cell `$procdff$138' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_meta' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:61$114'.
+  created $adff cell `$procdff$143' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_sync' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:61$114'.
+  created $adff cell `$procdff$148' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_prev' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:61$114'.
+  created $adff cell `$procdff$153' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\rx_shift' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:52$111'.
+  created $dff cell `$procdff$154' with positive edge clock.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\tx_shift' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:52$111'.
+  created $dff cell `$procdff$155' with positive edge clock.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_active' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:48$110'.
+  created $adff cell `$procdff$158' with positive edge clock and positive level reset.
+
+6.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+6.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:0$118'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:61$114'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:61$114'.
+Found and cleaned up 2 empty switches in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:52$111'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:52$111'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:48$110'.
+Cleaned up 3 empty switches.
+
+6.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+<suppressed ~14 debug messages>
+
+6.3. Executing FLATTEN pass (flatten design).
+
+6.4. Executing FUTURE pass.
+
+6.5. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+6.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 8 unused cells and 28 unused wires.
+<suppressed ~9 debug messages>
+
+6.7. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_spi_fpga_top...
+Found and reported 0 problems.
+
+6.8. Executing OPT pass (performing simple optimizations).
+
+6.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+6.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+6.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~4 debug messages>
+
+6.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+6.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+6.8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+6.8.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+6.8.8. Finished OPT passes. (There is nothing left to do.)
+
+6.9. Executing WREDUCE pass (reducing word size of cells).
+
+6.10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+6.11. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+6.12. Executing OPT pass (performing simple optimizations).
+
+6.12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+6.12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+6.12.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+6.12.4. Finished fast OPT passes.
+
+6.13. Printing statistics.
+
+=== adaptive_aero_control_top_spi_fpga_top ===
+
+   Number of wires:                 40
+   Number of wire bits:           1392
+   Number of public wires:          34
+   Number of public wire bits:     886
+   Number of ports:                  7
+   Number of port bits:              7
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 16
+     $adff                           6
+     $dff                            2
+     $logic_and                      1
+     $logic_not                      1
+     $mux                            5
+     adaptive_aero_control_top       1
+
+6.14. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_spi_fpga_top...
+Found and reported 0 problems.
+
+7. Executing ASYNC2SYNC pass.
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$133 ($adff): ARST=\reset_n, D=$0\rx_active[132:0], Q=\rx_active
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$138 ($adff): ARST=\reset_n, D={ \core_wb_dat_o \core_wb_ack_o \core_wb_err_o \core_model_req_desc_o \core_model_req_valid_o \core_model_rsp_ready_o \core_actuator_cmd_o \core_actuator_cmd_valid_o \core_fault_o \core_irq_o }, Q=\tx_snapshot
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$143 ($adff): ARST=\reset_n, D=\spi_cs_n, Q=\spi_cs_meta
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$148 ($adff): ARST=\reset_n, D=\spi_cs_meta, Q=\spi_cs_sync
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$153 ($adff): ARST=\reset_n, D=\spi_cs_sync, Q=\spi_cs_prev
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$158 ($adff): ARST=\spi_cs_n, D=1'1, Q=\spi_active
+
+8. Executing MEMORY pass.
+
+8.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+8.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+8.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+8.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+8.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+8.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+8.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+8.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+8.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+8.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Renaming module \adaptive_aero_control_top_spi_fpga_top to \gold.
+
+10. Executing Verilog-2005 frontend: C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v
+Parsing SystemVerilog input from `C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v' to AST representation.
+Warning: Encountered `parallel_case' comment! Such legacy hot comments are supported by Yosys, but are not part of any formal language specification. Using the Verilog `parallel_case' attribute or the SystemVerilog `unique' or `priority' keywords is recommended!
+Generating RTLIL representation for module `\adaptive_aero_control_top'.
+Generating RTLIL representation for module `\adaptive_aero_control_top_actuator_safety'.
+Generating RTLIL representation for module `\adaptive_aero_control_top_mmio'.
+Generating RTLIL representation for module `\adaptive_aero_control_top_request_fsm'.
+Generating RTLIL representation for module `\adaptive_aero_control_top_spi_fpga_top'.
+Successfully finished Verilog frontend.
+
+11. Executing PREP pass.
+
+11.1. Executing HIERARCHY pass (managing design hierarchy).
+
+11.1.1. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+
+11.1.2. Analyzing design hierarchy..
+Top module:  \adaptive_aero_control_top_spi_fpga_top
+Removed 0 unused modules.
+
+11.2. Executing PROC pass (convert processes to netlists).
+
+11.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+11.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1121$469 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1118$467 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1115$465 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1112$463 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1109$461 in module adaptive_aero_control_top_spi_fpga_top.
+Marked 1 switch rules as full_case in process $proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1100$453 in module adaptive_aero_control_top_spi_fpga_top.
+Removed a total of 0 dead cases.
+
+11.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 5 redundant assignments.
+Promoted 0 assignments to connections.
+
+11.2.4. Executing PROC_INIT pass (extract init attributes).
+
+11.2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \spi_cs_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1121$469'.
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1118$467'.
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1115$465'.
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1112$463'.
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1109$461'.
+Found async reset \reset_n in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1100$453'.
+
+11.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~3 debug messages>
+
+11.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1121$469'.
+     1/1: $0\spi_active[0:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1118$467'.
+     1/1: $0\spi_cs_prev[0:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1115$465'.
+     1/1: $0\spi_cs_sync[0:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1112$463'.
+     1/1: $0\spi_cs_meta[0:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1109$461'.
+     1/1: $0\tx_snapshot[118:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1105$457'.
+     1/1: $0\tx_shift[118:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1103$455'.
+     1/1: $0\rx_shift[132:0]
+Creating decoders for process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1100$453'.
+     1/1: $0\rx_active[132:0]
+
+11.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+11.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_active' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1121$469'.
+  created $adff cell `$procdff$480' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_prev' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1118$467'.
+  created $adff cell `$procdff$485' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_sync' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1115$465'.
+  created $adff cell `$procdff$490' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\spi_cs_meta' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1112$463'.
+  created $adff cell `$procdff$495' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\tx_snapshot' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1109$461'.
+  created $adff cell `$procdff$500' with positive edge clock and positive level reset.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\tx_shift' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1105$457'.
+  created $dff cell `$procdff$501' with positive edge clock.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\rx_shift' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1103$455'.
+  created $dff cell `$procdff$502' with positive edge clock.
+Creating register for signal `\adaptive_aero_control_top_spi_fpga_top.\rx_active' using process `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1100$453'.
+  created $adff cell `$procdff$507' with positive edge clock and positive level reset.
+
+11.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+11.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1121$469'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1118$467'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1115$465'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1112$463'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1109$461'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1105$457'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1105$457'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1103$455'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1103$455'.
+Found and cleaned up 1 empty switch in `\adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1100$453'.
+Removing empty process `adaptive_aero_control_top_spi_fpga_top.$proc$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1100$453'.
+Cleaned up 3 empty switches.
+
+11.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+<suppressed ~13 debug messages>
+
+11.3. Executing FLATTEN pass (flatten design).
+
+11.4. Executing FUTURE pass.
+
+11.5. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+11.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Removed 12 unused cells and 33 unused wires.
+<suppressed ~13 debug messages>
+
+11.7. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_spi_fpga_top...
+Found and reported 0 problems.
+
+11.8. Executing OPT pass (performing simple optimizations).
+
+11.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+11.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+11.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \adaptive_aero_control_top_spi_fpga_top..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~4 debug messages>
+
+11.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \adaptive_aero_control_top_spi_fpga_top.
+Performed a total of 0 changes.
+
+11.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+11.8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+11.8.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+11.8.8. Finished OPT passes. (There is nothing left to do.)
+
+11.9. Executing WREDUCE pass (reducing word size of cells).
+
+11.10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+11.11. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+11.12. Executing OPT pass (performing simple optimizations).
+
+11.12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module adaptive_aero_control_top_spi_fpga_top.
+
+11.12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\adaptive_aero_control_top_spi_fpga_top'.
+Removed a total of 0 cells.
+
+11.12.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+11.12.4. Finished fast OPT passes.
+
+11.13. Printing statistics.
+
+=== adaptive_aero_control_top_spi_fpga_top ===
+
+   Number of wires:                 40
+   Number of wire bits:           1392
+   Number of public wires:          37
+   Number of public wire bits:    1007
+   Number of ports:                  7
+   Number of port bits:              7
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 16
+     $adff                           6
+     $dff                            2
+     $logic_and                      1
+     $logic_not                      1
+     $mux                            5
+     adaptive_aero_control_top       1
+
+11.14. Executing CHECK pass (checking for obvious problems).
+Checking module adaptive_aero_control_top_spi_fpga_top...
+Found and reported 0 problems.
+
+12. Executing ASYNC2SYNC pass.
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$480 ($adff): ARST=\spi_cs_n, D=1'1, Q=\spi_active
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$485 ($adff): ARST=\reset_n, D=\spi_cs_sync, Q=\spi_cs_prev
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$490 ($adff): ARST=\reset_n, D=\spi_cs_meta, Q=\spi_cs_sync
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$495 ($adff): ARST=\reset_n, D=\spi_cs_n, Q=\spi_cs_meta
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$500 ($adff): ARST=\reset_n, D={ \core_wb_dat_o \core_wb_ack_o \core_wb_err_o \core_model_req_desc_o \core_model_req_valid_o \core_model_rsp_ready_o \core_actuator_cmd_o \core_actuator_cmd_valid_o \core_fault_o \core_irq_o }, Q=\tx_snapshot
+Replacing adaptive_aero_control_top_spi_fpga_top.$procdff$507 ($adff): ARST=\reset_n, D=$0\rx_active[132:0], Q=\rx_active
+
+13. Executing MEMORY pass.
+
+13.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+13.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+13.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+13.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+13.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+13.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+13.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+13.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+13.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+
+13.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+13.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \adaptive_aero_control_top_spi_fpga_top..
+Renaming module \adaptive_aero_control_top_spi_fpga_top to \gate.
+
+15. Executing EQUIV_MAKE pass (creating equiv checking module).
+Presumably equivalent wires: clk_gold (\clk_gold), clk_gate (\clk_gate) -> clk
+Presumably equivalent wires: core_actuator_cmd_o_gold (\core_actuator_cmd_o_gold), core_actuator_cmd_o_gate (\core_actuator_cmd_o_gate) -> core_actuator_cmd_o
+Presumably equivalent wires: core_actuator_cmd_valid_o_gold (\core_actuator_cmd_valid_o_gold), core_actuator_cmd_valid_o_gate (\core_actuator_cmd_valid_o_gate) -> core_actuator_cmd_valid_o
+Presumably equivalent wires: core_fault_o_gold (\core_fault_o_gold), core_fault_o_gate (\core_fault_o_gate) -> core_fault_o
+Presumably equivalent wires: core_irq_o_gold (\core_irq_o_gold), core_irq_o_gate (\core_irq_o_gate) -> core_irq_o
+Presumably equivalent wires: core_model_req_desc_o_gold (\core_model_req_desc_o_gold), core_model_req_desc_o_gate (\core_model_req_desc_o_gate) -> core_model_req_desc_o
+Presumably equivalent wires: core_model_req_ready_i_gold (\rx_active_gold [67]), core_model_req_ready_i_gate (\rx_active_gate [67]) -> core_model_req_ready_i
+Presumably equivalent wires: core_model_req_valid_o_gold (\core_model_req_valid_o_gold), core_model_req_valid_o_gate (\core_model_req_valid_o_gate) -> core_model_req_valid_o
+Presumably equivalent wires: core_model_rsp_desc_i_gold (\rx_active_gold [131:68]), core_model_rsp_desc_i_gate (\rx_active_gate [131:68]) -> core_model_rsp_desc_i
+Presumably equivalent wires: core_model_rsp_ready_o_gold (\core_model_rsp_ready_o_gold), core_model_rsp_ready_o_gate (\core_model_rsp_ready_o_gate) -> core_model_rsp_ready_o
+Presumably equivalent wires: core_model_rsp_valid_i_gold (\rx_active_gold [132]), core_model_rsp_valid_i_gate (\rx_active_gate [132]) -> core_model_rsp_valid_i
+Presumably equivalent wires: core_response_gold ({ \core_wb_dat_o_gold \core_wb_ack_o_gold \core_wb_err_o_gold \core_model_req_desc_o_gold \core_model_req_valid_o_gold \core_model_rsp_ready_o_gold \core_actuator_cmd_o_gold \core_actuator_cmd_valid_o_gold \core_fault_o_gold \core_irq_o_gold }), core_response_gate ({ \core_wb_dat_o_gate \core_wb_ack_o_gate \core_wb_err_o_gate \core_model_req_desc_o_gate \core_model_req_valid_o_gate \core_model_rsp_ready_o_gate \core_actuator_cmd_o_gate \core_actuator_cmd_valid_o_gate \core_fault_o_gate \core_irq_o_gate }) -> core_response
+Presumably equivalent wires: core_wb_ack_o_gold (\core_wb_ack_o_gold), core_wb_ack_o_gate (\core_wb_ack_o_gate) -> core_wb_ack_o
+Presumably equivalent wires: core_wb_adr_i_gold (\rx_active_gold [31:0]), core_wb_adr_i_gate (\rx_active_gate [31:0]) -> core_wb_adr_i
+Presumably equivalent wires: core_wb_cyc_i_gold (\rx_active_gold [66]), core_wb_cyc_i_gate (\rx_active_gate [66]) -> core_wb_cyc_i
+Presumably equivalent wires: core_wb_dat_i_gold (\rx_active_gold [63:32]), core_wb_dat_i_gate (\rx_active_gate [63:32]) -> core_wb_dat_i
+Presumably equivalent wires: core_wb_dat_o_gold (\core_wb_dat_o_gold), core_wb_dat_o_gate (\core_wb_dat_o_gate) -> core_wb_dat_o
+Presumably equivalent wires: core_wb_err_o_gold (\core_wb_err_o_gold), core_wb_err_o_gate (\core_wb_err_o_gate) -> core_wb_err_o
+Presumably equivalent wires: core_wb_stb_i_gold (\rx_active_gold [65]), core_wb_stb_i_gate (\rx_active_gate [65]) -> core_wb_stb_i
+Presumably equivalent wires: core_wb_we_i_gold (\rx_active_gold [64]), core_wb_we_i_gate (\rx_active_gate [64]) -> core_wb_we_i
+Presumably equivalent wires: fault_indicator_gold (1'0), fault_indicator_gate (1'0) -> fault_indicator
+Presumably equivalent wires: reset_n_gold (\reset_n_gold), reset_n_gate (\reset_n_gate) -> reset_n
+Presumably equivalent wires: rx_active_gold (\rx_active_gold), rx_active_gate (\rx_active_gate) -> rx_active
+Presumably equivalent wires: rx_shift_gold (\rx_shift_gold), rx_shift_gate (\rx_shift_gate) -> rx_shift
+Presumably equivalent wires: spi_active_gold (\spi_active_gold), spi_active_gate (\spi_active_gate) -> spi_active
+Presumably equivalent wires: spi_cs_meta_gold (\spi_cs_meta_gold), spi_cs_meta_gate (\spi_cs_meta_gate) -> spi_cs_meta
+Presumably equivalent wires: spi_cs_n_gold (\spi_cs_n_gold), spi_cs_n_gate (\spi_cs_n_gate) -> spi_cs_n
+Presumably equivalent wires: spi_cs_prev_gold (\spi_cs_prev_gold), spi_cs_prev_gate (\spi_cs_prev_gate) -> spi_cs_prev
+Presumably equivalent wires: spi_cs_sync_gold (\spi_cs_sync_gold), spi_cs_sync_gate (\spi_cs_sync_gate) -> spi_cs_sync
+Presumably equivalent wires: spi_miso_gold (\spi_miso_gold), spi_miso_gate (\spi_miso_gate) -> spi_miso
+Presumably equivalent wires: spi_mosi_gold (\spi_mosi_gold), spi_mosi_gate (\spi_mosi_gate) -> spi_mosi
+Presumably equivalent wires: spi_sclk_gold (\spi_sclk_gold), spi_sclk_gate (\spi_sclk_gate) -> spi_sclk
+Presumably equivalent wires: tx_shift_gold (\tx_shift_gold), tx_shift_gate (\tx_shift_gate) -> tx_shift
+Presumably equivalent wires: tx_snapshot_gold (\tx_snapshot_gold), tx_snapshot_gate (\tx_snapshot_gate) -> tx_snapshot
+Changing input A of cell $logic_and$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1107$459_gate ($logic_and): \spi_cs_sync_gate -> \spi_cs_sync
+Changing input A of cell $logic_not$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1108$460_gate ($logic_not): \spi_cs_prev_gate -> \spi_cs_prev
+Changing input D of cell $procdff$485_gate ($sdff): \spi_cs_sync_gate -> \spi_cs_sync
+Changing input D of cell $procdff$490_gate ($sdff): \spi_cs_meta_gate -> \spi_cs_meta
+Changing input D of cell $procdff$500_gate ($sdff): { \core_wb_dat_o_gate \core_wb_ack_o_gate \core_wb_err_o_gate \core_model_req_desc_o_gate \core_model_req_valid_o_gate \core_model_rsp_ready_o_gate \core_actuator_cmd_o_gate \core_actuator_cmd_valid_o_gate \core_fault_o_gate \core_irq_o_gate } -> { \core_wb_dat_o \core_wb_ack_o \core_wb_err_o \core_model_req_desc_o \core_model_req_valid_o \core_model_rsp_ready_o \core_actuator_cmd_o \core_actuator_cmd_valid_o \core_fault_o \core_irq_o }
+Changing input B of cell $procmux$472_gate ($mux): \tx_shift_gate -> \tx_shift
+Changing input A of cell $procmux$474_gate ($mux): { \rx_shift_gate [131:0] \spi_mosi_gate } -> { \rx_shift [131:0] \spi_mosi_gate }
+Changing input B of cell $procmux$474_gate ($mux): \rx_shift_gate -> \rx_shift
+Changing input A of cell $procmux$476_gate ($mux): \rx_active_gate -> \rx_active
+Changing input B of cell $procmux$476_gate ($mux): \rx_shift_gate -> \rx_shift
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1124$470_gate ($mux): { \tx_snapshot_gate [117:0] 1'0 } -> { \tx_snapshot [117:0] 1'0 }
+Changing input B of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1124$470_gate ($mux): { \tx_shift_gate [117:0] 1'0 } -> { \tx_shift [117:0] 1'0 }
+Changing input S of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1124$470_gate ($mux): \spi_active_gate -> \spi_active
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1125$471_gate ($mux): \tx_snapshot_gate [118] -> \tx_snapshot [118]
+Changing input B of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1125$471_gate ($mux): \tx_shift_gate [118] -> \tx_shift [118]
+Changing input S of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_lec_repro\generic.v:1125$471_gate ($mux): \spi_active_gate -> \spi_active
+Changing input actuator_cmd_o of cell u_core_gate (adaptive_aero_control_top): \core_actuator_cmd_o_gate -> \core_actuator_cmd_o
+Changing input actuator_cmd_valid_o of cell u_core_gate (adaptive_aero_control_top): \core_actuator_cmd_valid_o_gate -> \core_actuator_cmd_valid_o
+Changing input fault_o of cell u_core_gate (adaptive_aero_control_top): \core_fault_o_gate -> \core_fault_o
+Changing input irq_o of cell u_core_gate (adaptive_aero_control_top): \core_irq_o_gate -> \core_irq_o
+Changing input model_req_desc_o of cell u_core_gate (adaptive_aero_control_top): \core_model_req_desc_o_gate -> \core_model_req_desc_o
+Changing input model_req_ready_i of cell u_core_gate (adaptive_aero_control_top): \rx_active_gate [67] -> \rx_active [67]
+Changing input model_req_valid_o of cell u_core_gate (adaptive_aero_control_top): \core_model_req_valid_o_gate -> \core_model_req_valid_o
+Changing input model_rsp_desc_i of cell u_core_gate (adaptive_aero_control_top): \rx_active_gate [131:68] -> \rx_active [131:68]
+Changing input model_rsp_ready_o of cell u_core_gate (adaptive_aero_control_top): \core_model_rsp_ready_o_gate -> \core_model_rsp_ready_o
+Changing input model_rsp_valid_i of cell u_core_gate (adaptive_aero_control_top): \rx_active_gate [132] -> \rx_active [132]
+Changing input wb_ack_o of cell u_core_gate (adaptive_aero_control_top): \core_wb_ack_o_gate -> \core_wb_ack_o
+Changing input wb_adr_i of cell u_core_gate (adaptive_aero_control_top): \rx_active_gate [31:0] -> \rx_active [31:0]
+Changing input wb_cyc_i of cell u_core_gate (adaptive_aero_control_top): \rx_active_gate [66] -> \rx_active [66]
+Changing input wb_dat_i of cell u_core_gate (adaptive_aero_control_top): \rx_active_gate [63:32] -> \rx_active [63:32]
+Changing input wb_dat_o of cell u_core_gate (adaptive_aero_control_top): \core_wb_dat_o_gate -> \core_wb_dat_o
+Changing input wb_err_o of cell u_core_gate (adaptive_aero_control_top): \core_wb_err_o_gate -> \core_wb_err_o
+Changing input wb_stb_i of cell u_core_gate (adaptive_aero_control_top): \rx_active_gate [65] -> \rx_active [65]
+Changing input wb_we_i of cell u_core_gate (adaptive_aero_control_top): \rx_active_gate [64] -> \rx_active [64]
+Changing input A of cell $logic_and$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:67$117_gold ($logic_and): \spi_cs_sync_gold -> \spi_cs_sync
+Changing input A of cell $logic_not$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:67$116_gold ($logic_not): \spi_cs_prev_gold -> \spi_cs_prev
+Changing input D of cell $procdff$138_gold ($sdff): { \core_wb_dat_o_gold \core_wb_ack_o_gold \core_wb_err_o_gold \core_model_req_desc_o_gold \core_model_req_valid_o_gold \core_model_rsp_ready_o_gold \core_actuator_cmd_o_gold \core_actuator_cmd_valid_o_gold \core_fault_o_gold \core_irq_o_gold } -> { \core_wb_dat_o \core_wb_ack_o \core_wb_err_o \core_model_req_desc_o \core_model_req_valid_o \core_model_rsp_ready_o \core_actuator_cmd_o \core_actuator_cmd_valid_o \core_fault_o \core_irq_o }
+Changing input D of cell $procdff$148_gold ($sdff): \spi_cs_meta_gold -> \spi_cs_meta
+Changing input D of cell $procdff$153_gold ($sdff): \spi_cs_sync_gold -> \spi_cs_sync
+Changing input A of cell $procmux$120_gold ($mux): \rx_active_gold -> \rx_active
+Changing input B of cell $procmux$120_gold ($mux): \rx_shift_gold -> \rx_shift
+Changing input A of cell $procmux$123_gold ($mux): { \tx_snapshot_gold [117:0] 1'0 } -> { \tx_snapshot [117:0] 1'0 }
+Changing input B of cell $procmux$123_gold ($mux): { \tx_shift_gold [117:0] 1'0 } -> { \tx_shift [117:0] 1'0 }
+Changing input S of cell $procmux$123_gold ($mux): \spi_active_gold -> \spi_active
+Changing input B of cell $procmux$125_gold ($mux): \tx_shift_gold -> \tx_shift
+Changing input A of cell $procmux$127_gold ($mux): { \rx_shift_gold [131:0] \spi_mosi_gold } -> { \rx_shift [131:0] \spi_mosi_gold }
+Changing input B of cell $procmux$127_gold ($mux): \rx_shift_gold -> \rx_shift
+Changing input A of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:71$119_gold ($mux): \tx_snapshot_gold [118] -> \tx_snapshot [118]
+Changing input B of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:71$119_gold ($mux): \tx_shift_gold [118] -> \tx_shift [118]
+Changing input S of cell $ternary$C:\Users\satheesh\chiploop-saas\.tmp_workflow_a51ebfb7\fpga\handoff\rtl\adaptive_aero_control_top_spi_fpga_top.sv:71$119_gold ($mux): \spi_active_gold -> \spi_active
+Changing input actuator_cmd_o of cell u_core_gold (adaptive_aero_control_top): \core_actuator_cmd_o_gold -> \core_actuator_cmd_o
+Changing input actuator_cmd_valid_o of cell u_core_gold (adaptive_aero_control_top): \core_actuator_cmd_valid_o_gold -> \core_actuator_cmd_valid_o
+Changing input fault_o of cell u_core_gold (adaptive_aero_control_top): \core_fault_o_gold -> \core_fault_o
+Changing input irq_o of cell u_core_gold (adaptive_aero_control_top): \core_irq_o_gold -> \core_irq_o
+Changing input model_req_desc_o of cell u_core_gold (adaptive_aero_control_top): \core_model_req_desc_o_gold -> \core_model_req_desc_o
+Changing input model_req_ready_i of cell u_core_gold (adaptive_aero_control_top): \rx_active_gold [67] -> \rx_active [67]
+Changing input model_req_valid_o of cell u_core_gold (adaptive_aero_control_top): \core_model_req_valid_o_gold -> \core_model_req_valid_o
+Changing input model_rsp_desc_i of cell u_core_gold (adaptive_aero_control_top): \rx_active_gold [131:68] -> \rx_active [131:68]
+Changing input model_rsp_ready_o of cell u_core_gold (adaptive_aero_control_top): \core_model_rsp_ready_o_gold -> \core_model_rsp_ready_o
+Changing input model_rsp_valid_i of cell u_core_gold (adaptive_aero_control_top): \rx_active_gold [132] -> \rx_active [132]
+Changing input wb_ack_o of cell u_core_gold (adaptive_aero_control_top): \core_wb_ack_o_gold -> \core_wb_ack_o
+Changing input wb_adr_i of cell u_core_gold (adaptive_aero_control_top): \rx_active_gold [31:0] -> \rx_active [31:0]
+Changing input wb_cyc_i of cell u_core_gold (adaptive_aero_control_top): \rx_active_gold [66] -> \rx_active [66]
+Changing input wb_dat_i of cell u_core_gold (adaptive_aero_control_top): \rx_active_gold [63:32] -> \rx_active [63:32]
+Changing input wb_dat_o of cell u_core_gold (adaptive_aero_control_top): \core_wb_dat_o_gold -> \core_wb_dat_o
+Changing input wb_err_o of cell u_core_gold (adaptive_aero_control_top): \core_wb_err_o_gold -> \core_wb_err_o
+Changing input wb_stb_i of cell u_core_gold (adaptive_aero_control_top): \rx_active_gold [65] -> \rx_active [65]
+Changing input wb_we_i of cell u_core_gold (adaptive_aero_control_top): \rx_active_gold [64] -> \rx_active [64]
+Setting undriven nets to undef: \core_actuator_cmd_o_gate
+Setting undriven nets to undef: \core_actuator_cmd_valid_o_gate
+Setting undriven nets to undef: \core_fault_o_gate
+Setting undriven nets to undef: \core_irq_o_gate
+Setting undriven nets to undef: \core_model_req_desc_o_gate
+Setting undriven nets to undef: \core_model_req_valid_o_gate
+Setting undriven nets to undef: \core_model_rsp_ready_o_gate
+Setting undriven nets to undef: \core_wb_ack_o_gate
+Setting undriven nets to undef: \core_wb_dat_o_gate
+Setting undriven nets to undef: \core_wb_err_o_gate
+Setting undriven nets to undef: \core_actuator_cmd_valid_o_gold
+Setting undriven nets to undef: \core_fault_o_gold
+Setting undriven nets to undef: \core_irq_o_gold
+Setting undriven nets to undef: \core_model_req_desc_o_gold
+Setting undriven nets to undef: \core_actuator_cmd_o_gold
+Setting undriven nets to undef: \core_model_req_valid_o_gold
+Setting undriven nets to undef: \core_model_rsp_ready_o_gold
+Setting undriven nets to undef: \core_wb_dat_o_gold
+Setting undriven nets to undef: \core_wb_err_o_gold
+Setting undriven nets to undef: \core_wb_ack_o_gold
+
+16. Executing HIERARCHY pass (managing design hierarchy).
+
+16.1. Analyzing design hierarchy..
+Top module:  \equiv
+
+16.2. Analyzing design hierarchy..
+Top module:  \equiv
+Removing unused module `\gate'.
+Removing unused module `\gold'.
+Removed 2 unused modules.
+
+17. Executing EQUIV_STRUCT pass.
+Running equiv_struct on module equiv:
+  Starting iteration 1.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1024 and $auto$equiv_make.cc:294:find_same_wires$670.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1023 and $auto$equiv_make.cc:294:find_same_wires$668.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1022 and $auto$equiv_make.cc:294:find_same_wires$667.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1021 and $auto$equiv_make.cc:294:find_same_wires$666.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1020 and $auto$equiv_make.cc:294:find_same_wires$665.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1019 and $auto$equiv_make.cc:294:find_same_wires$664.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1018 and $auto$equiv_make.cc:294:find_same_wires$663.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1017 and $auto$equiv_make.cc:294:find_same_wires$662.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1016 and $auto$equiv_make.cc:294:find_same_wires$661.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1015 and $auto$equiv_make.cc:294:find_same_wires$660.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1014 and $auto$equiv_make.cc:294:find_same_wires$659.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1013 and $auto$equiv_make.cc:294:find_same_wires$658.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1012 and $auto$equiv_make.cc:294:find_same_wires$657.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1011 and $auto$equiv_make.cc:294:find_same_wires$656.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1010 and $auto$equiv_make.cc:294:find_same_wires$655.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1009 and $auto$equiv_make.cc:294:find_same_wires$654.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1008 and $auto$equiv_make.cc:294:find_same_wires$653.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1007 and $auto$equiv_make.cc:294:find_same_wires$652.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1006 and $auto$equiv_make.cc:294:find_same_wires$651.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1005 and $auto$equiv_make.cc:294:find_same_wires$650.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1004 and $auto$equiv_make.cc:294:find_same_wires$649.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1003 and $auto$equiv_make.cc:294:find_same_wires$648.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1002 and $auto$equiv_make.cc:294:find_same_wires$647.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1001 and $auto$equiv_make.cc:294:find_same_wires$646.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$1000 and $auto$equiv_make.cc:294:find_same_wires$645.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$999 and $auto$equiv_make.cc:294:find_same_wires$644.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$998 and $auto$equiv_make.cc:294:find_same_wires$643.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$997 and $auto$equiv_make.cc:294:find_same_wires$642.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$996 and $auto$equiv_make.cc:294:find_same_wires$641.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$995 and $auto$equiv_make.cc:294:find_same_wires$640.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$994 and $auto$equiv_make.cc:294:find_same_wires$639.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$993 and $auto$equiv_make.cc:294:find_same_wires$638.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$992 and $auto$equiv_make.cc:294:find_same_wires$637.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$991 and $auto$equiv_make.cc:294:find_same_wires$636.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$990 and $auto$equiv_make.cc:294:find_same_wires$635.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$989 and $auto$equiv_make.cc:294:find_same_wires$634.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$988 and $auto$equiv_make.cc:294:find_same_wires$633.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$987 and $auto$equiv_make.cc:294:find_same_wires$632.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$986 and $auto$equiv_make.cc:294:find_same_wires$631.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$985 and $auto$equiv_make.cc:294:find_same_wires$630.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$984 and $auto$equiv_make.cc:294:find_same_wires$629.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$983 and $auto$equiv_make.cc:294:find_same_wires$628.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$982 and $auto$equiv_make.cc:294:find_same_wires$627.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$981 and $auto$equiv_make.cc:294:find_same_wires$626.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$980 and $auto$equiv_make.cc:294:find_same_wires$625.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$979 and $auto$equiv_make.cc:294:find_same_wires$624.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$978 and $auto$equiv_make.cc:294:find_same_wires$623.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$977 and $auto$equiv_make.cc:294:find_same_wires$622.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$976 and $auto$equiv_make.cc:294:find_same_wires$621.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$975 and $auto$equiv_make.cc:294:find_same_wires$620.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$974 and $auto$equiv_make.cc:294:find_same_wires$619.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$973 and $auto$equiv_make.cc:294:find_same_wires$618.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$972 and $auto$equiv_make.cc:294:find_same_wires$617.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$971 and $auto$equiv_make.cc:294:find_same_wires$616.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$970 and $auto$equiv_make.cc:294:find_same_wires$615.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$969 and $auto$equiv_make.cc:294:find_same_wires$614.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$968 and $auto$equiv_make.cc:294:find_same_wires$613.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$967 and $auto$equiv_make.cc:294:find_same_wires$612.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$966 and $auto$equiv_make.cc:294:find_same_wires$611.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$965 and $auto$equiv_make.cc:294:find_same_wires$610.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$964 and $auto$equiv_make.cc:294:find_same_wires$609.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$963 and $auto$equiv_make.cc:294:find_same_wires$608.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$962 and $auto$equiv_make.cc:294:find_same_wires$607.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$961 and $auto$equiv_make.cc:294:find_same_wires$606.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$960 and $auto$equiv_make.cc:294:find_same_wires$605.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$959 and $auto$equiv_make.cc:294:find_same_wires$603.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$958 and $auto$equiv_make.cc:294:find_same_wires$823.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$957 and $auto$equiv_make.cc:294:find_same_wires$889.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$956 and $auto$equiv_make.cc:294:find_same_wires$890.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$955 and $auto$equiv_make.cc:294:find_same_wires$855.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$954 and $auto$equiv_make.cc:294:find_same_wires$854.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$953 and $auto$equiv_make.cc:294:find_same_wires$853.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$952 and $auto$equiv_make.cc:294:find_same_wires$852.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$951 and $auto$equiv_make.cc:294:find_same_wires$851.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$950 and $auto$equiv_make.cc:294:find_same_wires$850.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$949 and $auto$equiv_make.cc:294:find_same_wires$849.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$948 and $auto$equiv_make.cc:294:find_same_wires$848.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$947 and $auto$equiv_make.cc:294:find_same_wires$847.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$946 and $auto$equiv_make.cc:294:find_same_wires$846.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$945 and $auto$equiv_make.cc:294:find_same_wires$845.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$944 and $auto$equiv_make.cc:294:find_same_wires$844.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$943 and $auto$equiv_make.cc:294:find_same_wires$843.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$942 and $auto$equiv_make.cc:294:find_same_wires$842.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$941 and $auto$equiv_make.cc:294:find_same_wires$841.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$940 and $auto$equiv_make.cc:294:find_same_wires$840.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$939 and $auto$equiv_make.cc:294:find_same_wires$839.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$938 and $auto$equiv_make.cc:294:find_same_wires$838.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$937 and $auto$equiv_make.cc:294:find_same_wires$837.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$936 and $auto$equiv_make.cc:294:find_same_wires$836.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$935 and $auto$equiv_make.cc:294:find_same_wires$835.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$934 and $auto$equiv_make.cc:294:find_same_wires$834.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$933 and $auto$equiv_make.cc:294:find_same_wires$833.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$932 and $auto$equiv_make.cc:294:find_same_wires$832.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$931 and $auto$equiv_make.cc:294:find_same_wires$831.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$930 and $auto$equiv_make.cc:294:find_same_wires$830.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$929 and $auto$equiv_make.cc:294:find_same_wires$829.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$928 and $auto$equiv_make.cc:294:find_same_wires$828.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$927 and $auto$equiv_make.cc:294:find_same_wires$827.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$926 and $auto$equiv_make.cc:294:find_same_wires$826.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$925 and $auto$equiv_make.cc:294:find_same_wires$825.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$924 and $auto$equiv_make.cc:294:find_same_wires$824.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$923 and $auto$equiv_make.cc:294:find_same_wires$822.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$922 and $auto$equiv_make.cc:294:find_same_wires$821.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$921 and $auto$equiv_make.cc:294:find_same_wires$820.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$920 and $auto$equiv_make.cc:294:find_same_wires$819.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$919 and $auto$equiv_make.cc:294:find_same_wires$818.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$918 and $auto$equiv_make.cc:294:find_same_wires$817.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$917 and $auto$equiv_make.cc:294:find_same_wires$816.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$916 and $auto$equiv_make.cc:294:find_same_wires$815.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$915 and $auto$equiv_make.cc:294:find_same_wires$814.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$914 and $auto$equiv_make.cc:294:find_same_wires$813.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$913 and $auto$equiv_make.cc:294:find_same_wires$812.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$912 and $auto$equiv_make.cc:294:find_same_wires$811.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$911 and $auto$equiv_make.cc:294:find_same_wires$810.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$910 and $auto$equiv_make.cc:294:find_same_wires$809.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$909 and $auto$equiv_make.cc:294:find_same_wires$808.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$908 and $auto$equiv_make.cc:294:find_same_wires$807.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$907 and $auto$equiv_make.cc:294:find_same_wires$806.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$906 and $auto$equiv_make.cc:294:find_same_wires$805.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$905 and $auto$equiv_make.cc:294:find_same_wires$804.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$904 and $auto$equiv_make.cc:294:find_same_wires$803.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$903 and $auto$equiv_make.cc:294:find_same_wires$802.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$902 and $auto$equiv_make.cc:294:find_same_wires$801.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$901 and $auto$equiv_make.cc:294:find_same_wires$800.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$900 and $auto$equiv_make.cc:294:find_same_wires$799.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$899 and $auto$equiv_make.cc:294:find_same_wires$798.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$898 and $auto$equiv_make.cc:294:find_same_wires$797.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$897 and $auto$equiv_make.cc:294:find_same_wires$796.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$896 and $auto$equiv_make.cc:294:find_same_wires$795.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$895 and $auto$equiv_make.cc:294:find_same_wires$794.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$894 and $auto$equiv_make.cc:294:find_same_wires$793.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$893 and $auto$equiv_make.cc:294:find_same_wires$792.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$892 and $auto$equiv_make.cc:294:find_same_wires$791.
+    Fwd merging 238 $equiv cells (from group of 238) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$888 and $auto$equiv_make.cc:294:find_same_wires$887.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$886 and $auto$equiv_make.cc:294:find_same_wires$885.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$884 and $auto$equiv_make.cc:294:find_same_wires$883.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$882 and $auto$equiv_make.cc:294:find_same_wires$881.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$880 and $auto$equiv_make.cc:294:find_same_wires$879.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$878 and $auto$equiv_make.cc:294:find_same_wires$877.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$876 and $auto$equiv_make.cc:294:find_same_wires$875.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$874 and $auto$equiv_make.cc:294:find_same_wires$873.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$872 and $auto$equiv_make.cc:294:find_same_wires$871.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$870 and $auto$equiv_make.cc:294:find_same_wires$869.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$868 and $auto$equiv_make.cc:294:find_same_wires$867.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$866 and $auto$equiv_make.cc:294:find_same_wires$865.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$864 and $auto$equiv_make.cc:294:find_same_wires$863.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$862 and $auto$equiv_make.cc:294:find_same_wires$861.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$860 and $auto$equiv_make.cc:294:find_same_wires$859.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$858 and $auto$equiv_make.cc:294:find_same_wires$857.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$856 and $auto$equiv_make.cc:294:find_same_wires$790.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$789 and $auto$equiv_make.cc:294:find_same_wires$788.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$787 and $auto$equiv_make.cc:294:find_same_wires$786.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$785 and $auto$equiv_make.cc:294:find_same_wires$784.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$783 and $auto$equiv_make.cc:294:find_same_wires$782.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$781 and $auto$equiv_make.cc:294:find_same_wires$780.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$779 and $auto$equiv_make.cc:294:find_same_wires$778.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$777 and $auto$equiv_make.cc:294:find_same_wires$776.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$775 and $auto$equiv_make.cc:294:find_same_wires$774.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$773 and $auto$equiv_make.cc:294:find_same_wires$772.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$771 and $auto$equiv_make.cc:294:find_same_wires$770.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$769 and $auto$equiv_make.cc:294:find_same_wires$768.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$767 and $auto$equiv_make.cc:294:find_same_wires$766.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$765 and $auto$equiv_make.cc:294:find_same_wires$764.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$763 and $auto$equiv_make.cc:294:find_same_wires$762.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$761 and $auto$equiv_make.cc:294:find_same_wires$760.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$759 and $auto$equiv_make.cc:294:find_same_wires$758.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$757 and $auto$equiv_make.cc:294:find_same_wires$756.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$755 and $auto$equiv_make.cc:294:find_same_wires$754.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$753 and $auto$equiv_make.cc:294:find_same_wires$752.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$751 and $auto$equiv_make.cc:294:find_same_wires$750.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$749 and $auto$equiv_make.cc:294:find_same_wires$748.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$747 and $auto$equiv_make.cc:294:find_same_wires$746.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$745 and $auto$equiv_make.cc:294:find_same_wires$744.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$743 and $auto$equiv_make.cc:294:find_same_wires$742.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$741 and $auto$equiv_make.cc:294:find_same_wires$740.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$739 and $auto$equiv_make.cc:294:find_same_wires$738.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$737 and $auto$equiv_make.cc:294:find_same_wires$736.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$735 and $auto$equiv_make.cc:294:find_same_wires$734.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$733 and $auto$equiv_make.cc:294:find_same_wires$732.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$731 and $auto$equiv_make.cc:294:find_same_wires$730.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$729 and $auto$equiv_make.cc:294:find_same_wires$728.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$727 and $auto$equiv_make.cc:294:find_same_wires$726.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$725 and $auto$equiv_make.cc:294:find_same_wires$724.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$723 and $auto$equiv_make.cc:294:find_same_wires$722.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$721 and $auto$equiv_make.cc:294:find_same_wires$720.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$719 and $auto$equiv_make.cc:294:find_same_wires$718.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$717 and $auto$equiv_make.cc:294:find_same_wires$716.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$715 and $auto$equiv_make.cc:294:find_same_wires$714.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$713 and $auto$equiv_make.cc:294:find_same_wires$712.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$711 and $auto$equiv_make.cc:294:find_same_wires$710.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$709 and $auto$equiv_make.cc:294:find_same_wires$708.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$707 and $auto$equiv_make.cc:294:find_same_wires$706.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$705 and $auto$equiv_make.cc:294:find_same_wires$704.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$703 and $auto$equiv_make.cc:294:find_same_wires$702.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$701 and $auto$equiv_make.cc:294:find_same_wires$700.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$699 and $auto$equiv_make.cc:294:find_same_wires$698.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$697 and $auto$equiv_make.cc:294:find_same_wires$696.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$695 and $auto$equiv_make.cc:294:find_same_wires$694.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$693 and $auto$equiv_make.cc:294:find_same_wires$692.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$691 and $auto$equiv_make.cc:294:find_same_wires$690.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$689 and $auto$equiv_make.cc:294:find_same_wires$688.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$687 and $auto$equiv_make.cc:294:find_same_wires$686.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$685 and $auto$equiv_make.cc:294:find_same_wires$684.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$683 and $auto$equiv_make.cc:294:find_same_wires$682.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$681 and $auto$equiv_make.cc:294:find_same_wires$680.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$679 and $auto$equiv_make.cc:294:find_same_wires$678.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$677 and $auto$equiv_make.cc:294:find_same_wires$676.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$675 and $auto$equiv_make.cc:294:find_same_wires$674.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$673 and $auto$equiv_make.cc:294:find_same_wires$672.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$671 and $auto$equiv_make.cc:294:find_same_wires$669.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$604 and $auto$equiv_make.cc:294:find_same_wires$602.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$601 and $auto$equiv_make.cc:294:find_same_wires$600.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$599 and $auto$equiv_make.cc:294:find_same_wires$598.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$597 and $auto$equiv_make.cc:294:find_same_wires$596.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$595 and $auto$equiv_make.cc:294:find_same_wires$594.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$593 and $auto$equiv_make.cc:294:find_same_wires$592.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$591 and $auto$equiv_make.cc:294:find_same_wires$590.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$589 and $auto$equiv_make.cc:294:find_same_wires$588.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$587 and $auto$equiv_make.cc:294:find_same_wires$586.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$585 and $auto$equiv_make.cc:294:find_same_wires$584.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$583 and $auto$equiv_make.cc:294:find_same_wires$582.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$581 and $auto$equiv_make.cc:294:find_same_wires$580.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$579 and $auto$equiv_make.cc:294:find_same_wires$578.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$577 and $auto$equiv_make.cc:294:find_same_wires$576.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$575 and $auto$equiv_make.cc:294:find_same_wires$574.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$573 and $auto$equiv_make.cc:294:find_same_wires$572.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$571 and $auto$equiv_make.cc:294:find_same_wires$570.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$569 and $auto$equiv_make.cc:294:find_same_wires$568.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$567 and $auto$equiv_make.cc:294:find_same_wires$566.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$565 and $auto$equiv_make.cc:294:find_same_wires$564.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$563 and $auto$equiv_make.cc:294:find_same_wires$562.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$561 and $auto$equiv_make.cc:294:find_same_wires$560.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$559 and $auto$equiv_make.cc:294:find_same_wires$558.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$557 and $auto$equiv_make.cc:294:find_same_wires$556.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$555 and $auto$equiv_make.cc:294:find_same_wires$554.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$553 and $auto$equiv_make.cc:294:find_same_wires$552.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$551 and $auto$equiv_make.cc:294:find_same_wires$550.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$549 and $auto$equiv_make.cc:294:find_same_wires$548.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$547 and $auto$equiv_make.cc:294:find_same_wires$546.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$545 and $auto$equiv_make.cc:294:find_same_wires$544.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$543 and $auto$equiv_make.cc:294:find_same_wires$542.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$541 and $auto$equiv_make.cc:294:find_same_wires$540.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$539 and $auto$equiv_make.cc:294:find_same_wires$538.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$537 and $auto$equiv_make.cc:294:find_same_wires$536.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$535 and $auto$equiv_make.cc:294:find_same_wires$534.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$533 and $auto$equiv_make.cc:294:find_same_wires$532.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$531 and $auto$equiv_make.cc:294:find_same_wires$530.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$529 and $auto$equiv_make.cc:294:find_same_wires$528.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$527 and $auto$equiv_make.cc:294:find_same_wires$526.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$525 and $auto$equiv_make.cc:294:find_same_wires$524.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$523 and $auto$equiv_make.cc:294:find_same_wires$522.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$521 and $auto$equiv_make.cc:294:find_same_wires$520.
+  Starting iteration 2.
+    Fwd merging 118 $equiv cells (from group of 119) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$888 and $auto$equiv_make.cc:294:find_same_wires$886.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$884 and $auto$equiv_make.cc:294:find_same_wires$882.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$880 and $auto$equiv_make.cc:294:find_same_wires$878.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$876 and $auto$equiv_make.cc:294:find_same_wires$874.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$872 and $auto$equiv_make.cc:294:find_same_wires$870.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$868 and $auto$equiv_make.cc:294:find_same_wires$866.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$864 and $auto$equiv_make.cc:294:find_same_wires$862.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$860 and $auto$equiv_make.cc:294:find_same_wires$858.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$856 and $auto$equiv_make.cc:294:find_same_wires$789.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$787 and $auto$equiv_make.cc:294:find_same_wires$785.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$783 and $auto$equiv_make.cc:294:find_same_wires$781.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$779 and $auto$equiv_make.cc:294:find_same_wires$777.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$775 and $auto$equiv_make.cc:294:find_same_wires$773.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$771 and $auto$equiv_make.cc:294:find_same_wires$769.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$767 and $auto$equiv_make.cc:294:find_same_wires$765.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$763 and $auto$equiv_make.cc:294:find_same_wires$761.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$759 and $auto$equiv_make.cc:294:find_same_wires$757.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$755 and $auto$equiv_make.cc:294:find_same_wires$753.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$751 and $auto$equiv_make.cc:294:find_same_wires$749.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$747 and $auto$equiv_make.cc:294:find_same_wires$745.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$743 and $auto$equiv_make.cc:294:find_same_wires$741.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$739 and $auto$equiv_make.cc:294:find_same_wires$737.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$735 and $auto$equiv_make.cc:294:find_same_wires$733.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$731 and $auto$equiv_make.cc:294:find_same_wires$729.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$727 and $auto$equiv_make.cc:294:find_same_wires$725.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$723 and $auto$equiv_make.cc:294:find_same_wires$721.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$719 and $auto$equiv_make.cc:294:find_same_wires$717.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$715 and $auto$equiv_make.cc:294:find_same_wires$713.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$711 and $auto$equiv_make.cc:294:find_same_wires$709.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$707 and $auto$equiv_make.cc:294:find_same_wires$705.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$703 and $auto$equiv_make.cc:294:find_same_wires$701.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$699 and $auto$equiv_make.cc:294:find_same_wires$697.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$695 and $auto$equiv_make.cc:294:find_same_wires$693.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$691 and $auto$equiv_make.cc:294:find_same_wires$689.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$687 and $auto$equiv_make.cc:294:find_same_wires$685.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$683 and $auto$equiv_make.cc:294:find_same_wires$681.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$679 and $auto$equiv_make.cc:294:find_same_wires$677.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$675 and $auto$equiv_make.cc:294:find_same_wires$673.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$671 and $auto$equiv_make.cc:294:find_same_wires$604.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$601 and $auto$equiv_make.cc:294:find_same_wires$599.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$597 and $auto$equiv_make.cc:294:find_same_wires$595.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$593 and $auto$equiv_make.cc:294:find_same_wires$591.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$589 and $auto$equiv_make.cc:294:find_same_wires$587.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$585 and $auto$equiv_make.cc:294:find_same_wires$583.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$581 and $auto$equiv_make.cc:294:find_same_wires$579.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$577 and $auto$equiv_make.cc:294:find_same_wires$575.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$573 and $auto$equiv_make.cc:294:find_same_wires$571.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$569 and $auto$equiv_make.cc:294:find_same_wires$567.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$565 and $auto$equiv_make.cc:294:find_same_wires$563.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$561 and $auto$equiv_make.cc:294:find_same_wires$559.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$557 and $auto$equiv_make.cc:294:find_same_wires$555.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$553 and $auto$equiv_make.cc:294:find_same_wires$551.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$549 and $auto$equiv_make.cc:294:find_same_wires$547.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$545 and $auto$equiv_make.cc:294:find_same_wires$543.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$541 and $auto$equiv_make.cc:294:find_same_wires$539.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$537 and $auto$equiv_make.cc:294:find_same_wires$535.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$533 and $auto$equiv_make.cc:294:find_same_wires$531.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$529 and $auto$equiv_make.cc:294:find_same_wires$527.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$525 and $auto$equiv_make.cc:294:find_same_wires$523.
+  Starting iteration 3.
+    Fwd merging 60 $equiv cells (from group of 60) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$888 and $auto$equiv_make.cc:294:find_same_wires$884.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$880 and $auto$equiv_make.cc:294:find_same_wires$876.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$872 and $auto$equiv_make.cc:294:find_same_wires$868.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$864 and $auto$equiv_make.cc:294:find_same_wires$860.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$856 and $auto$equiv_make.cc:294:find_same_wires$787.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$783 and $auto$equiv_make.cc:294:find_same_wires$779.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$775 and $auto$equiv_make.cc:294:find_same_wires$771.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$767 and $auto$equiv_make.cc:294:find_same_wires$763.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$759 and $auto$equiv_make.cc:294:find_same_wires$755.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$751 and $auto$equiv_make.cc:294:find_same_wires$747.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$743 and $auto$equiv_make.cc:294:find_same_wires$739.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$735 and $auto$equiv_make.cc:294:find_same_wires$731.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$727 and $auto$equiv_make.cc:294:find_same_wires$723.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$719 and $auto$equiv_make.cc:294:find_same_wires$715.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$711 and $auto$equiv_make.cc:294:find_same_wires$707.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$703 and $auto$equiv_make.cc:294:find_same_wires$699.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$695 and $auto$equiv_make.cc:294:find_same_wires$691.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$687 and $auto$equiv_make.cc:294:find_same_wires$683.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$679 and $auto$equiv_make.cc:294:find_same_wires$675.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$671 and $auto$equiv_make.cc:294:find_same_wires$601.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$597 and $auto$equiv_make.cc:294:find_same_wires$593.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$589 and $auto$equiv_make.cc:294:find_same_wires$585.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$581 and $auto$equiv_make.cc:294:find_same_wires$577.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$573 and $auto$equiv_make.cc:294:find_same_wires$569.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$565 and $auto$equiv_make.cc:294:find_same_wires$561.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$557 and $auto$equiv_make.cc:294:find_same_wires$553.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$549 and $auto$equiv_make.cc:294:find_same_wires$545.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$541 and $auto$equiv_make.cc:294:find_same_wires$537.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$533 and $auto$equiv_make.cc:294:find_same_wires$529.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$525 and $auto$equiv_make.cc:294:find_same_wires$521.
+  Starting iteration 4.
+    Fwd merging 30 $equiv cells (from group of 30) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$888 and $auto$equiv_make.cc:294:find_same_wires$880.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$872 and $auto$equiv_make.cc:294:find_same_wires$864.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$856 and $auto$equiv_make.cc:294:find_same_wires$783.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$775 and $auto$equiv_make.cc:294:find_same_wires$767.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$759 and $auto$equiv_make.cc:294:find_same_wires$751.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$743 and $auto$equiv_make.cc:294:find_same_wires$735.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$727 and $auto$equiv_make.cc:294:find_same_wires$719.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$711 and $auto$equiv_make.cc:294:find_same_wires$703.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$695 and $auto$equiv_make.cc:294:find_same_wires$687.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$679 and $auto$equiv_make.cc:294:find_same_wires$671.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$597 and $auto$equiv_make.cc:294:find_same_wires$589.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$581 and $auto$equiv_make.cc:294:find_same_wires$573.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$565 and $auto$equiv_make.cc:294:find_same_wires$557.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$549 and $auto$equiv_make.cc:294:find_same_wires$541.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$533 and $auto$equiv_make.cc:294:find_same_wires$525.
+  Starting iteration 5.
+    Fwd merging 14 $equiv cells (from group of 15) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$888 and $auto$equiv_make.cc:294:find_same_wires$872.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$856 and $auto$equiv_make.cc:294:find_same_wires$775.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$759 and $auto$equiv_make.cc:294:find_same_wires$743.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$727 and $auto$equiv_make.cc:294:find_same_wires$711.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$695 and $auto$equiv_make.cc:294:find_same_wires$679.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$597 and $auto$equiv_make.cc:294:find_same_wires$581.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$565 and $auto$equiv_make.cc:294:find_same_wires$549.
+  Starting iteration 6.
+    Fwd merging 8 $equiv cells (from group of 8) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$888 and $auto$equiv_make.cc:294:find_same_wires$856.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$759 and $auto$equiv_make.cc:294:find_same_wires$727.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$695 and $auto$equiv_make.cc:294:find_same_wires$597.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$565 and $auto$equiv_make.cc:294:find_same_wires$533.
+  Starting iteration 7.
+    Fwd merging 4 $equiv cells (from group of 4) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$888 and $auto$equiv_make.cc:294:find_same_wires$759.
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$695 and $auto$equiv_make.cc:294:find_same_wires$565.
+  Starting iteration 8.
+    Fwd merging 2 $equiv cells (from group of 2) using strategy deduplicate:
+      Merging cells $auto$equiv_make.cc:294:find_same_wires$888 and $auto$equiv_make.cc:294:find_same_wires$695.
+  Starting iteration 9.
+    Nothing to merge.
+  Performed a total of 370 merges in module equiv.
+
+18. Executing EQUIV_SIMPLE pass.
+Found 510 unproven $equiv cells (10 groups) in equiv:
+  Trying to prove $equiv for \spi_miso: success!
+  Trying to prove $equiv for \fault_indicator: success!
+ Grouping SAT models for \rx_shift:
+  Trying to prove $equiv for \rx_shift [0]: success!
+  Trying to prove $equiv for \rx_shift [1]: success!
+  Trying to prove $equiv for \rx_shift [2]: success!
+  Trying to prove $equiv for \rx_shift [3]: success!
+  Trying to prove $equiv for \rx_shift [4]: success!
+  Trying to prove $equiv for \rx_shift [5]: success!
+  Trying to prove $equiv for \rx_shift [6]: success!
+  Trying to prove $equiv for \rx_shift [7]: success!
+  Trying to prove $equiv for \rx_shift [8]: success!
+  Trying to prove $equiv for \rx_shift [9]: success!
+  Trying to prove $equiv for \rx_shift [10]: success!
+  Trying to prove $equiv for \rx_shift [11]: success!
+  Trying to prove $equiv for \rx_shift [12]: success!
+  Trying to prove $equiv for \rx_shift [13]: success!
+  Trying to prove $equiv for \rx_shift [14]: success!
+  Trying to prove $equiv for \rx_shift [15]: success!
+  Trying to prove $equiv for \rx_shift [16]: success!
+  Trying to prove $equiv for \rx_shift [17]: success!
+  Trying to prove $equiv for \rx_shift [18]: success!
+  Trying to prove $equiv for \rx_shift [19]: success!
+  Trying to prove $equiv for \rx_shift [20]: success!
+  Trying to prove $equiv for \rx_shift [21]: success!
+  Trying to prove $equiv for \rx_shift [22]: success!
+  Trying to prove $equiv for \rx_shift [23]: success!
+  Trying to prove $equiv for \rx_shift [24]: success!
+  Trying to prove $equiv for \rx_shift [25]: success!
+  Trying to prove $equiv for \rx_shift [26]: success!
+  Trying to prove $equiv for \rx_shift [27]: success!
+  Trying to prove $equiv for \rx_shift [28]: success!
+  Trying to prove $equiv for \rx_shift [29]: success!
+  Trying to prove $equiv for \rx_shift [30]: success!
+  Trying to prove $equiv for \rx_shift [31]: success!
+  Trying to prove $equiv for \rx_shift [32]: success!
+  Trying to prove $equiv for \rx_shift [33]: success!
+  Trying to prove $equiv for \rx_shift [34]: success!
+  Trying to prove $equiv for \rx_shift [35]: success!
+  Trying to prove $equiv for \rx_shift [36]: success!
+  Trying to prove $equiv for \rx_shift [37]: success!
+  Trying to prove $equiv for \rx_shift [38]: success!
+  Trying to prove $equiv for \rx_shift [39]: success!
+  Trying to prove $equiv for \rx_shift [40]: success!
+  Trying to prove $equiv for \rx_shift [41]: success!
+  Trying to prove $equiv for \rx_shift [42]: success!
+  Trying to prove $equiv for \rx_shift [43]: success!
+  Trying to prove $equiv for \rx_shift [44]: success!
+  Trying to prove $equiv for \rx_shift [45]: success!
+  Trying to prove $equiv for \rx_shift [46]: success!
+  Trying to prove $equiv for \rx_shift [47]: success!
+  Trying to prove $equiv for \rx_shift [48]: success!
+  Trying to prove $equiv for \rx_shift [49]: success!
+  Trying to prove $equiv for \rx_shift [50]: success!
+  Trying to prove $equiv for \rx_shift [51]: success!
+  Trying to prove $equiv for \rx_shift [52]: success!
+  Trying to prove $equiv for \rx_shift [53]: success!
+  Trying to prove $equiv for \rx_shift [54]: success!
+  Trying to prove $equiv for \rx_shift [55]: success!
+  Trying to prove $equiv for \rx_shift [56]: success!
+  Trying to prove $equiv for \rx_shift [57]: success!
+  Trying to prove $equiv for \rx_shift [58]: success!
+  Trying to prove $equiv for \rx_shift [59]: success!
+  Trying to prove $equiv for \rx_shift [60]: success!
+  Trying to prove $equiv for \rx_shift [61]: success!
+  Trying to prove $equiv for \rx_shift [62]: success!
+  Trying to prove $equiv for \rx_shift [63]: success!
+  Trying to prove $equiv for \rx_shift [64]: success!
+  Trying to prove $equiv for \rx_shift [65]: success!
+  Trying to prove $equiv for \rx_shift [66]: success!
+  Trying to prove $equiv for \rx_shift [67]: success!
+  Trying to prove $equiv for \rx_shift [68]: success!
+  Trying to prove $equiv for \rx_shift [69]: success!
+  Trying to prove $equiv for \rx_shift [70]: success!
+  Trying to prove $equiv for \rx_shift [71]: success!
+  Trying to prove $equiv for \rx_shift [72]: success!
+  Trying to prove $equiv for \rx_shift [73]: success!
+  Trying to prove $equiv for \rx_shift [74]: success!
+  Trying to prove $equiv for \rx_shift [75]: success!
+  Trying to prove $equiv for \rx_shift [76]: success!
+  Trying to prove $equiv for \rx_shift [77]: success!
+  Trying to prove $equiv for \rx_shift [78]: success!
+  Trying to prove $equiv for \rx_shift [79]: success!
+  Trying to prove $equiv for \rx_shift [80]: success!
+  Trying to prove $equiv for \rx_shift [81]: success!
+  Trying to prove $equiv for \rx_shift [82]: success!
+  Trying to prove $equiv for \rx_shift [83]: success!
+  Trying to prove $equiv for \rx_shift [84]: success!
+  Trying to prove $equiv for \rx_shift [85]: success!
+  Trying to prove $equiv for \rx_shift [86]: success!
+  Trying to prove $equiv for \rx_shift [87]: success!
+  Trying to prove $equiv for \rx_shift [88]: success!
+  Trying to prove $equiv for \rx_shift [89]: success!
+  Trying to prove $equiv for \rx_shift [90]: success!
+  Trying to prove $equiv for \rx_shift [91]: success!
+  Trying to prove $equiv for \rx_shift [92]: success!
+  Trying to prove $equiv for \rx_shift [93]: success!
+  Trying to prove $equiv for \rx_shift [94]: success!
+  Trying to prove $equiv for \rx_shift [95]: success!
+  Trying to prove $equiv for \rx_shift [96]: success!
+  Trying to prove $equiv for \rx_shift [97]: success!
+  Trying to prove $equiv for \rx_shift [98]: success!
+  Trying to prove $equiv for \rx_shift [99]: success!
+  Trying to prove $equiv for \rx_shift [100]: success!
+  Trying to prove $equiv for \rx_shift [101]: success!
+  Trying to prove $equiv for \rx_shift [102]: success!
+  Trying to prove $equiv for \rx_shift [103]: success!
+  Trying to prove $equiv for \rx_shift [104]: success!
+  Trying to prove $equiv for \rx_shift [105]: success!
+  Trying to prove $equiv for \rx_shift [106]: success!
+  Trying to prove $equiv for \rx_shift [107]: success!
+  Trying to prove $equiv for \rx_shift [108]: success!
+  Trying to prove $equiv for \rx_shift [109]: success!
+  Trying to prove $equiv for \rx_shift [110]: success!
+  Trying to prove $equiv for \rx_shift [111]: success!
+  Trying to prove $equiv for \rx_shift [112]: success!
+  Trying to prove $equiv for \rx_shift [113]: success!
+  Trying to prove $equiv for \rx_shift [114]: success!
+  Trying to prove $equiv for \rx_shift [115]: success!
+  Trying to prove $equiv for \rx_shift [116]: success!
+  Trying to prove $equiv for \rx_shift [117]: success!
+  Trying to prove $equiv for \rx_shift [118]: success!
+  Trying to prove $equiv for \rx_shift [119]: success!
+  Trying to prove $equiv for \rx_shift [120]: success!
+  Trying to prove $equiv for \rx_shift [121]: success!
+  Trying to prove $equiv for \rx_shift [122]: success!
+  Trying to prove $equiv for \rx_shift [123]: success!
+  Trying to prove $equiv for \rx_shift [124]: success!
+  Trying to prove $equiv for \rx_shift [125]: success!
+  Trying to prove $equiv for \rx_shift [126]: success!
+  Trying to prove $equiv for \rx_shift [127]: success!
+  Trying to prove $equiv for \rx_shift [128]: success!
+  Trying to prove $equiv for \rx_shift [129]: success!
+  Trying to prove $equiv for \rx_shift [130]: success!
+  Trying to prove $equiv for \rx_shift [131]: success!
+  Trying to prove $equiv for \rx_shift [132]: success!
+ Grouping SAT models for \rx_active:
+  Trying to prove $equiv for \rx_active [0]: success!
+  Trying to prove $equiv for \rx_active [1]: success!
+  Trying to prove $equiv for \rx_active [2]: success!
+  Trying to prove $equiv for \rx_active [3]: success!
+  Trying to prove $equiv for \rx_active [4]: success!
+  Trying to prove $equiv for \rx_active [5]: success!
+  Trying to prove $equiv for \rx_active [6]: success!
+  Trying to prove $equiv for \rx_active [7]: success!
+  Trying to prove $equiv for \rx_active [8]: success!
+  Trying to prove $equiv for \rx_active [9]: success!
+  Trying to prove $equiv for \rx_active [10]: success!
+  Trying to prove $equiv for \rx_active [11]: success!
+  Trying to prove $equiv for \rx_active [12]: success!
+  Trying to prove $equiv for \rx_active [13]: success!
+  Trying to prove $equiv for \rx_active [14]: success!
+  Trying to prove $equiv for \rx_active [15]: success!
+  Trying to prove $equiv for \rx_active [16]: success!
+  Trying to prove $equiv for \rx_active [17]: success!
+  Trying to prove $equiv for \rx_active [18]: success!
+  Trying to prove $equiv for \rx_active [19]: success!
+  Trying to prove $equiv for \rx_active [20]: success!
+  Trying to prove $equiv for \rx_active [21]: success!
+  Trying to prove $equiv for \rx_active [22]: success!
+  Trying to prove $equiv for \rx_active [23]: success!
+  Trying to prove $equiv for \rx_active [24]: success!
+  Trying to prove $equiv for \rx_active [25]: success!
+  Trying to prove $equiv for \rx_active [26]: success!
+  Trying to prove $equiv for \rx_active [27]: success!
+  Trying to prove $equiv for \rx_active [28]: success!
+  Trying to prove $equiv for \rx_active [29]: success!
+  Trying to prove $equiv for \rx_active [30]: success!
+  Trying to prove $equiv for \rx_active [31]: success!
+  Trying to prove $equiv for \rx_active [32]: success!
+  Trying to prove $equiv for \rx_active [33]: success!
+  Trying to prove $equiv for \rx_active [34]: success!
+  Trying to prove $equiv for \rx_active [35]: success!
+  Trying to prove $equiv for \rx_active [36]: success!
+  Trying to prove $equiv for \rx_active [37]: success!
+  Trying to prove $equiv for \rx_active [38]: success!
+  Trying to prove $equiv for \rx_active [39]: success!
+  Trying to prove $equiv for \rx_active [40]: success!
+  Trying to prove $equiv for \rx_active [41]: success!
+  Trying to prove $equiv for \rx_active [42]: success!
+  Trying to prove $equiv for \rx_active [43]: success!
+  Trying to prove $equiv for \rx_active [44]: success!
+  Trying to prove $equiv for \rx_active [45]: success!
+  Trying to prove $equiv for \rx_active [46]: success!
+  Trying to prove $equiv for \rx_active [47]: success!
+  Trying to prove $equiv for \rx_active [48]: success!
+  Trying to prove $equiv for \rx_active [49]: success!
+  Trying to prove $equiv for \rx_active [50]: success!
+  Trying to prove $equiv for \rx_active [51]: success!
+  Trying to prove $equiv for \rx_active [52]: success!
+  Trying to prove $equiv for \rx_active [53]: success!
+  Trying to prove $equiv for \rx_active [54]: success!
+  Trying to prove $equiv for \rx_active [55]: success!
+  Trying to prove $equiv for \rx_active [56]: success!
+  Trying to prove $equiv for \rx_active [57]: success!
+  Trying to prove $equiv for \rx_active [58]: success!
+  Trying to prove $equiv for \rx_active [59]: success!
+  Trying to prove $equiv for \rx_active [60]: success!
+  Trying to prove $equiv for \rx_active [61]: success!
+  Trying to prove $equiv for \rx_active [62]: success!
+  Trying to prove $equiv for \rx_active [63]: success!
+  Trying to prove $equiv for \rx_active [64]: success!
+  Trying to prove $equiv for \rx_active [65]: success!
+  Trying to prove $equiv for \rx_active [66]: success!
+  Trying to prove $equiv for \rx_active [67]: success!
+  Trying to prove $equiv for \rx_active [68]: success!
+  Trying to prove $equiv for \rx_active [69]: success!
+  Trying to prove $equiv for \rx_active [70]: success!
+  Trying to prove $equiv for \rx_active [71]: success!
+  Trying to prove $equiv for \rx_active [72]: success!
+  Trying to prove $equiv for \rx_active [73]: success!
+  Trying to prove $equiv for \rx_active [74]: success!
+  Trying to prove $equiv for \rx_active [75]: success!
+  Trying to prove $equiv for \rx_active [76]: success!
+  Trying to prove $equiv for \rx_active [77]: success!
+  Trying to prove $equiv for \rx_active [78]: success!
+  Trying to prove $equiv for \rx_active [79]: success!
+  Trying to prove $equiv for \rx_active [80]: success!
+  Trying to prove $equiv for \rx_active [81]: success!
+  Trying to prove $equiv for \rx_active [82]: success!
+  Trying to prove $equiv for \rx_active [83]: success!
+  Trying to prove $equiv for \rx_active [84]: success!
+  Trying to prove $equiv for \rx_active [85]: success!
+  Trying to prove $equiv for \rx_active [86]: success!
+  Trying to prove $equiv for \rx_active [87]: success!
+  Trying to prove $equiv for \rx_active [88]: success!
+  Trying to prove $equiv for \rx_active [89]: success!
+  Trying to prove $equiv for \rx_active [90]: success!
+  Trying to prove $equiv for \rx_active [91]: success!
+  Trying to prove $equiv for \rx_active [92]: success!
+  Trying to prove $equiv for \rx_active [93]: success!
+  Trying to prove $equiv for \rx_active [94]: success!
+  Trying to prove $equiv for \rx_active [95]: success!
+  Trying to prove $equiv for \rx_active [96]: success!
+  Trying to prove $equiv for \rx_active [97]: success!
+  Trying to prove $equiv for \rx_active [98]: success!
+  Trying to prove $equiv for \rx_active [99]: success!
+  Trying to prove $equiv for \rx_active [100]: success!
+  Trying to prove $equiv for \rx_active [101]: success!
+  Trying to prove $equiv for \rx_active [102]: success!
+  Trying to prove $equiv for \rx_active [103]: success!
+  Trying to prove $equiv for \rx_active [104]: success!
+  Trying to prove $equiv for \rx_active [105]: success!
+  Trying to prove $equiv for \rx_active [106]: success!
+  Trying to prove $equiv for \rx_active [107]: success!
+  Trying to prove $equiv for \rx_active [108]: success!
+  Trying to prove $equiv for \rx_active [109]: success!
+  Trying to prove $equiv for \rx_active [110]: success!
+  Trying to prove $equiv for \rx_active [111]: success!
+  Trying to prove $equiv for \rx_active [112]: success!
+  Trying to prove $equiv for \rx_active [113]: success!
+  Trying to prove $equiv for \rx_active [114]: success!
+  Trying to prove $equiv for \rx_active [115]: success!
+  Trying to prove $equiv for \rx_active [116]: success!
+  Trying to prove $equiv for \rx_active [117]: success!
+  Trying to prove $equiv for \rx_active [118]: success!
+  Trying to prove $equiv for \rx_active [119]: success!
+  Trying to prove $equiv for \rx_active [120]: success!
+  Trying to prove $equiv for \rx_active [121]: success!
+  Trying to prove $equiv for \rx_active [122]: success!
+  Trying to prove $equiv for \rx_active [123]: success!
+  Trying to prove $equiv for \rx_active [124]: success!
+  Trying to prove $equiv for \rx_active [125]: success!
+  Trying to prove $equiv for \rx_active [126]: success!
+  Trying to prove $equiv for \rx_active [127]: success!
+  Trying to prove $equiv for \rx_active [128]: success!
+  Trying to prove $equiv for \rx_active [129]: success!
+  Trying to prove $equiv for \rx_active [130]: success!
+  Trying to prove $equiv for \rx_active [131]: success!
+  Trying to prove $equiv for \rx_active [132]: success!
+ Grouping SAT models for \tx_shift:
+  Trying to prove $equiv for \tx_shift [0]: success!
+  Trying to prove $equiv for \tx_shift [1]: success!
+  Trying to prove $equiv for \tx_shift [2]: success!
+  Trying to prove $equiv for \tx_shift [3]: success!
+  Trying to prove $equiv for \tx_shift [4]: success!
+  Trying to prove $equiv for \tx_shift [5]: success!
+  Trying to prove $equiv for \tx_shift [6]: success!
+  Trying to prove $equiv for \tx_shift [7]: success!
+  Trying to prove $equiv for \tx_shift [8]: success!
+  Trying to prove $equiv for \tx_shift [9]: success!
+  Trying to prove $equiv for \tx_shift [10]: success!
+  Trying to prove $equiv for \tx_shift [11]: success!
+  Trying to prove $equiv for \tx_shift [12]: success!
+  Trying to prove $equiv for \tx_shift [13]: success!
+  Trying to prove $equiv for \tx_shift [14]: success!
+  Trying to prove $equiv for \tx_shift [15]: success!
+  Trying to prove $equiv for \tx_shift [16]: success!
+  Trying to prove $equiv for \tx_shift [17]: success!
+  Trying to prove $equiv for \tx_shift [18]: success!
+  Trying to prove $equiv for \tx_shift [19]: success!
+  Trying to prove $equiv for \tx_shift [20]: success!
+  Trying to prove $equiv for \tx_shift [21]: success!
+  Trying to prove $equiv for \tx_shift [22]: success!
+  Trying to prove $equiv for \tx_shift [23]: success!
+  Trying to prove $equiv for \tx_shift [24]: success!
+  Trying to prove $equiv for \tx_shift [25]: success!
+  Trying to prove $equiv for \tx_shift [26]: success!
+  Trying to prove $equiv for \tx_shift [27]: success!
+  Trying to prove $equiv for \tx_shift [28]: success!
+  Trying to prove $equiv for \tx_shift [29]: success!
+  Trying to prove $equiv for \tx_shift [30]: success!
+  Trying to prove $equiv for \tx_shift [31]: success!
+  Trying to prove $equiv for \tx_shift [32]: success!
+  Trying to prove $equiv for \tx_shift [33]: success!
+  Trying to prove $equiv for \tx_shift [34]: success!
+  Trying to prove $equiv for \tx_shift [35]: success!
+  Trying to prove $equiv for \tx_shift [36]: success!
+  Trying to prove $equiv for \tx_shift [37]: success!
+  Trying to prove $equiv for \tx_shift [38]: success!
+  Trying to prove $equiv for \tx_shift [39]: success!
+  Trying to prove $equiv for \tx_shift [40]: success!
+  Trying to prove $equiv for \tx_shift [41]: success!
+  Trying to prove $equiv for \tx_shift [42]: success!
+  Trying to prove $equiv for \tx_shift [43]: success!
+  Trying to prove $equiv for \tx_shift [44]: success!
+  Trying to prove $equiv for \tx_shift [45]: success!
+  Trying to prove $equiv for \tx_shift [46]: success!
+  Trying to prove $equiv for \tx_shift [47]: success!
+  Trying to prove $equiv for \tx_shift [48]: success!
+  Trying to prove $equiv for \tx_shift [49]: success!
+  Trying to prove $equiv for \tx_shift [50]: success!
+  Trying to prove $equiv for \tx_shift [51]: success!
+  Trying to prove $equiv for \tx_shift [52]: success!
+  Trying to prove $equiv for \tx_shift [53]: success!
+  Trying to prove $equiv for \tx_shift [54]: success!
+  Trying to prove $equiv for \tx_shift [55]: success!
+  Trying to prove $equiv for \tx_shift [56]: success!
+  Trying to prove $equiv for \tx_shift [57]: success!
+  Trying to prove $equiv for \tx_shift [58]: success!
+  Trying to prove $equiv for \tx_shift [59]: success!
+  Trying to prove $equiv for \tx_shift [60]: success!
+  Trying to prove $equiv for \tx_shift [61]: success!
+  Trying to prove $equiv for \tx_shift [62]: success!
+  Trying to prove $equiv for \tx_shift [63]: success!
+  Trying to prove $equiv for \tx_shift [64]: success!
+  Trying to prove $equiv for \tx_shift [65]: success!
+  Trying to prove $equiv for \tx_shift [66]: success!
+  Trying to prove $equiv for \tx_shift [67]: success!
+  Trying to prove $equiv for \tx_shift [68]: success!
+  Trying to prove $equiv for \tx_shift [69]: success!
+  Trying to prove $equiv for \tx_shift [70]: success!
+  Trying to prove $equiv for \tx_shift [71]: success!
+  Trying to prove $equiv for \tx_shift [72]: success!
+  Trying to prove $equiv for \tx_shift [73]: success!
+  Trying to prove $equiv for \tx_shift [74]: success!
+  Trying to prove $equiv for \tx_shift [75]: success!
+  Trying to prove $equiv for \tx_shift [76]: success!
+  Trying to prove $equiv for \tx_shift [77]: success!
+  Trying to prove $equiv for \tx_shift [78]: success!
+  Trying to prove $equiv for \tx_shift [79]: success!
+  Trying to prove $equiv for \tx_shift [80]: success!
+  Trying to prove $equiv for \tx_shift [81]: success!
+  Trying to prove $equiv for \tx_shift [82]: success!
+  Trying to prove $equiv for \tx_shift [83]: success!
+  Trying to prove $equiv for \tx_shift [84]: success!
+  Trying to prove $equiv for \tx_shift [85]: success!
+  Trying to prove $equiv for \tx_shift [86]: success!
+  Trying to prove $equiv for \tx_shift [87]: success!
+  Trying to prove $equiv for \tx_shift [88]: success!
+  Trying to prove $equiv for \tx_shift [89]: success!
+  Trying to prove $equiv for \tx_shift [90]: success!
+  Trying to prove $equiv for \tx_shift [91]: success!
+  Trying to prove $equiv for \tx_shift [92]: success!
+  Trying to prove $equiv for \tx_shift [93]: success!
+  Trying to prove $equiv for \tx_shift [94]: success!
+  Trying to prove $equiv for \tx_shift [95]: success!
+  Trying to prove $equiv for \tx_shift [96]: success!
+  Trying to prove $equiv for \tx_shift [97]: success!
+  Trying to prove $equiv for \tx_shift [98]: success!
+  Trying to prove $equiv for \tx_shift [99]: success!
+  Trying to prove $equiv for \tx_shift [100]: success!
+  Trying to prove $equiv for \tx_shift [101]: success!
+  Trying to prove $equiv for \tx_shift [102]: success!
+  Trying to prove $equiv for \tx_shift [103]: success!
+  Trying to prove $equiv for \tx_shift [104]: success!
+  Trying to prove $equiv for \tx_shift [105]: success!
+  Trying to prove $equiv for \tx_shift [106]: success!
+  Trying to prove $equiv for \tx_shift [107]: success!
+  Trying to prove $equiv for \tx_shift [108]: success!
+  Trying to prove $equiv for \tx_shift [109]: success!
+  Trying to prove $equiv for \tx_shift [110]: success!
+  Trying to prove $equiv for \tx_shift [111]: success!
+  Trying to prove $equiv for \tx_shift [112]: success!
+  Trying to prove $equiv for \tx_shift [113]: success!
+  Trying to prove $equiv for \tx_shift [114]: success!
+  Trying to prove $equiv for \tx_shift [115]: success!
+  Trying to prove $equiv for \tx_shift [116]: success!
+  Trying to prove $equiv for \tx_shift [117]: success!
+  Trying to prove $equiv for \tx_shift [118]: success!
+ Grouping SAT models for \tx_snapshot:
+  Trying to prove $equiv for \tx_snapshot [0]: success!
+  Trying to prove $equiv for \tx_snapshot [1]: success!
+  Trying to prove $equiv for \tx_snapshot [2]: success!
+  Trying to prove $equiv for \tx_snapshot [3]: success!
+  Trying to prove $equiv for \tx_snapshot [4]: success!
+  Trying to prove $equiv for \tx_snapshot [5]: success!
+  Trying to prove $equiv for \tx_snapshot [6]: success!
+  Trying to prove $equiv for \tx_snapshot [7]: success!
+  Trying to prove $equiv for \tx_snapshot [8]: success!
+  Trying to prove $equiv for \tx_snapshot [9]: success!
+  Trying to prove $equiv for \tx_snapshot [10]: success!
+  Trying to prove $equiv for \tx_snapshot [11]: success!
+  Trying to prove $equiv for \tx_snapshot [12]: success!
+  Trying to prove $equiv for \tx_snapshot [13]: success!
+  Trying to prove $equiv for \tx_snapshot [14]: success!
+  Trying to prove $equiv for \tx_snapshot [15]: success!
+  Trying to prove $equiv for \tx_snapshot [16]: success!
+  Trying to prove $equiv for \tx_snapshot [17]: success!
+  Trying to prove $equiv for \tx_snapshot [18]: success!
+  Trying to prove $equiv for \tx_snapshot [19]: success!
+  Trying to prove $equiv for \tx_snapshot [20]: success!
+  Trying to prove $equiv for \tx_snapshot [21]: success!
+  Trying to prove $equiv for \tx_snapshot [22]: success!
+  Trying to prove $equiv for \tx_snapshot [23]: success!
+  Trying to prove $equiv for \tx_snapshot [24]: success!
+  Trying to prove $equiv for \tx_snapshot [25]: success!
+  Trying to prove $equiv for \tx_snapshot [26]: success!
+  Trying to prove $equiv for \tx_snapshot [27]: success!
+  Trying to prove $equiv for \tx_snapshot [28]: success!
+  Trying to prove $equiv for \tx_snapshot [29]: success!
+  Trying to prove $equiv for \tx_snapshot [30]: success!
+  Trying to prove $equiv for \tx_snapshot [31]: success!
+  Trying to prove $equiv for \tx_snapshot [32]: success!
+  Trying to prove $equiv for \tx_snapshot [33]: success!
+  Trying to prove $equiv for \tx_snapshot [34]: success!
+  Trying to prove $equiv for \tx_snapshot [35]: success!
+  Trying to prove $equiv for \tx_snapshot [36]: success!
+  Trying to prove $equiv for \tx_snapshot [37]: success!
+  Trying to prove $equiv for \tx_snapshot [38]: success!
+  Trying to prove $equiv for \tx_snapshot [39]: success!
+  Trying to prove $equiv for \tx_snapshot [40]: success!
+  Trying to prove $equiv for \tx_snapshot [41]: success!
+  Trying to prove $equiv for \tx_snapshot [42]: success!
+  Trying to prove $equiv for \tx_snapshot [43]: success!
+  Trying to prove $equiv for \tx_snapshot [44]: success!
+  Trying to prove $equiv for \tx_snapshot [45]: success!
+  Trying to prove $equiv for \tx_snapshot [46]: success!
+  Trying to prove $equiv for \tx_snapshot [47]: success!
+  Trying to prove $equiv for \tx_snapshot [48]: success!
+  Trying to prove $equiv for \tx_snapshot [49]: success!
+  Trying to prove $equiv for \tx_snapshot [50]: success!
+  Trying to prove $equiv for \tx_snapshot [51]: success!
+  Trying to prove $equiv for \tx_snapshot [52]: success!
+  Trying to prove $equiv for \tx_snapshot [53]: success!
+  Trying to prove $equiv for \tx_snapshot [54]: success!
+  Trying to prove $equiv for \tx_snapshot [55]: success!
+  Trying to prove $equiv for \tx_snapshot [56]: success!
+  Trying to prove $equiv for \tx_snapshot [57]: success!
+  Trying to prove $equiv for \tx_snapshot [58]: success!
+  Trying to prove $equiv for \tx_snapshot [59]: success!
+  Trying to prove $equiv for \tx_snapshot [60]: success!
+  Trying to prove $equiv for \tx_snapshot [61]: success!
+  Trying to prove $equiv for \tx_snapshot [62]: success!
+  Trying to prove $equiv for \tx_snapshot [63]: success!
+  Trying to prove $equiv for \tx_snapshot [64]: success!
+  Trying to prove $equiv for \tx_snapshot [65]: success!
+  Trying to prove $equiv for \tx_snapshot [66]: success!
+  Trying to prove $equiv for \tx_snapshot [67]: success!
+  Trying to prove $equiv for \tx_snapshot [68]: success!
+  Trying to prove $equiv for \tx_snapshot [69]: success!
+  Trying to prove $equiv for \tx_snapshot [70]: success!
+  Trying to prove $equiv for \tx_snapshot [71]: success!
+  Trying to prove $equiv for \tx_snapshot [72]: success!
+  Trying to prove $equiv for \tx_snapshot [73]: success!
+  Trying to prove $equiv for \tx_snapshot [74]: success!
+  Trying to prove $equiv for \tx_snapshot [75]: success!
+  Trying to prove $equiv for \tx_snapshot [76]: success!
+  Trying to prove $equiv for \tx_snapshot [77]: success!
+  Trying to prove $equiv for \tx_snapshot [78]: success!
+  Trying to prove $equiv for \tx_snapshot [79]: success!
+  Trying to prove $equiv for \tx_snapshot [80]: success!
+  Trying to prove $equiv for \tx_snapshot [81]: success!
+  Trying to prove $equiv for \tx_snapshot [82]: success!
+  Trying to prove $equiv for \tx_snapshot [83]: success!
+  Trying to prove $equiv for \tx_snapshot [84]: success!
+  Trying to prove $equiv for \tx_snapshot [85]: success!
+  Trying to prove $equiv for \tx_snapshot [86]: success!
+  Trying to prove $equiv for \tx_snapshot [87]: success!
+  Trying to prove $equiv for \tx_snapshot [88]: success!
+  Trying to prove $equiv for \tx_snapshot [89]: success!
+  Trying to prove $equiv for \tx_snapshot [90]: success!
+  Trying to prove $equiv for \tx_snapshot [91]: success!
+  Trying to prove $equiv for \tx_snapshot [92]: success!
+  Trying to prove $equiv for \tx_snapshot [93]: success!
+  Trying to prove $equiv for \tx_snapshot [94]: success!
+  Trying to prove $equiv for \tx_snapshot [95]: success!
+  Trying to prove $equiv for \tx_snapshot [96]: success!
+  Trying to prove $equiv for \tx_snapshot [97]: success!
+  Trying to prove $equiv for \tx_snapshot [98]: success!
+  Trying to prove $equiv for \tx_snapshot [99]: success!
+  Trying to prove $equiv for \tx_snapshot [100]: success!
+  Trying to prove $equiv for \tx_snapshot [101]: success!
+  Trying to prove $equiv for \tx_snapshot [102]: success!
+  Trying to prove $equiv for \tx_snapshot [103]: success!
+  Trying to prove $equiv for \tx_snapshot [104]: success!
+  Trying to prove $equiv for \tx_snapshot [105]: success!
+  Trying to prove $equiv for \tx_snapshot [106]: success!
+  Trying to prove $equiv for \tx_snapshot [107]: success!
+  Trying to prove $equiv for \tx_snapshot [108]: success!
+  Trying to prove $equiv for \tx_snapshot [109]: success!
+  Trying to prove $equiv for \tx_snapshot [110]: success!
+  Trying to prove $equiv for \tx_snapshot [111]: success!
+  Trying to prove $equiv for \tx_snapshot [112]: success!
+  Trying to prove $equiv for \tx_snapshot [113]: success!
+  Trying to prove $equiv for \tx_snapshot [114]: success!
+  Trying to prove $equiv for \tx_snapshot [115]: success!
+  Trying to prove $equiv for \tx_snapshot [116]: success!
+  Trying to prove $equiv for \tx_snapshot [117]: success!
+  Trying to prove $equiv for \tx_snapshot [118]: success!
+  Trying to prove $equiv for \spi_active: success!
+  Trying to prove $equiv for \spi_cs_meta: success!
+  Trying to prove $equiv for \spi_cs_sync: success!
+  Trying to prove $equiv for \spi_cs_prev: success!
+Proved 510 previously unproven $equiv cells.
+
+19. Executing EQUIV_INDUCT pass.
+No selected unproven $equiv cells found in equiv.
+Proved 0 previously unproven $equiv cells.
+
+20. Executing EQUIV_STATUS pass.
+Found 511 $equiv cells in equiv:
+  Of those cells 511 are proven and 0 are unproven.
+  Equivalence successfully proven!
+
+Warnings: 1 unique messages, 1 total
+End of script. Logfile hash: b74a23a950
+Yosys 0.56 (git sha1 9c447ad9d4b1ea589369364eea38b4d70da2c599, x86_64-w64-mingw32-g++ 15.2.0 -march=nocona -msahf -mtune=generic -O2 -fstack-protector-strong -O3)
+Time spent: 2% 14x opt_clean (0 sec), 2% 12x read_verilog (0 sec), ...
