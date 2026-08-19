@@ -1,0 +1,26 @@
+Digital Assertions (SVA) Agent Log
+[2026-08-19T16:39:31.816287] [INFO] Starting Digital Assertions (SVA) Agent...
+[2026-08-19T16:39:31.816550] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/cc1f88c1-2e31-4c16-99d6-946b9edeac87/spec/fpga_verification_source_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 5,
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "soc_mode": false
+}
+[2026-08-19T16:39:31.816745] [INFO] resolved_mode=digital
+[2026-08-19T16:39:31.816818] [INFO] spec_path=/root/chiploop-backend/backend/workflows/cc1f88c1-2e31-4c16-99d6-946b9edeac87/spec/fpga_verification_source_spec.json
+[2026-08-19T16:39:31.816891] [INFO] top_module=adaptive_aero_control_top_spi_fpga_top
+[2026-08-19T16:39:31.816986] [INFO] rtl_file_count=5
+[2026-08-19T16:39:31.817077] [INFO] clock_candidates=[]
+[2026-08-19T16:39:31.817208] [INFO] reset_candidates=[]
+[2026-08-19T16:39:31.817305] [INFO] sva_ports={
+  "port_names": [],
+  "input_count": 0,
+  "output_count": 0
+}
+[2026-08-19T16:39:31.817415] [INFO] LLM SVA expansion disabled; using deterministic scaffold.
+[2026-08-19T16:39:31.963730] [INFO] Generated adaptive_aero_control_top_spi_fpga_top_assertions.sv
+[2026-08-19T16:39:31.963877] [INFO] Generated sva_spec.json
+[2026-08-19T16:39:31.963998] [INFO] Generated SVA_README.md
