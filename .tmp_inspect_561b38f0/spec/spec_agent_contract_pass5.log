@@ -1,0 +1,2 @@
+Digital Spec Agent pass5 contract repair failure:
+Required child input 'actuator_clamp_fallback_controller.fallback_active' has no source in top_level_connections or inter_module_signals. Add an explicit top-level input connection or a real child producer. Repair every listed input in the same response.
