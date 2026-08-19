@@ -1,0 +1,30 @@
+{
+  "agent": "Embedded Rust Register Layer Generator Agent",
+  "phase": "hal_generate",
+  "workflow_dir": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816/system",
+  "manifest_present": true,
+  "register_count": 18,
+  "register_names": [
+    "CTRL",
+    "VELOCITY_Q8_8",
+    "GEOMETRY_HANDLE",
+    "SEQ_CTRL",
+    "TIMEOUT_AND_ENVELOPE",
+    "ACTUATOR_LIMITS",
+    "ACTUATOR_SLEW",
+    "SAFE_STATE",
+    "STATUS0",
+    "STATUS1",
+    "STATUS2",
+    "STATUS3",
+    "STATUS4",
+    "STATUS5",
+    "STATUS6",
+    "STATUS7",
+    "IRQ_STATUS",
+    "FAULT_STATUS"
+  ],
+  "base_address": "0x00000000",
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem"
+}

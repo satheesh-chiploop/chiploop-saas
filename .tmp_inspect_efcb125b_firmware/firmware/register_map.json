@@ -1,0 +1,472 @@
+{
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem",
+  "base_address": "0x00000000",
+  "bus": "WISHBONE",
+  "registers": [
+    {
+      "name": "CTRL",
+      "offset": "0x00000000",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Firmware control register. Bit 0-1 select operating mode. Bit 2 is a command-valid strobe written by firmware to request a new control action. Bit 3 selects hold-last-safe fallback behavior. Bit 4 requests fault clear. Bit 5 acknowledges sticky IRQ causes. Bits 8-15 enable interrupt sources. All other bits are reserved and read as zero.",
+      "fields": [
+        {
+          "name": "mode",
+          "bit_offset": 0,
+          "bit_width": 2,
+          "access": "RW",
+          "description": "Operating mode selection. Scalar control-policy mode programmed by firmware."
+        },
+        {
+          "name": "cmd_valid",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Firmware command-accept strobe. Writing 1 requests acceptance of the current configuration snapshot by the control core."
+        },
+        {
+          "name": "hold_last_safe",
+          "bit_offset": 3,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "When set, safe fallback holds the last known safe actuator command instead of driving the programmed safe-state command."
+        },
+        {
+          "name": "fault_clear",
+          "bit_offset": 4,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Write 1 to request clearing of latched fault state, subject to controller validity conditions."
+        },
+        {
+          "name": "irq_ack",
+          "bit_offset": 5,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Write 1 to acknowledge and clear sticky interrupt causes that are eligible to be cleared."
+        },
+        {
+          "name": "irq_enable",
+          "bit_offset": 8,
+          "bit_width": 8,
+          "access": "RW",
+          "description": "Interrupt enable mask. Each bit enables the corresponding sticky interrupt source in IRQ_STATUS."
+        }
+      ]
+    },
+    {
+      "name": "VELOCITY_Q8_8",
+      "offset": "0x00000004",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Programmed vehicle velocity input in Q8.8 fixed-point format. The control core validates this against the configured operating envelope before actuator updates are allowed.",
+      "fields": [
+        {
+          "name": "velocity_q8_8",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Velocity scalar in Q8.8 format. Reset value corresponds to the nominal reference condition of 38.89 m/s."
+        }
+      ]
+    },
+    {
+      "name": "GEOMETRY_HANDLE",
+      "offset": "0x00000008",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Opaque geometry descriptor handle used by firmware to reference off-chip model context. No geometry payload is stored in RTL.",
+      "fields": [
+        {
+          "name": "geometry_handle",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Opaque handle for the external aerodynamic service."
+        }
+      ]
+    },
+    {
+      "name": "SEQ_CTRL",
+      "offset": "0x0000000C",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Sequence control register. Firmware seeds or programs the next request sequence number in bits 0-15. Bits 16-31 expose the last accepted sequence number for readback.",
+      "fields": [
+        {
+          "name": "request_seq",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Firmware-programmed request sequence seed or expected next sequence number."
+        },
+        {
+          "name": "last_accepted_seq_ro",
+          "bit_offset": 16,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Last accepted request sequence number returned by the control core."
+        }
+      ]
+    },
+    {
+      "name": "TIMEOUT_AND_ENVELOPE",
+      "offset": "0x00000010",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Timeout threshold and envelope limits. Timeout is measured in controller ticks. Velocity limits define the allowed operating envelope around the 20 to 55 m/s region.",
+      "fields": [
+        {
+          "name": "timeout_threshold",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Deterministic timeout threshold in controller ticks. When age exceeds this value, the core enters safe fallback."
+        },
+        {
+          "name": "velocity_low_limit",
+          "bit_offset": 16,
+          "bit_width": 8,
+          "access": "RW",
+          "description": "Lower programmed velocity limit used by envelope validation. Intended to correspond to the lower edge of the allowed operating envelope."
+        },
+        {
+          "name": "velocity_high_limit",
+          "bit_offset": 24,
+          "bit_width": 8,
+          "access": "RW",
+          "description": "Upper programmed velocity limit used by envelope validation. Intended to correspond to the upper edge of the allowed operating envelope."
+        }
+      ]
+    },
+    {
+      "name": "ACTUATOR_LIMITS",
+      "offset": "0x00000014",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Actuator clamp configuration. Output commands are saturated between these bounds before being presented to the actuator interface.",
+      "fields": [
+        {
+          "name": "actuator_min",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Lower actuator clamp value."
+        },
+        {
+          "name": "actuator_max",
+          "bit_offset": 16,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Upper actuator clamp value."
+        }
+      ]
+    },
+    {
+      "name": "ACTUATOR_SLEW",
+      "offset": "0x00000018",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Programmable per-update slew cap used to rate-limit actuator command changes.",
+      "fields": [
+        {
+          "name": "actuator_slew",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Maximum absolute actuator delta permitted per update."
+        }
+      ]
+    },
+    {
+      "name": "SAFE_STATE",
+      "offset": "0x0000001C",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Safe fallback configuration. The controller drives this actuator command on faults unless hold-last-safe is enabled.",
+      "fields": [
+        {
+          "name": "safe_state_cmd",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Deterministic safe actuator command."
+        }
+      ]
+    },
+    {
+      "name": "STATUS0",
+      "offset": "0x00000020",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Primary status summary. Exposes outstanding request, safe-state indication, fault latch, actuator-valid, and fault code.",
+      "fields": [
+        {
+          "name": "outstanding_req",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "1 when a request is outstanding and awaiting response acceptance."
+        },
+        {
+          "name": "status_safe_state",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "1 when the controller is in safe fallback state."
+        },
+        {
+          "name": "status_fault_latched",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Latched fault indication."
+        },
+        {
+          "name": "status_actuator_valid",
+          "bit_offset": 3,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "1 when the presented actuator command is valid for actuation."
+        },
+        {
+          "name": "status_fault_code",
+          "bit_offset": 8,
+          "bit_width": 8,
+          "access": "RO",
+          "description": "Encoded fault reason. Code values are implementation-defined but deterministic."
+        }
+      ]
+    },
+    {
+      "name": "STATUS1",
+      "offset": "0x00000024",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Event counters for timeout and stale response rejection.",
+      "fields": [
+        {
+          "name": "status_timeout_count",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Count of deterministic timeout events."
+        },
+        {
+          "name": "status_stale_reject_count",
+          "bit_offset": 16,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Count of stale, late, duplicated, malformed, or mismatched responses rejected by the core."
+        }
+      ]
+    },
+    {
+      "name": "STATUS2",
+      "offset": "0x00000028",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Envelope and age observability.",
+      "fields": [
+        {
+          "name": "status_invalid_env_count",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Count of envelope violations where velocity was outside the programmed limits."
+        },
+        {
+          "name": "status_age_counter",
+          "bit_offset": 16,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Age of the outstanding request in controller ticks."
+        }
+      ]
+    },
+    {
+      "name": "STATUS3",
+      "offset": "0x0000002C",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Sequence observability.",
+      "fields": [
+        {
+          "name": "status_last_accepted_seq",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Last accepted request sequence number."
+        },
+        {
+          "name": "status_response_seq",
+          "bit_offset": 16,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Last accepted response sequence number."
+        }
+      ]
+    },
+    {
+      "name": "STATUS4",
+      "offset": "0x00000030",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Lower 32 bits of the last launched request word.",
+      "fields": [
+        {
+          "name": "status_last_req_word_lo",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RO",
+          "description": "Lower 32 bits of the last 64-bit request word sent to the external service."
+        }
+      ]
+    },
+    {
+      "name": "STATUS5",
+      "offset": "0x00000034",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Upper 32 bits of the last launched request word.",
+      "fields": [
+        {
+          "name": "status_last_req_word_hi",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RO",
+          "description": "Upper 32 bits of the last 64-bit request word sent to the external service."
+        }
+      ]
+    },
+    {
+      "name": "STATUS6",
+      "offset": "0x00000038",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Lower 32 bits of the last observed response word.",
+      "fields": [
+        {
+          "name": "status_last_resp_word_lo",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RO",
+          "description": "Lower 32 bits of the last 64-bit response word accepted or observed by the controller."
+        }
+      ]
+    },
+    {
+      "name": "STATUS7",
+      "offset": "0x0000003C",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Upper 32 bits of the last observed response word.",
+      "fields": [
+        {
+          "name": "status_last_resp_word_hi",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RO",
+          "description": "Upper 32 bits of the last 64-bit response word accepted or observed by the controller."
+        }
+      ]
+    },
+    {
+      "name": "IRQ_STATUS",
+      "offset": "0x00000040",
+      "address": null,
+      "access": "RW1C",
+      "reset": "0x00000000",
+      "description": "Sticky interrupt status register. Writing 1 to a bit clears that sticky cause.",
+      "fields": [
+        {
+          "name": "resp_ready_sticky",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RW1C",
+          "description": "Sticky interrupt cause for response-ready or response-accepted events."
+        },
+        {
+          "name": "timeout_sticky",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RW1C",
+          "description": "Sticky interrupt cause for timeout expiration."
+        },
+        {
+          "name": "stale_reject_sticky",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RW1C",
+          "description": "Sticky interrupt cause for stale or mismatched response rejection."
+        },
+        {
+          "name": "invalid_env_sticky",
+          "bit_offset": 3,
+          "bit_width": 1,
+          "access": "RW1C",
+          "description": "Sticky interrupt cause for invalid velocity envelope."
+        },
+        {
+          "name": "fault_clear_event",
+          "bit_offset": 4,
+          "bit_width": 1,
+          "access": "RW1C",
+          "description": "Sticky interrupt cause indicating that firmware requested a fault-clear event."
+        }
+      ]
+    },
+    {
+      "name": "FAULT_STATUS",
+      "offset": "0x00000044",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Latched fault summary and safe-state indication.",
+      "fields": [
+        {
+          "name": "fault_code",
+          "bit_offset": 0,
+          "bit_width": 8,
+          "access": "RO",
+          "description": "Latched fault code."
+        },
+        {
+          "name": "fault_latched",
+          "bit_offset": 8,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "1 when a fault is currently latched."
+        },
+        {
+          "name": "safe_state",
+          "bit_offset": 9,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "1 when safe fallback is currently active."
+        }
+      ]
+    }
+  ],
+  "__source": {
+    "mode": "artifact_passthrough",
+    "path": "state.digital_regmap"
+  }
+}

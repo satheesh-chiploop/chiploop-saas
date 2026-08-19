@@ -1,0 +1,91 @@
+{
+  "workflow_dir": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816/system",
+  "candidate_paths": [
+    "digital/digital_regmap.json",
+    "digital_regmap.json",
+    "digital/regmap.json",
+    "digital/register_map.json",
+    "regmap.json"
+  ],
+  "candidate_roots": [
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816/system",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816/system/digital",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8cb9d605-c830-4f6f-9ac5-b3d3c963a1ff/90703237-fd96-46d2-9c1a-4f4a10dcfa58/digital",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8cb9d605-c830-4f6f-9ac5-b3d3c963a1ff/90703237-fd96-46d2-9c1a-4f4a10dcfa58",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/8cb9d605-c830-4f6f-9ac5-b3d3c963a1ff/90703237-fd96-46d2-9c1a-4f4a10dcfa58/digital/digital",
+    "/root/chiploop-backend/backend/workflows/8cb9d605-c830-4f6f-9ac5-b3d3c963a1ff",
+    "/root/chiploop-backend/backend/workflows",
+    "/root/chiploop-backend/backend/workflows/8cb9d605-c830-4f6f-9ac5-b3d3c963a1ff/digital"
+  ],
+  "candidate_probe": [
+    {
+      "rel": "digital/digital_regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816/system/digital/digital_regmap.json",
+      "exists": true
+    },
+    {
+      "rel": "digital_regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816/system/digital_regmap.json",
+      "exists": false
+    },
+    {
+      "rel": "digital/regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816/system/digital/regmap.json",
+      "exists": false
+    },
+    {
+      "rel": "digital/register_map.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816/system/digital/register_map.json",
+      "exists": false
+    },
+    {
+      "rel": "regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816/system/regmap.json",
+      "exists": false
+    }
+  ],
+  "state_digital_regmap_present": true,
+  "state_digital_regmap_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816/system/digital/digital_regmap.json",
+  "state_digital_register_map_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/efcb125b-686c-4ed2-ac98-af6702bc94fa/ce46081e-d647-4a1c-b14f-ca8ace922816/system/digital/digital_regmap.json",
+  "state_digital_block_keys": [
+    "digital_regmap",
+    "regmap",
+    "digital_regmap_path",
+    "register_map_path",
+    "rtl_files",
+    "clock_intent"
+  ],
+  "selected_regmap_path": "state.digital_regmap",
+  "source_workflow_ids": [
+    "8cb9d605-c830-4f6f-9ac5-b3d3c963a1ff"
+  ],
+  "upstream_regmap_type": "dict",
+  "passthrough_taken": true,
+  "normalization_taken": false,
+  "candidate_regs_count": 18,
+  "goal_present": true,
+  "toolchain_keys": [
+    "compiler_features",
+    "custom_target_json",
+    "language",
+    "target_abi",
+    "target_cpu",
+    "target_isa",
+    "target_triple"
+  ],
+  "toggle_keys": [],
+  "mode": "artifact_passthrough",
+  "register_names_preview": [
+    "CTRL",
+    "VELOCITY_Q8_8",
+    "GEOMETRY_HANDLE",
+    "SEQ_CTRL",
+    "TIMEOUT_AND_ENVELOPE",
+    "ACTUATOR_LIMITS",
+    "ACTUATOR_SLEW",
+    "SAFE_STATE",
+    "STATUS0",
+    "STATUS1"
+  ]
+}

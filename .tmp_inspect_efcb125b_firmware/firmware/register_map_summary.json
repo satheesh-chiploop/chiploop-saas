@@ -1,0 +1,30 @@
+{
+  "agent": "Embedded Firmware Register Extract Agent",
+  "phase": "register_extract",
+  "mode": "artifact_passthrough",
+  "source_path": "state.digital_regmap",
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem",
+  "base_address": "0x00000000",
+  "register_count": 18,
+  "register_names": [
+    "CTRL",
+    "VELOCITY_Q8_8",
+    "GEOMETRY_HANDLE",
+    "SEQ_CTRL",
+    "TIMEOUT_AND_ENVELOPE",
+    "ACTUATOR_LIMITS",
+    "ACTUATOR_SLEW",
+    "SAFE_STATE",
+    "STATUS0",
+    "STATUS1",
+    "STATUS2",
+    "STATUS3",
+    "STATUS4",
+    "STATUS5",
+    "STATUS6",
+    "STATUS7",
+    "IRQ_STATUS",
+    "FAULT_STATUS"
+  ]
+}
