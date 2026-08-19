@@ -1,0 +1,21 @@
+{
+  "agent": "Embedded Rust Register Layer Generator Agent",
+  "phase": "hal_generate",
+  "hal_path": "firmware/hal/registers.rs",
+  "register_count": 12,
+  "register_names": [
+    "CONTROL",
+    "STATUS",
+    "SEQ_IN",
+    "AGE_LIMIT",
+    "VELOCITY_MPS",
+    "ACT_MIN",
+    "ACT_MAX",
+    "ACT_CMD",
+    "LAST_GOOD",
+    "TIMEOUT_CNT",
+    "FAULT_CAUSE",
+    "IRQ_ACK"
+  ],
+  "base_address": "0x00000000"
+}

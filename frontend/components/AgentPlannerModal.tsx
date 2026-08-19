@@ -2,7 +2,6 @@
 
 import React, { useState,useEffect } from "react";
 import { useVoiceAnalyzer } from "@/hooks/useVoiceAnalyzer";
-import { Special_Elite } from "next/font/google";
 import MissingAgentNamingDialog from "./MissingAgentNamingDialog";
 import MissingAgentsResolverModal from "@/components/studio/MissingAgentsResolverModal";
 import SpecTextBox from "@/components/SpecTextBox";
@@ -25,8 +24,11 @@ type InitialDesignIntent = {
   };
 };
 
+type MissingField = { path: string; ask?: string; type?: string };
+type LayoutNode = { position?: { x: number; y: number }; [key: string]: unknown };
 
-function autoLayoutHorizontal(nodes, spacing = 350, startX = 100, startY = 200) {
+
+function autoLayoutHorizontal(nodes: LayoutNode[], spacing = 350, startX = 100, startY = 200) {
   return nodes.map((node, index) => ({
     ...node,
     position: { x: startX + index * spacing, y: startY },
@@ -34,12 +36,13 @@ function autoLayoutHorizontal(nodes, spacing = 350, startX = 100, startY = 200) 
 }
 
 
-function getValueFromSpec(obj, path) {
+function getValueFromSpec(obj: unknown, path: string): unknown {
   try {
     return path
       .replace(/\]/g, "")
       .split(/\.|\[/)
-      .reduce((o, k) => (o ? o[k] : undefined), obj);
+      .reduce<unknown>((value, key) =>
+        value && typeof value === "object" ? (value as Record<string, unknown>)[key] : undefined, obj);
   } catch {
     return undefined;
   }
@@ -67,13 +70,13 @@ export default function AgentPlannerModal({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGeneratingAgent, setIsGeneratingAgent] = useState(false);
   const [spec, setSpec] = useState<any>(null);
-  const [missingFields, setMissingFields] = useState([]);
+  const [missingFields, setMissingFields] = useState<MissingField[]>([]);
   const [readyForPlanning, setReadyForPlanning] = useState(false);
   const [fieldEdits, setFieldEdits] = useState({});
   const [improvedSpec, setImprovedSpec] = useState<string | null>(null);
   const [finalizedSpec, setFinalizedSpec] = useState<string | null>(null);
   const [result, setResult] = useState<any>(null);
-  const [missingFieldEdits, setMissingFieldEdits] = useState({});
+  const [missingFieldEdits, setMissingFieldEdits] = useState<Record<string, string>>({});
   const [preplan, setPreplan] = useState<PreplanResult | null>(null);
   const [stage, setStage] = useState<"initial" | "analyzed" | "autofill" | "finalized" | "workflow">("initial");
   const [showNamingDialog, setShowNamingDialog] = useState(false);
@@ -112,12 +115,15 @@ export default function AgentPlannerModal({
   const handlePublish = () => {
     console.log("⚠️ Publish is not implemented yet. Coming in Step 7.");
   };
-  function normalizeMissing(input) {
-    return (input || []).map(m =>
-      typeof m === "string"
-        ? m                     // ✅ keep raw strings as strings
-        : m                     // ✅ keep dict objects untouched
-    );
+  function normalizeMissing(input: unknown): MissingField[] {
+    if (!Array.isArray(input)) return [];
+    return input.flatMap((item): MissingField[] => {
+      if (typeof item === "string") return [{ path: item }];
+      if (item && typeof item === "object" && typeof (item as { path?: unknown }).path === "string") {
+        return [item as MissingField];
+      }
+      return [];
+    });
   }
  // function normalizeMissing(input) {
   //  return (input || []).map(m =>
@@ -190,24 +196,9 @@ export default function AgentPlannerModal({
 
 
   useEffect(() => {
-    const handler = (e: any) => {
-      const agentName = e.detail;
-      fetch(`/api/agents/get_code?agent=${agentName}`)
-        .then(r => r.text())
-        .then(code => {
-          setSelectedAgent(agentName);
-          setAgentCode(code);
-          setOpen(true);
-        });
-    };
-    window.addEventListener("editAgent", handler);
-    return () => window.removeEventListener("editAgent", handler);
-  }, []);
-
-  useEffect(() => {
     async function loadDesignIntentsForSystemPlanner() {
       try {
-        const stableId = await getStableUserId(supabase);
+        const stableId = await getStableUserId();
         const { data, error } = await supabase
           .from("design_intent_drafts")
           .select("*")
@@ -470,7 +461,7 @@ export default function AgentPlannerModal({
       const autoVals = res.auto_filled_values ?? {};
 
       function resolveAutoValue(path: string, autoVals: any) {
-        const leaf = path.split(".").pop().replace(/\[\d+\]/g, "");
+        const leaf = (path.split(".").pop() || path).replace(/\[\d+\]/g, "");
         return (
           autoVals[path] ??
           autoVals[leaf] ??
@@ -1044,14 +1035,14 @@ export default function AgentPlannerModal({
                   body: JSON.stringify({
                     goal,
                     user_id: user_id,
-                    agent_names: finalNames.map(n => (typeof n === "string" ? n : n.new)),
+                    agent_names: finalNames,
                     structured_spec_final: spec
                   })
                 }).then(r => r.json());
             
                 // Append new agents to local custom agent list
                 const existing = JSON.parse(localStorage.getItem("custom_agents") || "[]");
-                const newOnes = (res.created_agents || []).map(a => ({
+                const newOnes = (res.created_agents || []).map((a: { agent_name: string; loop_type: string; path: string; description?: string }) => ({
                   agent_name: a.agent_name,
                   loop_type: a.loop_type,
                   script_path: a.path,

@@ -1,0 +1,376 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "custom",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 32,
+    "registers": [
+      {
+        "name": "CONTROL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Firmware control register for enabling command processing, clearing sticky faults, arming safe fallback, optionally bypassing output hold, and selecting a compact policy mode.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enable command processing and command acceptance."
+          },
+          {
+            "name": "CLEAR_FAULTS",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Write-one pulse to clear sticky faults and event flags."
+          },
+          {
+            "name": "ARM_SAFE_FALLBACK",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Arm safe fallback operation."
+          },
+          {
+            "name": "BYPASS_OUTPUT_HOLD",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bypass output hold policy when explicitly enabled by firmware."
+          },
+          {
+            "name": "MODE",
+            "lsb": 4,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Compact operation mode selector."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 8,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x04",
+        "access": "RO",
+        "description": "Live and sticky status bits reflecting command processing, faults, and interrupt state.",
+        "fields": [
+          {
+            "name": "BUSY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Control core is processing or holding a command."
+          },
+          {
+            "name": "COMMAND_ACCEPTED",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Last command was accepted."
+          },
+          {
+            "name": "STALE_REJECTED",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Last command was rejected as stale."
+          },
+          {
+            "name": "TIMEOUT_FAULT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Timeout or communication-loss fault active."
+          },
+          {
+            "name": "INVALID_INPUT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Velocity or policy input was invalid."
+          },
+          {
+            "name": "CLAMP_APPLIED",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "One or more actuator fields were clamped."
+          },
+          {
+            "name": "SAFE_FALLBACK_ACTIVE",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 1,
+            "description": "Safe fallback output is active."
+          },
+          {
+            "name": "IRQ_PENDING",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "IRQ is pending and awaiting acknowledgement."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 8,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_IN",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Command sequence number written by firmware.",
+        "fields": [
+          {
+            "name": "SEQUENCE_NUMBER",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Command sequence number written by firmware."
+          }
+        ]
+      },
+      {
+        "name": "AGE_LIMIT",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Maximum accepted command age in cycles.",
+        "fields": [
+          {
+            "name": "MAX_AGE_CYCLES",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum accepted command age in cycles."
+          }
+        ]
+      },
+      {
+        "name": "VELOCITY_MPS",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Fixed-point compact representation of stream velocity for the 20-55 m/s envelope.",
+        "fields": [
+          {
+            "name": "VELOCITY_FIXED_POINT",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Fixed-point compact representation of stream velocity for the 20-55 m/s envelope."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MIN",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Packed per-actuator minimum limit.",
+        "fields": [
+          {
+            "name": "PACKED_MINIMUM",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Packed per-actuator minimum limit."
+          }
+        ]
+      },
+      {
+        "name": "ACT_MAX",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Packed per-actuator maximum limit.",
+        "fields": [
+          {
+            "name": "PACKED_MAXIMUM",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 4294967295,
+            "description": "Packed per-actuator maximum limit."
+          }
+        ]
+      },
+      {
+        "name": "ACT_CMD",
+        "offset": "0x1C",
+        "access": "RW",
+        "description": "Packed actuator target command from firmware or CPU-side policy.",
+        "fields": [
+          {
+            "name": "PACKED_TARGET_COMMAND",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Packed actuator target command from firmware or CPU-side policy."
+          }
+        ]
+      },
+      {
+        "name": "LAST_GOOD",
+        "offset": "0x20",
+        "access": "RO",
+        "description": "Read-only last accepted packed actuator command.",
+        "fields": [
+          {
+            "name": "PACKED_LAST_ACCEPTED_COMMAND",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Last accepted packed actuator command."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CNT",
+        "offset": "0x24",
+        "access": "RO",
+        "description": "Current stale/timeout age counter.",
+        "fields": [
+          {
+            "name": "CURRENT_TIMEOUT_AGE",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Current stale/timeout age counter."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_CAUSE",
+        "offset": "0x28",
+        "access": "RO",
+        "description": "Sticky fault cause bits.",
+        "fields": [
+          {
+            "name": "STICKY_FAULT_BITS",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky fault cause bits."
+          }
+        ]
+      },
+      {
+        "name": "IRQ_ACK",
+        "offset": "0x2C",
+        "access": "WO",
+        "description": "Write-one-to-clear interrupt and sticky event flags.",
+        "fields": [
+          {
+            "name": "ACKNOWLEDGE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write-one-to-clear interrupt and sticky event flags."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 1,
+            "msb": 31,
+            "access": "WO",
+            "reset": 0,
+            "description": "Reserved; write ignored."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "COMMAND_ACCEPTED",
+        "description": "Asserted when a new valid command is accepted."
+      },
+      {
+        "name": "STALE_REJECTED",
+        "description": "Asserted when a command is rejected as stale."
+      },
+      {
+        "name": "TIMEOUT_FAULT",
+        "description": "Asserted on timeout expiration or communication loss."
+      },
+      {
+        "name": "INVALID_INPUT",
+        "description": "Asserted when velocity or policy input is outside the valid envelope."
+      },
+      {
+        "name": "CLAMP_EVENT",
+        "description": "Asserted when one or more packed actuator fields are clamped."
+      },
+      {
+        "name": "SAFE_FALLBACK_ENTRY",
+        "description": "Asserted when safe fallback is entered."
+      }
+    ],
+    "acknowledge_register": "IRQ_ACK",
+    "pending_status_bit": "STATUS.IRQ_PENDING"
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Reset or initialize the device and leave CONTROL.ENABLE cleared.",
+      "Program ACT_MIN and ACT_MAX with per-actuator bounds.",
+      "Program AGE_LIMIT with the maximum acceptable command age.",
+      "Program VELOCITY_MPS with the compact fixed-point velocity value.",
+      "Program SEQ_IN with the next monotonic sequence number.",
+      "Program ACT_CMD with the compact packed actuator command.",
+      "Set CONTROL.ARM_SAFE_FALLBACK as required by policy.",
+      "Set CONTROL.ENABLE to begin command processing."
+    ],
+    "polling_sequence": [
+      "Read STATUS until BUSY deasserts and IRQ_PENDING is either clear or has been serviced.",
+      "Read LAST_GOOD after accepted commands to confirm the last bounded command.",
+      "Read TIMEOUT_CNT to monitor stale-age progression.",
+      "Read FAULT_CAUSE to diagnose sticky fault reasons.",
+      "If a command is rejected as stale, update SEQ_IN with a newer sequence and retry only after policy allows."
+    ],
+    "irq_sequence": [
+      "On IRQ, read STATUS to determine whether the event was accepted-command, stale rejection, timeout, invalid input, clamp, or safe-fallback entry.",
+      "Write IRQ_ACK with bit 0 set to clear the interrupt and sticky event flags.",
+      "If CONTROL.CLEAR_FAULTS is required by firmware policy, write it as a one-cycle pulse in CONTROL and re-evaluate command state.",
+      "If safe fallback is active, either clear the fault under policy or program a new compact command within the allowed envelope before re-enabling acceptance."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map is 32-bit aligned and directly reachable through the Wishbone/MMIO decode in the synthesizable top.",
+    "No wide streaming model transport is introduced; firmware-mediated command acceptance remains the only control-plane path."
+  ]
+}

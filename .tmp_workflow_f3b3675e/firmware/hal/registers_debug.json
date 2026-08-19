@@ -1,0 +1,24 @@
+{
+  "agent": "Embedded Rust Register Layer Generator Agent",
+  "phase": "hal_generate",
+  "workflow_dir": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019/system",
+  "manifest_present": true,
+  "register_count": 12,
+  "register_names": [
+    "CONTROL",
+    "STATUS",
+    "SEQ_IN",
+    "AGE_LIMIT",
+    "VELOCITY_MPS",
+    "ACT_MIN",
+    "ACT_MAX",
+    "ACT_CMD",
+    "LAST_GOOD",
+    "TIMEOUT_CNT",
+    "FAULT_CAUSE",
+    "IRQ_ACK"
+  ],
+  "base_address": "0x00000000",
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem"
+}

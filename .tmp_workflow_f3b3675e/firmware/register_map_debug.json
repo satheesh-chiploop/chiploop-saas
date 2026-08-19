@@ -1,0 +1,89 @@
+{
+  "workflow_dir": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019/system",
+  "candidate_paths": [
+    "digital/digital_regmap.json",
+    "digital_regmap.json",
+    "digital/regmap.json",
+    "digital/register_map.json",
+    "regmap.json"
+  ],
+  "candidate_roots": [
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019/system",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019/system/digital",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d431c47d-0843-4179-9a2e-d9d49d479eab/33a19f11-de84-4a32-9111-487fbfc1dbe3/digital",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d431c47d-0843-4179-9a2e-d9d49d479eab/33a19f11-de84-4a32-9111-487fbfc1dbe3",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/d431c47d-0843-4179-9a2e-d9d49d479eab/33a19f11-de84-4a32-9111-487fbfc1dbe3/digital/digital",
+    "/root/chiploop-backend/backend/workflows/d431c47d-0843-4179-9a2e-d9d49d479eab",
+    "/root/chiploop-backend/backend/workflows",
+    "/root/chiploop-backend/backend/workflows/d431c47d-0843-4179-9a2e-d9d49d479eab/digital"
+  ],
+  "candidate_probe": [
+    {
+      "rel": "digital/digital_regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019/system/digital/digital_regmap.json",
+      "exists": true
+    },
+    {
+      "rel": "digital_regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019/system/digital_regmap.json",
+      "exists": false
+    },
+    {
+      "rel": "digital/regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019/system/digital/regmap.json",
+      "exists": false
+    },
+    {
+      "rel": "digital/register_map.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019/system/digital/register_map.json",
+      "exists": false
+    },
+    {
+      "rel": "regmap.json",
+      "abs": "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019/system/regmap.json",
+      "exists": false
+    }
+  ],
+  "state_digital_regmap_present": true,
+  "state_digital_regmap_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019/system/digital/digital_regmap.json",
+  "state_digital_register_map_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f3b3675e-a8d1-4137-9124-a21acf08f631/ee267d71-f9fa-4fa2-9e67-218d60eba019/system/digital/digital_regmap.json",
+  "state_digital_block_keys": [
+    "digital_regmap",
+    "regmap",
+    "digital_regmap_path",
+    "register_map_path",
+    "rtl_files",
+    "clock_intent"
+  ],
+  "selected_regmap_path": "state.digital_regmap",
+  "source_workflow_ids": [
+    "d431c47d-0843-4179-9a2e-d9d49d479eab"
+  ],
+  "upstream_regmap_type": "dict",
+  "passthrough_taken": true,
+  "normalization_taken": false,
+  "candidate_regs_count": 12,
+  "goal_present": true,
+  "toolchain_keys": [
+    "language",
+    "target_abi",
+    "target_cpu",
+    "target_isa",
+    "target_triple"
+  ],
+  "toggle_keys": [],
+  "mode": "artifact_passthrough",
+  "register_names_preview": [
+    "CONTROL",
+    "STATUS",
+    "SEQ_IN",
+    "AGE_LIMIT",
+    "VELOCITY_MPS",
+    "ACT_MIN",
+    "ACT_MAX",
+    "ACT_CMD",
+    "LAST_GOOD",
+    "TIMEOUT_CNT"
+  ]
+}

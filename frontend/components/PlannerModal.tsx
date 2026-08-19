@@ -64,7 +64,7 @@ export default function PlannerModal({ onClose, onBuildWorkflow }: PlannerModalP
 
   useEffect(() => {
     (async () => {
-      const id = await getStableUserId(supabase);
+      const id = await getStableUserId();
       setUserId(id);
     })();
   }, []);
@@ -233,7 +233,7 @@ export default function PlannerModal({ onClose, onBuildWorkflow }: PlannerModalP
 
   async function saveDesignIntent(continueToSystemPlanner: boolean) {
     const specText = consolidatedSpec.trim() ? consolidatedSpec : refreshConsolidatedSpec();
-    const effectiveUserId = userId || (await getStableUserId(supabase));
+    const effectiveUserId = userId || (await getStableUserId());
     const title = window.prompt("Enter a name for this Design Intent:", titleHint) || titleHint || "Untitled Design Intent";
     const structuredIntent = mergedInterpretation();
     const payload = {

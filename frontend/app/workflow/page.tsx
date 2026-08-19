@@ -673,17 +673,17 @@ function normalizeWorkflowConfigSchema(schema?: WorkflowConfigSchema | null): Wo
           label: String(field.label || field.key || "").trim(),
           type: field.type || "text",
           options: Array.isArray(field.options)
-            ? field.options.flatMap((option) => {
+            ? field.options.reduce<NonNullable<WorkflowConfigField["options"]>>((options, option) => {
                 if (typeof option === "string") {
                   const value = option.trim();
-                  return value ? [value] : [];
+                  if (value) options.push(value);
                 }
-                if (option && typeof option === "object") {
+                else if (option && typeof option === "object") {
                   const value = String(option.value || "").trim();
-                  return value ? [{ value, label: option.label, disabled: option.disabled }] : [];
+                  if (value) options.push({ value, label: option.label, disabled: option.disabled });
                 }
-                return [];
-              })
+                return options;
+              }, [])
             : [],
         }))
         .filter((field) => field.key && field.label)
@@ -1607,7 +1607,7 @@ function WorkflowPage() {
 
   // core state
   const [loop, setLoop] = useState<LoopKey>("digital");
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node<AgentNodeData>>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<AgentNodeData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>([]);
   const [autoConnectOnDrop, setAutoConnectOnDrop] = useState(true);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
@@ -1764,6 +1764,7 @@ type SystemPlannerIntent = {
 
   type RunRecord = {
     run_id: string;        // workflow_id returned by backend
+    workflow_id?: string;
     run_name: string;      // friendly name (Save-as prompt)
     created_at: string;    // ISO
   };
@@ -1804,7 +1805,7 @@ type SystemPlannerIntent = {
   
   const deleteCustomWorkflow = async (name: string) => {
     try {
-      const userId = await getStableUserId(supabase);  // unified ID
+      const userId = await getStableUserId();  // unified ID
 
       const res = await fetch(`${API_BASE}/delete_custom_workflow?name=${encodeURIComponent(name)}&user_id=${userId}`, {
         method: "DELETE"
@@ -1856,7 +1857,7 @@ type SystemPlannerIntent = {
       //  prev.map((n) => (n === renameTarget.oldName ? renameTarget.newName : n))
       //);
   
-      const userId = await getStableUserId(supabase);
+      const userId = await getStableUserId();
 
       // backend rename
       const res = await fetch(`${API_BASE}/rename_custom_workflow`, {
@@ -1882,7 +1883,7 @@ type SystemPlannerIntent = {
   };
   const publishCustomWorkflow = async (name: string) => {
     try {
-      const userId = await getStableUserId(supabase);  // unified ID
+      const userId = await getStableUserId();  // unified ID
 
       const res = await fetch(`${API_BASE}/publish_custom_workflow`, {
         method: "POST",
@@ -1926,7 +1927,7 @@ type SystemPlannerIntent = {
   const fetchValidationInstruments = async () => {
     setInstrumentLoadErr(null);
     try {
-      const userId = await getStableUserId(supabase);
+      const userId = await getStableUserId();
 
       const res = await fetch(`${API_BASE}/validation/instruments`, {
         headers: { "x-user-id": userId },
@@ -1947,7 +1948,7 @@ type SystemPlannerIntent = {
   
   const registerValidationInstrument = async () => {
     try {
-      const userId = await getStableUserId(supabase);
+      const userId = await getStableUserId();
 
       const res = await fetch(`${API_BASE}/validation/instruments/register`, {
         method: "POST",
@@ -2181,7 +2182,7 @@ type SystemPlannerIntent = {
   };
 
   const deleteCustomAgent = async (name: string) => {
-    const userId = await getStableUserId(supabase);  // unify ID
+    const userId = await getStableUserId();  // unify ID
 
     const agent = customAgents.find((item) => item.backendLabel === name);
     const res = agent?.id
@@ -2205,7 +2206,7 @@ type SystemPlannerIntent = {
   };
   const publishCustomAgent = async (name: string) => {
     try {
-      const userId = await getStableUserId(supabase);  // unified ID
+      const userId = await getStableUserId();  // unified ID
 
       const agent = customAgents.find((item) => item.backendLabel === name);
       const res = agent?.id
@@ -2277,7 +2278,7 @@ type SystemPlannerIntent = {
   const [selectedTestPlanId, setSelectedTestPlanId] = useState<string>("");
   const fetchValidationTestPlans = async () => {
     try {
-      const userId = await getStableUserId(supabase);
+      const userId = await getStableUserId();
   
       const resp = await fetch(`${API_BASE}/validation/test_plans?user_id=${userId}`);
       const json = await resp.json();
@@ -2370,7 +2371,7 @@ type SystemPlannerIntent = {
 
   // Load Saved Design Intents
   const loadIntents = async () => {
-    const stableId = await getStableUserId(supabase);
+    const stableId = await getStableUserId();
     const { data } = await supabase
       .from("design_intent_drafts")
       .select("*")
@@ -2953,7 +2954,7 @@ type SystemPlannerIntent = {
 
   const loadCustomWorkflowsFromDB = async () => {
 
-    const userId = await getStableUserId(supabase);
+    const userId = await getStableUserId();
     console.log("(CustomWork) Loading workflows for:", userId);
 
     const { data, error } = await supabase
@@ -3015,7 +3016,7 @@ type SystemPlannerIntent = {
   };
   const loadWorkflowFromDB = async (workflow: string | CustomWorkflowRow) => {
     try {
-      const userId = await getStableUserId(supabase);
+      const userId = await getStableUserId();
       const wfName = typeof workflow === "string" ? workflow : workflow.name;
       const wfId = typeof workflow === "string" ? undefined : workflow.id;
 
@@ -3175,7 +3176,7 @@ type SystemPlannerIntent = {
     }
     if (file) formData.append("file", file);
 
-    const userId = await getStableUserId(supabase); // or however you already do it in this file
+    const userId = await getStableUserId();
   
     // Step 4: attach selected instruments (validation only)
     if (instrumentIds?.length) {
@@ -3822,7 +3823,7 @@ type SystemPlannerIntent = {
             <h3 className="text-lg font-bold mb-3 text-white">Marketplace</h3>
   
             <button
-              onClick={() => setShowSubmitMarketplaceModal(true)}
+              onClick={() => alert("Marketplace submission is not available in this build.")}
               className="w-full text-left px-3 py-2 mb-1 rounded bg-cyan-500 hover:bg-cyan-400 text-white"
             >
               Submit for Review
@@ -3945,6 +3946,7 @@ type SystemPlannerIntent = {
             <button
               onClick={async () => {
                 const workflowName = prompt("Enter a name for this workflow:", `CanvasFlow_${new Date().toISOString().slice(0, 10)}`);
+                if (!workflowName?.trim()) return;
 
 
                 //const { data: sessionData } = await supabase.auth.getSession();
@@ -4060,7 +4062,7 @@ type SystemPlannerIntent = {
                   }`}
                   onClick={() => {
                     setSelectedRunId(r.run_id);
-                    setJobId(r.workflow_id); 
+                    setJobId(r.workflow_id || r.run_id);
                     setActiveTab("live");
                   }}
                 >

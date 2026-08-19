@@ -96,28 +96,6 @@ function MatchCard({
           Use
         </button>
       </div>
-      {showFactoryDryRun ? (
-        <AgentFactoryDryRunModal
-          initialRequest={{
-            name: plannedName,
-            natural_language_request: requestText,
-            loop_type: loopType,
-            domain: domain || loopType,
-            inputs: [],
-            outputs: plannerResult?.missing_capabilities?.length ? plannerResult.missing_capabilities : [currentMissing],
-            required_skills: plannerResult?.reusable_skills || [],
-            required_tools: plannerResult?.reusable_tools || [],
-            required_hooks: plannerResult?.reusable_hooks || [],
-            allow_extension: true,
-            force_create_private: true,
-          }}
-          onClose={() => setShowFactoryDryRun(false)}
-          onSaved={(agent) => {
-            setShowFactoryDryRun(false);
-            resolveWith(agent.agent_name || plannedName);
-          }}
-        />
-      ) : null}
     </div>
   );
 }
@@ -436,6 +414,28 @@ export default function MissingAgentsResolverModal({
           </section>
         </div>
       </div>
+      {showFactoryDryRun ? (
+        <AgentFactoryDryRunModal
+          initialRequest={{
+            name: plannedName,
+            natural_language_request: requestText,
+            loop_type: loopType,
+            domain: domain || loopType,
+            inputs: [],
+            outputs: plannerResult?.missing_capabilities?.length ? plannerResult.missing_capabilities : [currentMissing],
+            required_skills: plannerResult?.reusable_skills || [],
+            required_tools: plannerResult?.reusable_tools || [],
+            required_hooks: plannerResult?.reusable_hooks || [],
+            allow_extension: true,
+            force_create_private: true,
+          }}
+          onClose={() => setShowFactoryDryRun(false)}
+          onSaved={(agent) => {
+            setShowFactoryDryRun(false);
+            resolveWith(agent.agent_name || plannedName);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

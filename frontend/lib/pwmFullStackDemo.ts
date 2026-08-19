@@ -886,7 +886,7 @@ export const SAFETY_PRODUCT_INTENT = `Build a simulator-backed safety fault mana
 The dashboard should let a user configure watchdog timeout, feed heartbeat, inject faults, view latched faults, safety IRQ, reset request, escalation level, reset count, and run safety fault/recovery scenarios.`;
 
 export type DesignChainContext = {
-  demoKind?: "pwm" | "uart_packet" | "image_dma" | "mbist_sram" | "sensor_hub" | "secure_boot" | "safety_fault" | "temp_monitor_system";
+  demoKind?: "pwm" | "uart_packet" | "image_dma" | "mbist_sram" | "sram_mbist" | "sensor_hub" | "secure_boot" | "safety_fault" | "temp_monitor_system";
   arch2rtlWorkflowId?: string;
   arch2rtlRunId?: string;
   systemRtlWorkflowId?: string;

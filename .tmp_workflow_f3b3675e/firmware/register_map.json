@@ -1,0 +1,314 @@
+{
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem",
+  "base_address": "0x00000000",
+  "bus": "CUSTOM",
+  "registers": [
+    {
+      "name": "CONTROL",
+      "offset": "0x00000000",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Firmware control register for enabling command processing, clearing sticky faults, arming safe fallback, optionally bypassing output hold, and selecting a compact policy mode.",
+      "fields": [
+        {
+          "name": "ENABLE",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Enable command processing and command acceptance."
+        },
+        {
+          "name": "CLEAR_FAULTS",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Write-one pulse to clear sticky faults and event flags."
+        },
+        {
+          "name": "ARM_SAFE_FALLBACK",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Arm safe fallback operation."
+        },
+        {
+          "name": "BYPASS_OUTPUT_HOLD",
+          "bit_offset": 3,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Bypass output hold policy when explicitly enabled by firmware."
+        },
+        {
+          "name": "MODE",
+          "bit_offset": 4,
+          "bit_width": 4,
+          "access": "RW",
+          "description": "Compact operation mode selector."
+        },
+        {
+          "name": "RESERVED",
+          "bit_offset": 8,
+          "bit_width": 24,
+          "access": "RO",
+          "description": "Reserved; reads as zero."
+        }
+      ]
+    },
+    {
+      "name": "STATUS",
+      "offset": "0x00000004",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Live and sticky status bits reflecting command processing, faults, and interrupt state.",
+      "fields": [
+        {
+          "name": "BUSY",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Control core is processing or holding a command."
+        },
+        {
+          "name": "COMMAND_ACCEPTED",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Last command was accepted."
+        },
+        {
+          "name": "STALE_REJECTED",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Last command was rejected as stale."
+        },
+        {
+          "name": "TIMEOUT_FAULT",
+          "bit_offset": 3,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Timeout or communication-loss fault active."
+        },
+        {
+          "name": "INVALID_INPUT",
+          "bit_offset": 4,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Velocity or policy input was invalid."
+        },
+        {
+          "name": "CLAMP_APPLIED",
+          "bit_offset": 5,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "One or more actuator fields were clamped."
+        },
+        {
+          "name": "SAFE_FALLBACK_ACTIVE",
+          "bit_offset": 6,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Safe fallback output is active."
+        },
+        {
+          "name": "IRQ_PENDING",
+          "bit_offset": 7,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "IRQ is pending and awaiting acknowledgement."
+        },
+        {
+          "name": "RESERVED",
+          "bit_offset": 8,
+          "bit_width": 24,
+          "access": "RO",
+          "description": "Reserved; reads as zero."
+        }
+      ]
+    },
+    {
+      "name": "SEQ_IN",
+      "offset": "0x00000008",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Command sequence number written by firmware.",
+      "fields": [
+        {
+          "name": "SEQUENCE_NUMBER",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Command sequence number written by firmware."
+        }
+      ]
+    },
+    {
+      "name": "AGE_LIMIT",
+      "offset": "0x0000000C",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Maximum accepted command age in cycles.",
+      "fields": [
+        {
+          "name": "MAX_AGE_CYCLES",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Maximum accepted command age in cycles."
+        }
+      ]
+    },
+    {
+      "name": "VELOCITY_MPS",
+      "offset": "0x00000010",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Fixed-point compact representation of stream velocity for the 20-55 m/s envelope.",
+      "fields": [
+        {
+          "name": "VELOCITY_FIXED_POINT",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Fixed-point compact representation of stream velocity for the 20-55 m/s envelope."
+        }
+      ]
+    },
+    {
+      "name": "ACT_MIN",
+      "offset": "0x00000014",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Packed per-actuator minimum limit.",
+      "fields": [
+        {
+          "name": "PACKED_MINIMUM",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Packed per-actuator minimum limit."
+        }
+      ]
+    },
+    {
+      "name": "ACT_MAX",
+      "offset": "0x00000018",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Packed per-actuator maximum limit.",
+      "fields": [
+        {
+          "name": "PACKED_MAXIMUM",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Packed per-actuator maximum limit."
+        }
+      ]
+    },
+    {
+      "name": "ACT_CMD",
+      "offset": "0x0000001C",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Packed actuator target command from firmware or CPU-side policy.",
+      "fields": [
+        {
+          "name": "PACKED_TARGET_COMMAND",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Packed actuator target command from firmware or CPU-side policy."
+        }
+      ]
+    },
+    {
+      "name": "LAST_GOOD",
+      "offset": "0x00000020",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Read-only last accepted packed actuator command.",
+      "fields": [
+        {
+          "name": "PACKED_LAST_ACCEPTED_COMMAND",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RO",
+          "description": "Last accepted packed actuator command."
+        }
+      ]
+    },
+    {
+      "name": "TIMEOUT_CNT",
+      "offset": "0x00000024",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Current stale/timeout age counter.",
+      "fields": [
+        {
+          "name": "CURRENT_TIMEOUT_AGE",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RO",
+          "description": "Current stale/timeout age counter."
+        }
+      ]
+    },
+    {
+      "name": "FAULT_CAUSE",
+      "offset": "0x00000028",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Sticky fault cause bits.",
+      "fields": [
+        {
+          "name": "STICKY_FAULT_BITS",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RO",
+          "description": "Sticky fault cause bits."
+        }
+      ]
+    },
+    {
+      "name": "IRQ_ACK",
+      "offset": "0x0000002C",
+      "address": null,
+      "access": "WO",
+      "reset": "0x00000000",
+      "description": "Write-one-to-clear interrupt and sticky event flags.",
+      "fields": [
+        {
+          "name": "ACKNOWLEDGE",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "WO",
+          "description": "Write-one-to-clear interrupt and sticky event flags."
+        },
+        {
+          "name": "RESERVED",
+          "bit_offset": 1,
+          "bit_width": 31,
+          "access": "WO",
+          "description": "Reserved; write ignored."
+        }
+      ]
+    }
+  ],
+  "__source": {
+    "mode": "artifact_passthrough",
+    "path": "state.digital_regmap"
+  }
+}
