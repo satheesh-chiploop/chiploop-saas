@@ -1,0 +1,19 @@
+{
+  "agent": "Embedded Rust Register Layer Generator Agent",
+  "phase": "hal_generate",
+  "hal_path": "firmware/hal/registers.rs",
+  "register_count": 10,
+  "register_names": [
+    "CTRL",
+    "VELOCITY_SETPOINT",
+    "CLAMP_MIN",
+    "CLAMP_MAX",
+    "TIMEOUT_THRESHOLD",
+    "SEQUENCE_COUNTER",
+    "FAULT_CLEAR_W1C",
+    "STATUS",
+    "ACTUATOR_CMD",
+    "IRQ_STATUS"
+  ],
+  "base_address": "0x00000000"
+}

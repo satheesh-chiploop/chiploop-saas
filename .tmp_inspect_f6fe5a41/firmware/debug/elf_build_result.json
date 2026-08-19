@@ -1,0 +1,41 @@
+{
+  "agent": "Embedded ELF Build Agent",
+  "workflow_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system",
+  "cwd_used_for_build": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/build",
+  "target_triple": "riscv32imc-unknown-none-elf",
+  "bin_name": "firmware_app",
+  "cargo_workspace_dir": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/build",
+  "cargo_workspace_dir_exists": true,
+  "cargo_target_abs": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/build/target/riscv32imc-unknown-none-elf/release/firmware_app",
+  "canonical_elf_relpath": "firmware/build/target/riscv32imc-unknown-none-elf/release/firmware_app.elf",
+  "required_srcs_abs": [
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/src/main.rs",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/src/panic.rs",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/src/hal/mod.rs",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/build/Cargo.toml",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/build/.cargo/config.toml"
+  ],
+  "required_srcs_exists": {
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/src/main.rs": true,
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/src/panic.rs": true,
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/src/hal/mod.rs": true,
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/build/Cargo.toml": true,
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/build/.cargo/config.toml": true
+  },
+  "optional_srcs_abs": [
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/hal/registers.rs",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/drivers/driver_scaffold.rs",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/diagnostics/register_dump.rs"
+  ],
+  "optional_srcs_exists": {
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/hal/registers.rs": true,
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/drivers/driver_scaffold.rs": true,
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/diagnostics/register_dump.rs": false
+  },
+  "workspace_generated": true,
+  "build_attempted": true,
+  "build_succeeded": false,
+  "elf_exists": false,
+  "stdout_tail": "",
+  "stderr_tail": "   Compiling firmware_workspace v0.1.0 (/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/f6fe5a41-e79f-4751-97f1-35015474924c/20f74d1b-9303-4f3a-97e7-f92bbd8121b0/system/firmware/build)\nerror[E0463]: can't find crate for `core`\n  |\n  = note: the `riscv32imc-unknown-none-elf` target may not be installed\n  = help: consider downloading the target with `rustup target add riscv32imc-unknown-none-elf`\n\nFor more information about this error, try `rustc --explain E0463`.\nerror: could not compile `firmware_workspace` (bin \"firmware_app\") due to 1 previous error\n\nAutomatic target provisioning was required but rustup was not found. Preinstall Rust target 'riscv32imc-unknown-none-elf' in the execution image.\n"
+}

@@ -1,0 +1,309 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "custom",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 32,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Firmware-visible control register. Provides global enable, arm, mode selection, and interrupt enable masking through Wishbone decode.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Global enable for request issuance, safety authorization, and command propagation."
+          },
+          {
+            "name": "ARM",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Arm bit required before request emission and actuator command validity may be asserted."
+          },
+          {
+            "name": "MODE",
+            "lsb": 2,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "Operating mode selection used as request metadata."
+          },
+          {
+            "name": "IRQ_ENABLE",
+            "lsb": 4,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Interrupt enable mask for response-ready, stale-data, timeout, and fault causes."
+          }
+        ]
+      },
+      {
+        "name": "VELOCITY_SETPOINT",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Requested velocity setpoint used by the request formatter as compact command metadata.",
+        "fields": [
+          {
+            "name": "VELOCITY_SETPOINT",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Velocity setpoint in firmware-defined units."
+          }
+        ]
+      },
+      {
+        "name": "CLAMP_MIN",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Minimum actuator clamp for saturating the registered actuator command.",
+        "fields": [
+          {
+            "name": "CLAMP_MIN",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Lower bound for actuator command clamping."
+          }
+        ]
+      },
+      {
+        "name": "CLAMP_MAX",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Maximum actuator clamp for saturating the registered actuator command.",
+        "fields": [
+          {
+            "name": "CLAMP_MAX",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 2147483647,
+            "description": "Upper bound for actuator command clamping."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Bounded timeout threshold used by deterministic stale and missing-response supervision.",
+        "fields": [
+          {
+            "name": "TIMEOUT_THRESHOLD",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum allowed local tick age before timeout is asserted."
+          }
+        ]
+      },
+      {
+        "name": "SEQUENCE_COUNTER",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Firmware-maintained request sequence number used for request metadata and response validation.",
+        "fields": [
+          {
+            "name": "SEQUENCE_COUNTER",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Sequence number written by firmware and consumed by request formatting and supervision."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_CLEAR_W1C",
+        "offset": "0x18",
+        "access": "WO",
+        "description": "Write-one-to-clear fault register. Each written one clears the corresponding sticky fault bit; zero leaves the bit unchanged.",
+        "fields": [
+          {
+            "name": "FAULT_CLEAR_W1C",
+            "lsb": 0,
+            "msb": 7,
+            "access": "W1C",
+            "reset": 0,
+            "description": "Sticky-fault clear mask."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x1C",
+        "access": "RO",
+        "description": "Readable status register exposing sticky faults, response-ready, freshness, stale, timeout, and last seen sequence.",
+        "fields": [
+          {
+            "name": "FAULT_STICKY",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky fault summary, latched until reset or write-one-to-clear."
+          },
+          {
+            "name": "RESPONSE_READY",
+            "lsb": 8,
+            "msb": 8,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates that a response packet was accepted and decoded."
+          },
+          {
+            "name": "FRESH",
+            "lsb": 9,
+            "msb": 9,
+            "access": "RO",
+            "reset": 0,
+            "description": "Freshness indication from the response/safety supervision path."
+          },
+          {
+            "name": "STALE",
+            "lsb": 10,
+            "msb": 10,
+            "access": "RO",
+            "reset": 0,
+            "description": "Stale-data indication from deterministic supervision."
+          },
+          {
+            "name": "TIMEOUT",
+            "lsb": 11,
+            "msb": 11,
+            "access": "RO",
+            "reset": 0,
+            "description": "Timeout indication from deterministic supervision."
+          },
+          {
+            "name": "LAST_SEEN_SEQUENCE",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Last accepted response sequence observed by the safety supervisor."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_CMD",
+        "offset": "0x20",
+        "access": "RO",
+        "description": "Registered actuator command output as observed by firmware.",
+        "fields": [
+          {
+            "name": "ACTUATOR_CMD",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Registered 32-bit actuator command value after clamp and safety gating."
+          }
+        ]
+      },
+      {
+        "name": "IRQ_STATUS",
+        "offset": "0x24",
+        "access": "RO",
+        "description": "Interrupt cause summary register.",
+        "fields": [
+          {
+            "name": "RESPONSE_READY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Interrupt cause for response-ready event."
+          },
+          {
+            "name": "STALE",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Interrupt cause for stale-data detection."
+          },
+          {
+            "name": "TIMEOUT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Interrupt cause for timeout detection."
+          },
+          {
+            "name": "FAULT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Interrupt cause for sticky fault transition or assertion."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "RESPONSE_READY",
+        "description": "Asserted on response-ready events after compact response acceptance and decode."
+      },
+      {
+        "name": "STALE_DATA",
+        "description": "Asserted when deterministic supervision detects stale or repeated response conditions."
+      },
+      {
+        "name": "TIMEOUT",
+        "description": "Asserted when the programmed timeout threshold is exceeded without a fresh qualifying response."
+      },
+      {
+        "name": "FAULT",
+        "description": "Asserted on sticky fault transitions and maintained for software-visible handling."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Assert reset and wait for synchronous release.",
+      "Program CLAMP_MIN and CLAMP_MAX limits.",
+      "Program TIMEOUT_THRESHOLD and SEQUENCE_COUNTER.",
+      "Clear any pre-existing sticky faults with FAULT_CLEAR_W1C.",
+      "Program CTRL.MODE and IRQ_ENABLE as required.",
+      "Set CTRL.ENABLE, then set CTRL.ARM to begin request issuance."
+    ],
+    "polling_sequence": [
+      "Read STATUS until RESPONSE_READY, STALE, TIMEOUT, or FAULT changes require servicing.",
+      "Read ACTUATOR_CMD for the last registered command value when needed by firmware.",
+      "Read IRQ_STATUS to identify the interrupt cause(s).",
+      "If a fault is present, write FAULT_CLEAR_W1C with the corresponding one bits after software analysis."
+    ],
+    "irq_sequence": [
+      "On IRQ, read IRQ_STATUS and STATUS.",
+      "If RESPONSE_READY is set, consume the accepted-response event and process actuator state.",
+      "If STALE or TIMEOUT is set, treat the system as inhibited and service the supervision fault path.",
+      "If FAULT is set, clear using FAULT_CLEAR_W1C only after logging and recovery action."
+    ]
+  },
+  "consistency_notes": [
+    "The register map is Wishbone-compatible and firmware-visible through the declared CSR/MMIO block.",
+    "All registers named here are reachable through RTL decode and match DIGITAL_SPEC_JSON.",
+    "No fallback command, fallback controller, fallback status, or fallback-on-reset behavior is introduced.",
+    "Field ordering uses lsb <= msb and widths fit within the 32-bit data bus.",
+    "The streaming request and response ports coexist with this CSR/MMIO interface and do not replace it."
+  ]
+}
