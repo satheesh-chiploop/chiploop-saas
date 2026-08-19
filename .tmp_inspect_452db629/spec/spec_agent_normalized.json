@@ -1,0 +1,1482 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level synthesizable integration wrapper providing Wishbone CSR/MMIO registers, external model request/response stream interfaces, response validation, watchdog and fault management, and actuator command clamping for active aerodynamics. The top does not instantiate or implement the surrogate model itself; it only packages requests for external firmware/host execution and accepts bounded responses over a streaming interface.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "wb_adr_i",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "wb_dat_i",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "wb_dat_o",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "wb_sel_i",
+          "direction": "input",
+          "width": 4
+        },
+        {
+          "name": "wb_we_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_stb_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_cyc_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_ack_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "wb_err_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "wb_stall_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_req_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_req_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_req_payload",
+          "direction": "output",
+          "width": 128
+        },
+        {
+          "name": "model_rsp_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "model_rsp_payload",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "surface_cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "surface_cmd_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "surface_cmd_position",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "surface_cmd_rate",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "surface_cmd_mode",
+          "direction": "output",
+          "width": 2
+        },
+        {
+          "name": "irq_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "cpu_enable_in",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "external_fault_i",
+          "direction": "input",
+          "width": 1
+        }
+      ],
+      "functionality": "Implements the complete control wrapper for an active-aerodynamics application contract. The module decodes firmware-visible Wishbone CSRs for enable, mode, sequence/request control, timeout threshold, programmable clamp bounds, hold-last-safe configuration, and fault status. It packetizes bounded model requests into a 128-bit stream payload, accepts bounded model responses from an external service, validates request_id, model_version, and checksum/CRC metadata, detects stale or duplicate responses, tracks age against a timeout threshold, and generates one-cycle interrupts on valid response acceptance, timeout, or fault-state changes. It computes actuator commands only from validated response data and configuration state, clamps outputs within hard-coded RTL safety bounds and programmable limits, and inhibits output validity when disabled, timed out, stale, malformed, duplicated, or externally faulted. The design preserves the CPU contract by exposing a real Wishbone MMIO interface and does not invent a hardware streaming transport for the surrogate model beyond the bounded request/response handshake.",
+      "responsibilities": [
+        "Expose a firmware-visible Wishbone CSR/MMIO register bank with 32-bit accessible fields.",
+        "Generate bounded model request frames from CPU-programmed control state and command metadata.",
+        "Accept bounded model response frames through a valid/ready stream and validate them against outstanding request context.",
+        "Maintain request sequence, outstanding request tracking, age counter, timeout detection, and duplicate-response rejection.",
+        "Latch faults and generate a single-cycle interrupt for accepted response, timeout, or fault-state transitions.",
+        "Clamp actuator command outputs to safe bounds and inhibit actuator validity on any invalid, stale, timeout, reset, disabled, or fault condition.",
+        "Provide discrete/fixed-point actuator outputs suitable for active-aerodynamics surfaces without exposing any large tensor payloads at top level."
+      ],
+      "must_drive": [
+        "wb_dat_o",
+        "wb_ack_o",
+        "wb_err_o",
+        "wb_stall_o",
+        "model_req_valid",
+        "model_req_payload",
+        "model_rsp_ready",
+        "surface_cmd_valid",
+        "surface_cmd_position",
+        "surface_cmd_rate",
+        "surface_cmd_mode",
+        "irq_o"
+      ],
+      "must_receive": [
+        "clk",
+        "reset_n",
+        "wb_adr_i",
+        "wb_dat_i",
+        "wb_sel_i",
+        "wb_we_i",
+        "wb_stb_i",
+        "wb_cyc_i",
+        "model_req_ready",
+        "model_rsp_valid",
+        "model_rsp_payload",
+        "surface_cmd_ready",
+        "cpu_enable_in",
+        "external_fault_i"
+      ],
+      "must_not_drive": [
+        "model_req_ready",
+        "model_rsp_valid",
+        "model_rsp_payload",
+        "surface_cmd_ready",
+        "cpu_enable_in",
+        "external_fault_i"
+      ],
+      "reset_behavior": "On reset, all outputs are driven to inactive or safe values, outstanding request tracking is cleared, fault status is asserted/latched as appropriate for software visibility, actuator output validity is deasserted, and the design awaits firmware enable and a fresh request before issuing commands. No command replacement is performed on reset; outputs remain invalid until validated control is available.",
+      "behavior_rules": [
+        "Wishbone accesses shall be acknowledged with standard valid/ready semantics; only implemented CSR addresses may be decoded.",
+        "Register fields shall include enable, mode select, request sequence number, timeout threshold, clamp min/max, hold-last-safe configuration, and fault status; all are 32-bit accessible.",
+        "The request packetizer shall emit a request frame only after firmware enables the controller and presents a new command context.",
+        "model_req_payload and model_rsp_payload widths shall not exceed 128 bits and shall contain only compact metadata and bounded scalar descriptors.",
+        "The response depacketizer shall reject mismatched request_id, mismatched model_version, malformed integrity fields, duplicate responses, and late responses arriving after timeout.",
+        "The stale-data monitor shall start on request issue and assert timeout when age exceeds the configured threshold.",
+        "The safety monitor shall prioritize disable, timeout, invalid response, and external fault over nominal control update.",
+        "Actuator command outputs shall be clamped within hard-coded RTL safety bounds and programmable bounds; if rate limiting is implemented, rate of change shall also be clamped.",
+        "When invalid, stale, timeout, reset, disabled, or faulted, actuator output validity shall be deasserted and the last safe command shall not be silently substituted as a new valid command.",
+        "A single-cycle interrupt shall be generated on valid response acceptance, timeout occurrence, or fault-state change.",
+        "Any software-visible register or field must be reachable via RTL decode; inaccessible state shall not be described as software-visible."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "adaptive_aero_control_csr",
+        "description": "Wishbone-accessible control/status register block implementing the firmware-visible MMIO contract for enable, mode, request sequencing, timeout threshold, clamp limits, hold-last-safe configuration, and latched fault status. This module decodes register reads/writes and exposes explicit semantic configuration and status outputs used by downstream control logic.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "wb_adr_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_sel_i",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "wb_we_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_stb_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_cyc_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_ack_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_err_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_stall_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_mode_select",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "cfg_request_seq",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_timeout_threshold",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_clamp_min",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_clamp_max",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_hold_last_safe",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_fault_latched",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_fault_code",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_fault_status_update",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Provides the MMIO register bank for the soft CPU. It implements register decode, byte enables, readback, write strobe acceptance, and exports only explicit semantic configuration/control/status signals needed by the aero controller. No bulk payload storage is present; all stored state is confined to small registers and flip-flops.",
+        "responsibilities": [
+          "Decode Wishbone transactions into implemented control/status register fields.",
+          "Expose enable, mode, request sequence, timeout threshold, clamp min/max, and hold-last-safe configuration.",
+          "Accept latched fault status and fault code from control/safety logic for readback.",
+          "Provide coherent 32-bit read data and standard Wishbone acknowledge/stall behavior."
+        ],
+        "must_drive": [
+          "wb_dat_o",
+          "wb_ack_o",
+          "wb_err_o",
+          "wb_stall_o",
+          "cfg_enable",
+          "cfg_mode_select",
+          "cfg_request_seq",
+          "cfg_timeout_threshold",
+          "cfg_clamp_min",
+          "cfg_clamp_max",
+          "cfg_hold_last_safe"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "wb_adr_i",
+          "wb_dat_i",
+          "wb_sel_i",
+          "wb_we_i",
+          "wb_stb_i",
+          "wb_cyc_i",
+          "cfg_fault_latched",
+          "cfg_fault_code",
+          "cfg_fault_status_update"
+        ],
+        "must_not_drive": [
+          "cfg_fault_latched",
+          "cfg_fault_code",
+          "cfg_fault_status_update"
+        ],
+        "reset_behavior": "Registers reset to safe defaults: enable low, mode default, request sequence cleared, timeout threshold set to a conservative nonzero value, clamp range set to safe hard bounds, hold-last-safe configuration cleared or defaulted per policy, and readback status cleared.",
+        "behavior_rules": [
+          "All registers are 32-bit accessible and reachable via RTL decode.",
+          "Write protection may be applied to reserved bits; reserved bits read as zero.",
+          "The module must not create inaccessible software-visible state.",
+          "Fault status inputs are only sampled for readback/status shadowing and do not create hidden command generation paths.",
+          "WISHBONE responses shall be timely and deterministic for implemented addresses."
+        ],
+        "rtl_output_file": "adaptive_aero_control_csr.v"
+      },
+      {
+        "name": "adaptive_aero_control_packetizer",
+        "description": "Packages compact bounded request frames for external surrogate evaluation and decodes compact response frames received from the external service. The module does not implement the surrogate model; it only manages request/response framing, integrity metadata, and validation against outstanding command context.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_mode_select",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "cfg_request_seq",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_timeout_threshold",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "request_issue",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_cancel",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_id",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "geometry_handle",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "geometry_crc",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "reference_geometry_id",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "stream_velocity_mps",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "model_version",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "model_req_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "model_req_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_req_payload",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "model_rsp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "model_rsp_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "model_rsp_payload",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "rsp_accepted",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "rsp_rejected",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "rsp_validated_request_id",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "rsp_validated_model_version",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "rsp_drag_force_est",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "rsp_lift_force_est",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "rsp_status_flags",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "rsp_crc_ok",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "timeout_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "invalid_response_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "duplicate_response_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "external_fault_i",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Generates a compact 128-bit request payload containing request_id, geometry descriptor handles, flow-condition scalar values, model_version, and integrity metadata. Accepts a compact 128-bit response payload and validates request_id, model_version, optional checksum/CRC, and response freshness. It asserts validated outputs only on passing checks and rejects duplicate, malformed, or stale responses. Request and response handling are bounded and handshake-based, with model_req_valid held until model_req_ready or canceled by safety logic.",
+        "responsibilities": [
+          "Build request frames from explicit semantic inputs only.",
+          "Hold request valid until accepted or canceled.",
+          "Validate response frames against outstanding request context and integrity checks.",
+          "Report accepted/rejected response status and validated scalar outputs for downstream control.",
+          "Detect timeout, invalid response, and duplicate response conditions.",
+          "Constrain all payloads to 128 bits or less."
+        ],
+        "must_drive": [
+          "model_req_valid",
+          "model_req_payload",
+          "model_rsp_ready",
+          "rsp_accepted",
+          "rsp_rejected",
+          "rsp_validated_request_id",
+          "rsp_validated_model_version",
+          "rsp_drag_force_est",
+          "rsp_lift_force_est",
+          "rsp_status_flags",
+          "rsp_crc_ok",
+          "timeout_fault",
+          "invalid_response_fault",
+          "duplicate_response_fault"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_enable",
+          "cfg_mode_select",
+          "cfg_request_seq",
+          "cfg_timeout_threshold",
+          "request_issue",
+          "request_cancel",
+          "request_id",
+          "geometry_handle",
+          "geometry_crc",
+          "reference_geometry_id",
+          "stream_velocity_mps",
+          "model_version",
+          "model_req_ready",
+          "model_rsp_valid",
+          "model_rsp_payload",
+          "external_fault_i"
+        ],
+        "must_not_drive": [
+          "request_issue",
+          "request_cancel",
+          "request_id",
+          "geometry_handle",
+          "geometry_crc",
+          "reference_geometry_id",
+          "stream_velocity_mps",
+          "model_version",
+          "model_req_ready",
+          "model_rsp_valid",
+          "model_rsp_payload",
+          "external_fault_i"
+        ],
+        "reset_behavior": "On reset, request/response handshake outputs are deasserted, outstanding request context is cleared, validation outputs are invalid, and fault indicators are cleared or held as specified by the safety control path.",
+        "behavior_rules": [
+          "Request issuance shall only occur when enabled and when not canceled by safety logic.",
+          "The request payload shall be compact and bounded to 128 bits maximum.",
+          "The response payload shall be compact and bounded to 128 bits maximum.",
+          "A response with mismatched request_id or model_version shall be rejected.",
+          "Optional CRC/checksum fields shall be verified when present in the payload encoding.",
+          "Late responses after timeout shall be rejected and must not update validated outputs.",
+          "Duplicate responses for an already consumed request_id shall be rejected.",
+          "No large arrays or hidden payload buffers are permitted in this module."
+        ],
+        "rtl_output_file": "adaptive_aero_control_packetizer.v"
+      },
+      {
+        "name": "adaptive_aero_control_safety",
+        "description": "Combines timeout, invalid response, duplicate response, CPU disable, and external fault inputs into a latched safety state and a monotonic command inhibit decision. It also provides interrupt event pulse generation for validated response acceptance, timeout, and fault-state changes.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_hold_last_safe",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timeout_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "invalid_response_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "duplicate_response_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cpu_enable_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "external_fault_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rsp_accepted",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fault_latched",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "fault_code",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "fault_state_changed_pulse",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "irq_pulse",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "safe_output_inhibit",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "valid_response_pulse",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements the safety monitor and event generation. Any timeout, invalid response, duplicate response, disabled controller, CPU disable, or external fault causes command inhibition and latching of fault state for software handling. Interrupt pulse generation is single-cycle and occurs on accepted responses, timeout events, or fault-state changes.",
+        "responsibilities": [
+          "Latch fault state until cleared by software or a qualified safe condition.",
+          "Prioritize safety inhibit over nominal command generation.",
+          "Generate a one-cycle interrupt pulse on valid response acceptance, timeout, or fault-state change.",
+          "Provide a compact fault code for CSR/status readback.",
+          "Implement monotonic safety priority: inhibit dominates all nominal actions."
+        ],
+        "must_drive": [
+          "fault_latched",
+          "fault_code",
+          "fault_state_changed_pulse",
+          "irq_pulse",
+          "safe_output_inhibit",
+          "valid_response_pulse"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_enable",
+          "cfg_hold_last_safe",
+          "timeout_fault",
+          "invalid_response_fault",
+          "duplicate_response_fault",
+          "cpu_enable_in",
+          "external_fault_i",
+          "rsp_accepted"
+        ],
+        "must_not_drive": [
+          "cfg_enable",
+          "cfg_hold_last_safe",
+          "timeout_fault",
+          "invalid_response_fault",
+          "duplicate_response_fault",
+          "cpu_enable_in",
+          "external_fault_i",
+          "rsp_accepted"
+        ],
+        "reset_behavior": "On reset, safety inhibit is asserted, fault state is cleared or set to the defined reset-safe status, fault code is cleared, and no interrupt pulses are generated.",
+        "behavior_rules": [
+          "Safety inhibit has priority over command application and clamp logic.",
+          "Any fault-state transition shall generate a single-cycle event pulse.",
+          "The safety path shall not silently substitute an alternate command; it only inhibits or permits nominal outputs.",
+          "If configured to hold last safe output, the controller may retain a previously valid command internally, but validity must remain deasserted while inhibited.",
+          "Interrupt generation must be pulse-based and single-cycle."
+        ],
+        "rtl_output_file": "adaptive_aero_control_safety.v"
+      },
+      {
+        "name": "adaptive_aero_control_actuator",
+        "description": "Applies clamping and command formatting for active-aerodynamics surfaces. It consumes validated response-derived command intents and safety inhibit indications, then outputs discrete/fixed-point actuator commands and validity. No large arrays or physical model logic are implemented here.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_clamp_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_clamp_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_mode_select",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "safe_output_inhibit",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rsp_accepted",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rsp_drag_force_est",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_lift_force_est",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_status_flags",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "surface_cmd_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "surface_cmd_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "surface_cmd_position",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "surface_cmd_rate",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "surface_cmd_mode",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "command_applied_pulse",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Converts validated response estimates into bounded actuator position/rate commands for active-aerodynamics surfaces. Clamping is applied against hard-coded RTL safety bounds and programmable configuration bounds. If safety inhibit is asserted or enable is deasserted, output validity is deasserted and no new command is marked valid. This module does not implement fallback replacement behavior; it only inhibits or emits validated commands.",
+        "responsibilities": [
+          "Translate validated response estimates into fixed-point actuator command fields.",
+          "Clamp absolute command position to safe bounds.",
+          "Clamp rate of change if rate-limiting mode is selected.",
+          "Deassert validity when disabled or inhibited.",
+          "Generate a command-applied pulse when a valid command is accepted by the downstream actuator interface."
+        ],
+        "must_drive": [
+          "surface_cmd_valid",
+          "surface_cmd_position",
+          "surface_cmd_rate",
+          "surface_cmd_mode",
+          "command_applied_pulse"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cfg_clamp_min",
+          "cfg_clamp_max",
+          "cfg_enable",
+          "cfg_mode_select",
+          "safe_output_inhibit",
+          "rsp_accepted",
+          "rsp_drag_force_est",
+          "rsp_lift_force_est",
+          "rsp_status_flags",
+          "surface_cmd_ready"
+        ],
+        "must_not_drive": [
+          "cfg_clamp_min",
+          "cfg_clamp_max",
+          "cfg_enable",
+          "cfg_mode_select",
+          "safe_output_inhibit",
+          "rsp_accepted",
+          "rsp_drag_force_est",
+          "rsp_lift_force_est",
+          "rsp_status_flags",
+          "surface_cmd_ready"
+        ],
+        "reset_behavior": "On reset, actuator outputs are invalid and driven to safe inactive values, command pulses are cleared, and no command is considered applied.",
+        "behavior_rules": [
+          "Clamp limits are programmable but constrained by hard-coded safety bounds in RTL.",
+          "If rate limiting is enabled by mode selection, the rate field shall also be bounded.",
+          "When inhibited, the module must not silently replace commands; it only deasserts validity.",
+          "Validated command generation may only occur after response acceptance and only when not safety-inhibited.",
+          "Output validity must be monotonic with respect to safety inhibit: if inhibited, valid must be low."
+        ],
+        "rtl_output_file": "adaptive_aero_control_actuator.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_control_csr.clk",
+        "adaptive_aero_control_packetizer.clk",
+        "adaptive_aero_control_safety.clk",
+        "adaptive_aero_control_actuator.clk"
+      ],
+      "description": "System clock fanout to all synchronous submodules."
+    },
+    {
+      "top_port": "reset_n",
+      "connected_to": [
+        "adaptive_aero_control_csr.reset_n",
+        "adaptive_aero_control_packetizer.reset_n",
+        "adaptive_aero_control_safety.reset_n",
+        "adaptive_aero_control_actuator.reset_n"
+      ],
+      "description": "Active-low synchronous reset fanout to all submodules."
+    },
+    {
+      "top_port": "wb_adr_i",
+      "connected_to": [
+        "adaptive_aero_control_csr.wb_adr_i"
+      ],
+      "description": "Wishbone address bus into the CSR block."
+    },
+    {
+      "top_port": "wb_dat_i",
+      "connected_to": [
+        "adaptive_aero_control_csr.wb_dat_i"
+      ],
+      "description": "Wishbone write-data bus into the CSR block."
+    },
+    {
+      "top_port": "wb_dat_o",
+      "connected_to": [
+        "adaptive_aero_control_csr.wb_dat_o"
+      ],
+      "description": "Wishbone read-data bus from the CSR block."
+    },
+    {
+      "top_port": "wb_sel_i",
+      "connected_to": [
+        "adaptive_aero_control_csr.wb_sel_i"
+      ],
+      "description": "Wishbone byte enables into the CSR block."
+    },
+    {
+      "top_port": "wb_we_i",
+      "connected_to": [
+        "adaptive_aero_control_csr.wb_we_i"
+      ],
+      "description": "Wishbone write enable into the CSR block."
+    },
+    {
+      "top_port": "wb_stb_i",
+      "connected_to": [
+        "adaptive_aero_control_csr.wb_stb_i"
+      ],
+      "description": "Wishbone strobe into the CSR block."
+    },
+    {
+      "top_port": "wb_cyc_i",
+      "connected_to": [
+        "adaptive_aero_control_csr.wb_cyc_i"
+      ],
+      "description": "Wishbone cycle indicator into the CSR block."
+    },
+    {
+      "top_port": "wb_ack_o",
+      "connected_to": [
+        "adaptive_aero_control_csr.wb_ack_o"
+      ],
+      "description": "Wishbone acknowledge from the CSR block."
+    },
+    {
+      "top_port": "wb_err_o",
+      "connected_to": [
+        "adaptive_aero_control_csr.wb_err_o"
+      ],
+      "description": "Wishbone error from the CSR block."
+    },
+    {
+      "top_port": "wb_stall_o",
+      "connected_to": [
+        "adaptive_aero_control_csr.wb_stall_o"
+      ],
+      "description": "Wishbone stall from the CSR block."
+    },
+    {
+      "top_port": "model_req_valid",
+      "connected_to": [
+        "adaptive_aero_control_packetizer.model_req_valid"
+      ],
+      "description": "Bounded request stream valid to external surrogate infrastructure."
+    },
+    {
+      "top_port": "model_req_ready",
+      "connected_to": [
+        "adaptive_aero_control_packetizer.model_req_ready"
+      ],
+      "description": "Bounded request stream ready handshake from external surrogate infrastructure."
+    },
+    {
+      "top_port": "model_req_payload",
+      "connected_to": [
+        "adaptive_aero_control_packetizer.model_req_payload"
+      ],
+      "description": "Compact request payload to external surrogate infrastructure."
+    },
+    {
+      "top_port": "model_rsp_valid",
+      "connected_to": [
+        "adaptive_aero_control_packetizer.model_rsp_valid"
+      ],
+      "description": "Bounded response stream valid from external surrogate infrastructure."
+    },
+    {
+      "top_port": "model_rsp_ready",
+      "connected_to": [
+        "adaptive_aero_control_packetizer.model_rsp_ready"
+      ],
+      "description": "Bounded response stream ready handshake to external surrogate infrastructure."
+    },
+    {
+      "top_port": "model_rsp_payload",
+      "connected_to": [
+        "adaptive_aero_control_packetizer.model_rsp_payload"
+      ],
+      "description": "Compact response payload from external surrogate infrastructure."
+    },
+    {
+      "top_port": "surface_cmd_valid",
+      "connected_to": [
+        "adaptive_aero_control_actuator.surface_cmd_valid"
+      ],
+      "description": "Validated actuator command validity output."
+    },
+    {
+      "top_port": "surface_cmd_ready",
+      "connected_to": [
+        "adaptive_aero_control_actuator.surface_cmd_ready"
+      ],
+      "description": "Downstream actuator ready input."
+    },
+    {
+      "top_port": "surface_cmd_position",
+      "connected_to": [
+        "adaptive_aero_control_actuator.surface_cmd_position"
+      ],
+      "description": "Clamped actuator position command output."
+    },
+    {
+      "top_port": "surface_cmd_rate",
+      "connected_to": [
+        "adaptive_aero_control_actuator.surface_cmd_rate"
+      ],
+      "description": "Clamped actuator rate command output."
+    },
+    {
+      "top_port": "surface_cmd_mode",
+      "connected_to": [
+        "adaptive_aero_control_actuator.surface_cmd_mode"
+      ],
+      "description": "Actuator command mode output."
+    },
+    {
+      "top_port": "irq_o",
+      "connected_to": [
+        "adaptive_aero_control_safety.irq_pulse"
+      ],
+      "description": "Single-cycle interrupt output toward the soft CPU."
+    },
+    {
+      "top_port": "cpu_enable_in",
+      "connected_to": [
+        "adaptive_aero_control_safety.cpu_enable_in"
+      ],
+      "description": "CPU/firmware enable or service-present indication into safety logic."
+    },
+    {
+      "top_port": "external_fault_i",
+      "connected_to": [
+        "adaptive_aero_control_packetizer.external_fault_i",
+        "adaptive_aero_control_safety.external_fault_i"
+      ],
+      "description": "External fault indication fanout into packetizer cancellation and safety inhibition."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "cfg_enable",
+      "width": 1,
+      "source": "adaptive_aero_control_csr.cfg_enable",
+      "destinations": [
+        "adaptive_aero_control_packetizer.cfg_enable",
+        "adaptive_aero_control_safety.cfg_enable",
+        "adaptive_aero_control_actuator.cfg_enable"
+      ],
+      "description": "Firmware-controlled enable state."
+    },
+    {
+      "name": "cfg_mode_select",
+      "width": 2,
+      "source": "adaptive_aero_control_csr.cfg_mode_select",
+      "destinations": [
+        "adaptive_aero_control_packetizer.cfg_mode_select",
+        "adaptive_aero_control_actuator.cfg_mode_select"
+      ],
+      "description": "Firmware-selected operating mode."
+    },
+    {
+      "name": "cfg_request_seq",
+      "width": 16,
+      "source": "adaptive_aero_control_csr.cfg_request_seq",
+      "destinations": [
+        "adaptive_aero_control_packetizer.cfg_request_seq"
+      ],
+      "description": "Firmware-provided request sequence base value."
+    },
+    {
+      "name": "cfg_timeout_threshold",
+      "width": 16,
+      "source": "adaptive_aero_control_csr.cfg_timeout_threshold",
+      "destinations": [
+        "adaptive_aero_control_packetizer.cfg_timeout_threshold"
+      ],
+      "description": "Timeout threshold for stale-data monitoring."
+    },
+    {
+      "name": "cfg_clamp_min",
+      "width": 16,
+      "source": "adaptive_aero_control_csr.cfg_clamp_min",
+      "destinations": [
+        "adaptive_aero_control_actuator.cfg_clamp_min"
+      ],
+      "description": "Programmable lower actuator clamp limit."
+    },
+    {
+      "name": "cfg_clamp_max",
+      "width": 16,
+      "source": "adaptive_aero_control_csr.cfg_clamp_max",
+      "destinations": [
+        "adaptive_aero_control_actuator.cfg_clamp_max"
+      ],
+      "description": "Programmable upper actuator clamp limit."
+    },
+    {
+      "name": "cfg_hold_last_safe",
+      "width": 1,
+      "source": "adaptive_aero_control_csr.cfg_hold_last_safe",
+      "destinations": [
+        "adaptive_aero_control_safety.cfg_hold_last_safe"
+      ],
+      "description": "Configuration for whether the controller maintains an internally remembered safe output while inhibited."
+    },
+    {
+      "name": "request_issue",
+      "width": 1,
+      "source": "adaptive_aero_control_csr.cfg_enable",
+      "destinations": [
+        "adaptive_aero_control_packetizer.request_issue"
+      ],
+      "description": "Command issuance trigger derived from enabled firmware control and top-level request context."
+    },
+    {
+      "name": "request_cancel",
+      "width": 1,
+      "source": "adaptive_aero_control_safety.safe_output_inhibit",
+      "destinations": [
+        "adaptive_aero_control_packetizer.request_cancel"
+      ],
+      "description": "Safety cancellation of outstanding model requests."
+    },
+    {
+      "name": "request_id",
+      "width": 16,
+      "source": "adaptive_aero_control_csr.cfg_request_seq",
+      "destinations": [
+        "adaptive_aero_control_packetizer.request_id"
+      ],
+      "description": "Compact request identifier for validation and duplicate rejection."
+    },
+    {
+      "name": "geometry_handle",
+      "width": 16,
+      "source": "adaptive_aero_control_csr.cfg_request_seq",
+      "destinations": [
+        "adaptive_aero_control_packetizer.geometry_handle"
+      ],
+      "description": "Firmware-managed geometry descriptor handle used in the compact request frame."
+    },
+    {
+      "name": "geometry_crc",
+      "width": 16,
+      "source": "adaptive_aero_control_csr.cfg_request_seq",
+      "destinations": [
+        "adaptive_aero_control_packetizer.geometry_crc"
+      ],
+      "description": "Geometry integrity token used in the compact request frame."
+    },
+    {
+      "name": "stream_velocity_mps",
+      "width": 16,
+      "source": "adaptive_aero_control_csr.cfg_request_seq",
+      "destinations": [
+        "adaptive_aero_control_packetizer.stream_velocity_mps"
+      ],
+      "description": "Flow-condition scalar used in the compact request frame."
+    },
+    {
+      "name": "rsp_accepted",
+      "width": 1,
+      "source": "adaptive_aero_control_packetizer.rsp_accepted",
+      "destinations": [
+        "adaptive_aero_control_safety.rsp_accepted",
+        "adaptive_aero_control_actuator.rsp_accepted"
+      ],
+      "description": "Validated response acceptance pulse."
+    },
+    {
+      "name": "rsp_drag_force_est",
+      "width": 16,
+      "source": "adaptive_aero_control_packetizer.rsp_drag_force_est",
+      "destinations": [
+        "adaptive_aero_control_actuator.rsp_drag_force_est"
+      ],
+      "description": "Validated drag estimate for control synthesis."
+    },
+    {
+      "name": "rsp_lift_force_est",
+      "width": 16,
+      "source": "adaptive_aero_control_packetizer.rsp_lift_force_est",
+      "destinations": [
+        "adaptive_aero_control_actuator.rsp_lift_force_est"
+      ],
+      "description": "Validated lift estimate for control synthesis."
+    },
+    {
+      "name": "rsp_status_flags",
+      "width": 8,
+      "source": "adaptive_aero_control_packetizer.rsp_status_flags",
+      "destinations": [
+        "adaptive_aero_control_actuator.rsp_status_flags"
+      ],
+      "description": "Validated response status flags for downstream command formatting."
+    },
+    {
+      "name": "timeout_fault",
+      "width": 1,
+      "source": "adaptive_aero_control_packetizer.timeout_fault",
+      "destinations": [
+        "adaptive_aero_control_safety.timeout_fault"
+      ],
+      "description": "Stale-data timeout fault indication."
+    },
+    {
+      "name": "invalid_response_fault",
+      "width": 1,
+      "source": "adaptive_aero_control_packetizer.invalid_response_fault",
+      "destinations": [
+        "adaptive_aero_control_safety.invalid_response_fault"
+      ],
+      "description": "Invalid response fault indication."
+    },
+    {
+      "name": "duplicate_response_fault",
+      "width": 1,
+      "source": "adaptive_aero_control_packetizer.duplicate_response_fault",
+      "destinations": [
+        "adaptive_aero_control_safety.duplicate_response_fault"
+      ],
+      "description": "Duplicate response fault indication."
+    },
+    {
+      "name": "fault_latched",
+      "width": 1,
+      "source": "adaptive_aero_control_safety.fault_latched",
+      "destinations": [
+        "adaptive_aero_control_csr.cfg_fault_latched"
+      ],
+      "description": "Latched fault status returned to the firmware-visible CSR block."
+    },
+    {
+      "name": "fault_code",
+      "width": 8,
+      "source": "adaptive_aero_control_safety.fault_code",
+      "destinations": [
+        "adaptive_aero_control_csr.cfg_fault_code"
+      ],
+      "description": "Compact latched fault code returned to the firmware-visible CSR block."
+    },
+    {
+      "name": "fault_state_changed_pulse",
+      "width": 1,
+      "source": "adaptive_aero_control_safety.fault_state_changed_pulse",
+      "destinations": [
+        "adaptive_aero_control_csr.cfg_fault_status_update"
+      ],
+      "description": "Fault-state transition event for CSR status update and software interrupt visibility."
+    },
+    {
+      "name": "safe_output_inhibit",
+      "width": 1,
+      "source": "adaptive_aero_control_safety.safe_output_inhibit",
+      "destinations": [
+        "adaptive_aero_control_actuator.safe_output_inhibit"
+      ],
+      "description": "Monotonic safety inhibit signal into actuator command formatting."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "cfg_enable",
+      "owner": "adaptive_aero_control_csr.cfg_enable"
+    },
+    {
+      "signal": "cfg_mode_select",
+      "owner": "adaptive_aero_control_csr.cfg_mode_select"
+    },
+    {
+      "signal": "cfg_request_seq",
+      "owner": "adaptive_aero_control_csr.cfg_request_seq"
+    },
+    {
+      "signal": "cfg_timeout_threshold",
+      "owner": "adaptive_aero_control_csr.cfg_timeout_threshold"
+    },
+    {
+      "signal": "cfg_clamp_min",
+      "owner": "adaptive_aero_control_csr.cfg_clamp_min"
+    },
+    {
+      "signal": "cfg_clamp_max",
+      "owner": "adaptive_aero_control_csr.cfg_clamp_max"
+    },
+    {
+      "signal": "cfg_hold_last_safe",
+      "owner": "adaptive_aero_control_csr.cfg_hold_last_safe"
+    },
+    {
+      "signal": "request_issue",
+      "owner": "adaptive_aero_control_csr.cfg_enable"
+    },
+    {
+      "signal": "request_cancel",
+      "owner": "adaptive_aero_control_safety.safe_output_inhibit"
+    },
+    {
+      "signal": "request_id",
+      "owner": "adaptive_aero_control_csr.cfg_request_seq"
+    },
+    {
+      "signal": "geometry_handle",
+      "owner": "adaptive_aero_control_csr.cfg_request_seq"
+    },
+    {
+      "signal": "geometry_crc",
+      "owner": "adaptive_aero_control_csr.cfg_request_seq"
+    },
+    {
+      "signal": "reference_geometry_id",
+      "owner": "adaptive_aero_control_csr.cfg_request_seq"
+    },
+    {
+      "signal": "stream_velocity_mps",
+      "owner": "adaptive_aero_control_csr.cfg_request_seq"
+    },
+    {
+      "signal": "model_version",
+      "owner": "adaptive_aero_control_csr.cfg_mode_select"
+    },
+    {
+      "signal": "rsp_accepted",
+      "owner": "adaptive_aero_control_packetizer.rsp_accepted"
+    },
+    {
+      "signal": "rsp_rejected",
+      "owner": "adaptive_aero_control_packetizer.rsp_rejected"
+    },
+    {
+      "signal": "rsp_validated_request_id",
+      "owner": "adaptive_aero_control_packetizer.rsp_validated_request_id"
+    },
+    {
+      "signal": "rsp_validated_model_version",
+      "owner": "adaptive_aero_control_packetizer.rsp_validated_model_version"
+    },
+    {
+      "signal": "rsp_drag_force_est",
+      "owner": "adaptive_aero_control_packetizer.rsp_drag_force_est"
+    },
+    {
+      "signal": "rsp_lift_force_est",
+      "owner": "adaptive_aero_control_packetizer.rsp_lift_force_est"
+    },
+    {
+      "signal": "rsp_status_flags",
+      "owner": "adaptive_aero_control_packetizer.rsp_status_flags"
+    },
+    {
+      "signal": "rsp_crc_ok",
+      "owner": "adaptive_aero_control_packetizer.rsp_crc_ok"
+    },
+    {
+      "signal": "timeout_fault",
+      "owner": "adaptive_aero_control_packetizer.timeout_fault"
+    },
+    {
+      "signal": "invalid_response_fault",
+      "owner": "adaptive_aero_control_packetizer.invalid_response_fault"
+    },
+    {
+      "signal": "duplicate_response_fault",
+      "owner": "adaptive_aero_control_packetizer.duplicate_response_fault"
+    },
+    {
+      "signal": "fault_latched",
+      "owner": "adaptive_aero_control_safety.fault_latched"
+    },
+    {
+      "signal": "fault_code",
+      "owner": "adaptive_aero_control_safety.fault_code"
+    },
+    {
+      "signal": "fault_state_changed_pulse",
+      "owner": "adaptive_aero_control_safety.fault_state_changed_pulse"
+    },
+    {
+      "signal": "safe_output_inhibit",
+      "owner": "adaptive_aero_control_safety.safe_output_inhibit"
+    },
+    {
+      "signal": "valid_response_pulse",
+      "owner": "adaptive_aero_control_safety.valid_response_pulse"
+    },
+    {
+      "signal": "surface_cmd_valid",
+      "owner": "adaptive_aero_control_actuator.surface_cmd_valid"
+    },
+    {
+      "signal": "surface_cmd_position",
+      "owner": "adaptive_aero_control_actuator.surface_cmd_position"
+    },
+    {
+      "signal": "surface_cmd_rate",
+      "owner": "adaptive_aero_control_actuator.surface_cmd_rate"
+    },
+    {
+      "signal": "surface_cmd_mode",
+      "owner": "adaptive_aero_control_actuator.surface_cmd_mode"
+    },
+    {
+      "signal": "command_applied_pulse",
+      "owner": "adaptive_aero_control_actuator.command_applied_pulse"
+    },
+    {
+      "signal": "irq_o",
+      "owner": "adaptive_aero_control_safety.irq_pulse"
+    },
+    {
+      "signal": "wb_dat_o",
+      "owner": "adaptive_aero_control_csr.wb_dat_o"
+    },
+    {
+      "signal": "wb_ack_o",
+      "owner": "adaptive_aero_control_csr.wb_ack_o"
+    },
+    {
+      "signal": "wb_err_o",
+      "owner": "adaptive_aero_control_csr.wb_err_o"
+    },
+    {
+      "signal": "wb_stall_o",
+      "owner": "adaptive_aero_control_csr.wb_stall_o"
+    },
+    {
+      "signal": "model_req_valid",
+      "owner": "adaptive_aero_control_packetizer.model_req_valid"
+    },
+    {
+      "signal": "model_req_payload",
+      "owner": "adaptive_aero_control_packetizer.model_req_payload"
+    },
+    {
+      "signal": "model_rsp_ready",
+      "owner": "adaptive_aero_control_packetizer.model_rsp_ready"
+    }
+  ],
+  "register_contract": {}
+}
