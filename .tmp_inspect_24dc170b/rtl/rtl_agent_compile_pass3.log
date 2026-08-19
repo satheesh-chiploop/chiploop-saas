@@ -1,0 +1,17 @@
+backend/workflows/24dc170b-2c98-48a4-979e-e36f60c3de10/rtl/pass3/adaptive_aero_control_top.v:377: error: port ``payload_fifo_csb'' is not a port of u_transport_payload_fifo_mem.
+backend/workflows/24dc170b-2c98-48a4-979e-e36f60c3de10/rtl/pass3/adaptive_aero_control_top.v:377: error: port ``payload_fifo_we'' is not a port of u_transport_payload_fifo_mem.
+backend/workflows/24dc170b-2c98-48a4-979e-e36f60c3de10/rtl/pass3/adaptive_aero_control_top.v:377: error: port ``payload_fifo_addr'' is not a port of u_transport_payload_fifo_mem.
+backend/workflows/24dc170b-2c98-48a4-979e-e36f60c3de10/rtl/pass3/adaptive_aero_control_top.v:377: error: port ``payload_fifo_din'' is not a port of u_transport_payload_fifo_mem.
+backend/workflows/24dc170b-2c98-48a4-979e-e36f60c3de10/rtl/pass3/adaptive_aero_control_top.v:377: error: port ``payload_fifo_dout'' is not a port of u_transport_payload_fifo_mem.
+backend/workflows/24dc170b-2c98-48a4-979e-e36f60c3de10/rtl/pass3/adaptive_aero_control_top.v:386: error: port ``history_csb'' is not a port of u_transport_history_mem.
+backend/workflows/24dc170b-2c98-48a4-979e-e36f60c3de10/rtl/pass3/adaptive_aero_control_top.v:386: error: port ``history_we'' is not a port of u_transport_history_mem.
+backend/workflows/24dc170b-2c98-48a4-979e-e36f60c3de10/rtl/pass3/adaptive_aero_control_top.v:386: error: port ``history_addr'' is not a port of u_transport_history_mem.
+backend/workflows/24dc170b-2c98-48a4-979e-e36f60c3de10/rtl/pass3/adaptive_aero_control_top.v:386: error: port ``history_din'' is not a port of u_transport_history_mem.
+backend/workflows/24dc170b-2c98-48a4-979e-e36f60c3de10/rtl/pass3/adaptive_aero_control_top.v:386: error: port ``history_dout'' is not a port of u_transport_history_mem.
+10 error(s) during elaboration.
+
+Issues:
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

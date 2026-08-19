@@ -1,0 +1,19 @@
+{
+  "mode": "hierarchical",
+  "top_module": "adaptive_aero_control_top",
+  "expected_files": [
+    "adaptive_aero_control_top.v",
+    "aero_cpu_subsystem.v",
+    "control_plane_csr.v",
+    "request_response_supervisor.v",
+    "actuator_command_clamper.v",
+    "safety_fault_manager.v",
+    "transport_buffer_wrapper.v",
+    "transport_payload_fifo_mem.v",
+    "transport_history_mem.v"
+  ],
+  "has_regmap": true,
+  "has_clock_reset": false,
+  "has_power_intent": false,
+  "prompt_chars": 240664
+}

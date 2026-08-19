@@ -1,0 +1,2953 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level FPGA IP block for active aerodynamic control. Exposes Wishbone CSR/MMIO, bounded request and response streams, interrupts, UART diagnostics, and compact actuator outputs. Owns reset-safe fallback behavior and the gating of validated command updates.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_adr_i",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "wb_dat_i",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "wb_dat_o",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "wb_we_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_stb_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_cyc_i",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "wb_sel_i",
+          "direction": "input",
+          "width": 4
+        },
+        {
+          "name": "wb_ack_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "wb_err_o",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "ext_req_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "ext_req_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "ext_req_data",
+          "direction": "output",
+          "width": 128
+        },
+        {
+          "name": "ext_rsp_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "ext_rsp_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "ext_rsp_data",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_safe_fallback",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_surface0",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_cmd_surface1",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_cmd_surface2",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_cmd_surface3",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "irq_out",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "uart_tx",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "uart_rx",
+          "direction": "input",
+          "width": 1
+        }
+      ],
+      "functionality": "Implements the system-level contract: wishbone-attached firmware control plane, validated request/response transport for an external surrogate, deterministic acceptance and rejection rules, timeout and stale-data handling, actuator clamping and fallback selection, and fault summary generation. The top only accepts validated external responses via firmware-configured request issuance and never performs unvalidated direct actuation. On reset and on any fault or timeout, outputs remain in safe fallback and inhibited state until firmware clears faults and a fresh valid command is observed.",
+      "responsibilities": [
+        "Expose a real firmware-visible Wishbone CSR/MMIO interface with address, write-data, read-data, transaction-valid/write-enable, and response/ready semantics.",
+        "Instantiate and integrate the PicoRV32 CPU subsystem contract through internal hierarchy.",
+        "Transport request and response packets using bounded valid/ready streams no wider than 128 bits.",
+        "Validate response sequence, freshness, operating-point envelope, integrity bits, and timeout conditions before any actuator update.",
+        "Clamp actuator outputs to CSR-programmed limits and enforce optional rate limiting before drive-out.",
+        "Assert interrupts for response-ready, fault, and timeout events.",
+        "Keep outputs in safe fallback on reset, CPU unavailability, invalid data, or watchdog expiry."
+      ],
+      "must_drive": [
+        "wb_dat_o",
+        "wb_ack_o",
+        "wb_err_o",
+        "ext_req_valid",
+        "ext_req_data",
+        "ext_rsp_ready",
+        "actuator_cmd_valid",
+        "actuator_cmd_safe_fallback",
+        "actuator_cmd_surface0",
+        "actuator_cmd_surface1",
+        "actuator_cmd_surface2",
+        "actuator_cmd_surface3",
+        "irq_out",
+        "uart_tx"
+      ],
+      "must_receive": [
+        "clk",
+        "rst_n",
+        "wb_adr_i",
+        "wb_dat_i",
+        "wb_we_i",
+        "wb_stb_i",
+        "wb_cyc_i",
+        "wb_sel_i",
+        "ext_req_ready",
+        "ext_rsp_valid",
+        "ext_rsp_data",
+        "uart_rx"
+      ],
+      "must_not_drive": [
+        "Do not drive active actuator commands unless response validation passes and no fault is present.",
+        "Do not bypass firmware-mediated CSR/MMIO acceptance with an alternate hardware command path.",
+        "Do not expose geometry arrays, large tensors, or unbounded payloads at top level.",
+        "Do not claim board-ready CPU instantiation without the full RTL and memory/interconnect integration being synthesized together."
+      ],
+      "reset_behavior": "All registers, counters, buffers, latches, and outputs reset to safe fallback. actuator_cmd_safe_fallback asserts, actuator_cmd_valid deasserts, external request is inhibited until firmware initialization, and any outstanding request state is cleared. Fault and timeout summary bits reset to a known safe state. UART and Wishbone outputs are returned to idle/acknowledge-safe behavior.",
+      "behavior_rules": [
+        "Wishbone accesses must be acknowledged deterministically by the CSR block and any decode error must raise wb_err_o.",
+        "The top-level stream request packet shall include request validity, sequence_id, operating-point data, geometry reference tag/hash pointer, and command class identifier fields.",
+        "The top-level stream response packet shall include sequence_id, response validity, freshness stamp, commanded surface targets, and status bits fields.",
+        "A response is accepted only if valid, sequence matches policy, age is within timeout threshold, operating-point metadata is within 20-55 m/s, and status/integrity bits are clear.",
+        "If a new request is issued while another is outstanding, the configured overwrite/stall policy shall be enforced without bypassing freshness checks.",
+        "Timeout and stale-data faults must latch until firmware clears them after the condition is no longer present.",
+        "Output updates only occur after validation and clamp/rate-limit enforcement; otherwise safe fallback or last explicitly safe command is held per firmware policy.",
+        "The design shall remain in safe fallback if the CPU is halted, uninitialized, or external runtime is absent.",
+        "All storage for payload/history/FIFO behavior must be technology-neutral and BRAM-mappable; no Sky130-specific hard macros are permitted in FPGA synthesis.",
+        "No floating-point datapath is permitted in RTL; all conversions are integer fixed-point."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "aero_cpu_subsystem",
+        "description": "PicoRV32 Wishbone CPU subsystem contract for firmware execution, CSR/MMIO access, optional UART diagnostics, and interrupt generation. This module models the CPU-facing subsystem boundary and exposes the CPU-side control/status interaction points used by the top-level control plane.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_adr_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_we_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_stb_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_cyc_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_sel_o",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "wb_ack_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_err_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "irq_i",
+            "direction": "input",
+            "width": 3
+          },
+          {
+            "name": "uart_tx",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "uart_rx",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cpu_halted",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cpu_initialized",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Represents the integrated PicoRV32 rv32imc soft CPU subsystem and its observable integration signals. Firmware runs on this subsystem and performs CSR/MMIO reads and writes to configure request issuance, timeouts, limits, fallback command, and fault clearing. The CPU subsystem exports halt and initialization status so the top can remain in safe fallback until firmware is active.",
+        "responsibilities": [
+          "Generate Wishbone master transactions for firmware access to the control plane.",
+          "Provide CPU halt and initialized status to the top-level safety logic.",
+          "Drive optional UART diagnostics.",
+          "Accept interrupt inputs for response-ready, fault, and timeout events."
+        ],
+        "must_drive": [
+          "wb_adr_o",
+          "wb_dat_o",
+          "wb_we_o",
+          "wb_stb_o",
+          "wb_cyc_o",
+          "wb_sel_o",
+          "uart_tx",
+          "cpu_halted",
+          "cpu_initialized"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "wb_dat_i",
+          "wb_ack_i",
+          "wb_err_i",
+          "irq_i",
+          "uart_rx"
+        ],
+        "must_not_drive": [
+          "Do not directly command actuators.",
+          "Do not bypass the CSR/MMIO contract.",
+          "Do not assume external model streaming transport as a CPU replacement.",
+          "Do not expose geometry or payload tensors.",
+          "Do not claim memory/controller integration outside the declared subsystem ports."
+        ],
+        "reset_behavior": "CPU-facing outputs idle on reset; halt and uninitialized status assert in the safe state until firmware and subsystem initialization complete.",
+        "behavior_rules": [
+          "Wishbone master behavior must conform to rv32imc firmware execution requirements.",
+          "Interrupts shall be level- or pulse-encoded deterministically per top-level policy.",
+          "CPU subsystem status must be observable by the top-level safety supervisor.",
+          "UART presence is optional for firmware bring-up but must not affect safety operation."
+        ],
+        "rtl_output_file": "aero_cpu_subsystem.v"
+      },
+      {
+        "name": "control_plane_csr",
+        "description": "Wishbone CSR/MMIO register block that decodes firmware-visible control and status registers for the adaptive aero control application. Exposes request issuance control, watchdog timeout configuration, freshness thresholds, actuator limits, optional rate limits, fallback command, enable/mode fields, fault summary, and status fields. Also emits explicit semantic control signals for the request/response supervisor and actuator clamp logic.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_adr_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_we_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_stb_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_cyc_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_sel_i",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "wb_ack_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_err_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_request_mode",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_timeout_cycles",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_freshness_threshold",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_sequence_seed",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_overwrite_policy",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_op_point_min_kph",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_op_point_max_kph",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface0_min",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface0_max",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface1_min",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface1_max",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface2_min",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface2_max",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface3_min",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface3_max",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_rate_limit_en",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_rate_limit_step",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_surface0",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_surface1",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_surface2",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_surface3",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_request_seq",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_request_class",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_geometry_ref",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cfg_clear_faults",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "last_response_sequence",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "last_response_age",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "fault_summary",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "health_summary",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "watchdog_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_issued",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_stalled",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_overwritten",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Decodes the firmware-visible register bank and publishes semantic control signals used by the request issuer, validator, watchdog, and actuator clamp logic. Reads return configuration and status fields. Writes configure enable, timeout, freshness, sequence, geometry reference pointer/hash, operating-point envelope, actuator bounds, rate limiting, fallback command, overwrite policy, and fault clearing.",
+        "responsibilities": [
+          "Provide a real MMIO/CSR decode window reachable by firmware through Wishbone.",
+          "Expose all implemented registers and fields in the authoritative register contract.",
+          "Translate raw register writes into explicit semantic outputs for control and safety blocks.",
+          "Return status registers for last response sequence, age, fault summary, and health summary.",
+          "Latch writes to control registers and clear faults only when firmware requests it and the input condition has cleared."
+        ],
+        "must_drive": [
+          "wb_dat_o",
+          "wb_ack_o",
+          "wb_err_o",
+          "cfg_enable",
+          "cfg_request_mode",
+          "cfg_timeout_cycles",
+          "cfg_freshness_threshold",
+          "cfg_sequence_seed",
+          "cfg_overwrite_policy",
+          "cfg_op_point_min_kph",
+          "cfg_op_point_max_kph",
+          "cfg_surface0_min",
+          "cfg_surface0_max",
+          "cfg_surface1_min",
+          "cfg_surface1_max",
+          "cfg_surface2_min",
+          "cfg_surface2_max",
+          "cfg_surface3_min",
+          "cfg_surface3_max",
+          "cfg_rate_limit_en",
+          "cfg_rate_limit_step",
+          "cfg_fallback_surface0",
+          "cfg_fallback_surface1",
+          "cfg_fallback_surface2",
+          "cfg_fallback_surface3",
+          "cfg_request_seq",
+          "cfg_request_class",
+          "cfg_geometry_ref",
+          "cfg_clear_faults"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "wb_adr_i",
+          "wb_dat_i",
+          "wb_we_i",
+          "wb_stb_i",
+          "wb_cyc_i",
+          "wb_sel_i",
+          "last_response_sequence",
+          "last_response_age",
+          "fault_summary",
+          "health_summary",
+          "watchdog_active",
+          "request_issued",
+          "request_stalled",
+          "request_overwritten"
+        ],
+        "must_not_drive": [
+          "Do not directly drive actuator outputs.",
+          "Do not directly drive request/response stream pins.",
+          "Do not hide inaccessible state as software-visible registers.",
+          "Do not substitute implicit derivation for explicit semantic register outputs."
+        ],
+        "reset_behavior": "All registers reset to safe defaults: enable off, timeout conservative, freshness threshold conservative, limits centered on safe fallback, overwrite policy stalled, request class and sequence cleared, geometry reference cleared, and fault clear input deasserted. Read-only status fields reflect reset-safe values.",
+        "behavior_rules": [
+          "Every declared register must be reachable through RTL decode.",
+          "The register map must be compact and implementation-friendly, with 32-bit Wishbone accesses.",
+          "Control fields written by firmware must be held stable until overwritten by firmware.",
+          "Read-only status fields must reflect live safety state and controller state.",
+          "Fault-clear writes are accepted only when corresponding conditions are no longer present.",
+          "No inaccessible internal state may be described as software-visible."
+        ],
+        "rtl_output_file": "control_plane_csr.v"
+      },
+      {
+        "name": "request_response_supervisor",
+        "description": "Bounded valid/ready stream adapter and policy engine that issues request packets, tracks outstanding sequence state, enforces freshness and watchdog timeout, and validates response packets before they are eligible for actuator use.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_request_mode",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_timeout_cycles",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_freshness_threshold",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_sequence_seed",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_overwrite_policy",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_op_point_min_kph",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_op_point_max_kph",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_request_seq",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_request_class",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_geometry_ref",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "ext_req_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "ext_req_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "ext_req_data",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "ext_rsp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "ext_rsp_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "ext_rsp_data",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "request_issued",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "request_stalled",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "request_overwritten",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "outstanding_sequence",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "last_response_sequence",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "last_response_age",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "response_validated",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "response_rejected",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "timeout_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "age_counter",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "timeout_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "stale_data_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "validity_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "integrity_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "op_point_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "seq_fault",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Constructs the bounded external request packet, accepts an incoming bounded response packet, and performs sequencing, age, operating-point envelope, and integrity checks. It maintains outstanding request state, watchdog timeout counting, and explicit reject/accept indicators. The response is only marked validated when all policy checks pass; otherwise a specific fault bit is asserted and the response is rejected.",
+        "responsibilities": [
+          "Issue a single bounded request stream per accepted firmware command.",
+          "Track outstanding request sequence and age.",
+          "Support stall or overwrite policy for a new request while one is outstanding.",
+          "Set explicit reject and fault outputs for invalid, stale, or mismatched responses.",
+          "Start and monitor watchdog timing on each request issuance.",
+          "Provide status outputs for firmware-visible registers and interrupt generation."
+        ],
+        "must_drive": [
+          "ext_req_valid",
+          "ext_req_data",
+          "ext_rsp_ready",
+          "request_issued",
+          "request_stalled",
+          "request_overwritten",
+          "outstanding_sequence",
+          "last_response_sequence",
+          "last_response_age",
+          "response_validated",
+          "response_rejected",
+          "timeout_active",
+          "age_counter",
+          "timeout_fault",
+          "stale_data_fault",
+          "validity_fault",
+          "integrity_fault",
+          "op_point_fault",
+          "seq_fault"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_enable",
+          "cfg_request_mode",
+          "cfg_timeout_cycles",
+          "cfg_freshness_threshold",
+          "cfg_sequence_seed",
+          "cfg_overwrite_policy",
+          "cfg_op_point_min_kph",
+          "cfg_op_point_max_kph",
+          "cfg_request_seq",
+          "cfg_request_class",
+          "cfg_geometry_ref",
+          "ext_req_ready",
+          "ext_rsp_valid",
+          "ext_rsp_data"
+        ],
+        "must_not_drive": [
+          "Do not generate actuator outputs directly.",
+          "Do not accept responses without validating status, sequence, age, operating-point envelope, and integrity bits.",
+          "Do not expose geometry arrays or tensors.",
+          "Do not bypass firmware-mediated command acceptance.",
+          "Do not exceed 128-bit packet width."
+        ],
+        "reset_behavior": "On reset, no request is issued, no response is accepted, outstanding sequence and counters clear, timeout is inactive, and all fault outputs reset to safe inactive state. External request valid deasserts and response ready defaults to a safe, non-accepting state until enabled.",
+        "behavior_rules": [
+          "A response is accepted only when validity is asserted, sequence policy matches, age is within threshold, operating point is inside the configured envelope, and integrity bits are clear.",
+          "Rejected responses must explicitly assert the corresponding fault bit(s) and response_rejected.",
+          "Timeout must start on each request issuance and assert timeout_fault if the matching response does not arrive in time.",
+          "If overwrite policy is disabled, new request issuance while outstanding shall stall; if enabled, it may overwrite with explicit request_overwritten indication, but freshness checks remain mandatory.",
+          "Request and response packet formats must be fixed-slice, integer-only, and documented in the register contract.",
+          "The module shall remain bounded and shall not implement an unconstrained FIFO or wide payload store."
+        ],
+        "rtl_output_file": "request_response_supervisor.v"
+      },
+      {
+        "name": "actuator_command_clamper",
+        "description": "Applies programmable min/max bounds and optional rate-of-change limiting to validated actuator commands and selects the safe fallback command whenever the system is not in a valid drive condition.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_rate_limit_en",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_rate_limit_step",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface0_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface0_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface1_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface1_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface2_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface2_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface3_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_surface3_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_surface0",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_surface1",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_surface2",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_surface3",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "validated_update",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fault_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_validated",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "validated_surface0",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "validated_surface1",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "validated_surface2",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "validated_surface3",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "actuator_cmd_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "actuator_cmd_safe_fallback",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "actuator_cmd_surface0",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_cmd_surface1",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_cmd_surface2",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_cmd_surface3",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "clamp_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "rate_limit_fault",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements integer-only clamping and optional rate limiting for each actuator channel. When no validated update is present, or when any fault is active, it drives the deterministic fallback command and asserts safe_fallback. Only validated commands are eligible for output update, and all outputs remain bounded by the configured min/max limits.",
+        "responsibilities": [
+          "Clamp each actuator command to its configured bounds.",
+          "Apply optional rate limiting before output.",
+          "Hold or drive the fallback command when validation is absent or faulted.",
+          "Assert explicit clamp and rate-limit fault indicators when commands exceed permitted bounds or step size.",
+          "Maintain deterministic safe output behavior on reset and fault conditions."
+        ],
+        "must_drive": [
+          "actuator_cmd_valid",
+          "actuator_cmd_safe_fallback",
+          "actuator_cmd_surface0",
+          "actuator_cmd_surface1",
+          "actuator_cmd_surface2",
+          "actuator_cmd_surface3",
+          "clamp_fault",
+          "rate_limit_fault"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_rate_limit_en",
+          "cfg_rate_limit_step",
+          "cfg_surface0_min",
+          "cfg_surface0_max",
+          "cfg_surface1_min",
+          "cfg_surface1_max",
+          "cfg_surface2_min",
+          "cfg_surface2_max",
+          "cfg_surface3_min",
+          "cfg_surface3_max",
+          "cfg_fallback_surface0",
+          "cfg_fallback_surface1",
+          "cfg_fallback_surface2",
+          "cfg_fallback_surface3",
+          "validated_update",
+          "fault_active",
+          "response_validated",
+          "validated_surface0",
+          "validated_surface1",
+          "validated_surface2",
+          "validated_surface3"
+        ],
+        "must_not_drive": [
+          "Do not source outputs from unvalidated stream contents.",
+          "Do not violate configured bounds or rate limits.",
+          "Do not bypass safe fallback on reset or fault.",
+          "Do not expose payload storage or geometry tensors."
+        ],
+        "reset_behavior": "Reset forces the fallback command to the outputs, deasserts valid, and asserts safe_fallback. Internal last-command state clears to the fallback value so that no unsafe slew occurs after reset.",
+        "behavior_rules": [
+          "Output updates occur only when validated_update and response_validated are both asserted and fault_active is low.",
+          "Each channel must be clamped independently to its min/max range.",
+          "If rate limiting is enabled, the output delta per update must not exceed cfg_rate_limit_step.",
+          "When any fault is active, the fallback command is driven regardless of input command values.",
+          "All calculations are integer/fixed-point only."
+        ],
+        "rtl_output_file": "actuator_command_clamper.v"
+      },
+      {
+        "name": "safety_fault_manager",
+        "description": "Aggregates validation, timeout, stale-data, clamp, and CPU/runtime status into a latched fault summary and health summary, generates interrupt causes, and controls fault clearing policy.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cpu_halted",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cpu_initialized",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timeout_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "stale_data_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "validity_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "integrity_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "op_point_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "seq_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "clamp_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rate_limit_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "response_validated",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fault_clear_req",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_clear_faults",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "fault_summary",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "health_summary",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "fault_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "irq_response_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "irq_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "irq_timeout",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "watchdog_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "request_stalled",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "request_overwritten",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Latches and reports fault causes, computes health summary, and generates interrupt request lines for response-ready, fault, and timeout events. It also enforces the policy that faults may only be cleared when firmware requests clear and the underlying condition is no longer present. CPU halted or uninitialized status forces safe fallback through the top-level safety path.",
+        "responsibilities": [
+          "Aggregate and latch fault conditions deterministically.",
+          "Generate dedicated interrupt causes for response-ready, fault, and timeout events.",
+          "Expose read-only fault and health summaries to firmware.",
+          "Permit fault clearing only after the fault source has disappeared and firmware has issued a clear request.",
+          "Report whether watchdog supervision is active."
+        ],
+        "must_drive": [
+          "fault_summary",
+          "health_summary",
+          "fault_active",
+          "irq_response_ready",
+          "irq_fault",
+          "irq_timeout",
+          "watchdog_active"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cpu_halted",
+          "cpu_initialized",
+          "timeout_fault",
+          "stale_data_fault",
+          "validity_fault",
+          "integrity_fault",
+          "op_point_fault",
+          "seq_fault",
+          "clamp_fault",
+          "rate_limit_fault",
+          "response_validated",
+          "fault_clear_req",
+          "cfg_clear_faults",
+          "request_stalled",
+          "request_overwritten"
+        ],
+        "must_not_drive": [
+          "Do not directly modify actuator outputs.",
+          "Do not clear faults unconditionally.",
+          "Do not hide CPU unavailability from safety logic.",
+          "Do not use floating point or non-deterministic behavior."
+        ],
+        "reset_behavior": "All fault latches clear to the safe state on reset, interrupts deassert, and fault_active is low. On reset, the design remains in safe fallback because no valid command is active and CPU readiness is not assumed.",
+        "behavior_rules": [
+          "CPU halted or not initialized shall be treated as unsafe and force the fault/safe fallback path.",
+          "Faults latch until firmware clear is requested and the condition has cleared.",
+          "Interrupt outputs must be deterministic and directly attributable to specific conditions.",
+          "Health summary shall remain separate from the fault summary and reflect overall runtime readiness.",
+          "Watchdog active follows the outstanding request supervision state."
+        ],
+        "rtl_output_file": "safety_fault_manager.v"
+      },
+      {
+        "name": "transport_buffer_wrapper",
+        "description": "Technology-neutral bounded memory/buffer wrapper for minimal request, response, and history storage. This module exists to document FPGA BRAM-mappable buffering and to bridge the top-level controller to the memory macros without flattening them into registers.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "payload_fifo_csb",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "payload_fifo_we",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "payload_fifo_addr",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "payload_fifo_din",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "payload_fifo_dout",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "history_csb",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "history_we",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "history_addr",
+            "direction": "output",
+            "width": 6
+          },
+          {
+            "name": "history_din",
+            "direction": "output",
+            "width": 64
+          },
+          {
+            "name": "history_dout",
+            "direction": "input",
+            "width": 64
+          },
+          {
+            "name": "buffer_push",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "buffer_pop",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "history_write",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "history_read",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "buffer_full",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "buffer_empty",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "history_valid",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Provides bounded FIFO/history buffering semantics that are intended to map to native FPGA block RAM through the declared memory macros. This wrapper never exposes unbounded arrays or geometry tensors, and it only handles compact transport/history records needed for supervision and bring-up.",
+        "responsibilities": [
+          "Map bounded payload buffering to technology-neutral BRAM-style interfaces.",
+          "Avoid register-array flattening for bulk payload/history storage.",
+          "Provide full/empty and validity indicators for controller use.",
+          "Keep buffering minimal and bounded for FPGA prototype implementation."
+        ],
+        "must_drive": [
+          "payload_fifo_csb",
+          "payload_fifo_we",
+          "payload_fifo_addr",
+          "payload_fifo_din",
+          "history_csb",
+          "history_we",
+          "history_addr",
+          "history_din",
+          "buffer_full",
+          "buffer_empty",
+          "history_valid"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "payload_fifo_dout",
+          "history_dout",
+          "buffer_push",
+          "buffer_pop",
+          "history_write",
+          "history_read"
+        ],
+        "must_not_drive": [
+          "Do not replace memory macros with plain register arrays in the contract.",
+          "Do not widen the transport beyond the declared bounded widths.",
+          "Do not expose geometry arrays or tensors.",
+          "Do not create a hardware streaming transport that replaces firmware-mediated acceptance."
+        ],
+        "reset_behavior": "Buffer pointers, valid flags, and history state reset to empty and invalid. All buffer/memory control outputs are idle until commanded by the controller.",
+        "behavior_rules": [
+          "Storage is bounded and minimal.",
+          "The wrapper is technology-neutral and intended for FPGA BRAM inference/mapping.",
+          "History and payload buffering exist only to support the controller contract and must not become a data-plane bypass.",
+          "No ASIC hard macro assumptions are permitted in FPGA synthesis."
+        ],
+        "rtl_output_file": "transport_buffer_wrapper.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "aero_cpu_subsystem.clk",
+        "control_plane_csr.clk",
+        "request_response_supervisor.clk",
+        "actuator_command_clamper.clk",
+        "safety_fault_manager.clk",
+        "transport_buffer_wrapper.clk"
+      ],
+      "description": "Global synchronous clock fanout."
+    },
+    {
+      "top_port": "rst_n",
+      "connected_to": [
+        "aero_cpu_subsystem.rst_n",
+        "control_plane_csr.rst_n",
+        "request_response_supervisor.rst_n",
+        "actuator_command_clamper.rst_n",
+        "safety_fault_manager.rst_n",
+        "transport_buffer_wrapper.rst_n"
+      ],
+      "description": "Global active-low reset fanout."
+    },
+    {
+      "top_port": "wb_adr_i",
+      "connected_to": [
+        "control_plane_csr.wb_adr_i"
+      ],
+      "description": "Firmware Wishbone address into the CSR/MMIO decode window."
+    },
+    {
+      "top_port": "wb_dat_i",
+      "connected_to": [
+        "control_plane_csr.wb_dat_i"
+      ],
+      "description": "Firmware Wishbone write data into the CSR/MMIO decode window."
+    },
+    {
+      "top_port": "wb_dat_o",
+      "connected_to": [
+        "control_plane_csr.wb_dat_o"
+      ],
+      "description": "CSR/MMIO read data returned to firmware."
+    },
+    {
+      "top_port": "wb_we_i",
+      "connected_to": [
+        "control_plane_csr.wb_we_i"
+      ],
+      "description": "Firmware Wishbone write enable."
+    },
+    {
+      "top_port": "wb_stb_i",
+      "connected_to": [
+        "control_plane_csr.wb_stb_i"
+      ],
+      "description": "Firmware Wishbone strobe."
+    },
+    {
+      "top_port": "wb_cyc_i",
+      "connected_to": [
+        "control_plane_csr.wb_cyc_i"
+      ],
+      "description": "Firmware Wishbone cycle."
+    },
+    {
+      "top_port": "wb_sel_i",
+      "connected_to": [
+        "control_plane_csr.wb_sel_i"
+      ],
+      "description": "Firmware Wishbone byte select."
+    },
+    {
+      "top_port": "wb_ack_o",
+      "connected_to": [
+        "control_plane_csr.wb_ack_o"
+      ],
+      "description": "Wishbone acknowledge from the CSR/MMIO decode window."
+    },
+    {
+      "top_port": "wb_err_o",
+      "connected_to": [
+        "control_plane_csr.wb_err_o"
+      ],
+      "description": "Wishbone error response from the CSR/MMIO decode window."
+    },
+    {
+      "top_port": "ext_req_valid",
+      "connected_to": [
+        "request_response_supervisor.ext_req_valid"
+      ],
+      "description": "Bounded external request valid output."
+    },
+    {
+      "top_port": "ext_req_ready",
+      "connected_to": [
+        "request_response_supervisor.ext_req_ready"
+      ],
+      "description": "Bounded external request ready input."
+    },
+    {
+      "top_port": "ext_req_data",
+      "connected_to": [
+        "request_response_supervisor.ext_req_data"
+      ],
+      "description": "Bounded external request payload."
+    },
+    {
+      "top_port": "ext_rsp_valid",
+      "connected_to": [
+        "request_response_supervisor.ext_rsp_valid"
+      ],
+      "description": "Bounded external response valid input."
+    },
+    {
+      "top_port": "ext_rsp_ready",
+      "connected_to": [
+        "request_response_supervisor.ext_rsp_ready"
+      ],
+      "description": "Bounded external response ready output."
+    },
+    {
+      "top_port": "ext_rsp_data",
+      "connected_to": [
+        "request_response_supervisor.ext_rsp_data"
+      ],
+      "description": "Bounded external response payload input."
+    },
+    {
+      "top_port": "actuator_cmd_valid",
+      "connected_to": [
+        "actuator_command_clamper.actuator_cmd_valid"
+      ],
+      "description": "Validated actuator command valid output."
+    },
+    {
+      "top_port": "actuator_cmd_safe_fallback",
+      "connected_to": [
+        "actuator_command_clamper.actuator_cmd_safe_fallback"
+      ],
+      "description": "Safe fallback indicator output."
+    },
+    {
+      "top_port": "actuator_cmd_surface0",
+      "connected_to": [
+        "actuator_command_clamper.actuator_cmd_surface0"
+      ],
+      "description": "Actuator output for surface 0."
+    },
+    {
+      "top_port": "actuator_cmd_surface1",
+      "connected_to": [
+        "actuator_command_clamper.actuator_cmd_surface1"
+      ],
+      "description": "Actuator output for surface 1."
+    },
+    {
+      "top_port": "actuator_cmd_surface2",
+      "connected_to": [
+        "actuator_command_clamper.actuator_cmd_surface2"
+      ],
+      "description": "Actuator output for surface 2."
+    },
+    {
+      "top_port": "actuator_cmd_surface3",
+      "connected_to": [
+        "actuator_command_clamper.actuator_cmd_surface3"
+      ],
+      "description": "Actuator output for surface 3."
+    },
+    {
+      "top_port": "irq_out",
+      "connected_to": [
+        "safety_fault_manager.irq_fault"
+      ],
+      "description": "Top-level interrupt output driven by the fault/timeout interrupt source aggregated by the safety manager."
+    },
+    {
+      "top_port": "uart_tx",
+      "connected_to": [
+        "aero_cpu_subsystem.uart_tx"
+      ],
+      "description": "Optional UART transmit output."
+    },
+    {
+      "top_port": "uart_rx",
+      "connected_to": [
+        "aero_cpu_subsystem.uart_rx"
+      ],
+      "description": "Optional UART receive input."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "cfg_enable",
+      "width": 1,
+      "source": "control_plane_csr.cfg_enable",
+      "destinations": [
+        "request_response_supervisor.cfg_enable"
+      ],
+      "description": "Firmware enable control from CSR to request/response supervisor."
+    },
+    {
+      "name": "cfg_request_mode",
+      "width": 1,
+      "source": "control_plane_csr.cfg_request_mode",
+      "destinations": [
+        "request_response_supervisor.cfg_request_mode"
+      ],
+      "description": "Request issuance mode control from CSR to supervisor."
+    },
+    {
+      "name": "cfg_timeout_cycles",
+      "width": 16,
+      "source": "control_plane_csr.cfg_timeout_cycles",
+      "destinations": [
+        "request_response_supervisor.cfg_timeout_cycles"
+      ],
+      "description": "Programmable watchdog timeout from CSR to supervisor."
+    },
+    {
+      "name": "cfg_freshness_threshold",
+      "width": 16,
+      "source": "control_plane_csr.cfg_freshness_threshold",
+      "destinations": [
+        "request_response_supervisor.cfg_freshness_threshold"
+      ],
+      "description": "Freshness threshold from CSR to supervisor."
+    },
+    {
+      "name": "cfg_sequence_seed",
+      "width": 16,
+      "source": "control_plane_csr.cfg_sequence_seed",
+      "destinations": [
+        "request_response_supervisor.cfg_sequence_seed"
+      ],
+      "description": "Initial sequence seed from CSR to supervisor."
+    },
+    {
+      "name": "cfg_overwrite_policy",
+      "width": 1,
+      "source": "control_plane_csr.cfg_overwrite_policy",
+      "destinations": [
+        "request_response_supervisor.cfg_overwrite_policy"
+      ],
+      "description": "Outstanding-request overwrite/stall policy from CSR to supervisor."
+    },
+    {
+      "name": "cfg_op_point_min_kph",
+      "width": 16,
+      "source": "control_plane_csr.cfg_op_point_min_kph",
+      "destinations": [
+        "request_response_supervisor.cfg_op_point_min_kph"
+      ],
+      "description": "Lower operating-point envelope bound from CSR to supervisor."
+    },
+    {
+      "name": "cfg_op_point_max_kph",
+      "width": 16,
+      "source": "control_plane_csr.cfg_op_point_max_kph",
+      "destinations": [
+        "request_response_supervisor.cfg_op_point_max_kph"
+      ],
+      "description": "Upper operating-point envelope bound from CSR to supervisor."
+    },
+    {
+      "name": "cfg_request_seq",
+      "width": 16,
+      "source": "control_plane_csr.cfg_request_seq",
+      "destinations": [
+        "request_response_supervisor.cfg_request_seq"
+      ],
+      "description": "Firmware-selected request sequence from CSR to supervisor."
+    },
+    {
+      "name": "cfg_request_class",
+      "width": 8,
+      "source": "control_plane_csr.cfg_request_class",
+      "destinations": [
+        "request_response_supervisor.cfg_request_class"
+      ],
+      "description": "Command class identifier from CSR to supervisor."
+    },
+    {
+      "name": "cfg_geometry_ref",
+      "width": 32,
+      "source": "control_plane_csr.cfg_geometry_ref",
+      "destinations": [
+        "request_response_supervisor.cfg_geometry_ref"
+      ],
+      "description": "Geometry reference tag or hash pointer from CSR to supervisor."
+    },
+    {
+      "name": "request_issued",
+      "width": 1,
+      "source": "request_response_supervisor.request_issued",
+      "destinations": [
+        "control_plane_csr.request_issued"
+      ],
+      "description": "Indicates request issuance activity for CSR status and fault manager correlation."
+    },
+    {
+      "name": "request_stalled",
+      "width": 1,
+      "source": "request_response_supervisor.request_stalled",
+      "destinations": [
+        "control_plane_csr.request_stalled",
+        "safety_fault_manager.request_stalled"
+      ],
+      "description": "Indicates a stalled request due to outstanding transaction policy."
+    },
+    {
+      "name": "request_overwritten",
+      "width": 1,
+      "source": "request_response_supervisor.request_overwritten",
+      "destinations": [
+        "control_plane_csr.request_overwritten",
+        "safety_fault_manager.request_overwritten"
+      ],
+      "description": "Indicates an overwrite under configured policy."
+    },
+    {
+      "name": "last_response_sequence",
+      "width": 16,
+      "source": "request_response_supervisor.last_response_sequence",
+      "destinations": [
+        "control_plane_csr.last_response_sequence"
+      ],
+      "description": "Last accepted or observed response sequence number for firmware-visible status."
+    },
+    {
+      "name": "last_response_age",
+      "width": 16,
+      "source": "request_response_supervisor.last_response_age",
+      "destinations": [
+        "control_plane_csr.last_response_age"
+      ],
+      "description": "Age of the most recent response for firmware-visible status."
+    },
+    {
+      "name": "response_validated",
+      "width": 1,
+      "source": "request_response_supervisor.response_validated",
+      "destinations": [
+        "actuator_command_clamper.response_validated",
+        "safety_fault_manager.response_validated"
+      ],
+      "description": "Validated response indicator used by actuator clamp and safety manager."
+    },
+    {
+      "name": "timeout_fault",
+      "width": 1,
+      "source": "request_response_supervisor.timeout_fault",
+      "destinations": [
+        "safety_fault_manager.timeout_fault"
+      ],
+      "description": "Timeout fault from supervisor to safety manager."
+    },
+    {
+      "name": "stale_data_fault",
+      "width": 1,
+      "source": "request_response_supervisor.stale_data_fault",
+      "destinations": [
+        "safety_fault_manager.stale_data_fault"
+      ],
+      "description": "Stale response fault from supervisor to safety manager."
+    },
+    {
+      "name": "validity_fault",
+      "width": 1,
+      "source": "request_response_supervisor.validity_fault",
+      "destinations": [
+        "safety_fault_manager.validity_fault"
+      ],
+      "description": "Response validity fault from supervisor to safety manager."
+    },
+    {
+      "name": "integrity_fault",
+      "width": 1,
+      "source": "request_response_supervisor.integrity_fault",
+      "destinations": [
+        "safety_fault_manager.integrity_fault"
+      ],
+      "description": "Integrity/status fault from supervisor to safety manager."
+    },
+    {
+      "name": "op_point_fault",
+      "width": 1,
+      "source": "request_response_supervisor.op_point_fault",
+      "destinations": [
+        "safety_fault_manager.op_point_fault"
+      ],
+      "description": "Operating-point envelope fault from supervisor to safety manager."
+    },
+    {
+      "name": "seq_fault",
+      "width": 1,
+      "source": "request_response_supervisor.seq_fault",
+      "destinations": [
+        "safety_fault_manager.seq_fault"
+      ],
+      "description": "Sequence mismatch fault from supervisor to safety manager."
+    },
+    {
+      "name": "cfg_rate_limit_en",
+      "width": 1,
+      "source": "control_plane_csr.cfg_rate_limit_en",
+      "destinations": [
+        "actuator_command_clamper.cfg_rate_limit_en"
+      ],
+      "description": "Enable for optional actuator rate limiting."
+    },
+    {
+      "name": "cfg_rate_limit_step",
+      "width": 16,
+      "source": "control_plane_csr.cfg_rate_limit_step",
+      "destinations": [
+        "actuator_command_clamper.cfg_rate_limit_step"
+      ],
+      "description": "Maximum actuator step per update when rate limiting is enabled."
+    },
+    {
+      "name": "cfg_surface0_min",
+      "width": 16,
+      "source": "control_plane_csr.cfg_surface0_min",
+      "destinations": [
+        "actuator_command_clamper.cfg_surface0_min"
+      ],
+      "description": "Minimum bound for actuator surface 0."
+    },
+    {
+      "name": "cfg_surface0_max",
+      "width": 16,
+      "source": "control_plane_csr.cfg_surface0_max",
+      "destinations": [
+        "actuator_command_clamper.cfg_surface0_max"
+      ],
+      "description": "Maximum bound for actuator surface 0."
+    },
+    {
+      "name": "cfg_surface1_min",
+      "width": 16,
+      "source": "control_plane_csr.cfg_surface1_min",
+      "destinations": [
+        "actuator_command_clamper.cfg_surface1_min"
+      ],
+      "description": "Minimum bound for actuator surface 1."
+    },
+    {
+      "name": "cfg_surface1_max",
+      "width": 16,
+      "source": "control_plane_csr.cfg_surface1_max",
+      "destinations": [
+        "actuator_command_clamper.cfg_surface1_max"
+      ],
+      "description": "Maximum bound for actuator surface 1."
+    },
+    {
+      "name": "cfg_surface2_min",
+      "width": 16,
+      "source": "control_plane_csr.cfg_surface2_min",
+      "destinations": [
+        "actuator_command_clamper.cfg_surface2_min"
+      ],
+      "description": "Minimum bound for actuator surface 2."
+    },
+    {
+      "name": "cfg_surface2_max",
+      "width": 16,
+      "source": "control_plane_csr.cfg_surface2_max",
+      "destinations": [
+        "actuator_command_clamper.cfg_surface2_max"
+      ],
+      "description": "Maximum bound for actuator surface 2."
+    },
+    {
+      "name": "cfg_surface3_min",
+      "width": 16,
+      "source": "control_plane_csr.cfg_surface3_min",
+      "destinations": [
+        "actuator_command_clamper.cfg_surface3_min"
+      ],
+      "description": "Minimum bound for actuator surface 3."
+    },
+    {
+      "name": "cfg_surface3_max",
+      "width": 16,
+      "source": "control_plane_csr.cfg_surface3_max",
+      "destinations": [
+        "actuator_command_clamper.cfg_surface3_max"
+      ],
+      "description": "Maximum bound for actuator surface 3."
+    },
+    {
+      "name": "cfg_fallback_surface0",
+      "width": 16,
+      "source": "control_plane_csr.cfg_fallback_surface0",
+      "destinations": [
+        "actuator_command_clamper.cfg_fallback_surface0"
+      ],
+      "description": "Safe fallback command for surface 0."
+    },
+    {
+      "name": "cfg_fallback_surface1",
+      "width": 16,
+      "source": "control_plane_csr.cfg_fallback_surface1",
+      "destinations": [
+        "actuator_command_clamper.cfg_fallback_surface1"
+      ],
+      "description": "Safe fallback command for surface 1."
+    },
+    {
+      "name": "cfg_fallback_surface2",
+      "width": 16,
+      "source": "control_plane_csr.cfg_fallback_surface2",
+      "destinations": [
+        "actuator_command_clamper.cfg_fallback_surface2"
+      ],
+      "description": "Safe fallback command for surface 2."
+    },
+    {
+      "name": "cfg_fallback_surface3",
+      "width": 16,
+      "source": "control_plane_csr.cfg_fallback_surface3",
+      "destinations": [
+        "actuator_command_clamper.cfg_fallback_surface3"
+      ],
+      "description": "Safe fallback command for surface 3."
+    },
+    {
+      "name": "validated_update",
+      "width": 1,
+      "source": "request_response_supervisor.response_validated",
+      "destinations": [
+        "actuator_command_clamper.validated_update"
+      ],
+      "description": "Update strobe for accepted validated response commands."
+    },
+    {
+      "name": "fault_active",
+      "width": 1,
+      "source": "safety_fault_manager.fault_active",
+      "destinations": [
+        "actuator_command_clamper.fault_active"
+      ],
+      "description": "Global fault-active condition forcing safe fallback."
+    },
+    {
+      "name": "fault_summary",
+      "width": 16,
+      "source": "safety_fault_manager.fault_summary",
+      "destinations": [
+        "control_plane_csr.fault_summary"
+      ],
+      "description": "Latched fault summary exposed to firmware."
+    },
+    {
+      "name": "health_summary",
+      "width": 16,
+      "source": "safety_fault_manager.health_summary",
+      "destinations": [
+        "control_plane_csr.health_summary"
+      ],
+      "description": "Health summary exposed to firmware."
+    },
+    {
+      "name": "cfg_clear_faults",
+      "width": 1,
+      "source": "control_plane_csr.cfg_clear_faults",
+      "destinations": [
+        "safety_fault_manager.cfg_clear_faults"
+      ],
+      "description": "Firmware fault-clear request from CSR to safety manager."
+    },
+    {
+      "name": "fault_clear_req",
+      "width": 1,
+      "source": "control_plane_csr.cfg_clear_faults",
+      "destinations": [
+        "safety_fault_manager.fault_clear_req"
+      ],
+      "description": "Explicit fault-clear request to the safety manager."
+    },
+    {
+      "name": "cpu_halted",
+      "width": 1,
+      "source": "aero_cpu_subsystem.cpu_halted",
+      "destinations": [
+        "safety_fault_manager.cpu_halted"
+      ],
+      "description": "CPU halted status into safety manager."
+    },
+    {
+      "name": "cpu_initialized",
+      "width": 1,
+      "source": "aero_cpu_subsystem.cpu_initialized",
+      "destinations": [
+        "safety_fault_manager.cpu_initialized"
+      ],
+      "description": "CPU initialized status into safety manager."
+    },
+    {
+      "name": "wb_adr_o",
+      "width": 32,
+      "source": "aero_cpu_subsystem.wb_adr_o",
+      "destinations": [
+        "control_plane_csr.wb_adr_i"
+      ],
+      "description": "CPU Wishbone master address to CSR decode."
+    },
+    {
+      "name": "wb_dat_o",
+      "width": 32,
+      "source": "aero_cpu_subsystem.wb_dat_o",
+      "destinations": [
+        "control_plane_csr.wb_dat_i"
+      ],
+      "description": "CPU Wishbone master write data to CSR decode."
+    },
+    {
+      "name": "wb_dat_i",
+      "width": 32,
+      "source": "control_plane_csr.wb_dat_o",
+      "destinations": [
+        "aero_cpu_subsystem.wb_dat_i"
+      ],
+      "description": "CSR read data returned to CPU Wishbone master."
+    },
+    {
+      "name": "wb_we_o",
+      "width": 1,
+      "source": "aero_cpu_subsystem.wb_we_o",
+      "destinations": [
+        "control_plane_csr.wb_we_i"
+      ],
+      "description": "CPU Wishbone write enable to CSR decode."
+    },
+    {
+      "name": "wb_stb_o",
+      "width": 1,
+      "source": "aero_cpu_subsystem.wb_stb_o",
+      "destinations": [
+        "control_plane_csr.wb_stb_i"
+      ],
+      "description": "CPU Wishbone strobe to CSR decode."
+    },
+    {
+      "name": "wb_cyc_o",
+      "width": 1,
+      "source": "aero_cpu_subsystem.wb_cyc_o",
+      "destinations": [
+        "control_plane_csr.wb_cyc_i"
+      ],
+      "description": "CPU Wishbone cycle to CSR decode."
+    },
+    {
+      "name": "wb_sel_o",
+      "width": 4,
+      "source": "aero_cpu_subsystem.wb_sel_o",
+      "destinations": [
+        "control_plane_csr.wb_sel_i"
+      ],
+      "description": "CPU Wishbone byte select to CSR decode."
+    },
+    {
+      "name": "wb_ack_i",
+      "width": 1,
+      "source": "control_plane_csr.wb_ack_o",
+      "destinations": [
+        "aero_cpu_subsystem.wb_ack_i"
+      ],
+      "description": "Wishbone acknowledge returned to CPU subsystem."
+    },
+    {
+      "name": "wb_err_i",
+      "width": 1,
+      "source": "control_plane_csr.wb_err_o",
+      "destinations": [
+        "aero_cpu_subsystem.wb_err_i"
+      ],
+      "description": "Wishbone error returned to CPU subsystem."
+    },
+    {
+      "name": "buffer_push",
+      "width": 1,
+      "source": "request_response_supervisor.request_issued",
+      "destinations": [
+        "transport_buffer_wrapper.buffer_push"
+      ],
+      "description": "Push a request/response history record into the bounded transport buffer."
+    },
+    {
+      "name": "buffer_pop",
+      "width": 1,
+      "source": "request_response_supervisor.response_validated",
+      "destinations": [
+        "transport_buffer_wrapper.buffer_pop"
+      ],
+      "description": "Pop or retire a buffered transport record after validation."
+    },
+    {
+      "name": "history_read",
+      "width": 1,
+      "source": "control_plane_csr.cfg_enable",
+      "destinations": [
+        "transport_buffer_wrapper.history_read"
+      ],
+      "description": "Read history entry under firmware enable for diagnostics."
+    },
+    {
+      "name": "actuator_command_clamper_clamp_fault",
+      "width": 1,
+      "source": "actuator_command_clamper.clamp_fault",
+      "destinations": [
+        "safety_fault_manager.clamp_fault"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer actuator_command_clamper.clamp_fault."
+    },
+    {
+      "name": "actuator_command_clamper_rate_limit_fault",
+      "width": 1,
+      "source": "actuator_command_clamper.rate_limit_fault",
+      "destinations": [
+        "safety_fault_manager.rate_limit_fault"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer actuator_command_clamper.rate_limit_fault."
+    },
+    {
+      "name": "safety_fault_manager_watchdog_active",
+      "width": 1,
+      "source": "safety_fault_manager.watchdog_active",
+      "destinations": [
+        "control_plane_csr.watchdog_active"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer safety_fault_manager.watchdog_active."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "cfg_enable",
+      "owner": "control_plane_csr.cfg_enable"
+    },
+    {
+      "signal": "cfg_request_mode",
+      "owner": "control_plane_csr.cfg_request_mode"
+    },
+    {
+      "signal": "cfg_timeout_cycles",
+      "owner": "control_plane_csr.cfg_timeout_cycles"
+    },
+    {
+      "signal": "cfg_freshness_threshold",
+      "owner": "control_plane_csr.cfg_freshness_threshold"
+    },
+    {
+      "signal": "cfg_sequence_seed",
+      "owner": "control_plane_csr.cfg_sequence_seed"
+    },
+    {
+      "signal": "cfg_overwrite_policy",
+      "owner": "control_plane_csr.cfg_overwrite_policy"
+    },
+    {
+      "signal": "cfg_op_point_min_kph",
+      "owner": "control_plane_csr.cfg_op_point_min_kph"
+    },
+    {
+      "signal": "cfg_op_point_max_kph",
+      "owner": "control_plane_csr.cfg_op_point_max_kph"
+    },
+    {
+      "signal": "cfg_request_seq",
+      "owner": "control_plane_csr.cfg_request_seq"
+    },
+    {
+      "signal": "cfg_request_class",
+      "owner": "control_plane_csr.cfg_request_class"
+    },
+    {
+      "signal": "cfg_geometry_ref",
+      "owner": "control_plane_csr.cfg_geometry_ref"
+    },
+    {
+      "signal": "request_issued",
+      "owner": "request_response_supervisor.request_issued"
+    },
+    {
+      "signal": "request_stalled",
+      "owner": "request_response_supervisor.request_stalled"
+    },
+    {
+      "signal": "request_overwritten",
+      "owner": "request_response_supervisor.request_overwritten"
+    },
+    {
+      "signal": "outstanding_sequence",
+      "owner": "request_response_supervisor.outstanding_sequence"
+    },
+    {
+      "signal": "last_response_sequence",
+      "owner": "request_response_supervisor.last_response_sequence"
+    },
+    {
+      "signal": "last_response_age",
+      "owner": "request_response_supervisor.last_response_age"
+    },
+    {
+      "signal": "response_validated",
+      "owner": "request_response_supervisor.response_validated"
+    },
+    {
+      "signal": "response_rejected",
+      "owner": "request_response_supervisor.response_rejected"
+    },
+    {
+      "signal": "timeout_active",
+      "owner": "request_response_supervisor.timeout_active"
+    },
+    {
+      "signal": "age_counter",
+      "owner": "request_response_supervisor.age_counter"
+    },
+    {
+      "signal": "timeout_fault",
+      "owner": "request_response_supervisor.timeout_fault"
+    },
+    {
+      "signal": "stale_data_fault",
+      "owner": "request_response_supervisor.stale_data_fault"
+    },
+    {
+      "signal": "validity_fault",
+      "owner": "request_response_supervisor.validity_fault"
+    },
+    {
+      "signal": "integrity_fault",
+      "owner": "request_response_supervisor.integrity_fault"
+    },
+    {
+      "signal": "op_point_fault",
+      "owner": "request_response_supervisor.op_point_fault"
+    },
+    {
+      "signal": "seq_fault",
+      "owner": "request_response_supervisor.seq_fault"
+    },
+    {
+      "signal": "cfg_rate_limit_en",
+      "owner": "control_plane_csr.cfg_rate_limit_en"
+    },
+    {
+      "signal": "cfg_rate_limit_step",
+      "owner": "control_plane_csr.cfg_rate_limit_step"
+    },
+    {
+      "signal": "cfg_surface0_min",
+      "owner": "control_plane_csr.cfg_surface0_min"
+    },
+    {
+      "signal": "cfg_surface0_max",
+      "owner": "control_plane_csr.cfg_surface0_max"
+    },
+    {
+      "signal": "cfg_surface1_min",
+      "owner": "control_plane_csr.cfg_surface1_min"
+    },
+    {
+      "signal": "cfg_surface1_max",
+      "owner": "control_plane_csr.cfg_surface1_max"
+    },
+    {
+      "signal": "cfg_surface2_min",
+      "owner": "control_plane_csr.cfg_surface2_min"
+    },
+    {
+      "signal": "cfg_surface2_max",
+      "owner": "control_plane_csr.cfg_surface2_max"
+    },
+    {
+      "signal": "cfg_surface3_min",
+      "owner": "control_plane_csr.cfg_surface3_min"
+    },
+    {
+      "signal": "cfg_surface3_max",
+      "owner": "control_plane_csr.cfg_surface3_max"
+    },
+    {
+      "signal": "cfg_fallback_surface0",
+      "owner": "control_plane_csr.cfg_fallback_surface0"
+    },
+    {
+      "signal": "cfg_fallback_surface1",
+      "owner": "control_plane_csr.cfg_fallback_surface1"
+    },
+    {
+      "signal": "cfg_fallback_surface2",
+      "owner": "control_plane_csr.cfg_fallback_surface2"
+    },
+    {
+      "signal": "cfg_fallback_surface3",
+      "owner": "control_plane_csr.cfg_fallback_surface3"
+    },
+    {
+      "signal": "validated_update",
+      "owner": "request_response_supervisor.response_validated"
+    },
+    {
+      "signal": "fault_active",
+      "owner": "safety_fault_manager.fault_active"
+    },
+    {
+      "signal": "fault_summary",
+      "owner": "safety_fault_manager.fault_summary"
+    },
+    {
+      "signal": "health_summary",
+      "owner": "safety_fault_manager.health_summary"
+    },
+    {
+      "signal": "cfg_clear_faults",
+      "owner": "control_plane_csr.cfg_clear_faults"
+    },
+    {
+      "signal": "fault_clear_req",
+      "owner": "control_plane_csr.cfg_clear_faults"
+    },
+    {
+      "signal": "irq_response_ready",
+      "owner": "safety_fault_manager.irq_response_ready"
+    },
+    {
+      "signal": "irq_fault",
+      "owner": "safety_fault_manager.irq_fault"
+    },
+    {
+      "signal": "irq_timeout",
+      "owner": "safety_fault_manager.irq_timeout"
+    },
+    {
+      "signal": "cpu_halted",
+      "owner": "aero_cpu_subsystem.cpu_halted"
+    },
+    {
+      "signal": "cpu_initialized",
+      "owner": "aero_cpu_subsystem.cpu_initialized"
+    },
+    {
+      "signal": "wb_adr_o",
+      "owner": "aero_cpu_subsystem.wb_adr_o"
+    },
+    {
+      "signal": "wb_dat_o",
+      "owner": "aero_cpu_subsystem.wb_dat_o"
+    },
+    {
+      "signal": "wb_dat_i",
+      "owner": "control_plane_csr.wb_dat_o"
+    },
+    {
+      "signal": "wb_we_o",
+      "owner": "aero_cpu_subsystem.wb_we_o"
+    },
+    {
+      "signal": "wb_stb_o",
+      "owner": "aero_cpu_subsystem.wb_stb_o"
+    },
+    {
+      "signal": "wb_cyc_o",
+      "owner": "aero_cpu_subsystem.wb_cyc_o"
+    },
+    {
+      "signal": "wb_sel_o",
+      "owner": "aero_cpu_subsystem.wb_sel_o"
+    },
+    {
+      "signal": "wb_ack_i",
+      "owner": "control_plane_csr.wb_ack_o"
+    },
+    {
+      "signal": "wb_err_i",
+      "owner": "control_plane_csr.wb_err_o"
+    },
+    {
+      "signal": "payload_fifo_csb",
+      "owner": "transport_buffer_wrapper.payload_fifo_csb"
+    },
+    {
+      "signal": "payload_fifo_we",
+      "owner": "transport_buffer_wrapper.payload_fifo_we"
+    },
+    {
+      "signal": "payload_fifo_addr",
+      "owner": "transport_buffer_wrapper.payload_fifo_addr"
+    },
+    {
+      "signal": "payload_fifo_din",
+      "owner": "transport_buffer_wrapper.payload_fifo_din"
+    },
+    {
+      "signal": "history_csb",
+      "owner": "transport_buffer_wrapper.history_csb"
+    },
+    {
+      "signal": "history_we",
+      "owner": "transport_buffer_wrapper.history_we"
+    },
+    {
+      "signal": "history_addr",
+      "owner": "transport_buffer_wrapper.history_addr"
+    },
+    {
+      "signal": "history_din",
+      "owner": "transport_buffer_wrapper.history_din"
+    },
+    {
+      "signal": "buffer_push",
+      "owner": "request_response_supervisor.request_issued"
+    },
+    {
+      "signal": "buffer_pop",
+      "owner": "request_response_supervisor.response_validated"
+    },
+    {
+      "signal": "history_read",
+      "owner": "control_plane_csr.cfg_enable"
+    },
+    {
+      "signal": "buffer_full",
+      "owner": "transport_buffer_wrapper.buffer_full"
+    },
+    {
+      "signal": "buffer_empty",
+      "owner": "transport_buffer_wrapper.buffer_empty"
+    },
+    {
+      "signal": "history_valid",
+      "owner": "transport_buffer_wrapper.history_valid"
+    },
+    {
+      "signal": "actuator_command_clamper_clamp_fault",
+      "owner": "actuator_command_clamper.clamp_fault"
+    },
+    {
+      "signal": "actuator_command_clamper_rate_limit_fault",
+      "owner": "actuator_command_clamper.rate_limit_fault"
+    },
+    {
+      "signal": "safety_fault_manager_watchdog_active",
+      "owner": "safety_fault_manager.watchdog_active"
+    },
+    {
+      "signal": "wb_dat_o",
+      "owner": "control_plane_csr.wb_dat_o"
+    },
+    {
+      "signal": "wb_ack_o",
+      "owner": "control_plane_csr.wb_ack_o"
+    },
+    {
+      "signal": "wb_err_o",
+      "owner": "control_plane_csr.wb_err_o"
+    },
+    {
+      "signal": "ext_req_valid",
+      "owner": "request_response_supervisor.ext_req_valid"
+    },
+    {
+      "signal": "ext_req_data",
+      "owner": "request_response_supervisor.ext_req_data"
+    },
+    {
+      "signal": "ext_rsp_ready",
+      "owner": "request_response_supervisor.ext_rsp_ready"
+    },
+    {
+      "signal": "actuator_cmd_valid",
+      "owner": "actuator_command_clamper.actuator_cmd_valid"
+    },
+    {
+      "signal": "actuator_cmd_safe_fallback",
+      "owner": "actuator_command_clamper.actuator_cmd_safe_fallback"
+    },
+    {
+      "signal": "actuator_cmd_surface0",
+      "owner": "actuator_command_clamper.actuator_cmd_surface0"
+    },
+    {
+      "signal": "actuator_cmd_surface1",
+      "owner": "actuator_command_clamper.actuator_cmd_surface1"
+    },
+    {
+      "signal": "actuator_cmd_surface2",
+      "owner": "actuator_command_clamper.actuator_cmd_surface2"
+    },
+    {
+      "signal": "actuator_cmd_surface3",
+      "owner": "actuator_command_clamper.actuator_cmd_surface3"
+    },
+    {
+      "signal": "irq_out",
+      "owner": "safety_fault_manager.irq_fault"
+    },
+    {
+      "signal": "uart_tx",
+      "owner": "aero_cpu_subsystem.uart_tx"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "wishbone",
+    "registers": [
+      {
+        "name": "CTRL",
+        "address": "0x00",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "enable",
+            "bits": "0",
+            "reset": 0
+          },
+          {
+            "name": "request_mode",
+            "bits": "1",
+            "reset": 0
+          },
+          {
+            "name": "overwrite_policy",
+            "bits": "2",
+            "reset": 0
+          },
+          {
+            "name": "rate_limit_enable",
+            "bits": "3",
+            "reset": 0
+          },
+          {
+            "name": "clear_faults",
+            "bits": "4",
+            "reset": 0
+          }
+        ],
+        "description": "Global control and fault-clear register."
+      },
+      {
+        "name": "TIMEOUT_CYCLES",
+        "address": "0x04",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "timeout_cycles",
+            "bits": "15:0",
+            "reset": 50000
+          }
+        ],
+        "description": "Watchdog timeout in clock cycles."
+      },
+      {
+        "name": "FRESHNESS_THRESHOLD",
+        "address": "0x08",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "freshness_threshold",
+            "bits": "15:0",
+            "reset": 1000
+          }
+        ],
+        "description": "Maximum acceptable response age/freshness threshold."
+      },
+      {
+        "name": "SEQUENCE_CFG",
+        "address": "0x0C",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "sequence_seed",
+            "bits": "15:0",
+            "reset": 1
+          },
+          {
+            "name": "request_seq",
+            "bits": "31:16",
+            "reset": 1
+          }
+        ],
+        "description": "Sequence seed and current request sequence control."
+      },
+      {
+        "name": "REQUEST_CLASS",
+        "address": "0x10",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "request_class",
+            "bits": "7:0",
+            "reset": 0
+          }
+        ],
+        "description": "Command class identifier for the external model request."
+      },
+      {
+        "name": "GEOMETRY_REF",
+        "address": "0x14",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "geometry_ref",
+            "bits": "31:0",
+            "reset": 0
+          }
+        ],
+        "description": "Geometry reference tag or hash pointer; no geometry tensor is exposed."
+      },
+      {
+        "name": "OP_POINT_MIN",
+        "address": "0x18",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "op_point_min_kph",
+            "bits": "15:0",
+            "reset": 20
+          }
+        ],
+        "description": "Lower operating-point envelope bound."
+      },
+      {
+        "name": "OP_POINT_MAX",
+        "address": "0x1C",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "op_point_max_kph",
+            "bits": "15:0",
+            "reset": 55
+          }
+        ],
+        "description": "Upper operating-point envelope bound."
+      },
+      {
+        "name": "SURFACE0_LIMITS",
+        "address": "0x20",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "surface0_min",
+            "bits": "15:0",
+            "reset": 0
+          },
+          {
+            "name": "surface0_max",
+            "bits": "31:16",
+            "reset": 1000
+          }
+        ],
+        "description": "Actuator surface 0 min/max bounds."
+      },
+      {
+        "name": "SURFACE1_LIMITS",
+        "address": "0x24",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "surface1_min",
+            "bits": "15:0",
+            "reset": 0
+          },
+          {
+            "name": "surface1_max",
+            "bits": "31:16",
+            "reset": 1000
+          }
+        ],
+        "description": "Actuator surface 1 min/max bounds."
+      },
+      {
+        "name": "SURFACE2_LIMITS",
+        "address": "0x28",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "surface2_min",
+            "bits": "15:0",
+            "reset": 0
+          },
+          {
+            "name": "surface2_max",
+            "bits": "31:16",
+            "reset": 1000
+          }
+        ],
+        "description": "Actuator surface 2 min/max bounds."
+      },
+      {
+        "name": "SURFACE3_LIMITS",
+        "address": "0x2C",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "surface3_min",
+            "bits": "15:0",
+            "reset": 0
+          },
+          {
+            "name": "surface3_max",
+            "bits": "31:16",
+            "reset": 1000
+          }
+        ],
+        "description": "Actuator surface 3 min/max bounds."
+      },
+      {
+        "name": "RATE_LIMIT",
+        "address": "0x30",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "rate_limit_step",
+            "bits": "15:0",
+            "reset": 10
+          }
+        ],
+        "description": "Optional actuator rate-of-change limit."
+      },
+      {
+        "name": "FALLBACK0",
+        "address": "0x34",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "fallback_surface0",
+            "bits": "15:0",
+            "reset": 500
+          }
+        ],
+        "description": "Safe fallback command for surface 0."
+      },
+      {
+        "name": "FALLBACK1",
+        "address": "0x38",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "fallback_surface1",
+            "bits": "15:0",
+            "reset": 500
+          }
+        ],
+        "description": "Safe fallback command for surface 1."
+      },
+      {
+        "name": "FALLBACK2",
+        "address": "0x3C",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "fallback_surface2",
+            "bits": "15:0",
+            "reset": 500
+          }
+        ],
+        "description": "Safe fallback command for surface 2."
+      },
+      {
+        "name": "FALLBACK3",
+        "address": "0x40",
+        "access": "rw",
+        "fields": [
+          {
+            "name": "fallback_surface3",
+            "bits": "15:0",
+            "reset": 500
+          }
+        ],
+        "description": "Safe fallback command for surface 3."
+      },
+      {
+        "name": "STATUS_LAST_SEQ",
+        "address": "0x44",
+        "access": "ro",
+        "fields": [
+          {
+            "name": "last_response_sequence",
+            "bits": "15:0",
+            "reset": 0
+          }
+        ],
+        "description": "Last accepted or observed response sequence."
+      },
+      {
+        "name": "STATUS_LAST_AGE",
+        "address": "0x48",
+        "access": "ro",
+        "fields": [
+          {
+            "name": "last_response_age",
+            "bits": "15:0",
+            "reset": 0
+          }
+        ],
+        "description": "Age of the last response."
+      },
+      {
+        "name": "STATUS_FAULT_SUMMARY",
+        "address": "0x4C",
+        "access": "ro",
+        "fields": [
+          {
+            "name": "fault_summary",
+            "bits": "15:0",
+            "reset": 0
+          }
+        ],
+        "description": "Latched fault summary."
+      },
+      {
+        "name": "STATUS_HEALTH_SUMMARY",
+        "address": "0x50",
+        "access": "ro",
+        "fields": [
+          {
+            "name": "health_summary",
+            "bits": "15:0",
+            "reset": 0
+          }
+        ],
+        "description": "Overall health summary."
+      },
+      {
+        "name": "STATUS_WATCHDOG",
+        "address": "0x54",
+        "access": "ro",
+        "fields": [
+          {
+            "name": "watchdog_active",
+            "bits": "0",
+            "reset": 0
+          },
+          {
+            "name": "request_issued",
+            "bits": "1",
+            "reset": 0
+          },
+          {
+            "name": "request_stalled",
+            "bits": "2",
+            "reset": 0
+          },
+          {
+            "name": "request_overwritten",
+            "bits": "3",
+            "reset": 0
+          }
+        ],
+        "description": "Live watchdog and request-state summary."
+      },
+      {
+        "name": "PACKET_FORMAT_REQUEST",
+        "address": "0x58",
+        "access": "ro",
+        "fields": [
+          {
+            "name": "request_validity_tag",
+            "bits": "7:0",
+            "reset": 165
+          },
+          {
+            "name": "sequence_id",
+            "bits": "23:8",
+            "reset": 0
+          },
+          {
+            "name": "operating_point_kph",
+            "bits": "39:24",
+            "reset": 0
+          },
+          {
+            "name": "geometry_ref",
+            "bits": "71:40",
+            "reset": 0
+          },
+          {
+            "name": "command_class",
+            "bits": "79:72",
+            "reset": 0
+          }
+        ],
+        "description": "Documented request packet field map, transported in the bounded 128-bit request payload."
+      },
+      {
+        "name": "PACKET_FORMAT_RESPONSE",
+        "address": "0x5C",
+        "access": "ro",
+        "fields": [
+          {
+            "name": "response_validity_tag",
+            "bits": "7:0",
+            "reset": 90
+          },
+          {
+            "name": "sequence_id",
+            "bits": "23:8",
+            "reset": 0
+          },
+          {
+            "name": "freshness_stamp",
+            "bits": "39:24",
+            "reset": 0
+          },
+          {
+            "name": "surface_targets",
+            "bits": "103:40",
+            "reset": 0
+          },
+          {
+            "name": "status_bits",
+            "bits": "111:104",
+            "reset": 0
+          }
+        ],
+        "description": "Documented response packet field map, transported in the bounded 128-bit response payload."
+      }
+    ]
+  }
+}

@@ -1,0 +1,139 @@
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: pass3/adaptive_aero_control_top.v:271:6: Instance pin connected by name with empty reference: 'outstanding_sequence'
+  271 |     .outstanding_sequence(),
+      |      ^~~~~~~~~~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: pass3/adaptive_aero_control_top.v:275:6: Instance pin connected by name with empty reference: 'response_rejected'
+  275 |     .response_rejected(),
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: pass3/adaptive_aero_control_top.v:277:6: Instance pin connected by name with empty reference: 'age_counter'
+  277 |     .age_counter(),
+      |      ^~~~~~~~~~~
+%Warning-PINMISSING: pass3/adaptive_aero_control_top.v:377:28: Instance has missing pin: 'csb'
+  377 | transport_payload_fifo_mem u_transport_payload_fifo_mem(
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                     pass3/transport_payload_fifo_mem.v:3:5: ... Location of port declaration
+    3 |     csb,
+      |     ^~~
+                     ... For warning description see https://verilator.org/warn/PINMISSING?v=5.047
+                     ... Use "/* verilator lint_off PINMISSING */" and lint_on around source to disable this message.
+%Warning-PINMISSING: pass3/adaptive_aero_control_top.v:377:28: Instance has missing pin: 'we'
+  377 | transport_payload_fifo_mem u_transport_payload_fifo_mem(
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                     pass3/transport_payload_fifo_mem.v:4:5: ... Location of port declaration
+    4 |     we,
+      |     ^~
+%Warning-PINMISSING: pass3/adaptive_aero_control_top.v:377:28: Instance has missing pin: 'addr'
+  377 | transport_payload_fifo_mem u_transport_payload_fifo_mem(
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                     pass3/transport_payload_fifo_mem.v:5:5: ... Location of port declaration
+    5 |     addr,
+      |     ^~~~
+%Warning-PINMISSING: pass3/adaptive_aero_control_top.v:377:28: Instance has missing pin: 'din'
+  377 | transport_payload_fifo_mem u_transport_payload_fifo_mem(
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                     pass3/transport_payload_fifo_mem.v:6:5: ... Location of port declaration
+    6 |     din,
+      |     ^~~
+%Warning-PINMISSING: pass3/adaptive_aero_control_top.v:377:28: Instance has missing pin: 'dout'
+  377 | transport_payload_fifo_mem u_transport_payload_fifo_mem(
+      |                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                     pass3/transport_payload_fifo_mem.v:7:5: ... Location of port declaration
+    7 |     dout
+      |     ^~~~
+%Warning-PINMISSING: pass3/adaptive_aero_control_top.v:386:23: Instance has missing pin: 'csb'
+  386 | transport_history_mem u_transport_history_mem(
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~
+                     pass3/transport_history_mem.v:3:5: ... Location of port declaration
+    3 |     csb,
+      |     ^~~
+%Warning-PINMISSING: pass3/adaptive_aero_control_top.v:386:23: Instance has missing pin: 'we'
+  386 | transport_history_mem u_transport_history_mem(
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~
+                     pass3/transport_history_mem.v:4:5: ... Location of port declaration
+    4 |     we,
+      |     ^~
+%Warning-PINMISSING: pass3/adaptive_aero_control_top.v:386:23: Instance has missing pin: 'addr'
+  386 | transport_history_mem u_transport_history_mem(
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~
+                     pass3/transport_history_mem.v:5:5: ... Location of port declaration
+    5 |     addr,
+      |     ^~~~
+%Warning-PINMISSING: pass3/adaptive_aero_control_top.v:386:23: Instance has missing pin: 'din'
+  386 | transport_history_mem u_transport_history_mem(
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~
+                     pass3/transport_history_mem.v:6:5: ... Location of port declaration
+    6 |     din,
+      |     ^~~
+%Warning-PINMISSING: pass3/adaptive_aero_control_top.v:386:23: Instance has missing pin: 'dout'
+  386 | transport_history_mem u_transport_history_mem(
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~
+                     pass3/transport_history_mem.v:7:5: ... Location of port declaration
+    7 |     dout
+      |     ^~~~
+%Error-PINNOTFOUND: pass3/adaptive_aero_control_top.v:379:6: Pin not found: 'payload_fifo_csb'
+  379 |     .payload_fifo_csb(payload_fifo_csb),
+      |      ^~~~~~~~~~~~~~~~
+                                                           : ... Location of instance's module declaration
+    1 | module transport_payload_fifo_mem(
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~
+                    ... For error description see https://verilator.org/warn/PINNOTFOUND?v=5.047
+%Error-PINNOTFOUND: pass3/adaptive_aero_control_top.v:380:6: Pin not found: 'payload_fifo_we'
+  380 |     .payload_fifo_we(payload_fifo_we),
+      |      ^~~~~~~~~~~~~~~
+                                                           : ... Location of instance's module declaration
+    1 | module transport_payload_fifo_mem(
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass3/adaptive_aero_control_top.v:381:6: Pin not found: 'payload_fifo_addr'
+  381 |     .payload_fifo_addr(payload_fifo_addr),
+      |      ^~~~~~~~~~~~~~~~~
+                                                           : ... Location of instance's module declaration
+    1 | module transport_payload_fifo_mem(
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass3/adaptive_aero_control_top.v:382:6: Pin not found: 'payload_fifo_din'
+  382 |     .payload_fifo_din(payload_fifo_din),
+      |      ^~~~~~~~~~~~~~~~
+                                                           : ... Location of instance's module declaration
+    1 | module transport_payload_fifo_mem(
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass3/adaptive_aero_control_top.v:383:6: Pin not found: 'payload_fifo_dout'
+  383 |     .payload_fifo_dout(payload_fifo_dout)
+      |      ^~~~~~~~~~~~~~~~~
+                                                           : ... Location of instance's module declaration
+    1 | module transport_payload_fifo_mem(
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass3/adaptive_aero_control_top.v:388:6: Pin not found: 'history_csb'
+  388 |     .history_csb(history_csb),
+      |      ^~~~~~~~~~~
+                                                           : ... Location of instance's module declaration
+    1 | module transport_history_mem(
+      |        ^~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass3/adaptive_aero_control_top.v:389:6: Pin not found: 'history_we'
+  389 |     .history_we(history_we),
+      |      ^~~~~~~~~~
+                                                           : ... Location of instance's module declaration
+    1 | module transport_history_mem(
+      |        ^~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass3/adaptive_aero_control_top.v:390:6: Pin not found: 'history_addr'
+  390 |     .history_addr(history_addr),
+      |      ^~~~~~~~~~~~
+                                                           : ... Location of instance's module declaration
+    1 | module transport_history_mem(
+      |        ^~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass3/adaptive_aero_control_top.v:391:6: Pin not found: 'history_din'
+  391 |     .history_din(history_din),
+      |      ^~~~~~~~~~~
+                                                           : ... Location of instance's module declaration
+    1 | module transport_history_mem(
+      |        ^~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass3/adaptive_aero_control_top.v:392:6: Pin not found: 'history_dout'
+  392 |     .history_dout(history_dout)
+      |      ^~~~~~~~~~~~
+                                                           : ... Location of instance's module declaration
+    1 | module transport_history_mem(
+      |        ^~~~~~~~~~~~~~~~~~~~~
+%Error: Exiting due to 10 error(s)
+
+=== RETURN CODE ===
+1

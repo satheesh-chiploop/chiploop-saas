@@ -1,0 +1,437 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "design_summary": {
+    "purpose": "Synthesizable FPGA adaptive aero control integration block with a PicoRV32/Wishbone firmware control plane, bounded external request/response supervision, deterministic safety aggregation, actuator clamping, and technology-neutral bounded buffering.",
+    "operating_model": "Firmware on the integrated PicoRV32 subsystem configures the CSR/MMIO register bank, issues supervised external model requests through the bounded valid/ready request stream, receives bounded responses through the matching response stream, and only then permits validated actuator updates. Safety logic enforces freshness, timeout, operating-point envelope, sequence policy, fault latching, and safe fallback behavior.",
+    "external_interfaces": [
+      "Wishbone CSR/MMIO control plane with address, write-data, read-data, write-enable, strobe, cycle, byte-select, acknowledge, and error semantics",
+      "Bounded external request stream: ext_req_valid/ext_req_ready/ext_req_data",
+      "Bounded external response stream: ext_rsp_valid/ext_rsp_ready/ext_rsp_data",
+      "Compact actuator command outputs: actuator_cmd_valid, actuator_cmd_safe_fallback, actuator_cmd_surface0..3",
+      "Aggregated interrupt output: irq_out",
+      "Optional UART diagnostics: uart_tx/uart_rx"
+    ]
+  },
+  "module_architecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "role": "Top-level system integration point for firmware-mediated adaptive aero control, supervision, buffering, safety, and actuator output selection.",
+      "responsibilities": [
+        "Expose a real Wishbone CSR/MMIO interface reachable by firmware.",
+        "Integrate the PicoRV32 soft CPU subsystem boundary and its observable status.",
+        "Validate external model responses before any actuator update.",
+        "Clamp and optionally rate-limit validated actuator commands.",
+        "Maintain deterministic safe fallback on reset and on fault conditions.",
+        "Generate interrupt output from safety/fault status."
+      ],
+      "interface_notes": [
+        "Receives clk and active-low rst_n in a single synchronous clock domain.",
+        "Drives the bounded request stream, response-ready handshake, actuator outputs, irq_out, and uart_tx.",
+        "Receives Wishbone control transactions, external response data, and uart_rx.",
+        "Keeps the top-level pin set compact and avoids geometry arrays, tensors, or unbounded payload buses."
+      ],
+      "ownership_notes": [
+        "Top-level port ownership remains unchanged as specified.",
+        "Firmware-visible control remains mediated by CSR/MMIO decode, not by direct hardware command bypass.",
+        "The top module is the system contract owner; it is not replaced by a status or leaf module."
+      ]
+    },
+    {
+      "name": "aero_cpu_subsystem",
+      "role": "PicoRV32 rv32imc Wishbone master boundary for firmware execution, CSR/MMIO access, optional UART diagnostics, and interrupt reception.",
+      "responsibilities": [
+        "Generate Wishbone master transactions for firmware access.",
+        "Provide CPU halt and initialization status.",
+        "Receive a single aggregated interrupt source for response-ready, fault, and timeout events.",
+        "Provide optional UART diagnostics.",
+        "Remain inactive from an actuator-control standpoint."
+      ],
+      "interface_notes": [
+        "Exports Wishbone master signals wb_adr_o, wb_dat_o, wb_we_o, wb_stb_o, wb_cyc_o, wb_sel_o and receives wb_dat_i, wb_ack_i, wb_err_i.",
+        "Consumes irq_i as a single aggregated interrupt input.",
+        "Exposes cpu_halted and cpu_initialized for safety supervision.",
+        "Provides uart_tx and uart_rx for optional bring-up diagnostics."
+      ],
+      "ownership_notes": [
+        "The CPU subsystem is firmware-facing and observable, but does not directly command actuators.",
+        "It is integrated as a soft-CPU boundary, not claimed as standalone board-ready without complete synthesis and routing with memory and control-plane RTL.",
+        "Wishbone is the selected bus contract and must remain preserved."
+      ]
+    },
+    {
+      "name": "control_plane_csr",
+      "role": "Firmware-visible Wishbone CSR/MMIO register bank that decodes control and status registers and publishes explicit semantic control outputs.",
+      "responsibilities": [
+        "Provide a real MMIO/CSR decode window reachable by firmware through Wishbone.",
+        "Expose all implemented registers and fields in the authoritative register contract.",
+        "Translate raw register writes into explicit semantic outputs.",
+        "Return status registers for response sequence, age, fault summary, and health summary.",
+        "Clear faults only when firmware requests it and the fault source has cleared."
+      ],
+      "interface_notes": [
+        "Accepts Wishbone address, data, control, and byte-select inputs and returns read data plus acknowledge/error semantics.",
+        "Drives enable, timeout, freshness, sequence, overwrite policy, operating-point bounds, actuator limit registers, rate-limit control, fallback command, and fault-clear control.",
+        "Receives live status inputs including last response sequence, last response age, fault summary, health summary, watchdog_active, request activity indicators, and history_valid.",
+        "The register map is compact and implementation-friendly, with firmware-visible access to every declared register."
+      ],
+      "ownership_notes": [
+        "This block is the sole owner of the firmware-visible register semantics described in register_contract.",
+        "No inaccessible internal state is presented as software-visible.",
+        "It is the CSR/MMIO control-plane source for request, safety, and actuator configuration."
+      ]
+    },
+    {
+      "name": "request_response_supervisor",
+      "role": "Bounded stream policy engine for external model transport supervision, sequencing, freshness, timeout, and response validation.",
+      "responsibilities": [
+        "Issue a single bounded request stream per accepted firmware command.",
+        "Track outstanding request sequence and age.",
+        "Support stall or overwrite policy for a new request while one is outstanding.",
+        "Set explicit reject and fault outputs for invalid, stale, or mismatched responses.",
+        "Start and monitor watchdog timing on each request issuance.",
+        "Provide validated actuator surface outputs to the clamping stage.",
+        "Expose a single response_rejected indicator and no duplicate raw validity fault output to downstream safety logic."
+      ],
+      "interface_notes": [
+        "Constructs ext_req_data as a fixed-slice 128-bit request packet and drives ext_req_valid.",
+        "Consumes ext_rsp_valid and ext_rsp_data and drives ext_rsp_ready.",
+        "Publishes outstanding_sequence, response_last_sequence, response_age, response_validated, response_rejected, timeout_active, age_counter, and fault indicators.",
+        "Outputs validated_surface0..3 and validated_update only when a response passes policy checks.",
+        "Request and response packet formats are documented in the register contract and use fixed field slices."
+      ],
+      "ownership_notes": [
+        "This module owns transport policy and validation, not actuator output authority.",
+        "Response acceptance is explicitly firmware-mediated and bounded; stale or invalid model commands are rejected.",
+        "The external model itself remains outside RTL; this block only transports and validates requests and responses."
+      ]
+    },
+    {
+      "name": "actuator_command_clamper",
+      "role": "Integer-only actuator clamp and safe-command selection stage with optional rate limiting.",
+      "responsibilities": [
+        "Clamp each actuator command to configured bounds.",
+        "Apply optional rate limiting before output.",
+        "Hold or drive the fallback command when validation is absent or faulted.",
+        "Assert explicit clamp and rate-limit fault indicators when commands exceed permitted bounds or step size."
+      ],
+      "interface_notes": [
+        "Consumes validated_surface0..3 and validated_update from the supervisor, along with fault_active and response_validated.",
+        "Uses CSR-programmed min/max limits, optional rate-limit enable and step, and fallback surface commands.",
+        "Drives actuator_cmd_valid, actuator_cmd_safe_fallback, and surface outputs 0 through 3.",
+        "Updates outputs only when a validated command is present and the system is not faulted."
+      ],
+      "ownership_notes": [
+        "This stage never sources outputs from unvalidated stream contents.",
+        "Safe fallback is deterministic and reset-safe.",
+        "All arithmetic remains synthesizable integer or fixed-point only."
+      ]
+    },
+    {
+      "name": "safety_fault_manager",
+      "role": "Deterministic fault aggregation, health summary, and interrupt generation block.",
+      "responsibilities": [
+        "Aggregate and latch fault conditions deterministically.",
+        "Generate dedicated interrupt causes for response-ready, fault, and timeout events.",
+        "Expose read-only fault and health summaries to firmware.",
+        "Permit fault clearing only after the fault source has disappeared and firmware has issued a clear request.",
+        "Provide a single aggregated irq_i output for CPU consumption."
+      ],
+      "interface_notes": [
+        "Consumes CPU status, timeout/stale/validation/integrity/op-point/sequence/clamp/rate-limit faults, response_validated, and fault clear control.",
+        "Outputs fault_summary, health_summary, fault_active, irq_response_ready, irq_fault, irq_timeout, irq_i, and watchdog_active.",
+        "The aggregated irq_i is the OR of the dedicated interrupt causes and is consumed by the CPU subsystem.",
+        "Safety logic also forces safe fallback whenever the CPU is halted or not initialized."
+      ],
+      "ownership_notes": [
+        "Fault latching is deterministic and reviewable in RTL.",
+        "Faults do not clear unconditionally; firmware clearing is gated by condition clearance.",
+        "This block owns the top-level safety interrupt aggregation."
+      ]
+    },
+    {
+      "name": "transport_buffer_wrapper",
+      "role": "Technology-neutral bounded payload/history buffer wrapper intended for FPGA BRAM mapping.",
+      "responsibilities": [
+        "Map bounded payload buffering to technology-neutral BRAM-style interfaces.",
+        "Avoid register-array flattening for bulk payload/history storage.",
+        "Provide full/empty and validity indicators for controller use.",
+        "Keep buffering minimal and bounded for FPGA prototype implementation."
+      ],
+      "interface_notes": [
+        "Provides chip-select, write-enable, address, data-in, and data-out style ports for payload and history storage paths.",
+        "Exposes buffer_full, buffer_empty, and history_valid for supervisory use.",
+        "Serves as the bridge between controller intent and the instantiated technology-neutral memories.",
+        "Maintains bounded storage only and does not expose geometry arrays or unbounded payload structures."
+      ],
+      "ownership_notes": [
+        "This wrapper is the contract-prescribed memory/buffering abstraction for FPGA synthesis.",
+        "It must remain technology-neutral and map naturally to native block RAM.",
+        "It does not become a surrogate data plane bypass."
+      ]
+    },
+    {
+      "name": "transport_payload_fifo_mem",
+      "role": "Technology-neutral instantiated payload FIFO memory wrapper for bounded 128-bit storage.",
+      "responsibilities": [
+        "Provide bounded payload storage for transport buffering.",
+        "Expose a real dout producer for payload FIFO reads.",
+        "Remain technology-neutral and suitable for FPGA BRAM inference."
+      ],
+      "interface_notes": [
+        "Implements a 128-bit data port with depth 256 and 8-bit address width.",
+        "Is a real child producer for payload_fifo_dout.",
+        "Uses csb, we, addr, din, and dout ports only.",
+        "Is intended for BRAM mapping rather than ASIC macros."
+      ],
+      "ownership_notes": [
+        "This is a technology-neutral memory wrapper, not a flattened register array.",
+        "It is part of the prescribed bounded buffering contract.",
+        "It preserves the explicit memory-collateral note for future ASIC retargeting."
+      ]
+    },
+    {
+      "name": "transport_history_mem",
+      "role": "Technology-neutral instantiated history memory wrapper for bounded 64-bit storage.",
+      "responsibilities": [
+        "Provide bounded history storage for transport buffering.",
+        "Expose a real dout producer for history reads.",
+        "Remain technology-neutral and suitable for FPGA BRAM inference."
+      ],
+      "interface_notes": [
+        "Implements a 64-bit data port with depth 64 and 6-bit address width.",
+        "Is a real child producer for history_dout.",
+        "Uses csb, we, addr, din, and dout ports only.",
+        "Supports supervision and bring-up history without exposing unbounded state."
+      ],
+      "ownership_notes": [
+        "This memory wrapper is explicitly technology-neutral and FPGA-friendly.",
+        "It must not be replaced by ASIC-specific hard macros in FPGA synthesis.",
+        "It supports bounded history only, not a general data plane."
+      ]
+    }
+  ],
+  "interface_summary": [
+    {
+      "from": "control_plane_csr",
+      "to": "request_response_supervisor",
+      "signals": [
+        "cfg_enable",
+        "cfg_request_mode",
+        "cfg_timeout_cycles",
+        "cfg_freshness_threshold",
+        "cfg_sequence_seed",
+        "cfg_overwrite_policy",
+        "cfg_op_point_min_kph",
+        "cfg_op_point_max_kph",
+        "cfg_request_seq",
+        "cfg_request_class",
+        "cfg_geometry_ref"
+      ],
+      "intent": "Firmware-programmed control parameters drive request issuance policy, freshness enforcement, operating-point envelope checks, and request packet content selection."
+    },
+    {
+      "from": "request_response_supervisor",
+      "to": "control_plane_csr",
+      "signals": [
+        "request_issued",
+        "request_stalled",
+        "request_overwritten",
+        "response_last_sequence",
+        "response_age",
+        "timeout_active"
+      ],
+      "intent": "Publish live request activity and supervision status into firmware-visible CSR fields."
+    },
+    {
+      "from": "request_response_supervisor",
+      "to": "actuator_command_clamper",
+      "signals": [
+        "validated_surface0",
+        "validated_surface1",
+        "validated_surface2",
+        "validated_surface3",
+        "validated_update",
+        "response_validated"
+      ],
+      "intent": "Only validated control decisions are allowed to reach actuator clamping and output selection."
+    },
+    {
+      "from": "control_plane_csr",
+      "to": "actuator_command_clamper",
+      "signals": [
+        "cfg_rate_limit_en",
+        "cfg_rate_limit_step",
+        "cfg_surface0_min",
+        "cfg_surface0_max",
+        "cfg_surface1_min",
+        "cfg_surface1_max",
+        "cfg_surface2_min",
+        "cfg_surface2_max",
+        "cfg_surface3_min",
+        "cfg_surface3_max",
+        "cfg_fallback_surface0",
+        "cfg_fallback_surface1",
+        "cfg_fallback_surface2",
+        "cfg_fallback_surface3"
+      ],
+      "intent": "Provide programmable actuator limits, optional rate limiting, and deterministic fallback commands."
+    },
+    {
+      "from": "safety_fault_manager",
+      "to": "actuator_command_clamper",
+      "signals": [
+        "fault_active"
+      ],
+      "intent": "Force safe fallback whenever the system is faulted or CPU/runtime conditions are unsafe."
+    },
+    {
+      "from": "request_response_supervisor",
+      "to": "safety_fault_manager",
+      "signals": [
+        "timeout_fault",
+        "stale_data_fault",
+        "validity_fault",
+        "integrity_fault",
+        "op_point_fault",
+        "seq_fault"
+      ],
+      "intent": "Consolidate transport validation failures into the system safety summary and interrupt logic."
+    },
+    {
+      "from": "actuator_command_clamper",
+      "to": "safety_fault_manager",
+      "signals": [
+        "clamp_fault",
+        "rate_limit_fault"
+      ],
+      "intent": "Feed actuator-limit enforcement failures into safety aggregation and firmware-visible health state."
+    },
+    {
+      "from": "aero_cpu_subsystem",
+      "to": "control_plane_csr",
+      "signals": [
+        "wb_adr_o",
+        "wb_dat_o",
+        "wb_we_o",
+        "wb_stb_o",
+        "wb_cyc_o",
+        "wb_sel_o"
+      ],
+      "intent": "Firmware accesses the CSR/MMIO block through the resolved PicoRV32 Wishbone master interface."
+    },
+    {
+      "from": "control_plane_csr",
+      "to": "aero_cpu_subsystem",
+      "signals": [
+        "wb_dat_i",
+        "wb_ack_i",
+        "wb_err_i"
+      ],
+      "intent": "Return CSR/MMIO read data and transaction completion semantics to firmware."
+    },
+    {
+      "from": "safety_fault_manager",
+      "to": "aero_cpu_subsystem",
+      "signals": [
+        "irq_i"
+      ],
+      "intent": "Provide a single aggregated interrupt input to firmware for response-ready, fault, and timeout events."
+    },
+    {
+      "from": "aero_cpu_subsystem",
+      "to": "safety_fault_manager",
+      "signals": [
+        "cpu_halted",
+        "cpu_initialized"
+      ],
+      "intent": "Expose CPU runtime readiness to the safety manager so that inactive or uninitialized firmware keeps the system in safe fallback."
+    },
+    {
+      "from": "transport_buffer_wrapper",
+      "to": "transport_payload_fifo_mem",
+      "signals": [
+        "payload_fifo_csb",
+        "payload_fifo_we",
+        "payload_fifo_addr",
+        "payload_fifo_din",
+        "payload_fifo_dout"
+      ],
+      "intent": "Implement bounded payload storage through a technology-neutral memory wrapper suitable for FPGA BRAM mapping."
+    },
+    {
+      "from": "transport_buffer_wrapper",
+      "to": "transport_history_mem",
+      "signals": [
+        "history_csb",
+        "history_we",
+        "history_addr",
+        "history_din",
+        "history_dout"
+      ],
+      "intent": "Implement bounded history storage through a technology-neutral memory wrapper suitable for FPGA BRAM mapping."
+    },
+    {
+      "from": "request_response_supervisor",
+      "to": "transport_buffer_wrapper",
+      "signals": [
+        "request_issued",
+        "response_validated"
+      ],
+      "intent": "Push issued requests into the bounded transport buffer and retire or record entries when a response is validated."
+    },
+    {
+      "from": "control_plane_csr",
+      "to": "transport_buffer_wrapper",
+      "signals": [
+        "cfg_enable"
+      ],
+      "intent": "Allow firmware enable control to gate diagnostics/history-related behavior without creating an alternate data path."
+    },
+    {
+      "from": "transport_buffer_wrapper",
+      "to": "control_plane_csr",
+      "signals": [
+        "history_valid"
+      ],
+      "intent": "Expose bounded history availability as a firmware-visible status indicator."
+    },
+    {
+      "from": "control_plane_csr",
+      "to": "safety_fault_manager",
+      "signals": [
+        "cfg_clear_faults"
+      ],
+      "intent": "Allow firmware to request fault clearing, subject to the underlying fault condition no longer being present."
+    }
+  ],
+  "data_flow_summary": [
+    "Firmware configures the control-plane CSR/MMIO registers over Wishbone, including enable, timeout, freshness, sequence, envelope, actuator bounds, rate limiting, fallback command, and fault-clear control.",
+    "The PicoRV32 subsystem issues Wishbone accesses to the CSR block and receives read data, acknowledge, and error responses through the same control-plane window.",
+    "When enabled, the request/response supervisor emits a bounded 128-bit request packet containing the configured validity tag, sequence, operating-point metadata, geometry reference, and command class.",
+    "The external response stream is accepted only after fixed-slice validation of validity, sequence policy, age/freshness, operating-point envelope, and integrity bits.",
+    "Validated response payloads drive the actuator clamping stage, which enforces programmable bounds and optional rate limiting before output.",
+    "Any timeout, stale-data, validity, integrity, operating-point, sequence, clamp, or rate-limit violation contributes to latched safety status and safe fallback selection.",
+    "The safety fault manager also observes CPU halted and initialization status so that absent or uninitialized firmware keeps the system inhibited.",
+    "Bounded payload and history buffering are implemented through technology-neutral memory wrappers, preserving FPGA BRAM mapping and avoiding register-array flattening."
+  ],
+  "clock_reset_summary": {
+    "clocking": "Single synchronous clock domain on clk at 50.0 MHz with a 20 ns period.",
+    "reset_behavior": "rst_n is active-low and synchronous. All state resets to a deterministic safe fallback condition: no request is issued, watchdog supervision is inactive, faults are cleared to the safe state, actuator outputs assert safe_fallback, and active actuator commands remain inhibited until firmware has initialized the control plane and a fresh, valid command is received with the watchdog clear."
+  },
+  "integration_notes": [
+    "The design preserves the resolved soft-CPU contract: PicoRV32, rv32imc, Wishbone, ilp32, 50 MHz, optional UART, and interrupt support.",
+    "The top-level module is adaptive_aero_control_top, and no status-only or leaf module replaces it as the design top.",
+    "The external model is not instantiated in RTL; firmware-mediated command acceptance remains the only control path for model interaction.",
+    "Request and response packets are bounded to 128 bits and documented in the register contract using fixed slices.",
+    "The CSR register map is the sole firmware-visible control plane and every declared register is reachable through RTL decode.",
+    "Bulk payload/history buffering is described through technology-neutral memory wrappers intended for FPGA BRAM inference, not flattened into registers.",
+    "All arithmetic is integer or fixed-point only; no floating-point datapath is required in RTL.",
+    "If future ASIC retargeting is considered, memory-collateral verification is required before replacing bounded storage with ASIC macros."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}
