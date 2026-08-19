@@ -1,0 +1,76 @@
+The required synthesizable top module is adaptive_aero_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must implement the selected Physical AI application contract, firmware-mediated command acceptance, validation, safety, timeout, fallback, and bounded actuator-command behavior.
+
+SOFT-CPU MODEL TRANSPORT CONTRACT: external model/reference execution is firmware-mediated through the declared CSR/MMIO command and status registers. Do not invent a hardware streaming transport at the top level when the application contract assigns command acceptance to firmware.
+
+FIRMWARE CONTROL-PLANE CONTRACT (mandatory): this product journey requests generated firmware. The synthesizable top must expose a real firmware-visible CSR/MMIO interface with address, write-data, read-data, transaction-valid/write-enable, and response/ready semantics. DIGITAL_SPEC_JSON.register_contract must describe the implemented registers and fields. Every declared register must be reachable through RTL decode; do not label inaccessible internal state as software-visible. The streaming transport may coexist with, but cannot replace, this interface.
+
+SOFT CPU INTEGRATION CONTRACT: preserve the resolved CPU contract in generated architecture, firmware, and handoff metadata: {"abi": "ilp32", "bus": "wishbone", "clock_mhz": 50.0, "compiler_arch": "rv32imc", "core": "picorv32", "core_label": "PicoRV32", "data_memory_kib": 16, "debug": false, "enabled": true, "estimated_reservation": {"basis": "supabase_governed_reference_estimate", "block_ram_blocks": 12, "logic_cells": 3000, "must_be_replaced_by_complete_system_synthesis": true}, "instruction_memory_kib": 32, "interrupts": true, "isa": "rv32imc", "license": "ISC", "policy_schema": "chiploop.application_intelligence.processor_ip_policy.v2", "profile": "balanced", "schema": "chiploop.fpga.soft_cpu.v1", "selection_mode": "automatic", "target_triple": "rv32imc-unknown-none-elf", "uart": true}. The application RTL must expose the selected bus and MMIO interface. Do not claim the CPU is instantiated or board-ready until its RTL, memory/interconnect, and application RTL are synthesized and routed together.
+Module name: adaptive_aero_control_top.
+
+Purpose: FPGA synthesizable control shell for an intelligent active-aerodynamics controller. The module shall NOT implement the NVIDIA DoMINO surrogate model itself. Instead it shall provide compact request/response transport, control/status register access, safety checks, stale-data rejection, timeout handling, and actuator command output.
+
+Top-level ports:
+- clk: input, system clock.
+- rst_n: input, active-low reset.
+- wishbone: standard 32-bit Wishbone slave interface for a soft CPU master. Support address, data, strobe, cycle, write-enable, select, ack, and read-data signals in the platform's canonical Wishbone packing.
+- irq_o: output interrupt to the soft CPU for command-complete, timeout, stale-data, or fault events.
+- aero_cmd_o[15:0]: output actuator command, quantized and clamped.
+- aero_cmd_valid_o: output valid for aero_cmd_o.
+- aero_cmd_ready_i: input ready from downstream actuator stage.
+- uart_tx_o, uart_rx_i: optional debug UART pins if enabled by parameter.
+
+Implementation constraints:
+1) The top-level interface must remain compact. Do not expose geometry tensors, flow fields, pressure maps, or surrogate embeddings as ports.
+2) Bulk runtime data shall be represented either as a bounded streaming bus no wider than 128 bits with valid/ready, or as a register-memory window no wider than 64 bits. For this FPGA path, prefer a memory-mapped descriptor window behind Wishbone.
+3) Any buffering for request descriptors or response snapshots shall use FPGA BRAM or vendor-supported block memory primitives only. Do not infer ASIC hard macros. Do not create unbounded register arrays for payload storage.
+4) The module shall be fully synthesizable in standard RTL.
+
+Functional blocks required inside the RTL:
+- control_register_bank: holds mode, enable, velocity setpoint, safety limits, fallback command, request sequence counter, response sequence counter, timeout threshold, and sticky fault flags.
+- request_packager: converts CPU register writes into a compact model-request descriptor. The descriptor shall include a geometry handle or index, flow speed, selected operating point, and sequence number. The descriptor width shall be fixed and implementation-friendly.
+- response_validator: checks that incoming response metadata matches the outstanding request, that the response is marked complete, and that the age counter has not exceeded the timeout threshold.
+- stale_timeout_watchdog: increments while a request is outstanding and asserts timeout when the threshold is reached.
+- safety_clamp_and_fallback: clamps the command to configured bounds and substitutes the fallback command when validity is lost.
+- actuator_command_driver: handshakes the final command to the output interface and holds valid until accepted.
+
+Suggested register map over Wishbone, 32-bit aligned:
+- 0x00 CONTROL: bit0 enable, bit1 arm, bit2 clear_faults, bit3 use_fallback_override, bits[7:4] mode.
+- 0x04 STATUS: bit0 busy, bit1 done, bit2 timeout, bit3 stale, bit4 invalid_resp, bit5 clamp_active, bit6 fallback_active, bit7 armed, bit8 irq_pending.
+- 0x08 FLOW_SPEED_MPS_Q8.8: input flow speed in fixed-point.
+- 0x0C ACTUATOR_MIN_Q8.8: minimum allowed actuator command.
+- 0x10 ACTUATOR_MAX_Q8.8: maximum allowed actuator command.
+- 0x14 FALLBACK_CMD_Q8.8: safe default command.
+- 0x18 TIMEOUT_CYCLES: watchdog threshold.
+- 0x1C GEOMETRY_HANDLE: compact geometry index or descriptor ID.
+- 0x20 REQUEST_SEQ: write-only sequence seed or auto-increment trigger.
+- 0x24 RESPONSE_CMD_Q8.8: readback of accepted command.
+- 0x28 RESPONSE_META: response sequence, freshness, and error flags.
+
+Dataflow behavior:
+- On arm and enable, capture the current request parameters and mark the request outstanding.
+- Increment a sequence counter for each new request.
+- While outstanding, the watchdog counts clock cycles until a response is accepted or timeout occurs.
+- When a response arrives, the validator shall compare sequence IDs and completion flags. If matched and fresh, capture the response command, clamp it to the legal range, and assert done.
+- If the response is stale, malformed, missing, or timed out, assert the fault bits, drive the fallback command, and set fallback_active.
+- Once a fault is asserted, require explicit clear_faults plus re-arm before accepting new requests.
+- The module shall generate irq_o on completion, timeout, stale-data, or fault transitions as configured.
+
+Timing and synthesis requirements:
+- Use synchronous state machines and registered outputs.
+- Avoid combinational loops between ready/valid paths.
+- Support a single outstanding request at a time unless a small bounded request buffer is explicitly parameterized.
+- Use parameters for command width, timeout width, and UART enable, but keep the default top-level I/O stable.
+- Reset shall place the output in fallback state, clear busy, and clear all non-sticky indicators.
+
+Verification-oriented requirements:
+- Assert that stale responses are rejected.
+- Assert that command outputs never exceed configured min/max limits.
+- Assert that timeout forces fallback.
+- Assert that a fault blocks normal command issuance until cleared.
+- Assert that the Wishbone interface returns consistent status and readback values.
+
+Non-goals:
+- Do not implement DoMINO inference, neural network layers, CFD solvers, or geometry meshing in RTL.
+- Do not create large payload memories in registers.
+- Do not expose multi-hundred-bit or tensor-like top-level interfaces.
+FPGA MEMORY CONTRACT (mandatory): describe bulk payload/history/FIFO storage through a technology-neutral memory wrapper that the FPGA flow can map to native block RAM; do not flatten it into registers.

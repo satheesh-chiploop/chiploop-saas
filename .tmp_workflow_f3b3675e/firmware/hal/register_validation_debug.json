@@ -1,8 +1,0 @@
-{
-  "agent": "Embedded Register Validation Agent",
-  "manifest_present": true,
-  "register_count": 12,
-  "hal_length": 13559,
-  "driver_length": 0,
-  "status": "pass"
-}
