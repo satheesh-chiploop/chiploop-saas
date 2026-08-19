@@ -1,0 +1,11 @@
+{
+  "schema": "chiploop.system.app_failure.v1",
+  "status": "failed",
+  "workflow_id": "464c7402-f44e-44aa-97fb-ab7a4710c4e6",
+  "run_id": "685a1b93-c762-40d4-b173-8e1c4bec9463",
+  "template_workflow": "System_Firmware",
+  "app_name": "system",
+  "exception_type": "RuntimeError",
+  "message": "\u274c Embedded ELF Build Agent Cargo compilation failed",
+  "traceback": "Traceback (most recent call last):\n  File \"/root/chiploop-backend/main.py\", line 14850, in execute_system_app_background\n    _run_nodes_with_shared_state(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        workflow_id=workflow_id,\n        ^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n        shared_state=shared_state,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/root/chiploop-backend/main.py\", line 2170, in _run_nodes_with_shared_state\n    raise RuntimeError(result_status)\nRuntimeError: \u274c Embedded ELF Build Agent Cargo compilation failed\n"
+}

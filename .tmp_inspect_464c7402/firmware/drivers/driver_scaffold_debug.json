@@ -1,0 +1,21 @@
+{
+  "agent": "Embedded Rust Driver Scaffold Agent",
+  "phase": "driver_scaffold",
+  "regmap_path": "firmware/register_map.json",
+  "hal_path": "firmware/hal/registers.rs",
+  "driver_name": "DigitalSubsystemDriver",
+  "register_count": 10,
+  "register_names": [
+    "CTRL",
+    "STATUS",
+    "TIMEOUT_CFG",
+    "STALE_CFG",
+    "CMD_MIN",
+    "CMD_MAX",
+    "CMD_SAFE",
+    "SEQ_TX",
+    "SEQ_RX",
+    "META"
+  ],
+  "manifest_present": true
+}

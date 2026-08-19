@@ -1,0 +1,377 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "custom",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 32,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control and mode register for firmware-visible command acceptance and output arming.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enable controller operation."
+          },
+          {
+            "name": "CLEAR_FAULT",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Write-one-to-clear latched faults."
+          },
+          {
+            "name": "ARM_OUTPUT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Arm actuator output validity."
+          },
+          {
+            "name": "REQUEST_START",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "Initiate a request transaction."
+          },
+          {
+            "name": "BYPASS_MODEL",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RW",
+            "reset": 0,
+            "description": "Bypass surrogate policy selection while preserving safety enforcement."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 5,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x04",
+        "access": "RO",
+        "description": "Controller status summary and fault indicators.",
+        "fields": [
+          {
+            "name": "BUSY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Controller busy."
+          },
+          {
+            "name": "REQ_PENDING",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Request pending."
+          },
+          {
+            "name": "RSP_SEEN",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Response observed."
+          },
+          {
+            "name": "STALE_FAULT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Stale response fault."
+          },
+          {
+            "name": "TIMEOUT_FAULT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Timeout fault."
+          },
+          {
+            "name": "RANGE_FAULT",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Range or clamp fault."
+          },
+          {
+            "name": "FALLBACK_ACTIVE",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Output validity is inhibited due to safety state."
+          },
+          {
+            "name": "LAST_GOOD_VALID",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "A last accepted command exists and remains valid."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 8,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CFG",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Programmable watchdog threshold in clock cycles.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Watchdog threshold in clk cycles."
+          }
+        ]
+      },
+      {
+        "name": "STALE_CFG",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Programmable response staleness threshold.",
+        "fields": [
+          {
+            "name": "STALE_CYCLES",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum response age in clk cycles or equivalent sequence-age window."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MIN",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Lower actuator clamp limit.",
+        "fields": [
+          {
+            "name": "CMD_MIN",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum fixed-point actuator command."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MAX",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Upper actuator clamp limit.",
+        "fields": [
+          {
+            "name": "CMD_MAX",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum fixed-point actuator command."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "CMD_SAFE",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Programmed non-valid safe reference value used only as the inhibited-output reference.",
+        "fields": [
+          {
+            "name": "CMD_SAFE",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Safe inhibit reference value used when validity is deasserted; not a substituted command."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_TX",
+        "offset": "0x1C",
+        "access": "RW",
+        "description": "Transmit sequence counter used in outgoing requests.",
+        "fields": [
+          {
+            "name": "SEQ_TX",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Transmit sequence counter."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_RX",
+        "offset": "0x20",
+        "access": "RO",
+        "description": "Last accepted receive sequence counter.",
+        "fields": [
+          {
+            "name": "SEQ_RX",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Last accepted receive sequence counter."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "META",
+        "offset": "0x24",
+        "access": "RW",
+        "description": "Compact vehicle-state and session metadata for request formation and validation.",
+        "fields": [
+          {
+            "name": "VELOCITY_BUCKET",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Velocity bucket for the 20-55 m/s envelope."
+          },
+          {
+            "name": "MODE",
+            "lsb": 8,
+            "msb": 11,
+            "access": "RW",
+            "reset": 0,
+            "description": "Operating mode."
+          },
+          {
+            "name": "ENV_FLAGS",
+            "lsb": 12,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Environment flags."
+          },
+          {
+            "name": "SESSION_ID",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Compact DrivAerML geometry/session identifier."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "FAULT_IRQ",
+        "description": "Latched fault summary or fault-status change indication for firmware handling."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Program TIMEOUT_CFG with a nonzero watchdog threshold.",
+      "Program STALE_CFG with a nonzero freshness threshold.",
+      "Program CMD_MIN and CMD_MAX to a valid clamp window.",
+      "Program CMD_SAFE to the desired inhibited reference value.",
+      "Program SEQ_TX and META fields with the initial control context.",
+      "Clear any prior faults by writing CTRL.CLEAR_FAULT=1.",
+      "Set CTRL.ENABLE=1 and CTRL.ARM_OUTPUT=1 before starting command exchange.",
+      "Assert CTRL.REQUEST_START when a new request packet should be issued."
+    ],
+    "polling_sequence": [
+      "Read STATUS for BUSY, REQ_PENDING, RSP_SEEN, STALE_FAULT, TIMEOUT_FAULT, RANGE_FAULT, FALLBACK_ACTIVE, and LAST_GOOD_VALID.",
+      "Read SEQ_RX to confirm the last accepted response sequence.",
+      "If a fault bit is set, service the condition in firmware and clear it with CTRL.CLEAR_FAULT=1 after remediation.",
+      "Update META and SEQ_TX before the next request as required by policy."
+    ],
+    "irq_sequence": [
+      "On FAULT_IRQ, read STATUS and SEQ_RX to determine cause and recoverability.",
+      "Disable or re-arm the controller through CTRL as needed.",
+      "Clear faults only after firmware has handled the condition and policy has been updated."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The regmap is Wishbone-backed in RTL, with 32-bit data width and decoded offsets matching the declared register contract.",
+    "No additional hierarchy, ports, or transport semantics are introduced beyond the specified top-level interfaces.",
+    "No fallback command is defined; invalid, stale, timeout, reset, disable, or fault conditions only deassert actuator command validity and latch faults for software handling."
+  ]
+}

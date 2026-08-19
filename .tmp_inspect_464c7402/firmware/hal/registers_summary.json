@@ -1,0 +1,19 @@
+{
+  "agent": "Embedded Rust Register Layer Generator Agent",
+  "phase": "hal_generate",
+  "hal_path": "firmware/hal/registers.rs",
+  "register_count": 10,
+  "register_names": [
+    "CTRL",
+    "STATUS",
+    "TIMEOUT_CFG",
+    "STALE_CFG",
+    "CMD_MIN",
+    "CMD_MAX",
+    "CMD_SAFE",
+    "SEQ_TX",
+    "SEQ_RX",
+    "META"
+  ],
+  "base_address": "0x00000000"
+}

@@ -1,0 +1,67 @@
+{
+  "package_type": "system_rtl",
+  "package_version": "1.0",
+  "source_workflow_id": "0fe326cf-4224-4b15-91be-26405899dc12",
+  "source_verification_workflow_id": null,
+  "top": {
+    "sim": "adaptive_aero_control_supervisor",
+    "phys": "adaptive_aero_control_supervisor"
+  },
+  "filelists": {
+    "sim": [
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/464c7402-f44e-44aa-97fb-ab7a4710c4e6/685a1b93-c762-40d4-b173-8e1c4bec9463/system/digital/rtl/adaptive_aero_control_top.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/464c7402-f44e-44aa-97fb-ab7a4710c4e6/685a1b93-c762-40d4-b173-8e1c4bec9463/system/digital/rtl/adaptive_aero_control_csr_mmio.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/464c7402-f44e-44aa-97fb-ab7a4710c4e6/685a1b93-c762-40d4-b173-8e1c4bec9463/system/digital/rtl/adaptive_aero_control_packet_io.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/464c7402-f44e-44aa-97fb-ab7a4710c4e6/685a1b93-c762-40d4-b173-8e1c4bec9463/system/digital/rtl/adaptive_aero_control_supervisor.v"
+    ],
+    "phys": [
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/464c7402-f44e-44aa-97fb-ab7a4710c4e6/685a1b93-c762-40d4-b173-8e1c4bec9463/system/digital/rtl/adaptive_aero_control_top.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/464c7402-f44e-44aa-97fb-ab7a4710c4e6/685a1b93-c762-40d4-b173-8e1c4bec9463/system/digital/rtl/adaptive_aero_control_csr_mmio.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/464c7402-f44e-44aa-97fb-ab7a4710c4e6/685a1b93-c762-40d4-b173-8e1c4bec9463/system/digital/rtl/adaptive_aero_control_packet_io.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/464c7402-f44e-44aa-97fb-ab7a4710c4e6/685a1b93-c762-40d4-b173-8e1c4bec9463/system/digital/rtl/adaptive_aero_control_supervisor.v"
+    ],
+    "libs": []
+  },
+  "register_map_path": "digital/digital_regmap.json",
+  "clock_intent_path": "digital/timing/clock_intent.json",
+  "clock_intent": {
+    "type": "digital_clock_intent",
+    "clocks": [
+      {
+        "name": "clk",
+        "port": "clk",
+        "frequency_mhz": null,
+        "period_ns": null,
+        "source": "rtl_port_inference",
+        "needs_user_frequency": true
+      }
+    ],
+    "resets": [
+      {
+        "name": "rst_n",
+        "port": "rst_n",
+        "active_low": true,
+        "source": "rtl_port_inference"
+      }
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "rst_n",
+    "needs_user_review": true,
+    "provenance": {
+      "requested": false,
+      "sdc_clocks": 0,
+      "spec_clocks": 0,
+      "rtl_clocks": 1,
+      "spec_resets": 0,
+      "rtl_resets": 1
+    }
+  },
+  "ready_for_cosim": true,
+  "compile": {
+    "sim": "imported_from_verified_digital_flow"
+  },
+  "notes": [
+    "RTL and register map were imported from the specified Arch2RTL workflow.",
+    "Verification evidence remains associated with source_verification_workflow_id when supplied."
+  ]
+}
