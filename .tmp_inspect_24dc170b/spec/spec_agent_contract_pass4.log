@@ -1,2 +1,0 @@
-Digital Spec Agent final contract repair failure:
-Required child input 'aero_cpu_subsystem.irq_i' has no source in top_level_connections or inter_module_signals. Add an explicit top-level input connection or a real child producer. Repair every listed input in the same response.

@@ -1,2 +1,0 @@
-Digital Spec Agent final contract repair failure:
-Required child input 'pico_wishbone_cpu_subsystem.wb_ack_i' has no source in top_level_connections or inter_module_signals. Add an explicit top-level input connection or a real child producer. Other required child inputs without sources: 'pico_wishbone_cpu_subsystem.wb_err_i', 'pico_wishbone_cpu_subsystem.wb_stall_i', 'actuator_clamp_fallback_controller.fallback_active'. Repair every listed input in the same response.
