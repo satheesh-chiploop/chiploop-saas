@@ -42,6 +42,19 @@ jobs:
           provenance: mode=max
           sbom: true
 
+      - name: Verify firmware toolchain in published image
+        env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/chiploop-backend
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          docker run --rm --entrypoint sh "${IMAGE}@${DIGEST}" -ec '
+            cargo --version
+            rustc --version
+            rustup --version
+            rustup target list --installed | grep -Fx riscv32imc-unknown-none-elf
+            rustup target list --installed | grep -Fx thumbv7em-none-eabihf
+          '
+
       - uses: sigstore/cosign-installer@v3.8.2
 
       - name: Sign image

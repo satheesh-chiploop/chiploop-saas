@@ -1,0 +1,84 @@
+{
+  "source_workflow_id": "d860e638-428e-4a39-803c-1c05f0b02af6",
+  "source_verification_workflow_id": null,
+  "rtl_source_paths": [
+    "backend/workflows/d860e638-428e-4a39-803c-1c05f0b02af6/rtl/request_manager.v",
+    "backend/workflows/d860e638-428e-4a39-803c-1c05f0b02af6/rtl/response_adapter.v",
+    "backend/workflows/d860e638-428e-4a39-803c-1c05f0b02af6/rtl/timeout_watchdog.v",
+    "backend/workflows/d860e638-428e-4a39-803c-1c05f0b02af6/rtl/safety_supervisor.v",
+    "backend/workflows/d860e638-428e-4a39-803c-1c05f0b02af6/rtl/wishbone_csr_mmio.v",
+    "backend/workflows/d860e638-428e-4a39-803c-1c05f0b02af6/rtl/actuator_command_unit.v",
+    "backend/workflows/d860e638-428e-4a39-803c-1c05f0b02af6/rtl/adaptive_aero_control_top.v"
+  ],
+  "rtl_top_resolution": {
+    "resolution": "metadata_top_found_in_rtl",
+    "candidate_top": "adaptive_aero_control_top",
+    "module_map": {
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/request_manager.v": [
+        "request_manager"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/response_adapter.v": [
+        "response_adapter"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/timeout_watchdog.v": [
+        "timeout_watchdog"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/safety_supervisor.v": [
+        "safety_supervisor"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/wishbone_csr_mmio.v": [
+        "wishbone_csr_mmio"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/actuator_command_unit.v": [
+        "actuator_command_unit"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/adaptive_aero_control_top.v": [
+        "adaptive_aero_control_top"
+      ]
+    }
+  },
+  "regmap_source_path": "backend/workflows/d860e638-428e-4a39-803c-1c05f0b02af6/digital/digital_regmap.json",
+  "local_sdc_files": [],
+  "clock_intent": {
+    "type": "digital_clock_intent",
+    "clocks": [
+      {
+        "name": "clk",
+        "port": "clk",
+        "frequency_mhz": null,
+        "period_ns": null,
+        "source": "rtl_port_inference",
+        "needs_user_frequency": true
+      }
+    ],
+    "resets": [
+      {
+        "name": "reset_n",
+        "port": "reset_n",
+        "active_low": true,
+        "source": "rtl_port_inference"
+      }
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "reset_n",
+    "needs_user_review": true,
+    "provenance": {
+      "requested": false,
+      "sdc_clocks": 0,
+      "spec_clocks": 0,
+      "rtl_clocks": 1,
+      "spec_resets": 0,
+      "rtl_resets": 1
+    }
+  },
+  "local_rtl_paths": [
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/request_manager.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/response_adapter.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/timeout_watchdog.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/safety_supervisor.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/wishbone_csr_mmio.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/actuator_command_unit.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/rtl/adaptive_aero_control_top.v"
+  ],
+  "local_regmap_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b4d7c05c-cd06-48d2-b720-7b3c548ba75f/2dc103cd-ec0a-4da5-9d6e-a6966cf6f191/system/digital/digital_regmap.json"
+}

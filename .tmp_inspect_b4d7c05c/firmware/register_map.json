@@ -1,0 +1,300 @@
+{
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem",
+  "base_address": "0x00000000",
+  "bus": "CUSTOM",
+  "registers": [
+    {
+      "name": "CTRL",
+      "offset": "0x00000000",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Control register for request launch, fault clearing, and safe mode selection. Write-only control bits pulse internally on write; reads return the current latched software-visible control state.",
+      "fields": [
+        {
+          "name": "start_request",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Write 1 to launch a new request. The RTL captures the current request/configuration fields and attempts to issue one bounded outstanding request."
+        },
+        {
+          "name": "clear_faults",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Write 1 to request clearing of latched faults under supervisory policy."
+        },
+        {
+          "name": "safe_mode_select",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Firmware-selected safety inhibit/override mode. This does not create a substitute or fallback command."
+        }
+      ]
+    },
+    {
+      "name": "REQUEST",
+      "offset": "0x00000004",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Request metadata register containing the compact request sequencing and mode fields.",
+      "fields": [
+        {
+          "name": "request_seq",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Firmware-provided sequence identifier for matching request and response lifecycle."
+        },
+        {
+          "name": "flow_condition_sel",
+          "bit_offset": 16,
+          "bit_width": 4,
+          "access": "RW",
+          "description": "Flow condition selector used in request packaging and safety validation."
+        },
+        {
+          "name": "control_mode",
+          "bit_offset": 20,
+          "bit_width": 4,
+          "access": "RW",
+          "description": "Control mode selector used in request packaging and command policy."
+        }
+      ]
+    },
+    {
+      "name": "REQUEST_VELOCITY",
+      "offset": "0x00000008",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Stream velocity register used in request packaging.",
+      "fields": [
+        {
+          "name": "stream_velocity",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "32-bit integer or fixed-point stream velocity parameter."
+        }
+      ]
+    },
+    {
+      "name": "GEOMETRY",
+      "offset": "0x0000000C",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Geometry identifier or handle used in request packaging.",
+      "fields": [
+        {
+          "name": "geometry_id",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Geometry identifier or handle."
+        }
+      ]
+    },
+    {
+      "name": "TIMEOUT_CYCLES",
+      "offset": "0x00000010",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Programmable timeout deadline in control cycles.",
+      "fields": [
+        {
+          "name": "timeout_cycles",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Maximum number of clk cycles allowed before timeout is declared for the outstanding request."
+        }
+      ]
+    },
+    {
+      "name": "FRESHNESS_CYCLES",
+      "offset": "0x00000014",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Programmable freshness window in control cycles.",
+      "fields": [
+        {
+          "name": "freshness_cycles",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Maximum age window for accepting a response as fresh."
+        }
+      ]
+    },
+    {
+      "name": "ACTUATOR_MIN",
+      "offset": "0x00000018",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Lower clamp bound for actuator command generation.",
+      "fields": [
+        {
+          "name": "actuator_min",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Minimum allowable actuator command value."
+        }
+      ]
+    },
+    {
+      "name": "ACTUATOR_MAX",
+      "offset": "0x0000001C",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Upper clamp bound for actuator command generation.",
+      "fields": [
+        {
+          "name": "actuator_max",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Maximum allowable actuator command value."
+        }
+      ]
+    },
+    {
+      "name": "RATE_LIMIT",
+      "offset": "0x00000020",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Optional slew-rate limit register.",
+      "fields": [
+        {
+          "name": "rate_limit",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Optional command rate limit. A value of zero may disable rate limiting by implementation policy."
+        }
+      ]
+    },
+    {
+      "name": "STATUS",
+      "offset": "0x00000024",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Primary status register exposing live supervision and fault state.",
+      "fields": [
+        {
+          "name": "busy",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "One outstanding request is active."
+        },
+        {
+          "name": "response_valid",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "A response has been accepted and is visible to the command path."
+        },
+        {
+          "name": "timeout_fault",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Timeout fault latched by watchdog supervision."
+        },
+        {
+          "name": "stale_fault",
+          "bit_offset": 3,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Stale response fault latched by response validation."
+        },
+        {
+          "name": "response_seq_mismatch",
+          "bit_offset": 4,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Sequence mismatch fault latched by response validation."
+        },
+        {
+          "name": "invalid_payload_fault",
+          "bit_offset": 5,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Invalid payload fault latched by response validation or safety checks."
+        },
+        {
+          "name": "fallback_active",
+          "bit_offset": 6,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Safety inhibition is active; actuator output validity is deasserted."
+        },
+        {
+          "name": "fault_pending",
+          "bit_offset": 7,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Latched fault pending for firmware handling."
+        }
+      ]
+    },
+    {
+      "name": "SEQUENCE",
+      "offset": "0x00000028",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Sequence and command status register.",
+      "fields": [
+        {
+          "name": "current_sequence",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Current outstanding sequence number."
+        },
+        {
+          "name": "last_good_command",
+          "bit_offset": 16,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Upper half of the command/status mirror. Full last-good-command visibility is provided by LAST_GOOD_COMMAND at 0x2C."
+        }
+      ]
+    },
+    {
+      "name": "LAST_GOOD_COMMAND",
+      "offset": "0x0000002C",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Accepted actuator command status register.",
+      "fields": [
+        {
+          "name": "last_good_command",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RO",
+          "description": "Last accepted actuator command value."
+        }
+      ]
+    }
+  ],
+  "__source": {
+    "mode": "artifact_passthrough",
+    "path": "state.digital_regmap"
+  }
+}
