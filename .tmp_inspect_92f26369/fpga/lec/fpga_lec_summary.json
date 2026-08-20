@@ -1,0 +1,162 @@
+{
+  "agent": "FPGA RTL-to-Netlist Equivalence Agent",
+  "comparison": "two_stage_rtl_generic_and_generic_mapped_equivalence",
+  "enabled": true,
+  "failure_kind": "proof_incomplete",
+  "family": "ecp5",
+  "gate_status": "fail",
+  "generic_lec": {
+    "coverage_complete": false,
+    "failure_kind": "proof_incomplete",
+    "gate": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+    "gold": [
+      "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v",
+      "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+    ],
+    "monolithic_attempt": {
+      "coverage_complete": false,
+      "failure_kind": "proof_incomplete",
+      "gate": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+      "gold": [
+        "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v",
+        "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+      ],
+      "partition_count": 1,
+      "partitions": [
+        {
+          "command": {
+            "cmd": [
+              "/usr/bin/yosys",
+              "-s",
+              "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/lec/fpga_generic_partition_adaptive_aero_control_top.ys"
+            ],
+            "error": null,
+            "executable": "/usr/bin/yosys",
+            "log": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/lec/fpga_generic_partition_adaptive_aero_control_top.log",
+            "ok": false,
+            "profile_id": "chiploop_saas_default",
+            "returncode": 1,
+            "status": "failed",
+            "stderr_tail": "ERROR: Found 10 unproven $equiv cells in 'equiv_status -assert'.\n",
+            "stdout_tail": "load_reg [67]: success!\n  Trying to prove $equiv for \\req_payload_reg [68]: success!\n  Trying to prove $equiv for \\req_payload_reg [69]: success!\n  Trying to prove $equiv for \\req_payload_reg [70]: success!\n  Trying to prove $equiv for \\req_payload_reg [71]: success!\n  Trying to prove $equiv for \\req_payload_reg [72]: success!\n  Trying to prove $equiv for \\req_payload_reg [73]: success!\n  Trying to prove $equiv for \\req_payload_reg [74]: success!\n  Trying to prove $equiv for \\req_payload_reg [75]: success!\n  Trying to prove $equiv for \\req_payload_reg [76]: success!\n  Trying to prove $equiv for \\req_payload_reg [77]: success!\n  Trying to prove $equiv for \\req_payload_reg [78]: success!\n  Trying to prove $equiv for \\req_payload_reg [79]: success!\n  Trying to prove $equiv for \\req_payload_reg [80]: success!\n  Trying to prove $equiv for \\req_payload_reg [81]: success!\n  Trying to prove $equiv for \\req_payload_reg [82]: success!\n  Trying to prove $equiv for \\req_payload_reg [83]: success!\n  Trying to prove $equiv for \\req_payload_reg [84]: success!\n  Trying to prove $equiv for \\req_payload_reg [85]: success!\n  Trying to prove $equiv for \\req_payload_reg [86]: success!\n  Trying to prove $equiv for \\req_payload_reg [87]: success!\n  Trying to prove $equiv for \\req_payload_reg [88]: success!\n  Trying to prove $equiv for \\req_payload_reg [89]: success!\n  Trying to prove $equiv for \\req_payload_reg [90]: success!\n  Trying to prove $equiv for \\req_payload_reg [91]: success!\n  Trying to prove $equiv for \\req_payload_reg [92]: success!\n  Trying to prove $equiv for \\req_payload_reg [93]: success!\n  Trying to prove $equiv for \\req_payload_reg [94]: success!\n  Trying to prove $equiv for \\req_payload_reg [95]: success!\n  Trying to prove $equiv for \\req_payload_reg [96]: success!\n  Trying to prove $equiv for \\req_payload_reg [97]: success!\n  Trying to prove $equiv for \\req_payload_reg [98]: success!\n  Trying to prove $equiv for \\req_payload_reg [99]: success!\n  Trying to prove $equiv for \\req_payload_reg [100]: success!\n  Trying to prove $equiv for \\req_payload_reg [101]: success!\n  Trying to prove $equiv for \\req_payload_reg [102]: success!\n  Trying to prove $equiv for \\req_payload_reg [103]: success!\n  Trying to prove $equiv for \\req_payload_reg [104]: success!\n  Trying to prove $equiv for \\req_payload_reg [105]: success!\n  Trying to prove $equiv for \\req_payload_reg [106]: success!\n  Trying to prove $equiv for \\req_payload_reg [107]: success!\n  Trying to prove $equiv for \\req_payload_reg [108]: success!\n  Trying to prove $equiv for \\req_payload_reg [109]: success!\n  Trying to prove $equiv for \\req_payload_reg [110]: success!\n  Trying to prove $equiv for \\req_payload_reg [111]: success!\n  Trying to prove $equiv for \\req_payload_reg [112]: success!\n  Trying to prove $equiv for \\req_payload_reg [113]: success!\n  Trying to prove $equiv for \\req_payload_reg [114]: success!\n  Trying to prove $equiv for \\req_payload_reg [115]: success!\n  Trying to prove $equiv for \\req_payload_reg [116]: success!\n  Trying to prove $equiv for \\req_payload_reg [117]: success!\n  Trying to prove $equiv for \\req_payload_reg [118]: success!\n  Trying to prove $equiv for \\req_payload_reg [119]: success!\n  Trying to prove $equiv for \\req_payload_reg [120]: success!\n  Trying to prove $equiv for \\req_payload_reg [121]: success!\n  Trying to prove $equiv for \\req_payload_reg [122]: success!\n  Trying to prove $equiv for \\req_payload_reg [123]: success!\n  Trying to prove $equiv for \\req_payload_reg [124]: success!\n  Trying to prove $equiv for \\req_payload_reg [125]: success!\n  Trying to prove $equiv for \\last_reject_reason_reg [0]: success!\n  Trying to prove $equiv for \\last_reject_is_stale_reg: success!\n  Trying to prove $equiv for \\last_reject_is_timeout_reg: success!\n  Trying to prove $equiv for \\last_reject_reason_reg [1]: success!\n  Trying to prove $equiv for \\last_reject_reason_reg [2]: success!\nProved 494 previously unproven $equiv cells.\n\n17. Executing EQUIV_STATUS pass.\n"
+          },
+          "failure_kind": "proof_incomplete",
+          "gate": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+          "gold": [
+            "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v",
+            "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+          ],
+          "log": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/lec/fpga_generic_partition_adaptive_aero_control_top.log",
+          "module": "adaptive_aero_control_top",
+          "proven": false,
+          "reason": "Yosys could not prove 10 equivalence points after induction depths 12.",
+          "script": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/lec/fpga_generic_partition_adaptive_aero_control_top.ys",
+          "status": "inconclusive",
+          "timeout_seconds": 600,
+          "unproven_points": 10
+        }
+      ],
+      "partitions_attempted": 1,
+      "partitions_proven": 0,
+      "proven": false,
+      "reason": "Yosys could not prove 10 equivalence points after induction depths 12.",
+      "status": "inconclusive",
+      "strategy": "hierarchical",
+      "top_connectivity": null,
+      "unproven_points": 10
+    },
+    "partition_count": 1,
+    "partitions": [
+      {
+        "command": {
+          "cmd": [
+            "/usr/bin/yosys",
+            "-s",
+            "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/lec/fpga_generic_partition_adaptive_aero_control_top.ys"
+          ],
+          "error": null,
+          "executable": "/usr/bin/yosys",
+          "log": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/lec/fpga_generic_partition_adaptive_aero_control_top.log",
+          "ok": false,
+          "profile_id": "chiploop_saas_default",
+          "returncode": 1,
+          "status": "failed",
+          "stderr_tail": "ERROR: Found 10 unproven $equiv cells in 'equiv_status -assert'.\n",
+          "stdout_tail": "load_reg [67]: success!\n  Trying to prove $equiv for \\req_payload_reg [68]: success!\n  Trying to prove $equiv for \\req_payload_reg [69]: success!\n  Trying to prove $equiv for \\req_payload_reg [70]: success!\n  Trying to prove $equiv for \\req_payload_reg [71]: success!\n  Trying to prove $equiv for \\req_payload_reg [72]: success!\n  Trying to prove $equiv for \\req_payload_reg [73]: success!\n  Trying to prove $equiv for \\req_payload_reg [74]: success!\n  Trying to prove $equiv for \\req_payload_reg [75]: success!\n  Trying to prove $equiv for \\req_payload_reg [76]: success!\n  Trying to prove $equiv for \\req_payload_reg [77]: success!\n  Trying to prove $equiv for \\req_payload_reg [78]: success!\n  Trying to prove $equiv for \\req_payload_reg [79]: success!\n  Trying to prove $equiv for \\req_payload_reg [80]: success!\n  Trying to prove $equiv for \\req_payload_reg [81]: success!\n  Trying to prove $equiv for \\req_payload_reg [82]: success!\n  Trying to prove $equiv for \\req_payload_reg [83]: success!\n  Trying to prove $equiv for \\req_payload_reg [84]: success!\n  Trying to prove $equiv for \\req_payload_reg [85]: success!\n  Trying to prove $equiv for \\req_payload_reg [86]: success!\n  Trying to prove $equiv for \\req_payload_reg [87]: success!\n  Trying to prove $equiv for \\req_payload_reg [88]: success!\n  Trying to prove $equiv for \\req_payload_reg [89]: success!\n  Trying to prove $equiv for \\req_payload_reg [90]: success!\n  Trying to prove $equiv for \\req_payload_reg [91]: success!\n  Trying to prove $equiv for \\req_payload_reg [92]: success!\n  Trying to prove $equiv for \\req_payload_reg [93]: success!\n  Trying to prove $equiv for \\req_payload_reg [94]: success!\n  Trying to prove $equiv for \\req_payload_reg [95]: success!\n  Trying to prove $equiv for \\req_payload_reg [96]: success!\n  Trying to prove $equiv for \\req_payload_reg [97]: success!\n  Trying to prove $equiv for \\req_payload_reg [98]: success!\n  Trying to prove $equiv for \\req_payload_reg [99]: success!\n  Trying to prove $equiv for \\req_payload_reg [100]: success!\n  Trying to prove $equiv for \\req_payload_reg [101]: success!\n  Trying to prove $equiv for \\req_payload_reg [102]: success!\n  Trying to prove $equiv for \\req_payload_reg [103]: success!\n  Trying to prove $equiv for \\req_payload_reg [104]: success!\n  Trying to prove $equiv for \\req_payload_reg [105]: success!\n  Trying to prove $equiv for \\req_payload_reg [106]: success!\n  Trying to prove $equiv for \\req_payload_reg [107]: success!\n  Trying to prove $equiv for \\req_payload_reg [108]: success!\n  Trying to prove $equiv for \\req_payload_reg [109]: success!\n  Trying to prove $equiv for \\req_payload_reg [110]: success!\n  Trying to prove $equiv for \\req_payload_reg [111]: success!\n  Trying to prove $equiv for \\req_payload_reg [112]: success!\n  Trying to prove $equiv for \\req_payload_reg [113]: success!\n  Trying to prove $equiv for \\req_payload_reg [114]: success!\n  Trying to prove $equiv for \\req_payload_reg [115]: success!\n  Trying to prove $equiv for \\req_payload_reg [116]: success!\n  Trying to prove $equiv for \\req_payload_reg [117]: success!\n  Trying to prove $equiv for \\req_payload_reg [118]: success!\n  Trying to prove $equiv for \\req_payload_reg [119]: success!\n  Trying to prove $equiv for \\req_payload_reg [120]: success!\n  Trying to prove $equiv for \\req_payload_reg [121]: success!\n  Trying to prove $equiv for \\req_payload_reg [122]: success!\n  Trying to prove $equiv for \\req_payload_reg [123]: success!\n  Trying to prove $equiv for \\req_payload_reg [124]: success!\n  Trying to prove $equiv for \\req_payload_reg [125]: success!\n  Trying to prove $equiv for \\last_reject_reason_reg [0]: success!\n  Trying to prove $equiv for \\last_reject_is_stale_reg: success!\n  Trying to prove $equiv for \\last_reject_is_timeout_reg: success!\n  Trying to prove $equiv for \\last_reject_reason_reg [1]: success!\n  Trying to prove $equiv for \\last_reject_reason_reg [2]: success!\nProved 494 previously unproven $equiv cells.\n\n17. Executing EQUIV_STATUS pass.\n"
+        },
+        "failure_kind": "proof_incomplete",
+        "gate": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+        "gold": [
+          "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v",
+          "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/lec/fpga_generic_partition_adaptive_aero_control_top.log",
+        "module": "adaptive_aero_control_top",
+        "proven": false,
+        "reason": "Yosys could not prove 10 equivalence points after induction depths 12.",
+        "script": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/lec/fpga_generic_partition_adaptive_aero_control_top.ys",
+        "status": "inconclusive",
+        "timeout_seconds": 600,
+        "unproven_points": 10
+      }
+    ],
+    "partitions_attempted": 1,
+    "partitions_proven": 0,
+    "proven": false,
+    "reason": "Yosys could not prove 10 equivalence points after induction depths 12.",
+    "status": "inconclusive",
+    "strategy": "hierarchical",
+    "top_connectivity": null,
+    "unproven_points": 10
+  },
+  "generic_lec_strategy": {
+    "flip_flops": 1104,
+    "large_design": true,
+    "mapped_cells": 3133,
+    "reason": "shared hierarchy and complexity threshold; applied before the first proof",
+    "requested": "auto",
+    "selected": "hierarchical",
+    "shared_partitions": [
+      "adaptive_aero_control_top"
+    ]
+  },
+  "generic_netlist": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+  "generic_proven": false,
+  "induction_depth": 12,
+  "induction_depths_attempted": [
+    12
+  ],
+  "mapped_lec": {
+    "failure_kind": "upstream_proof_failed",
+    "gate": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+    "gold": [
+      "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v"
+    ],
+    "proven": false,
+    "reason": "Mapped-netlist LEC was not started because RTL-to-generic LEC did not pass.",
+    "status": "blocked",
+    "unproven_points": null
+  },
+  "mapped_lec_strategy": {
+    "flip_flops": 1104,
+    "large_design": true,
+    "mapped_cells": 3133,
+    "reason": "shared hierarchy and complexity threshold",
+    "requested": "auto",
+    "selected": "hierarchical",
+    "shared_partitions": [
+      "adaptive_aero_control_top"
+    ]
+  },
+  "mapped_netlist": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "mapped_proven": false,
+  "netlist": "/root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "proven": false,
+  "reason": "Yosys could not prove 10 equivalence points after induction depths 12.",
+  "required": true,
+  "rtl_file_count": 2,
+  "status": "inconclusive",
+  "tool": "Yosys",
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "unproven_points": 10
+}

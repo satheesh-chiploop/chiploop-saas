@@ -1,0 +1,71 @@
+%Warning-WIDTHEXPAND: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:139:41: Operator GT expects 16 bits on the LHS, but LHS's VARREF 'rsp_age_field' generates 8 bits.
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+  139 |   assign stale_expired = (rsp_age_field > timeout_reg[31:16]);
+      |                                         ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-WIDTHEXPAND: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:402:31: Operator ASSIGNDLY expects 16 bits on the Assign RHS, but Assign RHS's VARREF 'rsp_age_field' generates 8 bits.
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+  402 |           transaction_age_reg <= rsp_age_field;
+      |                               ^~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:14:19: Signal is not used: 'req_ready_i'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   14 |     input         req_ready_i,
+      |                   ^~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:18:20: Bits of signal are not used: 'rsp_payload_i'[127:33]
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   18 |     input  [127:0] rsp_payload_i,
+      |                    ^~~~~~~~~~~~~
+%Warning-UNUSEDPARAM: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:42:20: Parameter is not used: 'ST_LAUNCH'
+                                                                                                                                                       : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   42 |   localparam [2:0] ST_LAUNCH        = 3'd1;
+      |                    ^~~~~~~~~
+                      ... For warning description see https://verilator.org/warn/UNUSEDPARAM?v=5.047
+                      ... Use "/* verilator lint_off UNUSEDPARAM */" and lint_on around source to disable this message.
+%Warning-UNUSEDPARAM: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:44:20: Parameter is not used: 'ST_VALIDATE_RSP'
+                                                                                                                                                       : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   44 |   localparam [2:0] ST_VALIDATE_RSP  = 3'd3;
+      |                    ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:73:14: Signal is not used: 'state_reg'
+                                                                                                                                                        : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   73 |   reg [2:0]  state_reg;
+      |              ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:96:8: Signal is not used: 'wb_read'
+                                                                                                                                                       : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   96 |   wire wb_read;
+      |        ^~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:106:15: Signal is not used: 'req_velocity_field'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+  106 |   wire [15:0] req_velocity_field;
+      |               ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:107:15: Signal is not used: 'req_flow_field'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+  107 |   wire [7:0]  req_flow_field;
+      |               ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:113:15: Signal is not used: 'fallback_cmd'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+  113 |   wire [31:0] fallback_cmd;
+      |               ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:117:15: Signal is not used: 'stale_expired'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+  117 |   wire        stale_expired;
+      |               ^~~~~~~~~~~~~
+%Warning-CASEOVERLAP: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:327:11: Case conditions overlap
+  327 |           ADDR_CONTROL: begin
+      |           ^~~~~~~~~~~~
+                      /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v:281:11: ... Location of overlapping condition
+  281 |           ADDR_CONTROL: begin
+      |           ^~~~~~~~~~~~
+                      ... For warning description see https://verilator.org/warn/CASEOVERLAP?v=5.047
+                      ... Use "/* verilator lint_off CASEOVERLAP */" and lint_on around source to disable this message.
+%Warning-SYNCASYNCNET: /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:7:16: Signal flopped as both synchronous and async: 'spi_cs_n'
+                       /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:50:9: ... Location of async usage
+   50 |     if (spi_cs_n) spi_active <= 1'b0;
+      |         ^~~~~~~~
+                       /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:54:10: ... Location of sync usage
+   54 |     if (!spi_cs_n) begin
+      |          ^~~~~~~~
+                       ... For warning description see https://verilator.org/warn/SYNCASYNCNET?v=5.047
+                       ... Use "/* verilator lint_off SYNCASYNCNET */" and lint_on around source to disable this message.

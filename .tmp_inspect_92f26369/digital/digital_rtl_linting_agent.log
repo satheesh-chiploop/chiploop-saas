@@ -1,0 +1,4 @@
+RTL Linting Agent Log
+[2026-08-19T22:36:31.878738] Discovered 2 RTL files under backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49
+[2026-08-19T22:36:31.880445] Running via ChipLoop tool profile: iverilog -g2012 -tnull /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v
+[2026-08-19T22:36:31.898481] Running via ChipLoop tool profile: verilator --lint-only -Wall -Wno-fatal /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv /root/chiploop-backend/backend/workflows/92f26369-d8c7-493a-b6d1-62843344bd49/fpga/src/upstream/adaptive_aero_control_top.v
