@@ -84,6 +84,9 @@ export default function PhysicalAiStudioPage() {
   const [softCpuInterrupts, setSoftCpuInterrupts] = useState(true);
   const [softCpuUart, setSoftCpuUart] = useState(true);
   const [softCpuDebug, setSoftCpuDebug] = useState(false);
+  const [hostClockMhz, setHostClockMhz] = useState(10);
+  const [hostTargetTriple, setHostTargetTriple] = useState("x86_64-unknown-linux-gnu");
+  const [hostInterruptSignaling, setHostInterruptSignaling] = useState("optional_gpio");
   const [asicCpuAdvanced, setAsicCpuAdvanced] = useState(false);
   const [asicCpuCore, setAsicCpuCore] = useState<SoftCpuCore>("automatic");
   const [asicCpuIsa, setAsicCpuIsa] = useState("automatic");
@@ -183,13 +186,17 @@ export default function PhysicalAiStudioPage() {
     const base = ["Application", "Model mapping", "Partition", "Architecture", "RTL generation", "Verification"];
     if (implementationPath === "architecture_only") return base.slice(0, 4);
     const product = ["Device layer", "Software", "Validation", "Product"];
-    if (implementationPath === "fpga_prototype") return [...base, "Board explorer", "Bitstream", ...product];
+    const fpgaIntegration = deploymentArchitecture === "fpga_onboard_cpu"
+      ? ["Board explorer", "CPU/fabric integration", "Integrated RTL verification", "Bitstream"]
+      : deploymentArchitecture === "fpga_external_host"
+        ? ["Board explorer", "Board interface integration", "Integrated RTL verification", "Bitstream"]
+        : ["Board explorer", "Bitstream"];
+    if (implementationPath === "fpga_prototype") return [...base, ...fpgaIntegration, ...product];
     if (implementationPath === "digital_ip_asic") return [...base, "ASIC implementation", ...product];
-    return [...base, "Board explorer", "Bitstream", "ASIC implementation", ...product];
-  }, [implementationPath]);
+    return [...base, ...fpgaIntegration, "ASIC implementation", ...product];
+  }, [implementationPath, deploymentArchitecture]);
   const deploymentOptions = useMemo(() => {
     if (implementationPath.includes("fpga")) return [
-      { key: "automatic", title: "Choose automatically", body: "Refine after FPGA Explorer selects a viable board." },
       { key: "fpga_onboard_cpu", title: "Onboard CPU", body: "Use a hard CPU connected to FPGA fabric." },
       { key: "fpga_soft_cpu", title: "Soft CPU", body: "Implement a CPU in FPGA logic and reserve its resources." },
       { key: "fpga_external_host", title: "External host", body: "Use a PC, Mac, MCU, or embedded host over a board transport." },
@@ -203,8 +210,10 @@ export default function PhysicalAiStudioPage() {
   }, [implementationPath]);
 
   useEffect(() => {
-    if (!deploymentOptions.some((option) => option.key === deploymentArchitecture)) setDeploymentArchitecture("automatic");
-  }, [deploymentArchitecture, deploymentOptions]);
+    if (!deploymentOptions.some((option) => option.key === deploymentArchitecture)) {
+      setDeploymentArchitecture(implementationPath.includes("fpga") ? "fpga_external_host" : "automatic");
+    }
+  }, [deploymentArchitecture, deploymentOptions, implementationPath]);
 
   async function start() {
     if (!token || !selected || running) return;
@@ -241,6 +250,15 @@ export default function PhysicalAiStudioPage() {
             instruction_memory_kib: softCpuInstructionKib, data_memory_kib: softCpuDataKib,
             interrupts: softCpuInterrupts, uart: softCpuUart, debug: softCpuDebug,
           } : { core: "automatic", isa: "automatic", bus: "automatic" },
+          host_interface_plan: deploymentArchitecture === "fpga_external_host" ? {
+            protocol: "spi", role: "fpga_peripheral", clock_mhz: hostClockMhz,
+            data_width_bits: 8, framing: "register_command_response",
+            flow_control: "chip_select_and_status", interrupt_signaling: hostInterruptSignaling,
+            register_access: "addressed_read_write",
+          } : {},
+          external_host_config: deploymentArchitecture === "fpga_external_host" ? {
+            target_triple: hostTargetTriple,
+          } : {},
           asic_cpu_config: asicCpuAdvanced ? {
             core: asicCpuCore, isa: asicCpuIsa, bus: asicCpuBus, clock_mhz: asicCpuClockMhz,
             boot_rom_kib: asicBootRomKib, sram_kib: asicSramKib, interrupts: asicCpuInterrupts,
@@ -301,6 +319,7 @@ export default function PhysicalAiStudioPage() {
     {deploymentArchitecture === "asic_soc" && <section className="mt-6 rounded-2xl border border-violet-400/25 bg-slate-900/50 p-6"><div className="flex flex-wrap items-center justify-between gap-3"><div><div className="text-xs font-bold uppercase text-violet-300">ASIC SoC CPU IP</div><h2 className="mt-2 text-lg font-semibold">Embedded processor configuration</h2><p className="mt-1 text-xs text-slate-400">Automatic uses a balanced PicoRV32/APB profile. Full tapeout readiness remains gated until CPU RTL and memory macros are included in complete-SoC synthesis.</p></div><label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={asicCpuAdvanced} onChange={(event) => setAsicCpuAdvanced(event.target.checked)} />Advanced overrides</label></div>{!asicCpuAdvanced ? <div className="mt-4 rounded-lg border border-lime-400/20 bg-lime-500/5 p-3 text-sm text-lime-200">Recommended automatic profile · PicoRV32 · RV32IMC · APB · 100 MHz · 16 KiB boot ROM / 64 KiB SRAM · scan and clock gating enabled</div> : <div className="mt-5 grid gap-4 md:grid-cols-3"><label className="text-xs">CPU IP<select value={asicCpuCore} onChange={(event) => setAsicCpuCore(event.target.value as SoftCpuCore)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="automatic">Automatic</option>{asicCoreOptions.map(([key, core]) => <option key={key} value={key}>{core.label || key} — {core.profile || "policy profile"}</option>)}</select></label><label className="text-xs">ISA<select value={asicCpuIsa} onChange={(event) => setAsicCpuIsa(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="automatic">Automatic</option><option value="rv32i">RV32I</option><option value="rv32im">RV32IM</option><option value="rv32imc">RV32IMC</option></select></label><label className="text-xs">Peripheral bus<select value={asicCpuBus} onChange={(event) => setAsicCpuBus(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="automatic">Automatic</option><option value="apb">APB</option><option value="axi4_lite">AXI4-Lite</option><option value="wishbone">Wishbone</option><option value="native">Native</option></select></label><label className="text-xs">CPU clock (MHz)<input type="number" min={1} value={asicCpuClockMhz} onChange={(event) => setAsicCpuClockMhz(Number(event.target.value) || 100)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label><label className="text-xs">Boot ROM (KiB)<input type="number" min={4} value={asicBootRomKib} onChange={(event) => setAsicBootRomKib(Number(event.target.value) || 16)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label><label className="text-xs">SRAM (KiB)<input type="number" min={8} value={asicSramKib} onChange={(event) => setAsicSramKib(Number(event.target.value) || 64)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label><div className="flex flex-wrap gap-4 md:col-span-3">{[["Interrupts", asicCpuInterrupts, setAsicCpuInterrupts], ["Debug", asicCpuDebug, setAsicCpuDebug], ["Clock gating", asicClockGating, setAsicClockGating], ["DFT scan", asicDftScan, setAsicDftScan]].map(([label, value, setter]) => <label key={String(label)} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={Boolean(value)} onChange={(event) => (setter as (value: boolean) => void)(event.target.checked)} />{String(label)}</label>)}</div></div>}</section>}
 
     {implementationPath !== "architecture_only" && <section className="mt-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-6"><HemAutomaticRunControls enabled={hemEnabled} adaptive={hemAdaptive} onEnabledChange={setHemEnabled} onAdaptiveChange={setHemAdaptive} currentStageLabel="Physical AI architecture" nextStageLabel="RTL generation" /><p className="mt-4 text-sm text-slate-400">When enabled, ChipLoop continues automatically through the selected path. When disabled, the completed dashboard shows the next workflow button.</p></section>}
+    {deploymentArchitecture === "fpga_external_host" && <section className="mt-6 rounded-2xl border border-cyan-400/25 bg-slate-900/50 p-6"><div className="text-xs font-bold uppercase text-cyan-300">External-host interface plan</div><h2 className="mt-2 text-lg font-semibold">Resolve transport before RTL generation</h2><p className="mt-1 text-xs text-slate-400">SPI is the currently qualified transport. This contract drives RTL ports, board filtering, verification, and host-driver generation; it is never selected silently.</p><div className="mt-5 grid gap-4 md:grid-cols-3"><label className="text-xs">Transport<select value="spi" disabled className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="spi">SPI peripheral</option></select></label><label className="text-xs">Maximum SPI clock (MHz)<input type="number" min={1} max={100} value={hostClockMhz} onChange={(event) => setHostClockMhz(Math.max(1, Number(event.target.value) || 10))} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label><label className="text-xs">Host software target<select value={hostTargetTriple} onChange={(event) => setHostTargetTriple(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="x86_64-unknown-linux-gnu">Linux x86-64</option><option value="aarch64-unknown-linux-gnu">Linux ARM64</option><option value="x86_64-apple-darwin">macOS Intel</option><option value="aarch64-apple-darwin">macOS Apple Silicon</option></select></label><label className="text-xs">Event signaling<select value={hostInterruptSignaling} onChange={(event) => setHostInterruptSignaling(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="optional_gpio">Optional IRQ GPIO</option><option value="status_polling">Status polling</option></select></label></div></section>}
     {error && <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200">{error}</div>}
     <button onClick={start} disabled={!token || !selected || running} className="mt-6 w-full rounded-xl bg-fuchsia-400 px-6 py-4 text-lg font-bold text-slate-950 disabled:opacity-50">{running ? "Starting the journey…" : hemEnabled && implementationPath !== "architecture_only" ? "Run the complete journey" : "Run Physical AI agents"}</button>
   </div></main>;
