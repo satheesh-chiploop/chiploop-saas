@@ -1,0 +1,1465 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "Synthesizable FPGA control shell for firmware-mediated active aerodynamics command acceptance, validation, safety enforcement, timeout/stale detection, bounded actuator command generation, and interrupt signaling using a Wishbone MMIO control plane plus optional bounded host stream ingress for compact descriptors.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "rst_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "All sequential logic is synchronous to clk.",
+      "The CPU is integrated as PicoRV32 for firmware-supervised control-plane operation.",
+      "No large payload memories, CFD models, neural networks, or geometry processing are included.",
+      "The optional host stream carries only compact descriptors and does not replace the MMIO control plane."
+    ]
+  },
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level integration of PicoRV32 firmware, Wishbone control/status register window, compact command mailbox, safety/validation logic, bounded host stream ingress, and bounded actuator output generation. The top provides the firmware-visible CSR/MMIO interface and enforces command acceptance, stale/timeout rejection, clamp behavior, sticky fault reporting, and interrupt generation.",
+      "ports": [
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "fault_out",
+          "direction": "output",
+          "width": 4
+        },
+        {
+          "name": "irq_out",
+          "direction": "output",
+          "width": 1
+        }
+      ],
+      "functionality": "Expose a 32-bit Wishbone MMIO window for firmware to program mode, limits, thresholds, mailbox metadata, interrupt enables, and fault clear strobes; instantiate PicoRV32 as the firmware control CPU; route compact command descriptors and status signals between register logic and safety logic; optionally accept a bounded 64-bit host stream descriptor; and produce only bounded actuator command output, validity, fault summary, and interrupt request. On invalid, stale, timeout, reset, or fault conditions, the design inhibits actuator output validity and latches faults for software handling.",
+      "responsibilities": [
+        "Instantiate and integrate PicoRV32 as the soft CPU control plane.",
+        "Expose a firmware-visible Wishbone MMIO slave window for all control and status registers.",
+        "Decode and route CSR/MMIO accesses to the register block with response/ready semantics.",
+        "Accept compact command descriptors only through firmware-mediated mailbox registers or bounded host stream input.",
+        "Validate sequence ordering, age/timeout, and legal command range.",
+        "Clamp actuator requests to programmed min/max bounds.",
+        "Latch sticky fault indicators until software clears them or reset occurs.",
+        "Assert interrupts for required events with maskable enable bits.",
+        "Provide bounded backpressure handling for the optional host stream and raise transport fault if backpressure persists beyond limit.",
+        "Drive actuator outputs only with bounded, narrow control signals."
+      ],
+      "must_drive": [
+        "actuator_cmd",
+        "actuator_valid",
+        "fault_out",
+        "irq_out"
+      ],
+      "must_receive": [],
+      "must_not_drive": [],
+      "reset_behavior": "On reset, clear mailbox state, sequence tracking, sticky faults, interrupt status, and output-valid state. Actuator validity is inhibited until a valid command is accepted by firmware-mediated control flow or bounded host stream ingress.",
+      "behavior_rules": [
+        "Use only the declared Wishbone CSR/MMIO interface for firmware-visible command acceptance and status reads/writes.",
+        "Every implemented register must be reachable by RTL address decode and reflected in register_contract.",
+        "New command acceptance requires valid descriptor, strictly newer sequence_id, and age within timeout threshold.",
+        "Commands older than stale_threshold are rejected and latch stale fault.",
+        "Commands older than timeout_threshold are rejected and latch timeout fault.",
+        "Requested actuator position is clamped to actuator_min/actuator_max; clamp event is sticky until cleared by software.",
+        "If invalid, stale, timeout, reset, or fault conditions are present, inhibit actuator_valid and latch the corresponding fault for software handling.",
+        "Optional host stream is bounded, uses valid/ready handshake, and may only carry compact descriptors; no large payloads are permitted.",
+        "Any persistent host backpressure beyond the programmed limit latches transport fault and inhibits actuator output validity.",
+        "irq_out asserts on new accepted command, stale rejection, timeout fault, clamp event, and transport fault when enabled by mask bits.",
+        "No fallback command, fallback register, fallback status, fallback controller, or silent command substitution is permitted."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v",
+      "ports_documentation": []
+    },
+    "modules": [
+      {
+        "name": "adaptive_aero_control_registers",
+        "description": "Wishbone MMIO register block implementing the firmware-visible control/status plane, mailbox descriptor capture, fault status, interrupt enables, and readback fields. It provides explicit semantic outputs for command acceptance, configuration, and status reporting, and exposes the implemented register contract to firmware.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "wb_adr_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_sel_i",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "wb_we_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_stb_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_cyc_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wb_ack_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_stall_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_mode_select",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "cfg_safe_fallback_position",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_min",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_max",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_timeout_threshold",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_stale_threshold",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_sequence_counter",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_irq_enable",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_command_mailbox_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_command_mailbox_sequence_id",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_command_mailbox_timestamp",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_command_mailbox_target_actuator_position",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_command_mailbox_age",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_command_mailbox_control",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "cmd_accept_pulse",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_clear_faults_w1c",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "accepted_sequence_counter",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "current_accepted_command",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "current_actuator_output",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "fault_status_i",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "fault_summary_i",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "irq_status_i",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements a firmware-visible CSR/MMIO register map with address decode, write-data capture, read-data return, transaction-valid/write-enable, and response/ready semantics on Wishbone. Exposes all declared registers and fields required by the application contract, including mode select, safe position configuration, actuator limits, timeout threshold, stale threshold, sequence counter, accepted sequence counter, fault status, interrupt enable, mailbox descriptor fields, current accepted command, current actuator output, and fault summary. Generates explicit semantic outputs for the mailbox descriptor fields and command accept pulse. Provides write-one-to-clear semantics for sticky fault bits through a dedicated W1C command field.",
+        "responsibilities": [
+          "Decode all implemented CSR/MMIO registers and fields.",
+          "Expose exact firmware-visible semantics for control, status, and mailbox descriptor registers.",
+          "Capture compact command descriptors only; do not store large payloads or geometry data.",
+          "Provide readback of current accepted command, current actuator output, and fault summary.",
+          "Generate command accept pulse only from a valid firmware write path when configured conditions are met.",
+          "Generate W1C clear strobes for sticky fault bits.",
+          "Feed explicit semantic configuration and mailbox signals to the safety/actuator controller.",
+          "Return Wishbone acknowledge and read data with bounded ready semantics."
+        ],
+        "must_drive": [
+          "wb_dat_o",
+          "wb_ack_o",
+          "wb_stall_o",
+          "cfg_mode_select",
+          "cfg_safe_fallback_position",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_timeout_threshold",
+          "cfg_stale_threshold",
+          "cfg_sequence_counter",
+          "cfg_irq_enable",
+          "cfg_command_mailbox_valid",
+          "cfg_command_mailbox_sequence_id",
+          "cfg_command_mailbox_timestamp",
+          "cfg_command_mailbox_target_actuator_position",
+          "cfg_command_mailbox_age",
+          "cfg_command_mailbox_control",
+          "cmd_accept_pulse",
+          "cmd_clear_faults_w1c"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "wb_adr_i",
+          "wb_dat_i",
+          "wb_sel_i",
+          "wb_we_i",
+          "wb_stb_i",
+          "wb_cyc_i",
+          "accepted_sequence_counter",
+          "current_accepted_command",
+          "current_actuator_output",
+          "fault_status_i",
+          "fault_summary_i",
+          "irq_status_i"
+        ],
+        "must_not_drive": [
+          "wb_adr_i",
+          "wb_dat_i",
+          "wb_sel_i",
+          "wb_we_i",
+          "wb_stb_i",
+          "wb_cyc_i",
+          "accepted_sequence_counter",
+          "current_accepted_command",
+          "current_actuator_output",
+          "fault_status_i",
+          "fault_summary_i",
+          "irq_status_i"
+        ],
+        "reset_behavior": "Clear all control fields to safe defaults, deassert cmd_accept_pulse, clear W1C strobes, and return readback fields to zeroed or safe values until firmware writes them. Wishbone handshake outputs return idle on reset.",
+        "behavior_rules": [
+          "Every declared register and field must be decodable through the RTL address map.",
+          "No inaccessible internal state may be described as software-visible.",
+          "Mailbox fields are compact metadata only: sequence_id, timestamp or age marker, target_actuator_position, and valid bit.",
+          "Write-one-to-clear semantics apply only to sticky fault bits through cmd_clear_faults_w1c.",
+          "Firmware-visible readback must reflect the current accepted command and actuator output."
+        ],
+        "rtl_output_file": "adaptive_aero_control_registers.v"
+      },
+      {
+        "name": "adaptive_aero_control_logic",
+        "description": "Safety, validation, clamping, timeout/stale checking, transport fault handling, interrupt generation, and actuator command output controller. It consumes explicit semantic signals from the register block, optional host stream descriptor inputs, and the CPU reset/clock, and produces bounded actuator and fault outputs without implementing any model inference or large-data processing.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_mode_select",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "cfg_safe_fallback_position",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_actuator_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_timeout_threshold",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_stale_threshold",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_sequence_counter",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_irq_enable",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_command_mailbox_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_command_mailbox_sequence_id",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_command_mailbox_timestamp",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_command_mailbox_target_actuator_position",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_command_mailbox_age",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_command_mailbox_control",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "cmd_accept_pulse",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cmd_clear_faults_w1c",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "host_stream_valid_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "host_stream_ready_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "host_stream_data_i",
+            "direction": "input",
+            "width": 64
+          },
+          {
+            "name": "actuator_cmd",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "fault_out",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "irq_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "accepted_sequence_counter_o",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "current_accepted_command_o",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "current_actuator_output_o",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "fault_status_o",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "fault_summary_o",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "irq_status_o",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements the bounded command acceptance and actuator safety controller. It validates compact descriptors for valid bit, strict sequence freshness, and age/timeout constraints; clamps requested actuator position within programmed min/max bounds; inhibits actuator validity on invalid, stale, timeout, reset, or fault conditions; and asserts sticky fault outputs. It also monitors optional bounded host stream backpressure and raises transport fault if backpressure persists beyond limit. No fallback command substitution is performed; invalid or faulted conditions simply deassert actuator_valid and retain latched fault status for software handling.",
+        "responsibilities": [
+          "Validate compact command descriptors.",
+          "Check strict sequence monotonicity against the last accepted sequence.",
+          "Check age against timeout and stale thresholds.",
+          "Clamp actuator request to configured min/max before any output update.",
+          "Deassert actuator validity on invalid or fault conditions.",
+          "Raise and latch fault indicators.",
+          "Generate interrupt status according to enabled events.",
+          "Monitor host stream readiness and detect transport backpressure faults.",
+          "Provide current accepted command, actuator output, fault, and IRQ status feedback to the register block."
+        ],
+        "must_drive": [
+          "host_stream_ready_o",
+          "actuator_cmd",
+          "actuator_valid",
+          "fault_out",
+          "irq_out",
+          "accepted_sequence_counter_o",
+          "current_accepted_command_o",
+          "current_actuator_output_o",
+          "fault_status_o",
+          "fault_summary_o",
+          "irq_status_o"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_mode_select",
+          "cfg_safe_fallback_position",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_timeout_threshold",
+          "cfg_stale_threshold",
+          "cfg_sequence_counter",
+          "cfg_irq_enable",
+          "cfg_command_mailbox_valid",
+          "cfg_command_mailbox_sequence_id",
+          "cfg_command_mailbox_timestamp",
+          "cfg_command_mailbox_target_actuator_position",
+          "cfg_command_mailbox_age",
+          "cfg_command_mailbox_control",
+          "cmd_accept_pulse",
+          "cmd_clear_faults_w1c",
+          "host_stream_valid_i",
+          "host_stream_data_i"
+        ],
+        "must_not_drive": [
+          "cfg_mode_select",
+          "cfg_safe_fallback_position",
+          "cfg_actuator_min",
+          "cfg_actuator_max",
+          "cfg_timeout_threshold",
+          "cfg_stale_threshold",
+          "cfg_sequence_counter",
+          "cfg_irq_enable",
+          "cfg_command_mailbox_valid",
+          "cfg_command_mailbox_sequence_id",
+          "cfg_command_mailbox_timestamp",
+          "cfg_command_mailbox_target_actuator_position",
+          "cfg_command_mailbox_age",
+          "cfg_command_mailbox_control",
+          "cmd_accept_pulse",
+          "cmd_clear_faults_w1c",
+          "host_stream_valid_i",
+          "host_stream_data_i"
+        ],
+        "reset_behavior": "On reset, clear all sticky faults, set accepted sequence and command outputs to zero, deassert actuator_valid and irq_out, and return host_stream_ready_o to the default accepting state. No output validity is asserted until a valid accepted command is processed.",
+        "behavior_rules": [
+          "A descriptor is accepted only when valid is asserted, sequence_id is strictly newer than the last accepted sequence, and age/timeout checks pass.",
+          "If sequence_id is not newer, assert stale fault and reject the command.",
+          "If command age exceeds timeout threshold, assert timeout fault and reject the command.",
+          "Clamp requests below min to min and above max to max; assert clamp event for that transaction.",
+          "If invalid, stale, timeout, reset, transport fault, or explicit safe-mode request conditions exist, deassert actuator_valid and latch the fault for software handling.",
+          "No silent command replacement or fallback command generation is permitted.",
+          "Optional host stream uses valid/ready handshake with 64-bit payload and compact fixed-format descriptor fields only.",
+          "Persistent backpressure beyond the programmed limit asserts transport fault and inhibits output validity.",
+          "Interrupts are maskable via cfg_irq_enable bits."
+        ],
+        "rtl_output_file": "adaptive_aero_control_logic.v"
+      },
+      {
+        "name": "picorv32_core",
+        "description": "Resolved PicoRV32 soft CPU instance used by the firmware-mediated control plane. The core is integrated for Wishbone-based memory-mapped operation and is responsible for running firmware that programs the control/status registers and supervises fault handling.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "wb_adr_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_o",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "wb_dat_i",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "wb_sel_o",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "wb_we_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_stb_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_cyc_o",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "wb_ack_i",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "irq_i",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Soft CPU execution core for firmware-generated command supervision. It executes RV32IMC firmware that writes the MMIO register set, polls fault status, clears sticky flags after safe recovery, and updates command sequencing state. The core is referenced for system integration only and does not replace the explicit firmware-visible CSR/MMIO control plane.",
+        "responsibilities": [
+          "Execute application firmware.",
+          "Issue Wishbone bus transactions toward the control/status register block.",
+          "Receive interrupt requests from the control logic.",
+          "Maintain CPU-side control flow for sequence and watchdog supervision."
+        ],
+        "must_drive": [
+          "wb_adr_o",
+          "wb_dat_o",
+          "wb_sel_o",
+          "wb_we_o",
+          "wb_stb_o",
+          "wb_cyc_o"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "wb_dat_i",
+          "wb_ack_i",
+          "irq_i"
+        ],
+        "must_not_drive": [
+          "wb_dat_i",
+          "wb_ack_i",
+          "irq_i"
+        ],
+        "reset_behavior": "Reset the CPU into its architectural reset state with bus outputs deasserted until firmware execution begins.",
+        "behavior_rules": [
+          "The CPU is present to satisfy the resolved software contract and firmware mediation requirements.",
+          "Do not claim board readiness unless CPU, memory/interconnect, and application RTL are synthesized and routed together.",
+          "The CPU does not implement actuator control directly; it only programs and supervises the register block through Wishbone."
+        ],
+        "rtl_output_file": "picorv32_core.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "actuator_cmd",
+      "connected_to": [
+        "adaptive_aero_control_logic.actuator_cmd"
+      ],
+      "description": "Bounded actuator command output is driven by the safety/actuator logic."
+    },
+    {
+      "top_port": "actuator_valid",
+      "connected_to": [
+        "adaptive_aero_control_logic.actuator_valid"
+      ],
+      "description": "Actuator validity output is driven by the safety/actuator logic."
+    },
+    {
+      "top_port": "fault_out",
+      "connected_to": [
+        "adaptive_aero_control_logic.fault_out"
+      ],
+      "description": "Fault summary output is driven by the safety/actuator logic."
+    },
+    {
+      "top_port": "irq_out",
+      "connected_to": [
+        "adaptive_aero_control_logic.irq_out"
+      ],
+      "description": "Interrupt output is driven by the safety/actuator logic."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "cfg_mode_select",
+      "width": 2,
+      "source": "adaptive_aero_control_registers.cfg_mode_select",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_mode_select"
+      ],
+      "description": "Semantic mode select configuration from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_safe_fallback_position",
+      "width": 16,
+      "source": "adaptive_aero_control_registers.cfg_safe_fallback_position",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_safe_fallback_position"
+      ],
+      "description": "Configured safe position value from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_actuator_min",
+      "width": 16,
+      "source": "adaptive_aero_control_registers.cfg_actuator_min",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_actuator_min"
+      ],
+      "description": "Configured minimum actuator limit from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_actuator_max",
+      "width": 16,
+      "source": "adaptive_aero_control_registers.cfg_actuator_max",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_actuator_max"
+      ],
+      "description": "Configured maximum actuator limit from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_timeout_threshold",
+      "width": 16,
+      "source": "adaptive_aero_control_registers.cfg_timeout_threshold",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_timeout_threshold"
+      ],
+      "description": "Configured timeout threshold from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_stale_threshold",
+      "width": 16,
+      "source": "adaptive_aero_control_registers.cfg_stale_threshold",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_stale_threshold"
+      ],
+      "description": "Configured stale threshold from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_sequence_counter",
+      "width": 16,
+      "source": "adaptive_aero_control_registers.cfg_sequence_counter",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_sequence_counter"
+      ],
+      "description": "Firmware-maintained sequence counter from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_irq_enable",
+      "width": 8,
+      "source": "adaptive_aero_control_registers.cfg_irq_enable",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_irq_enable"
+      ],
+      "description": "Interrupt enable mask from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_command_mailbox_valid",
+      "width": 1,
+      "source": "adaptive_aero_control_registers.cfg_command_mailbox_valid",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_command_mailbox_valid"
+      ],
+      "description": "Mailbox valid bit from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_command_mailbox_sequence_id",
+      "width": 16,
+      "source": "adaptive_aero_control_registers.cfg_command_mailbox_sequence_id",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_command_mailbox_sequence_id"
+      ],
+      "description": "Mailbox sequence identifier from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_command_mailbox_timestamp",
+      "width": 16,
+      "source": "adaptive_aero_control_registers.cfg_command_mailbox_timestamp",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_command_mailbox_timestamp"
+      ],
+      "description": "Mailbox timestamp or age marker from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_command_mailbox_target_actuator_position",
+      "width": 16,
+      "source": "adaptive_aero_control_registers.cfg_command_mailbox_target_actuator_position",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_command_mailbox_target_actuator_position"
+      ],
+      "description": "Requested actuator position from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_command_mailbox_age",
+      "width": 16,
+      "source": "adaptive_aero_control_registers.cfg_command_mailbox_age",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_command_mailbox_age"
+      ],
+      "description": "Command age marker from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cfg_command_mailbox_control",
+      "width": 4,
+      "source": "adaptive_aero_control_registers.cfg_command_mailbox_control",
+      "destinations": [
+        "adaptive_aero_control_logic.cfg_command_mailbox_control"
+      ],
+      "description": "Mailbox control flags from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cmd_accept_pulse",
+      "width": 1,
+      "source": "adaptive_aero_control_registers.cmd_accept_pulse",
+      "destinations": [
+        "adaptive_aero_control_logic.cmd_accept_pulse"
+      ],
+      "description": "Command acceptance pulse from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "cmd_clear_faults_w1c",
+      "width": 4,
+      "source": "adaptive_aero_control_registers.cmd_clear_faults_w1c",
+      "destinations": [
+        "adaptive_aero_control_logic.cmd_clear_faults_w1c"
+      ],
+      "description": "Write-one-to-clear fault strobes from the register block to the actuator/safety logic."
+    },
+    {
+      "name": "accepted_sequence_counter_o",
+      "width": 16,
+      "source": "adaptive_aero_control_logic.accepted_sequence_counter_o",
+      "destinations": [
+        "adaptive_aero_control_registers.accepted_sequence_counter"
+      ],
+      "description": "Accepted sequence counter feedback from the actuator/safety logic to the register block for firmware readback."
+    },
+    {
+      "name": "current_accepted_command_o",
+      "width": 16,
+      "source": "adaptive_aero_control_logic.current_accepted_command_o",
+      "destinations": [
+        "adaptive_aero_control_registers.current_accepted_command"
+      ],
+      "description": "Current accepted command feedback from the actuator/safety logic to the register block for firmware readback."
+    },
+    {
+      "name": "current_actuator_output_o",
+      "width": 16,
+      "source": "adaptive_aero_control_logic.current_actuator_output_o",
+      "destinations": [
+        "adaptive_aero_control_registers.current_actuator_output"
+      ],
+      "description": "Current actuator output feedback from the actuator/safety logic to the register block for firmware readback."
+    },
+    {
+      "name": "fault_status_o",
+      "width": 4,
+      "source": "adaptive_aero_control_logic.fault_status_o",
+      "destinations": [
+        "adaptive_aero_control_registers.fault_status_i"
+      ],
+      "description": "Sticky fault status feedback from the actuator/safety logic to the register block."
+    },
+    {
+      "name": "fault_summary_o",
+      "width": 4,
+      "source": "adaptive_aero_control_logic.fault_summary_o",
+      "destinations": [
+        "adaptive_aero_control_registers.fault_summary_i"
+      ],
+      "description": "Fault summary feedback from the actuator/safety logic to the register block."
+    },
+    {
+      "name": "irq_status_o",
+      "width": 1,
+      "source": "adaptive_aero_control_logic.irq_status_o",
+      "destinations": [
+        "adaptive_aero_control_registers.irq_status_i"
+      ],
+      "description": "IRQ status feedback from the actuator/safety logic to the register block for firmware readback."
+    },
+    {
+      "name": "wb_adr_o",
+      "width": 32,
+      "source": "picorv32_core.wb_adr_o",
+      "destinations": [
+        "adaptive_aero_control_registers.wb_adr_i"
+      ],
+      "description": "CPU Wishbone address output to the register block slave interface."
+    },
+    {
+      "name": "wb_dat_o",
+      "width": 32,
+      "source": "picorv32_core.wb_dat_o",
+      "destinations": [
+        "adaptive_aero_control_registers.wb_dat_i"
+      ],
+      "description": "CPU Wishbone write data output to the register block slave interface."
+    },
+    {
+      "name": "wb_dat_i",
+      "width": 32,
+      "source": "adaptive_aero_control_registers.wb_dat_o",
+      "destinations": [
+        "picorv32_core.wb_dat_i"
+      ],
+      "description": "Register block Wishbone read data returned to the CPU."
+    },
+    {
+      "name": "wb_sel_o",
+      "width": 4,
+      "source": "picorv32_core.wb_sel_o",
+      "destinations": [
+        "adaptive_aero_control_registers.wb_sel_i"
+      ],
+      "description": "CPU Wishbone byte select output to the register block."
+    },
+    {
+      "name": "wb_we_o",
+      "width": 1,
+      "source": "picorv32_core.wb_we_o",
+      "destinations": [
+        "adaptive_aero_control_registers.wb_we_i"
+      ],
+      "description": "CPU Wishbone write enable output to the register block."
+    },
+    {
+      "name": "wb_stb_o",
+      "width": 1,
+      "source": "picorv32_core.wb_stb_o",
+      "destinations": [
+        "adaptive_aero_control_registers.wb_stb_i"
+      ],
+      "description": "CPU Wishbone strobe output to the register block."
+    },
+    {
+      "name": "wb_cyc_o",
+      "width": 1,
+      "source": "picorv32_core.wb_cyc_o",
+      "destinations": [
+        "adaptive_aero_control_registers.wb_cyc_i"
+      ],
+      "description": "CPU Wishbone cycle output to the register block."
+    },
+    {
+      "name": "wb_ack_i",
+      "width": 1,
+      "source": "adaptive_aero_control_registers.wb_ack_o",
+      "destinations": [
+        "picorv32_core.wb_ack_i"
+      ],
+      "description": "Wishbone acknowledge from the register block back to the CPU."
+    },
+    {
+      "name": "irq_i",
+      "width": 1,
+      "source": "adaptive_aero_control_logic.irq_out",
+      "destinations": [
+        "picorv32_core.irq_i"
+      ],
+      "description": "Interrupt request from the actuator/safety logic to the CPU."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "cfg_mode_select",
+      "owner": "adaptive_aero_control_registers.cfg_mode_select"
+    },
+    {
+      "signal": "cfg_safe_fallback_position",
+      "owner": "adaptive_aero_control_registers.cfg_safe_fallback_position"
+    },
+    {
+      "signal": "cfg_actuator_min",
+      "owner": "adaptive_aero_control_registers.cfg_actuator_min"
+    },
+    {
+      "signal": "cfg_actuator_max",
+      "owner": "adaptive_aero_control_registers.cfg_actuator_max"
+    },
+    {
+      "signal": "cfg_timeout_threshold",
+      "owner": "adaptive_aero_control_registers.cfg_timeout_threshold"
+    },
+    {
+      "signal": "cfg_stale_threshold",
+      "owner": "adaptive_aero_control_registers.cfg_stale_threshold"
+    },
+    {
+      "signal": "cfg_sequence_counter",
+      "owner": "adaptive_aero_control_registers.cfg_sequence_counter"
+    },
+    {
+      "signal": "cfg_irq_enable",
+      "owner": "adaptive_aero_control_registers.cfg_irq_enable"
+    },
+    {
+      "signal": "cfg_command_mailbox_valid",
+      "owner": "adaptive_aero_control_registers.cfg_command_mailbox_valid"
+    },
+    {
+      "signal": "cfg_command_mailbox_sequence_id",
+      "owner": "adaptive_aero_control_registers.cfg_command_mailbox_sequence_id"
+    },
+    {
+      "signal": "cfg_command_mailbox_timestamp",
+      "owner": "adaptive_aero_control_registers.cfg_command_mailbox_timestamp"
+    },
+    {
+      "signal": "cfg_command_mailbox_target_actuator_position",
+      "owner": "adaptive_aero_control_registers.cfg_command_mailbox_target_actuator_position"
+    },
+    {
+      "signal": "cfg_command_mailbox_age",
+      "owner": "adaptive_aero_control_registers.cfg_command_mailbox_age"
+    },
+    {
+      "signal": "cfg_command_mailbox_control",
+      "owner": "adaptive_aero_control_registers.cfg_command_mailbox_control"
+    },
+    {
+      "signal": "cmd_accept_pulse",
+      "owner": "adaptive_aero_control_registers.cmd_accept_pulse"
+    },
+    {
+      "signal": "cmd_clear_faults_w1c",
+      "owner": "adaptive_aero_control_registers.cmd_clear_faults_w1c"
+    },
+    {
+      "signal": "accepted_sequence_counter_o",
+      "owner": "adaptive_aero_control_logic.accepted_sequence_counter_o"
+    },
+    {
+      "signal": "current_accepted_command_o",
+      "owner": "adaptive_aero_control_logic.current_accepted_command_o"
+    },
+    {
+      "signal": "current_actuator_output_o",
+      "owner": "adaptive_aero_control_logic.current_actuator_output_o"
+    },
+    {
+      "signal": "fault_status_o",
+      "owner": "adaptive_aero_control_logic.fault_status_o"
+    },
+    {
+      "signal": "fault_summary_o",
+      "owner": "adaptive_aero_control_logic.fault_summary_o"
+    },
+    {
+      "signal": "irq_status_o",
+      "owner": "adaptive_aero_control_logic.irq_status_o"
+    },
+    {
+      "signal": "wb_adr_o",
+      "owner": "picorv32_core.wb_adr_o"
+    },
+    {
+      "signal": "wb_dat_o",
+      "owner": "picorv32_core.wb_dat_o"
+    },
+    {
+      "signal": "wb_dat_i",
+      "owner": "adaptive_aero_control_registers.wb_dat_o"
+    },
+    {
+      "signal": "wb_sel_o",
+      "owner": "picorv32_core.wb_sel_o"
+    },
+    {
+      "signal": "wb_we_o",
+      "owner": "picorv32_core.wb_we_o"
+    },
+    {
+      "signal": "wb_stb_o",
+      "owner": "picorv32_core.wb_stb_o"
+    },
+    {
+      "signal": "wb_cyc_o",
+      "owner": "picorv32_core.wb_cyc_o"
+    },
+    {
+      "signal": "wb_ack_i",
+      "owner": "adaptive_aero_control_registers.wb_ack_o"
+    },
+    {
+      "signal": "irq_i",
+      "owner": "adaptive_aero_control_logic.irq_out"
+    },
+    {
+      "signal": "actuator_cmd",
+      "owner": "adaptive_aero_control_logic.actuator_cmd"
+    },
+    {
+      "signal": "actuator_valid",
+      "owner": "adaptive_aero_control_logic.actuator_valid"
+    },
+    {
+      "signal": "fault_out",
+      "owner": "adaptive_aero_control_logic.fault_out"
+    },
+    {
+      "signal": "irq_out",
+      "owner": "adaptive_aero_control_logic.irq_out"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "wishbone",
+    "registers": [
+      {
+        "name": "MODE_SELECT",
+        "address": 0,
+        "access": "rw",
+        "width": 2,
+        "fields": [
+          {
+            "name": "mode_select",
+            "lsb": 0,
+            "msb": 1,
+            "access": "rw"
+          }
+        ],
+        "description": "Control mode selector for firmware-mediated operation."
+      },
+      {
+        "name": "SAFE_POSITION",
+        "address": 4,
+        "access": "rw",
+        "width": 16,
+        "fields": [
+          {
+            "name": "safe_position",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw"
+          }
+        ],
+        "description": "Configured safe position value used as a software-visible configuration reference."
+      },
+      {
+        "name": "ACTUATOR_MIN",
+        "address": 8,
+        "access": "rw",
+        "width": 16,
+        "fields": [
+          {
+            "name": "actuator_min",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw"
+          }
+        ],
+        "description": "Minimum actuator command bound."
+      },
+      {
+        "name": "ACTUATOR_MAX",
+        "address": 12,
+        "access": "rw",
+        "width": 16,
+        "fields": [
+          {
+            "name": "actuator_max",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw"
+          }
+        ],
+        "description": "Maximum actuator command bound."
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD",
+        "address": 16,
+        "access": "rw",
+        "width": 16,
+        "fields": [
+          {
+            "name": "timeout_threshold",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw"
+          }
+        ],
+        "description": "Maximum allowable command age before timeout fault is asserted."
+      },
+      {
+        "name": "STALE_THRESHOLD",
+        "address": 20,
+        "access": "rw",
+        "width": 16,
+        "fields": [
+          {
+            "name": "stale_threshold",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw"
+          }
+        ],
+        "description": "Age threshold beyond which a command is considered stale and rejected."
+      },
+      {
+        "name": "SEQUENCE_COUNTER",
+        "address": 24,
+        "access": "rw",
+        "width": 16,
+        "fields": [
+          {
+            "name": "sequence_counter",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw"
+          }
+        ],
+        "description": "Firmware-maintained current sequence counter."
+      },
+      {
+        "name": "ACCEPTED_SEQUENCE_COUNTER",
+        "address": 28,
+        "access": "ro",
+        "width": 16,
+        "fields": [
+          {
+            "name": "accepted_sequence_counter",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro"
+          }
+        ],
+        "description": "Readback of the last accepted sequence counter."
+      },
+      {
+        "name": "COMMAND_MAILBOX",
+        "address": 32,
+        "access": "rw",
+        "width": 64,
+        "fields": [
+          {
+            "name": "valid",
+            "lsb": 0,
+            "msb": 0,
+            "access": "rw"
+          },
+          {
+            "name": "sequence_id",
+            "lsb": 1,
+            "msb": 16,
+            "access": "rw"
+          },
+          {
+            "name": "timestamp_or_age",
+            "lsb": 17,
+            "msb": 32,
+            "access": "rw"
+          },
+          {
+            "name": "target_actuator_position",
+            "lsb": 33,
+            "msb": 48,
+            "access": "rw"
+          },
+          {
+            "name": "control",
+            "lsb": 49,
+            "msb": 52,
+            "access": "rw"
+          }
+        ],
+        "description": "Compact command descriptor mailbox containing only valid bit, sequence_id, timestamp or age marker, target actuator position, and control bits."
+      },
+      {
+        "name": "CURRENT_ACCEPTED_COMMAND",
+        "address": 40,
+        "access": "ro",
+        "width": 16,
+        "fields": [
+          {
+            "name": "current_accepted_command",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro"
+          }
+        ],
+        "description": "Readback of the current accepted command."
+      },
+      {
+        "name": "CURRENT_ACTUATOR_OUTPUT",
+        "address": 44,
+        "access": "ro",
+        "width": 16,
+        "fields": [
+          {
+            "name": "current_actuator_output",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro"
+          }
+        ],
+        "description": "Readback of the current actuator output value."
+      },
+      {
+        "name": "FAULT_STATUS",
+        "address": 48,
+        "access": "ro",
+        "width": 4,
+        "fields": [
+          {
+            "name": "stale_fault",
+            "lsb": 0,
+            "msb": 0,
+            "access": "ro"
+          },
+          {
+            "name": "timeout_fault",
+            "lsb": 1,
+            "msb": 1,
+            "access": "ro"
+          },
+          {
+            "name": "clamp_fault",
+            "lsb": 2,
+            "msb": 2,
+            "access": "ro"
+          },
+          {
+            "name": "transport_fault",
+            "lsb": 3,
+            "msb": 3,
+            "access": "ro"
+          }
+        ],
+        "description": "Sticky fault status summary."
+      },
+      {
+        "name": "FAULT_STATUS_W1C",
+        "address": 52,
+        "access": "wo",
+        "width": 4,
+        "fields": [
+          {
+            "name": "clear_stale_fault",
+            "lsb": 0,
+            "msb": 0,
+            "access": "w1c"
+          },
+          {
+            "name": "clear_timeout_fault",
+            "lsb": 1,
+            "msb": 1,
+            "access": "w1c"
+          },
+          {
+            "name": "clear_clamp_fault",
+            "lsb": 2,
+            "msb": 2,
+            "access": "w1c"
+          },
+          {
+            "name": "clear_transport_fault",
+            "lsb": 3,
+            "msb": 3,
+            "access": "w1c"
+          }
+        ],
+        "description": "Write-one-to-clear register for sticky fault bits."
+      },
+      {
+        "name": "IRQ_ENABLE",
+        "address": 56,
+        "access": "rw",
+        "width": 8,
+        "fields": [
+          {
+            "name": "accepted_cmd_irq_enable",
+            "lsb": 0,
+            "msb": 0,
+            "access": "rw"
+          },
+          {
+            "name": "stale_fault_irq_enable",
+            "lsb": 1,
+            "msb": 1,
+            "access": "rw"
+          },
+          {
+            "name": "timeout_fault_irq_enable",
+            "lsb": 2,
+            "msb": 2,
+            "access": "rw"
+          },
+          {
+            "name": "clamp_event_irq_enable",
+            "lsb": 3,
+            "msb": 3,
+            "access": "rw"
+          },
+          {
+            "name": "transport_fault_irq_enable",
+            "lsb": 4,
+            "msb": 4,
+            "access": "rw"
+          },
+          {
+            "name": "reserved",
+            "lsb": 5,
+            "msb": 7,
+            "access": "rw"
+          }
+        ],
+        "description": "Interrupt enable mask."
+      },
+      {
+        "name": "FAULT_SUMMARY",
+        "address": 60,
+        "access": "ro",
+        "width": 4,
+        "fields": [
+          {
+            "name": "fault_summary",
+            "lsb": 0,
+            "msb": 3,
+            "access": "ro"
+          }
+        ],
+        "description": "Condensed fault summary for firmware polling."
+      },
+      {
+        "name": "IRQ_STATUS",
+        "address": 64,
+        "access": "ro",
+        "width": 1,
+        "fields": [
+          {
+            "name": "irq_status",
+            "lsb": 0,
+            "msb": 0,
+            "access": "ro"
+          }
+        ],
+        "description": "Current interrupt status indicator."
+      }
+    ]
+  }
+}
