@@ -1,0 +1,33 @@
+{
+  "advisories": [],
+  "agent": "FPGA Constraint and CDC/RDC Signoff Agent",
+  "cdc_rdc_findings": [],
+  "constraint_format": "lpf",
+  "constraint_path": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/constraints/adaptive_aero_control_top_spi_fpga_top.lpf",
+  "detected_async_resets": [
+    "reset_n",
+    "spi_cs_n"
+  ],
+  "detected_clocks": [
+    "clk",
+    "spi_sclk"
+  ],
+  "enabled": true,
+  "errors": [],
+  "required": true,
+  "rtl_file_count": 6,
+  "signoff": {
+    "all_clocks_defined": true,
+    "all_top_level_ports_constrained": true,
+    "cdc_rdc_review_complete": false
+  },
+  "status": "review",
+  "target_frequency_mhz": 50.0,
+  "tool": "ChipLoop structural RTL/constraint analysis",
+  "unconstrained_ports": [],
+  "unsafe_crossing_count": 0,
+  "warnings": [
+    "Multiple RTL clock signals were detected; provide CDC classifications or run structural CDC analysis.",
+    "Asynchronous reset usage was detected; reset release synchronization requires review."
+  ]
+}

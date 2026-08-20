@@ -1,0 +1,29 @@
+{
+  "type": "vv_simulation_manifest",
+  "version": "1.1",
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "spec_path": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/spec/fpga_verification_source_spec.json",
+  "rtl_files": [
+    "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/handoff/rtl/adaptive_aero_control_registers.v",
+    "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/handoff/rtl/adaptive_aero_control_request_packager.v",
+    "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/handoff/rtl/adaptive_aero_control_response_parser.v",
+    "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/handoff/rtl/adaptive_aero_control_supervisor.v",
+    "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/handoff/rtl/adaptive_aero_control_top.v",
+    "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv"
+  ],
+  "default_tests": [
+    "smoke_test",
+    "constrained_random_sanity"
+  ],
+  "runner": "backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/vv/tb/run_regression.py",
+  "makefile": "backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/vv/tb/Makefile",
+  "testcases_json": "backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/vv/tb/testcases.json",
+  "tb_contract_json": "backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/vv/tb/tb_contract.json",
+  "reports_dir": "backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/vv/tb/reports",
+  "simulator": "verilator",
+  "sva_assertions_path": "backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions.sv",
+  "sva_bind_path": "backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions_bind.sv",
+  "coverage_model_py": "backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/vv/tb/coverage_model.py",
+  "functional_coverage_summary_json": "backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/vv/tb/reports/functional_coverage_summary.json",
+  "functional_coverage_md": "backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/vv/tb/reports/COVERAGE.md"
+}

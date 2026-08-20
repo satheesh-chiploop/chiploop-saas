@@ -1,0 +1,165 @@
+{
+  "agent": "FPGA RTL-to-Netlist Equivalence Agent",
+  "comparison": "two_stage_rtl_generic_and_generic_mapped_equivalence",
+  "enabled": true,
+  "failure_kind": "proof_incomplete",
+  "family": "ecp5",
+  "gate_status": "fail",
+  "generic_lec": {
+    "coverage_complete": false,
+    "failure_kind": "proof_incomplete",
+    "gate": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+    "gold": [
+      "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_registers.v",
+      "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_request_packager.v",
+      "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_response_parser.v",
+      "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_supervisor.v",
+      "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_top.v",
+      "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+    ],
+    "partition_count": 5,
+    "partitions": [
+      {
+        "command": {
+          "cmd": [
+            "/usr/bin/yosys",
+            "-s",
+            "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/lec/fpga_generic_partition_adaptive_aero_control_registers_refined.ys"
+          ],
+          "error": null,
+          "executable": "/usr/bin/yosys",
+          "log": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/lec/fpga_generic_partition_adaptive_aero_control_registers_refined.log",
+          "ok": false,
+          "profile_id": "chiploop_saas_default",
+          "returncode": 1,
+          "status": "failed",
+          "stderr_tail": "ERROR: Found 32 unproven $equiv cells in 'equiv_status -assert'.\n",
+          "stdout_tail": "e step.\n  Proving existence of base case for step 39. (6197701 clauses over 2329332 variables)\n  Proving induction step 39. (6357485 clauses over 2389369 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 40. (6357486 clauses over 2389369 variables)\n  Proving induction step 40. (6517270 clauses over 2449406 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 41. (6517271 clauses over 2449406 variables)\n  Proving induction step 41. (6677055 clauses over 2509443 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 42. (6677056 clauses over 2509443 variables)\n  Proving induction step 42. (6836840 clauses over 2569480 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 43. (6836841 clauses over 2569480 variables)\n  Proving induction step 43. (6996625 clauses over 2629517 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 44. (6996626 clauses over 2629517 variables)\n  Proving induction step 44. (7156410 clauses over 2689554 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 45. (7156411 clauses over 2689554 variables)\n  Proving induction step 45. (7316195 clauses over 2749591 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 46. (7316196 clauses over 2749591 variables)\n  Proving induction step 46. (7475980 clauses over 2809628 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 47. (7475981 clauses over 2809628 variables)\n  Proving induction step 47. (7635765 clauses over 2869665 variables)\n  Proof for induction step failed. Extending to next time step.\n  Proving existence of base case for step 48. (7635766 clauses over 2869665 variables)\n  Proving induction step 48. (7795550 clauses over 2929702 variables)\n  Proof for induction step failed. Trying to prove individual $equiv from workset.\n  Trying to prove $equiv for \\read_mux [0]: failed.\n  Trying to prove $equiv for \\read_mux [1]: failed.\n  Trying to prove $equiv for \\read_mux [2]: failed.\n  Trying to prove $equiv for \\read_mux [3]: failed.\n  Trying to prove $equiv for \\read_mux [4]: failed.\n  Trying to prove $equiv for \\read_mux [5]: failed.\n  Trying to prove $equiv for \\read_mux [6]: failed.\n  Trying to prove $equiv for \\read_mux [7]: failed.\n  Trying to prove $equiv for \\read_mux [8]: failed.\n  Trying to prove $equiv for \\read_mux [9]: failed.\n  Trying to prove $equiv for \\read_mux [10]: failed.\n  Trying to prove $equiv for \\read_mux [11]: failed.\n  Trying to prove $equiv for \\read_mux [12]: failed.\n  Trying to prove $equiv for \\read_mux [13]: failed.\n  Trying to prove $equiv for \\read_mux [14]: failed.\n  Trying to prove $equiv for \\read_mux [15]: failed.\n  Trying to prove $equiv for \\read_mux [16]: failed.\n  Trying to prove $equiv for \\read_mux [17]: failed.\n  Trying to prove $equiv for \\read_mux [18]: failed.\n  Trying to prove $equiv for \\read_mux [19]: failed.\n  Trying to prove $equiv for \\read_mux [20]: failed.\n  Trying to prove $equiv for \\read_mux [21]: failed.\n  Trying to prove $equiv for \\read_mux [22]: failed.\n  Trying to prove $equiv for \\read_mux [23]: failed.\n  Trying to prove $equiv for \\read_mux [24]: failed.\n  Trying to prove $equiv for \\read_mux [25]: failed.\n  Trying to prove $equiv for \\read_mux [26]: failed.\n  Trying to prove $equiv for \\read_mux [27]: failed.\n  Trying to prove $equiv for \\read_mux [28]: failed.\n  Trying to prove $equiv for \\read_mux [29]: failed.\n  Trying to prove $equiv for \\read_mux [30]: failed.\n  Trying to prove $equiv for \\read_mux [31]: failed.\nProved 0 previously unproven $equiv cells.\n\n22. Executing EQUIV_STATUS pass.\n"
+        },
+        "failure_kind": "proof_incomplete",
+        "gate": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+        "gold": [
+          "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_registers.v",
+          "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_request_packager.v",
+          "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_response_parser.v",
+          "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_supervisor.v",
+          "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_top.v",
+          "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+        ],
+        "initial_attempt": {
+          "command": {
+            "cmd": [
+              "/usr/bin/yosys",
+              "-s",
+              "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/lec/fpga_generic_partition_adaptive_aero_control_registers.ys"
+            ],
+            "error": null,
+            "executable": "/usr/bin/yosys",
+            "log": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/lec/fpga_generic_partition_adaptive_aero_control_registers.log",
+            "ok": false,
+            "profile_id": "chiploop_saas_default",
+            "returncode": 1,
+            "status": "failed",
+            "stderr_tail": "ERROR: Found 32 unproven $equiv cells in 'equiv_status -assert'.\n",
+            "stdout_tail": "[13]: failed.\n  Trying to prove $equiv for \\read_mux [14]: failed.\n  Trying to prove $equiv for \\read_mux [15]: failed.\n  Trying to prove $equiv for \\read_mux [16]: failed.\n  Trying to prove $equiv for \\read_mux [17]: failed.\n  Trying to prove $equiv for \\read_mux [18]: failed.\n  Trying to prove $equiv for \\read_mux [19]: failed.\n  Trying to prove $equiv for \\read_mux [20]: failed.\n  Trying to prove $equiv for \\read_mux [21]: failed.\n  Trying to prove $equiv for \\read_mux [22]: failed.\n  Trying to prove $equiv for \\read_mux [23]: failed.\n  Trying to prove $equiv for \\read_mux [24]: failed.\n  Trying to prove $equiv for \\read_mux [25]: failed.\n  Trying to prove $equiv for \\read_mux [26]: failed.\n  Trying to prove $equiv for \\read_mux [27]: failed.\n  Trying to prove $equiv for \\read_mux [28]: failed.\n  Trying to prove $equiv for \\read_mux [29]: failed.\n  Trying to prove $equiv for \\read_mux [30]: failed.\n  Trying to prove $equiv for \\read_mux [31]: failed.\n  Trying to prove $equiv for \\identification_r [4]: success!\n  Trying to prove $equiv for \\identification_r [5]: success!\n  Trying to prove $equiv for \\identification_r [6]: success!\n  Trying to prove $equiv for \\identification_r [7]: success!\n  Trying to prove $equiv for \\identification_r [8]: success!\n  Trying to prove $equiv for \\identification_r [9]: success!\n  Trying to prove $equiv for \\identification_r [10]: success!\n  Trying to prove $equiv for \\identification_r [11]: success!\n  Trying to prove $equiv for \\identification_r [12]: success!\n  Trying to prove $equiv for \\identification_r [13]: success!\n  Trying to prove $equiv for \\identification_r [14]: success!\n  Trying to prove $equiv for \\identification_r [15]: success!\n  Trying to prove $equiv for \\identification_r [16]: success!\n  Trying to prove $equiv for \\identification_r [17]: success!\n  Trying to prove $equiv for \\identification_r [18]: success!\n  Trying to prove $equiv for \\identification_r [19]: success!\n  Trying to prove $equiv for \\identification_r [20]: success!\n  Trying to prove $equiv for \\identification_r [21]: success!\n  Trying to prove $equiv for \\identification_r [22]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [0]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [1]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [2]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [3]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [4]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [5]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [6]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [7]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [8]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [9]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [10]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [11]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [12]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [13]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [14]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [15]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [16]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [17]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [18]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [19]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [20]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [21]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [22]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [23]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [24]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [25]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [26]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [27]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [28]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [29]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [30]: success!\n  Trying to prove $equiv for \\wb_dat_o_r [31]: success!\nProved 64 previously unproven $equiv cells.\n\n21. Executing EQUIV_STATUS pass.\n"
+          },
+          "failure_kind": "proof_incomplete",
+          "gate": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+          "gold": [
+            "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_registers.v",
+            "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_request_packager.v",
+            "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_response_parser.v",
+            "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_supervisor.v",
+            "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_top.v",
+            "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/src/upstream/adaptive_aero_control_top_spi_fpga_top.sv"
+          ],
+          "log": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/lec/fpga_generic_partition_adaptive_aero_control_registers.log",
+          "proven": false,
+          "reason": "Yosys could not prove 32 equivalence points after induction depths 12.",
+          "script": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/lec/fpga_generic_partition_adaptive_aero_control_registers.ys",
+          "status": "inconclusive",
+          "timeout_seconds": 600,
+          "unproven_points": 32
+        },
+        "log": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/lec/fpga_generic_partition_adaptive_aero_control_registers_refined.log",
+        "module": "adaptive_aero_control_registers",
+        "proven": false,
+        "reason": "Yosys could not prove 32 equivalence points after induction depths 24, 48.",
+        "refinement_depths": [
+          24,
+          48
+        ],
+        "script": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/lec/fpga_generic_partition_adaptive_aero_control_registers_refined.ys",
+        "status": "inconclusive",
+        "timeout_seconds": 600,
+        "unproven_points": 32
+      }
+    ],
+    "partitions_attempted": 1,
+    "partitions_proven": 0,
+    "proven": false,
+    "reason": "Yosys could not prove 32 equivalence points after induction depths 24, 48.",
+    "status": "inconclusive",
+    "strategy": "hierarchical",
+    "top_connectivity": null,
+    "unproven_points": 32
+  },
+  "generic_lec_strategy": {
+    "flip_flops": 1671,
+    "large_design": true,
+    "mapped_cells": 3961,
+    "reason": "shared hierarchy and complexity threshold; applied before the first proof",
+    "requested": "auto",
+    "selected": "hierarchical",
+    "shared_partitions": [
+      "adaptive_aero_control_registers",
+      "adaptive_aero_control_request_packager",
+      "adaptive_aero_control_response_parser",
+      "adaptive_aero_control_supervisor",
+      "adaptive_aero_control_top"
+    ]
+  },
+  "generic_netlist": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+  "generic_proven": false,
+  "induction_depth": 12,
+  "induction_depths_attempted": [
+    12
+  ],
+  "mapped_lec": {
+    "failure_kind": "upstream_proof_failed",
+    "gate": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+    "gold": [
+      "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v"
+    ],
+    "proven": false,
+    "reason": "Mapped-netlist LEC was not started because RTL-to-generic LEC did not pass.",
+    "status": "blocked",
+    "unproven_points": null
+  },
+  "mapped_lec_strategy": {
+    "flip_flops": 1671,
+    "large_design": true,
+    "mapped_cells": 3961,
+    "reason": "shared hierarchy and complexity threshold",
+    "requested": "auto",
+    "selected": "hierarchical",
+    "shared_partitions": [
+      "adaptive_aero_control_registers",
+      "adaptive_aero_control_request_packager",
+      "adaptive_aero_control_response_parser",
+      "adaptive_aero_control_supervisor",
+      "adaptive_aero_control_top"
+    ]
+  },
+  "mapped_netlist": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "mapped_proven": false,
+  "netlist": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "proven": false,
+  "reason": "Yosys could not prove 32 equivalence points after induction depths 24, 48.",
+  "required": true,
+  "rtl_file_count": 6,
+  "status": "inconclusive",
+  "tool": "Yosys",
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "unproven_points": 32
+}

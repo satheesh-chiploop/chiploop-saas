@@ -1,0 +1,43 @@
+{
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "output_points": [
+    {
+      "name": "spi_miso",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "fault_indicator",
+      "direction": "output",
+      "width_expr": "1"
+    }
+  ],
+  "input_points": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "reset_n",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "spi_sclk",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "spi_cs_n",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "spi_mosi",
+      "direction": "input",
+      "width_expr": "1"
+    }
+  ],
+  "user_coverage_plan_points": []
+}

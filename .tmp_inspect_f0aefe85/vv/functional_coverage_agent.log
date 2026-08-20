@@ -1,0 +1,43 @@
+Digital Functional Coverage Agent Log
+[2026-08-20T00:59:25.866552] [INFO] Starting Digital Functional Coverage Agent...
+[2026-08-20T00:59:25.866809] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/spec/fpga_verification_source_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 6,
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "soc_mode": false
+}
+[2026-08-20T00:59:25.871396] [INFO] resolved_mode=digital
+[2026-08-20T00:59:25.871502] [INFO] spec_path=/root/chiploop-backend/backend/workflows/f0aefe85-b5c0-4c9a-b352-28b45f77c68e/spec/fpga_verification_source_spec.json
+[2026-08-20T00:59:25.871665] [INFO] top_module=adaptive_aero_control_top_spi_fpga_top
+[2026-08-20T00:59:25.871770] [INFO] rtl_file_count=6
+[2026-08-20T00:59:25.871877] [INFO] port_source=rtl_fallback
+[2026-08-20T00:59:25.872033] [INFO] clock_candidates=[
+  "clk"
+]
+[2026-08-20T00:59:25.872178] [INFO] reset_candidates=[
+  {
+    "name": "reset_n",
+    "active_low": true,
+    "async": false
+  }
+]
+[2026-08-20T00:59:25.872422] [INFO] coverage_points={
+  "output_points": [
+    "spi_miso",
+    "fault_indicator"
+  ],
+  "input_points": [
+    "clk",
+    "reset_n",
+    "spi_sclk",
+    "spi_cs_n",
+    "spi_mosi"
+  ],
+  "user_coverage_plan_points": []
+}
+[2026-08-20T00:59:25.873741] [INFO] Generated coverage_model.py
+[2026-08-20T00:59:25.873813] [INFO] Generated coverage_spec.json
+[2026-08-20T00:59:25.873876] [INFO] Generated COVERAGE.md
