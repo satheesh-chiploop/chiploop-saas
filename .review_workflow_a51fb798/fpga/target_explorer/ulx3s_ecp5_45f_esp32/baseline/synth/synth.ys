@@ -1,0 +1,9 @@
+read_verilog -sv /root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/src/upstream/adaptive_aero_actuator_formatter.v
+read_verilog -sv /root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/src/upstream/adaptive_aero_control_top.v
+read_verilog -sv /root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/src/upstream/adaptive_aero_fault_manager.v
+read_verilog -sv /root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/src/upstream/adaptive_aero_register_map.v
+read_verilog -sv /root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/src/upstream/adaptive_aero_request_engine.v
+read_verilog -sv /root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/src/upstream/adaptive_aero_response_validator.v
+read_verilog -sv /root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv
+read_verilog -sv /root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top_spi_fpga_top.sv
+synth_ecp5 -top adaptive_aero_control_top_spi_fpga_top_spi_fpga_top -noflatten -json /root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/target_explorer/ulx3s_ecp5_45f_esp32/baseline/synth/adaptive_aero_control_top_spi_fpga_top_spi_fpga_top_ecp5.json

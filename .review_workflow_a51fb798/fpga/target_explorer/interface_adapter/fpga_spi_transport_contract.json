@@ -1,0 +1,53 @@
+{
+  "schema": "chiploop.fpga.spi_transport.v1",
+  "mode": 0,
+  "bit_order": "msb_first",
+  "frame_bits": 8,
+  "frame_bytes": 1,
+  "command_leading_padding_bits": 5,
+  "response_trailing_padding_bits": 6,
+  "command_commit": "chip_select_rising_edge",
+  "response_latency_frames": 2,
+  "minimum_interframe_delay_us": 1,
+  "cdc_model": "bundled_data_mailboxes_held_stable_between_frame_commits",
+  "input_bits": 3,
+  "output_bits": 2,
+  "input_bit_map": [
+    {
+      "port": "spi_sclk",
+      "width": 1,
+      "lsb": 0
+    },
+    {
+      "port": "spi_cs_n",
+      "width": 1,
+      "lsb": 1
+    },
+    {
+      "port": "spi_mosi",
+      "width": 1,
+      "lsb": 2
+    }
+  ],
+  "output_bit_map": [
+    {
+      "port": "spi_miso",
+      "width": 1,
+      "lsb": 1
+    },
+    {
+      "port": "fault_indicator",
+      "width": 1,
+      "lsb": 0
+    }
+  ],
+  "maximum_spi_clock_mhz": 10.0,
+  "interrupt_signaling": null,
+  "source_interface_plan": {
+    "protocol": "spi_register",
+    "mode": 0,
+    "frame_order": "msb_first",
+    "clock_mhz": 10.0,
+    "source": "board_compute_host_contract"
+  }
+}

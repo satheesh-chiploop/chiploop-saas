@@ -1,0 +1,273 @@
+{
+  "candidate_count": 1,
+  "capability_rejections": {
+    "orangecrab_ecp5_85f": "no qualified hard onboard CPU contract",
+    "ulx3s_ecp5_45f": "no qualified hard onboard CPU contract"
+  },
+  "closure_policy": {
+    "far_miss_action": "retain baseline result and recommend a relaxed frequency without expensive closure P&R",
+    "minimum_fmax_mhz": 42.5,
+    "near_miss_ratio": 0.85
+  },
+  "continuation": {
+    "app": "fpga-bitstream",
+    "blocked_reason": "No explored board met the requested target with a verified complete pin map, and no programming-ready relaxed-frequency result was permitted or available.",
+    "compute_host": {},
+    "deployment_architecture": "fpga_onboard_cpu",
+    "host_driver_ready": false,
+    "host_transport": null,
+    "integration_contract_ready": false,
+    "integration_reverification_required": true,
+    "label": "Continue to FPGA Prototyping",
+    "programming_ready": false,
+    "requested_target_frequency_mhz": 50.0,
+    "selected_board": null,
+    "selection_mode": "requested_target",
+    "soft_cpu_system_ready": false,
+    "source_workflow_id": "a51fb798-eff0-4a9e-9509-960f57178f3a",
+    "target_frequency_mhz": 50.0,
+    "top_module": "adaptive_aero_control_top_spi_fpga_top_spi_fpga_top",
+    "transport_contract": {},
+    "transport_contract_ready": false,
+    "unmapped_ports": [],
+    "winning_configuration": {
+      "achieved_frequency_mhz": null,
+      "seed": null,
+      "synthesis_strategy": null,
+      "timing_margin_percent": null,
+      "tool_effort": null
+    }
+  },
+  "deployment_architecture": "fpga_onboard_cpu",
+  "design_intent": null,
+  "design_intent_provided": false,
+  "frequency_relaxation_policy": "reported only for candidates that fail the requested target after closure",
+  "preflight_rejected_count": 0,
+  "recommendation_details": {
+    "best_for_growth": null,
+    "best_low_cost": null,
+    "best_overall": null,
+    "best_performance": null
+  },
+  "recommendation_policy": {
+    "best_for_growth": "largest remaining logic headroom",
+    "best_low_cost": "smallest viable FPGA capacity proxy; live board pricing is not assumed",
+    "best_overall": "target met, timing stability, useful headroom, performance, then smallest viable target",
+    "best_performance": "highest robust median Fmax"
+  },
+  "recommendations": {
+    "best_for_growth": null,
+    "best_low_cost": null,
+    "best_overall": null,
+    "best_performance": null
+  },
+  "requested_profile": "best_overall",
+  "results": [
+    {
+      "best_frequency_mhz": null,
+      "board": "ulx3s_ecp5_45f_esp32",
+      "board_input_frequency_mhz": 25.0,
+      "capacity_preflight": {
+        "checks": {
+          "block_ram_blocks": {
+            "application_required": 0,
+            "available": 108,
+            "required": 0,
+            "soft_cpu_reserved": 0,
+            "status": "pass"
+          },
+          "dsp_blocks": {
+            "available": 72,
+            "required": 0,
+            "status": "pass"
+          },
+          "io_cells": {
+            "available": 245,
+            "required": 7,
+            "status": "pass"
+          },
+          "logic_cells": {
+            "application_required": 4033,
+            "available": 44000,
+            "required": 4033,
+            "soft_cpu_reserved": 0,
+            "status": "pass"
+          }
+        },
+        "failure_reasons": [],
+        "policy": "P&R runs only when application synthesis plus any governed soft-CPU reservation fits the device; final readiness requires complete-system synthesis.",
+        "soft_cpu": null,
+        "status": "pass"
+      },
+      "closure_used": false,
+      "constraint_confidence": "exploration_only",
+      "constraint_scope": "capacity_and_timing_exploration; board pin compatibility must be confirmed in FPGA Prototyping",
+      "device": "45k",
+      "failure_kind": "implementation_failed",
+      "failure_reason": "\n\nInfo: Logic utilisation before packing:\nInfo:     Total LUT4s:      2441/43848     5%\nInfo:         logic LUTs:   2305/43848     5%\nInfo:         carry LUTs:    136/43848     0%\nInfo:           RAM LUTs:      0/ 5481     0%\nInfo:          RAMW LUTs:      0/10962     0%\n\nInfo:      Total DFFs:      1728/43848     3%\n\nInfo: Packing IOs..\nInfo: Packing constants..\nInfo: Packing carries...\nInfo: Packing LUTs...\nInfo: Packing LUT5-7s...\nInfo: Packing FFs...\nInfo:     358 FFs paired with LUTs.\nInfo: Generating derived timing constraints...\nInfo: Promoting globals...\nInfo:     promoting clock net clk$TRELLIS_IO_IN to global network\nInfo:     promoting clock net core_spi_sclk to global network\nInfo:     promoting clock net spi_sclk$TRELLIS_IO_IN to global network\nInfo: Checksum: 0x4e355008\n\nInfo: Device utilisation:\nInfo: \t          TRELLIS_IO:     7/  245     2%\nInfo: \t                DCCA:     3/   56     5%\nInfo: \t              DP16KD:     0/  108     0%\nInfo: \t          MULT18X18D:     0/   72     0%\nInfo: \t              ALU54B:     0/   36     0%\nInfo: \t             EHXPLLL:     0/    4     0%\nInfo: \t             EXTREFB:     0/    2     0%\nInfo: \t                DCUA:     0/    2     0%\nInfo: \t           PCSCLKDIV:     0/    2     0%\nInfo: \t             IOLOGIC:     0/  160     0%\nInfo: \t            SIOLOGIC:     0/   85     0%\nInfo: \t                 GSR:     0/    1     0%\nInfo: \t               JTAGG:     0/    1     0%\nInfo: \t                OSCG:     0/    1     0%\nInfo: \t               SEDGA:     0/    1     0%\nInfo: \t                 DTR:     0/    1     0%\nInfo: \t             USRMCLK:     0/    1     0%\nInfo: \t             CLKDIVF:     0/    4     0%\nInfo: \t           ECLKSYNCB:     0/   10     0%\nInfo: \t             DLLDELD:     0/    8     0%\nInfo: \t              DDRDLL:     0/    4     0%\nInfo: \t             DQSBUFM:     0/   10     0%\nInfo: \t     TRELLIS_ECLKBUF:     0/    8     0%\nInfo: \t        ECLKBRIDGECS:     0/    2     0%\nInfo: \t                DCSC:     0/    2     0%\nInfo: \t          TRELLIS_FF:  1728/43848     3%\nInfo: \t        TRELLIS_COMB:  2476/43848     5%\nInfo: \t        TRELLIS_RAMW:     0/ 5481     0%\n\nERROR: cell type '$_TBUF_' is unsupported (instantiated as 'u_core.spi_miso_$_TBUF__Y')\n0 warnings, 1 error\n",
+      "family": "ecp5",
+      "frequency_relaxation": {
+        "eligible": false,
+        "reason": null,
+        "recommended_mhz": null
+      },
+      "implementation_key": "ecp5:45k:CABGA381",
+      "label": "Lattice ULX3S ECP5-45F + ESP32 (populated v2.x/v3.0.x)",
+      "logic_cells_available": 44000,
+      "logic_cells_used": null,
+      "logic_utilization_percent": null,
+      "mapped_ports": [
+        "clk",
+        "reset_n",
+        "spi_sclk",
+        "spi_cs_n",
+        "spi_mosi",
+        "spi_miso",
+        "fault_indicator"
+      ],
+      "median_frequency_mhz": null,
+      "package": "CABGA381",
+      "pnr_runs": [
+        {
+          "boundary_path_delay_ns": null,
+          "command": [
+            "/usr/bin/nextpnr-ecp5",
+            "--45k",
+            "--package",
+            "CABGA381",
+            "--json",
+            "/root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/target_explorer/ulx3s_ecp5_45f_esp32/baseline/synth/adaptive_aero_control_top_spi_fpga_top_spi_fpga_top_ecp5.json",
+            "--report",
+            "/root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/target_explorer/ulx3s_ecp5_45f_esp32/baseline/seed_1/nextpnr_report.json",
+            "--textcfg",
+            "/root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/target_explorer/ulx3s_ecp5_45f_esp32/baseline/seed_1/routed.config",
+            "--lpf-allow-unconstrained",
+            "--timing-allow-fail",
+            "--detailed-timing-report",
+            "--freq",
+            "50.0",
+            "--seed",
+            "1"
+          ],
+          "effective_args": [
+            "--detailed-timing-report",
+            "--freq",
+            "50.0"
+          ],
+          "effort": "balanced",
+          "error": "\n\nInfo: Logic utilisation before packing:\nInfo:     Total LUT4s:      2441/43848     5%\nInfo:         logic LUTs:   2305/43848     5%\nInfo:         carry LUTs:    136/43848     0%\nInfo:           RAM LUTs:      0/ 5481     0%\nInfo:          RAMW LUTs:      0/10962     0%\n\nInfo:      Total DFFs:      1728/43848     3%\n\nInfo: Packing IOs..\nInfo: Packing constants..\nInfo: Packing carries...\nInfo: Packing LUTs...\nInfo: Packing LUT5-7s...\nInfo: Packing FFs...\nInfo:     358 FFs paired with LUTs.\nInfo: Generating derived timing constraints...\nInfo: Promoting globals...\nInfo:     promoting clock net clk$TRELLIS_IO_IN to global network\nInfo:     promoting clock net core_spi_sclk to global network\nInfo:     promoting clock net spi_sclk$TRELLIS_IO_IN to global network\nInfo: Checksum: 0x4e355008\n\nInfo: Device utilisation:\nInfo: \t          TRELLIS_IO:     7/  245     2%\nInfo: \t                DCCA:     3/   56     5%\nInfo: \t              DP16KD:     0/  108     0%\nInfo: \t          MULT18X18D:     0/   72     0%\nInfo: \t              ALU54B:     0/   36     0%\nInfo: \t             EHXPLLL:     0/    4     0%\nInfo: \t             EXTREFB:     0/    2     0%\nInfo: \t                DCUA:     0/    2     0%\nInfo: \t           PCSCLKDIV:     0/    2     0%\nInfo: \t             IOLOGIC:     0/  160     0%\nInfo: \t            SIOLOGIC:     0/   85     0%\nInfo: \t                 GSR:     0/    1     0%\nInfo: \t               JTAGG:     0/    1     0%\nInfo: \t                OSCG:     0/    1     0%\nInfo: \t               SEDGA:     0/    1     0%\nInfo: \t                 DTR:     0/    1     0%\nInfo: \t             USRMCLK:     0/    1     0%\nInfo: \t             CLKDIVF:     0/    4     0%\nInfo: \t           ECLKSYNCB:     0/   10     0%\nInfo: \t             DLLDELD:     0/    8     0%\nInfo: \t              DDRDLL:     0/    4     0%\nInfo: \t             DQSBUFM:     0/   10     0%\nInfo: \t     TRELLIS_ECLKBUF:     0/    8     0%\nInfo: \t        ECLKBRIDGECS:     0/    2     0%\nInfo: \t                DCSC:     0/    2     0%\nInfo: \t          TRELLIS_FF:  1728/43848     3%\nInfo: \t        TRELLIS_COMB:  2476/43848     5%\nInfo: \t        TRELLIS_RAMW:     0/ 5481     0%\n\nERROR: cell type '$_TBUF_' is unsupported (instantiated as 'u_core.spi_miso_$_TBUF__Y')\n0 warnings, 1 error\n",
+          "interior_timing_paths_present": true,
+          "log": "/root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/target_explorer/ulx3s_ecp5_45f_esp32/baseline/seed_1/nextpnr.log",
+          "logic_cells_available": 44000,
+          "logic_cells_used": null,
+          "logic_utilization_percent": null,
+          "max_frequency_mhz": null,
+          "report": null,
+          "routed_flip_flops": null,
+          "routed_lut4_cells": null,
+          "routed_output": null,
+          "seed": 1,
+          "status": "failed",
+          "synthesis_strategy": "baseline",
+          "timing_basis": "register_to_register_fmax",
+          "timing_met": null,
+          "tool_version": "\"nextpnr-ecp5\" -- Next Generation Place and Route (Version 0.7-1build1)"
+        }
+      ],
+      "product_family": "ecp5",
+      "programming_ready": true,
+      "resource_headroom_percent": null,
+      "segments": [],
+      "status": "implementation_failed",
+      "support_tier": "production",
+      "synthesis_runs": [
+        {
+          "block_ram_bits_available": 1944000,
+          "block_ram_blocks_available": 108,
+          "block_ram_blocks_used": 0,
+          "block_ram_primitive": "DP16KD",
+          "block_ram_utilization_percent": 0.0,
+          "carry_cells": 68,
+          "cell_type_counts": {
+            "$_TBUF_": 2,
+            "$specify2": 18,
+            "CCU2C": 68,
+            "L6MUX21": 87,
+            "LUT4": 2305,
+            "PFUMX": 257,
+            "TRELLIS_FF": 1728,
+            "adaptive_aero_actuator_formatter": 1,
+            "adaptive_aero_control_top": 1,
+            "adaptive_aero_control_top_spi_fpga_top": 1,
+            "adaptive_aero_fault_manager": 1,
+            "adaptive_aero_register_map": 1,
+            "adaptive_aero_request_engine": 1,
+            "adaptive_aero_response_validator": 1
+          },
+          "combinational_cells": 2726,
+          "command": [
+            "/usr/bin/yosys",
+            "-s",
+            "/root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/target_explorer/ulx3s_ecp5_45f_esp32/baseline/synth/synth.ys"
+          ],
+          "core_only_ports_removed": [],
+          "effective_options": [
+            "-noflatten"
+          ],
+          "error": null,
+          "fabric_mapped_cells": 4101,
+          "flip_flops": 1728,
+          "log": "/root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/target_explorer/ulx3s_ecp5_45f_esp32/baseline/synth/yosys.log",
+          "logic_utilization_percent": 9.166,
+          "logical_cells_available": 44000,
+          "logical_cells_used": 4033,
+          "lut4_cells": 2305,
+          "memory_intent": {
+            "declarations": [],
+            "estimated_bits": 0,
+            "requires_block_ram": false,
+            "threshold_bits": 4096
+          },
+          "memory_mapping_gate": {
+            "enforced": false,
+            "mapped": false,
+            "primitive": "DP16KD",
+            "required": false,
+            "source_memory_optimized_away": false,
+            "status": "pass",
+            "supported": true
+          },
+          "netlist": "/root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/target_explorer/ulx3s_ecp5_45f_esp32/baseline/synth/adaptive_aero_control_top_spi_fpga_top_spi_fpga_top_ecp5.json",
+          "script": "/root/chiploop-backend/backend/workflows/a51fb798-eff0-4a9e-9509-960f57178f3a/fpga/target_explorer/ulx3s_ecp5_45f_esp32/baseline/synth/synth.ys",
+          "status": "completed",
+          "strategy": "baseline",
+          "tool_version": "Yosys 0.33 (git sha1 2584903a060)",
+          "total_mapped_cells": 4472
+        }
+      ],
+      "target_frequency_mhz": 50.0,
+      "target_met": false,
+      "timing_margin_percent": null,
+      "timing_pass_rate": 0.0,
+      "toolchain_confidence": "qualified",
+      "unmapped_ports": [],
+      "vendor": "lattice",
+      "winning_run": null,
+      "winning_seed": null,
+      "worst_frequency_mhz": null
+    }
+  ],
+  "rtl_file_count": 8,
+  "seed_policy": {
+    "baseline_seed_count": 1,
+    "closure_is_conditional": true,
+    "closure_seed_count": 1
+  },
+  "selected_implementation_recommendation": null,
+  "selected_recommendation": null,
+  "status": "completed",
+  "target_frequency_mhz": 50.0,
+  "top_module": "adaptive_aero_control_top_spi_fpga_top_spi_fpga_top",
+  "type": "fpga_target_explorer",
+  "unique_implementation_count": 1
+}
