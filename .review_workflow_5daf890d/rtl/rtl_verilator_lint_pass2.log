@@ -1,0 +1,123 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.177 MB sources in 7 modules, into 0.072 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.023 s (elab=0.003, cvt=0.012, bld=0.000); cpu 0.023 s on 1 threads; allocated 32.355 MB
+
+=== STDERR ===
+%Warning-WIDTHTRUNC: pass2/request_formatter.v:26:17: Operator ASSIGNW expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 168 bits.
+                                                    : ... note: In instance 'adaptive_aero_control_top.u_request_formatter'
+   26 | assign packet_w = {
+      |                 ^
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:43:6: Signal is not used: 'control_clear_faults'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   43 | wire control_clear_faults;
+      |      ^~~~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:50:13: Signal is not driven, nor used: 'last_request_tag_w'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   50 | wire [15:0] last_request_tag_w;
+      |             ^~~~~~~~~~~~~~~~~~
+%Warning-UNDRIVEN: pass2/adaptive_aero_control_top.v:52:12: Signal is not driven: 'fault_code_w'
+                                                          : ... note: In instance 'adaptive_aero_control_top'
+   52 | wire [7:0] fault_code_w;
+      |            ^~~~~~~~~~~~
+                   ... For warning description see https://verilator.org/warn/UNDRIVEN?v=5.047
+                   ... Use "/* verilator lint_off UNDRIVEN */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:62:6: Signal is not driven, nor used: 'stale_monitor_busy_w'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   62 | wire stale_monitor_busy_w;
+      |      ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:68:6: Signal is not driven, nor used: 'request_accepted'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   68 | wire request_accepted;
+      |      ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:69:13: Signal is not driven, nor used: 'expected_sequence_tag_out'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   69 | wire [15:0] expected_sequence_tag_out;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:70:6: Signal is not driven, nor used: 'timeout_expired_out'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   70 | wire timeout_expired_out;
+      |      ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:71:6: Signal is not driven, nor used: 'busy_out'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   71 | wire busy_out;
+      |      ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:72:6: Signal is not driven, nor used: 'response_valid_out'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   72 | wire response_valid_out;
+      |      ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:73:6: Signal is not driven, nor used: 'response_stale_out'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   73 | wire response_stale_out;
+      |      ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:74:6: Signal is not driven, nor used: 'malformed_response_out'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   74 | wire malformed_response_out;
+      |      ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:75:6: Signal is not driven, nor used: 'sequence_error_out'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   75 | wire sequence_error_out;
+      |      ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:76:13: Signal is not driven, nor used: 'validated_command_out'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   76 | wire [31:0] validated_command_out;
+      |             ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:77:6: Signal is not driven, nor used: 'limit_enable_in'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   77 | wire limit_enable_in;
+      |      ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:78:6: Signal is not driven, nor used: 'apply_in'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   78 | wire apply_in;
+      |      ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:79:6: Signal is not driven, nor used: 'command_clamped_out'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   79 | wire command_clamped_out;
+      |      ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:80:13: Signal is not driven, nor used: 'last_request_tag_out'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   80 | wire [15:0] last_request_tag_out;
+      |             ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:81:13: Signal is not driven, nor used: 'last_response_tag_out'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   81 | wire [15:0] last_response_tag_out;
+      |             ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:82:12: Signal is not driven, nor used: 'fault_code_out'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   82 | wire [7:0] fault_code_out;
+      |            ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:83:6: Signal is not driven, nor used: 'fallback_active_out'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   83 | wire fallback_active_out;
+      |      ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:84:13: Signal is not driven, nor used: 'accepted_response_count_sig'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   84 | wire [15:0] accepted_response_count_sig;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:85:13: Signal is not driven, nor used: 'rejected_response_count_sig'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   85 | wire [15:0] rejected_response_count_sig;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:86:13: Signal is not driven, nor used: 'timeout_count_sig'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   86 | wire [15:0] timeout_count_sig;
+      |             ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:87:13: Signal is not driven, nor used: 'fallback_entry_count_sig'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   87 | wire [15:0] fallback_entry_count_sig;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:88:13: Signal is not driven, nor used: 'clamp_event_count_sig'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   88 | wire [15:0] clamp_event_count_sig;
+      |             ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/stale_data_monitor.v:18:5: Signal is not used: 'active_reg'
+                                                      : ... note: In instance 'adaptive_aero_control_top.u_stale_data_monitor'
+   18 | reg active_reg;
+      |     ^~~~~~~~~~
+
+=== RETURN CODE ===
+0

@@ -1,0 +1,438 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "abstract",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 64,
+    "registers": [
+      {
+        "name": "CONTROL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control register with start, abort, enable, and clear_faults bits.",
+        "fields": [
+          {
+            "name": "start",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Writing 1 initiates a new request when idle."
+          },
+          {
+            "name": "abort",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Writing 1 aborts the outstanding transaction."
+          },
+          {
+            "name": "enable",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Enables closed-loop operation and request generation."
+          },
+          {
+            "name": "clear_faults",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "Clears latched faults when written with 1."
+          },
+          {
+            "name": "reserved",
+            "lsb": 4,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x08",
+        "access": "RO",
+        "description": "Live status flags.",
+        "fields": [
+          {
+            "name": "busy",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Controller is processing a transaction."
+          },
+          {
+            "name": "response_valid",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "A response was accepted and validated."
+          },
+          {
+            "name": "response_stale",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "A response was rejected as stale or late."
+          },
+          {
+            "name": "timeout",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Outstanding transaction exceeded the configured timeout."
+          },
+          {
+            "name": "malformed_response",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Response framing or length was invalid."
+          },
+          {
+            "name": "sequence_error",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Response sequence tag did not match the active request."
+          },
+          {
+            "name": "fallback_active",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the controller is inhibiting actuator validity due to a safety condition."
+          },
+          {
+            "name": "command_clamped",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "The most recent accepted command was clamped or rate-limited."
+          },
+          {
+            "name": "reserved",
+            "lsb": 8,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_CODE",
+        "offset": "0x10",
+        "access": "RO",
+        "description": "Latched fault code register.",
+        "fields": [
+          {
+            "name": "fault_code",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched fault reason encoding."
+          },
+          {
+            "name": "reserved",
+            "lsb": 8,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "SEQUENCE",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Sequence seed / next request tag.",
+        "fields": [
+          {
+            "name": "sequence_seed",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Seed or next sequence tag used for request framing."
+          },
+          {
+            "name": "reserved",
+            "lsb": 16,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THRESHOLD",
+        "offset": "0x20",
+        "access": "RW",
+        "description": "Timeout threshold configuration.",
+        "fields": [
+          {
+            "name": "timeout_threshold",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 1000,
+            "description": "Timeout threshold in clock cycles or implementation-defined tick units."
+          },
+          {
+            "name": "reserved",
+            "lsb": 16,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MIN",
+        "offset": "0x28",
+        "access": "RW",
+        "description": "Minimum actuator command limit.",
+        "fields": [
+          {
+            "name": "actuator_min",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Lower bound for accepted actuator commands."
+          },
+          {
+            "name": "reserved",
+            "lsb": 32,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MAX",
+        "offset": "0x30",
+        "access": "RW",
+        "description": "Maximum actuator command limit.",
+        "fields": [
+          {
+            "name": "actuator_max",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 65535,
+            "description": "Upper bound for accepted actuator commands."
+          },
+          {
+            "name": "reserved",
+            "lsb": 32,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "RATE_LIMIT",
+        "offset": "0x38",
+        "access": "RW",
+        "description": "Rate limit step configuration.",
+        "fields": [
+          {
+            "name": "rate_limit_step",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum command delta per accepted update when enabled."
+          },
+          {
+            "name": "reserved",
+            "lsb": 16,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "LAST_TAGS",
+        "offset": "0x40",
+        "access": "RO",
+        "description": "Last request and last response tags.",
+        "fields": [
+          {
+            "name": "last_request_tag",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most recent active or completed request tag."
+          },
+          {
+            "name": "last_response_tag",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most recent validated response tag."
+          },
+          {
+            "name": "reserved",
+            "lsb": 32,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_STATE",
+        "offset": "0x48",
+        "access": "RW",
+        "description": "Safe-state configuration metadata required by firmware contract.",
+        "fields": [
+          {
+            "name": "safe_state_cfg",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Documented safe-state selector or metadata word used by firmware to configure conservative behavior metadata."
+          },
+          {
+            "name": "reserved",
+            "lsb": 8,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "COUNTERS_0",
+        "offset": "0x50",
+        "access": "RO",
+        "description": "Accepted and rejected response counters.",
+        "fields": [
+          {
+            "name": "accepted_response_count",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Count of responses accepted as valid."
+          },
+          {
+            "name": "rejected_response_count",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Count of responses rejected for any reason."
+          },
+          {
+            "name": "reserved",
+            "lsb": 32,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      },
+      {
+        "name": "COUNTERS_1",
+        "offset": "0x58",
+        "access": "RO",
+        "description": "Timeout, fallback-entry, and clamp-event counters.",
+        "fields": [
+          {
+            "name": "timeout_count",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Count of transaction timeout events."
+          },
+          {
+            "name": "fallback_entry_count",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Count of safety inhibition entries."
+          },
+          {
+            "name": "clamp_event_count",
+            "lsb": 32,
+            "msb": 47,
+            "access": "RO",
+            "reset": 0,
+            "description": "Count of command clamp or rate-limit events."
+          },
+          {
+            "name": "reserved",
+            "lsb": 48,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Deassert reset and wait for mmio_ready to indicate the register block is accessible.",
+      "Program ACTUATOR_MIN, ACTUATOR_MAX, RATE_LIMIT, TIMEOUT_THRESHOLD, SEQUENCE, and SAFE_STATE as required by the application.",
+      "Write CONTROL.enable=1 to permit closed-loop operation.",
+      "Clear any preexisting fault presentation by writing CONTROL.clear_faults=1 if needed.",
+      "When the controller is idle, write CONTROL.start=1 to launch a request transaction."
+    ],
+    "polling_sequence": [
+      "Poll STATUS.busy to determine whether a request is outstanding.",
+      "Poll STATUS.response_valid, STATUS.response_stale, STATUS.timeout, STATUS.malformed_response, and STATUS.sequence_error for completion outcome.",
+      "Read LAST_TAGS to correlate the most recent request and validated response tags.",
+      "Read FAULT_CODE and COUNTERS_0/COUNTERS_1 to obtain persistent error and observability information.",
+      "Use STATUS.command_clamped to detect limiter activity on the last accepted command."
+    ],
+    "irq_sequence": []
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map is a 64-bit MMIO window with real, reachable decode for every documented register.",
+    "No new hierarchy, ports, or bus protocol were invented beyond the abstract/custom register interface implied by the spec.",
+    "Fields use lsb <= msb ordering throughout."
+  ]
+}

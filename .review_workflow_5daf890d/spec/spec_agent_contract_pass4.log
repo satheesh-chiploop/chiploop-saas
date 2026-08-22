@@ -1,0 +1,2 @@
+Digital Spec Agent final contract repair failure:
+Required child input 'stale_data_monitor.request_busy_in' has no source in top_level_connections or inter_module_signals. Add an explicit top-level input connection or a real child producer. Other required child inputs without sources: 'mmio_register_block.last_response_tag_in'. Repair every listed input in the same response.

@@ -1,0 +1,16 @@
+{
+  "mode": "hierarchical",
+  "top_module": "adaptive_aero_control_top",
+  "expected_files": [
+    "adaptive_aero_control_top.v",
+    "request_formatter.v",
+    "response_validator.v",
+    "actuator_command_limiter.v",
+    "stale_data_monitor.v",
+    "mmio_register_block.v"
+  ],
+  "has_regmap": true,
+  "has_clock_reset": false,
+  "has_power_intent": false,
+  "prompt_chars": 166166
+}
