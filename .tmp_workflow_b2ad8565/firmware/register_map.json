@@ -1,0 +1,295 @@
+{
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem",
+  "base_address": "0x00000000",
+  "bus": "CUSTOM",
+  "registers": [
+    {
+      "name": "REVISION_ID",
+      "offset": "0x00000000",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Implementation revision identifier readable by firmware.",
+      "fields": [
+        {
+          "name": "revision_id",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Implementation revision ID. Matches DIGITAL_SPEC_JSON register contract."
+        },
+        {
+          "name": "reserved",
+          "bit_offset": 16,
+          "bit_width": 48,
+          "access": "RO",
+          "description": "Reserved, reads as zero."
+        }
+      ]
+    },
+    {
+      "name": "CTRL",
+      "offset": "0x00000004",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Primary control register for enable, mode, sequence seed, age limit, and timeout configuration.",
+      "fields": [
+        {
+          "name": "enable",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Global enable for request launch and response-to-actuator flow."
+        },
+        {
+          "name": "mode",
+          "bit_offset": 1,
+          "bit_width": 3,
+          "access": "RW",
+          "description": "Control mode used by request framing and response validation."
+        },
+        {
+          "name": "slew_enable",
+          "bit_offset": 4,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Enable bounded slew limiting in actuator command shaping."
+        },
+        {
+          "name": "safe_selector",
+          "bit_offset": 5,
+          "bit_width": 3,
+          "access": "RW",
+          "description": "Safe-state selector for documented policy selection and observability."
+        },
+        {
+          "name": "reserved0",
+          "bit_offset": 8,
+          "bit_width": 8,
+          "access": "RO",
+          "description": "Reserved, reads as zero."
+        },
+        {
+          "name": "request_seq_seed",
+          "bit_offset": 16,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Initial request identifier seed loaded into request framing state after reset or write."
+        },
+        {
+          "name": "response_age_limit",
+          "bit_offset": 32,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Maximum permitted response age in cycles/validations as implemented by the RTL."
+        },
+        {
+          "name": "timeout_threshold",
+          "bit_offset": 48,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Watchdog timeout threshold in cycles for an outstanding request."
+        }
+      ]
+    },
+    {
+      "name": "LIMITS_MIN",
+      "offset": "0x00000008",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Lower clamp limit for actuator command output.",
+      "fields": [
+        {
+          "name": "actuator_min",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Minimum clamp bound for the 32-bit actuator command output."
+        },
+        {
+          "name": "reserved",
+          "bit_offset": 32,
+          "bit_width": 32,
+          "access": "RO",
+          "description": "Reserved, reads as zero."
+        }
+      ]
+    },
+    {
+      "name": "LIMITS_MAX",
+      "offset": "0x0000000C",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Upper clamp limit for actuator command output.",
+      "fields": [
+        {
+          "name": "actuator_max",
+          "bit_offset": 0,
+          "bit_width": 32,
+          "access": "RW",
+          "description": "Maximum clamp bound for the 32-bit actuator command output."
+        },
+        {
+          "name": "reserved",
+          "bit_offset": 32,
+          "bit_width": 32,
+          "access": "RO",
+          "description": "Reserved, reads as zero."
+        }
+      ]
+    },
+    {
+      "name": "FAULT_STATUS",
+      "offset": "0x00000010",
+      "address": null,
+      "access": "RW1C",
+      "reset": "0x00000000",
+      "description": "Sticky fault status and encoded fault cause; write-one-to-clear applies to documented sticky fault bits only.",
+      "fields": [
+        {
+          "name": "fault_status",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Sticky fault indicator. Cleared only by documented write-one-to-clear behavior or reset policy."
+        },
+        {
+          "name": "reserved0",
+          "bit_offset": 1,
+          "bit_width": 7,
+          "access": "RO",
+          "description": "Reserved, reads as zero."
+        },
+        {
+          "name": "fault_cause",
+          "bit_offset": 8,
+          "bit_width": 8,
+          "access": "RO",
+          "description": "Encoded fault cause from safety supervision."
+        },
+        {
+          "name": "reserved1",
+          "bit_offset": 16,
+          "bit_width": 48,
+          "access": "RO",
+          "description": "Reserved, reads as zero."
+        }
+      ]
+    },
+    {
+      "name": "WATCHDOG_SNAPSHOT",
+      "offset": "0x00000014",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Firmware visibility into watchdog and request tracking state plus last accepted command snapshot.",
+      "fields": [
+        {
+          "name": "timeout_counter_snapshot",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Current watchdog counter snapshot."
+        },
+        {
+          "name": "request_id_snapshot",
+          "bit_offset": 16,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Current request identifier snapshot."
+        },
+        {
+          "name": "last_good_cmd",
+          "bit_offset": 32,
+          "bit_width": 32,
+          "access": "RO",
+          "description": "Last good actuator command snapshot accepted by the shaper."
+        }
+      ]
+    },
+    {
+      "name": "STATUS",
+      "offset": "0x00000018",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Compact status register for software observability.",
+      "fields": [
+        {
+          "name": "safe_fallback",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Inhibit/status indication asserted during reset, fault, timeout, or host-unavailable conditions."
+        },
+        {
+          "name": "fault_irq",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Fault interrupt mirror driven from the latched fault state."
+        },
+        {
+          "name": "request_busy",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Outstanding request indication."
+        },
+        {
+          "name": "validated_response_valid",
+          "bit_offset": 3,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Most recent validated response strobe."
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "bit_offset": 4,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Most recent actuator command validity status."
+        },
+        {
+          "name": "status_snapshot_valid",
+          "bit_offset": 5,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Status snapshot validity indication."
+        },
+        {
+          "name": "reserved",
+          "bit_offset": 6,
+          "bit_width": 58,
+          "access": "RO",
+          "description": "Reserved, reads as zero."
+        }
+      ]
+    },
+    {
+      "name": "RESERVED_1",
+      "offset": "0x0000001C",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Reserved location for forward compatibility; reads as zero.",
+      "fields": [
+        {
+          "name": "reserved",
+          "bit_offset": 0,
+          "bit_width": 64,
+          "access": "RO",
+          "description": "Reserved, reads as zero."
+        }
+      ]
+    }
+  ],
+  "__source": {
+    "mode": "artifact_passthrough",
+    "path": "state.digital_regmap"
+  }
+}

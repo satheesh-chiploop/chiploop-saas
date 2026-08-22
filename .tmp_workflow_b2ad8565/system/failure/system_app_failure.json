@@ -1,0 +1,11 @@
+{
+  "schema": "chiploop.system.app_failure.v1",
+  "status": "failed",
+  "workflow_id": "b2ad8565-a390-4c4d-9b5e-24dcc1fe017f",
+  "run_id": "d7816d76-12c3-4890-bb2f-06b98ff6fa22",
+  "template_workflow": "System_Firmware",
+  "app_name": "system",
+  "exception_type": "RuntimeError",
+  "message": "ESP-IDF register API currently supports register fields up to 32 bits.",
+  "traceback": "Traceback (most recent call last):\n  File \"/root/chiploop-backend/main.py\", line 15179, in execute_system_app_background\n    _run_nodes_with_shared_state(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        workflow_id=workflow_id,\n        ^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n        shared_state=shared_state,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/root/chiploop-backend/main.py\", line 2158, in _run_nodes_with_shared_state\n    result = _execute_agent_with_runtime(\n        label,\n    ...<4 lines>...\n        loop_type,\n    )\n  File \"/root/chiploop-backend/main.py\", line 1970, in _execute_agent_with_runtime\n    runtime_result = execute_legacy_agent(agent_fn, context)\n  File \"/root/chiploop-backend/agents/runtime.py\", line 311, in execute_legacy_agent\n    return execute_agent(context, _handler)\n  File \"/root/chiploop-backend/agents/runtime.py\", line 224, in execute_agent\n    result = AgentResult.from_legacy(handler(context))\n                                     ~~~~~~~^^^^^^^^^\n  File \"/root/chiploop-backend/agents/runtime.py\", line 304, in _handler\n    return agent_fn(ctx.state)\n  File \"/root/chiploop-backend/agents/embedded/embedded_elf_build_agent.py\", line 334, in run_agent\n    return run_esp_idf_build(state)\n  File \"/root/chiploop-backend/agents/embedded/embedded_esp_idf_build.py\", line 210, in run_esp_idf_build\n    raise RuntimeError(\"ESP-IDF register API currently supports register fields up to 32 bits.\")\nRuntimeError: ESP-IDF register API currently supports register fields up to 32 bits.\n"
+}

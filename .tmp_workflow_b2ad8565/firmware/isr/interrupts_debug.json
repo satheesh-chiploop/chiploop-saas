@@ -1,0 +1,12 @@
+{
+  "agent": "Embedded Interrupt Mapping Agent",
+  "manifest_present": true,
+  "register_count": 8,
+  "source_count": 4,
+  "sources": [
+    "FAULT_STATUS",
+    "fault_status",
+    "fault_cause",
+    "fault_irq"
+  ]
+}
