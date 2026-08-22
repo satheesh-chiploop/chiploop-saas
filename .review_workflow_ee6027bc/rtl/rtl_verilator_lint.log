@@ -1,0 +1,173 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.161 MB sources in 6 modules, into 0.099 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.028 s (elab=0.003, cvt=0.015, bld=0.000); cpu 0.028 s on 1 threads; allocated 33.355 MB
+
+=== STDERR ===
+%Warning-WIDTHTRUNC: adaptive_aero_history_store.v:61:44: Operator ASSIGNDLY expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 144 bits.
+                                                        : ... note: In instance 'adaptive_aero_control_top.u_history_store'
+   61 |             mem[store_outstanding_id[4:0]] <= {store_outstanding_id, store_age_counter, 16'h0000, {14'h0000, store_stale, store_timeout}, 15'h0000, store_invalid_packet, history_din[63:0]};
+      |                                            ^~
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: adaptive_aero_history_store.v:64:44: Operator ASSIGNDLY expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 144 bits.
+                                                        : ... note: In instance 'adaptive_aero_control_top.u_history_store'
+   64 |             mem[store_outstanding_id[4:0]] <= {store_outstanding_id, store_age_counter, 16'h0000, {14'h0000, store_stale, store_timeout}, 15'h0000, store_invalid_packet, history_din[63:0]};
+      |                                            ^~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:77:13: Signal is not driven, nor used: 'req_transaction_id'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   77 | wire [15:0] req_transaction_id;
+      |             ^~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:78:13: Signal is not driven, nor used: 'req_flow_velocity_mps'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   78 | wire [15:0] req_flow_velocity_mps;
+      |             ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:79:13: Signal is not driven, nor used: 'req_control_field'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   79 | wire [15:0] req_control_field;
+      |             ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:80:13: Signal is not driven, nor used: 'req_freshness'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   80 | wire [15:0] req_freshness;
+      |             ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:81:13: Signal is not driven, nor used: 'req_flags'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   81 | wire [15:0] req_flags;
+      |             ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:82:13: Signal is not driven, nor used: 'rsp_flow_velocity_mps'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   82 | wire [15:0] rsp_flow_velocity_mps;
+      |             ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:83:13: Signal is not driven, nor used: 'rsp_control_field'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   83 | wire [15:0] rsp_control_field;
+      |             ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:88:6: Signal is not used: 'sticky_stale'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   88 | wire sticky_stale;
+      |      ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:92:13: Signal is not used: 'outstanding_sequence_counter'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   92 | wire [15:0] outstanding_sequence_counter;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:93:13: Signal is not used: 'version_id'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   93 | wire [15:0] version_id;
+      |             ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:94:13: Signal is not used: 'capability_id'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   94 | wire [15:0] capability_id;
+      |             ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:98:6: Signal is not used: 'seq_outstanding_valid'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   98 | wire seq_outstanding_valid;
+      |      ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:116:14: Signal is not used: 'history_dout'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  116 | wire [127:0] history_dout;
+      |              ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:130:13: Signal is not used: 'seq_accept_id_from_u_stream_ctrl'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  130 | wire [15:0] seq_accept_id_from_u_stream_ctrl;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:131:13: Signal is not driven, nor used: 'rsp_transaction_id'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  131 | wire [15:0] rsp_transaction_id;
+      |             ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:132:13: Signal is not driven, nor used: 'rsp_flags'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  132 | wire [15:0] rsp_flags;
+      |             ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:133:6: Signal is not driven, nor used: 'req_valid_to_validator'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  133 | wire req_valid_to_validator;
+      |      ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:134:12: Signal is not driven, nor used: 'req_mode_to_validator'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  134 | wire [1:0] req_mode_to_validator;
+      |            ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:135:6: Signal is not driven, nor used: 'stale_data'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  135 | wire stale_data;
+      |      ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:136:6: Signal is not driven, nor used: 'timeout_fault'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  136 | wire timeout_fault;
+      |      ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:137:6: Signal is not driven, nor used: 'cmd_invalid'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  137 | wire cmd_invalid;
+      |      ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:138:6: Signal is not driven, nor used: 'sensor_fault'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  138 | wire sensor_fault;
+      |      ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:139:6: Signal is not driven, nor used: 'host_timeout'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  139 | wire host_timeout;
+      |      ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:140:6: Signal is not driven, nor used: 'overrange'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+  140 | wire overrange;
+      |      ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:141:13: Signal is not driven, nor used: 'store_outstanding_id'
+                                                         : ... note: In instance 'adaptive_aero_control_top'
+  141 | wire [15:0] store_outstanding_id;
+      |             ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_csr_mmio.v:38:14: Bits of signal are not used: 'csr_wdata'[63:32]
+                                                     : ... note: In instance 'adaptive_aero_control_top.u_csr_mmio'
+   38 | input [63:0] csr_wdata;
+      |              ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_csr_mmio.v:61:14: Signal is not used: 'seq_age_counter'
+                                                     : ... note: In instance 'adaptive_aero_control_top.u_csr_mmio'
+   61 | input [15:0] seq_age_counter;
+      |              ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_csr_mmio.v:80:12: Signal is not driven, nor used: 'read_data'
+                                                     : ... note: In instance 'adaptive_aero_control_top.u_csr_mmio'
+   80 | reg [63:0] read_data;
+      |            ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_history_store.v:33:13: Signal is not used: 'read_data'
+                                                          : ... note: In instance 'adaptive_aero_control_top.u_history_store'
+   33 | reg [127:0] read_data;
+      |             ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_history_store.v:34:13: Signal is not used: 'write_data'
+                                                          : ... note: In instance 'adaptive_aero_control_top.u_history_store'
+   34 | reg [127:0] write_data;
+      |             ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_history_store.v:35:11: Signal is not used: 'addr_q'
+                                                          : ... note: In instance 'adaptive_aero_control_top.u_history_store'
+   35 | reg [4:0] addr_q;
+      |           ^~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_history_store.v:36:5: Signal is not used: 'we_q'
+                                                         : ... note: In instance 'adaptive_aero_control_top.u_history_store'
+   36 | reg we_q;
+      |     ^~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_history_store.v:37:5: Signal is not used: 'csb_q'
+                                                         : ... note: In instance 'adaptive_aero_control_top.u_history_store'
+   37 | reg csb_q;
+      |     ^~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_stream_ctrl.v:53:14: Signal is not used: 'rsp_flow_velocity_mps'
+                                                        : ... note: In instance 'adaptive_aero_control_top.u_stream_ctrl'
+   53 | input [15:0] rsp_flow_velocity_mps;
+      |              ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_stream_ctrl.v:54:14: Signal is not used: 'rsp_control_field'
+                                                        : ... note: In instance 'adaptive_aero_control_top.u_stream_ctrl'
+   54 | input [15:0] rsp_control_field;
+      |              ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_stream_ctrl.v:55:14: Signal is not used: 'rsp_geometry_token'
+                                                        : ... note: In instance 'adaptive_aero_control_top.u_stream_ctrl'
+   55 | input [31:0] rsp_geometry_token;
+      |              ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_stream_ctrl.v:56:14: Signal is not used: 'rsp_flags'
+                                                        : ... note: In instance 'adaptive_aero_control_top.u_stream_ctrl'
+   56 | input [15:0] rsp_flags;
+      |              ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_stream_ctrl.v:74:12: Signal is not driven, nor used: 'accept_id_next'
+                                                        : ... note: In instance 'adaptive_aero_control_top.u_stream_ctrl'
+   74 | reg [15:0] accept_id_next;
+      |            ^~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

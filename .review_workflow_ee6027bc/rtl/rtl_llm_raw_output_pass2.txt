@@ -1,0 +1,925 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    clk,
+    reset_n,
+    fault_in,
+    host_cmd_valid,
+    host_cmd_data,
+    host_cmd_ready,
+    host_rsp_valid,
+    host_rsp_data,
+    host_rsp_ready,
+    csr_addr,
+    csr_wdata,
+    csr_rdata,
+    csr_valid,
+    csr_we,
+    csr_ready,
+    act_cmd_code,
+    act_cmd_pos,
+    act_cmd_valid,
+    status_mode,
+    status_outstanding_tid,
+    status_age_counter,
+    status_timeout,
+    status_stale,
+    status_invalid,
+    status_fallback_active,
+    status_clamp_active,
+    req_packet_type,
+    req_version,
+    req_geometry_token,
+    rsp_version,
+    rsp_geometry_token,
+    fault_latch_clear,
+    seq_accept_id,
+    intent_value,
+    history_we_n,
+    history_addr,
+    store_rsp_valid
+);
+input clk;
+input reset_n;
+input [3:0] fault_in;
+output host_cmd_valid;
+output [127:0] host_cmd_data;
+input host_cmd_ready;
+input host_rsp_valid;
+input [127:0] host_rsp_data;
+output host_rsp_ready;
+input [7:0] csr_addr;
+input [63:0] csr_wdata;
+output [63:0] csr_rdata;
+input csr_valid;
+input csr_we;
+output csr_ready;
+output [7:0] act_cmd_code;
+output [11:0] act_cmd_pos;
+output act_cmd_valid;
+output [1:0] status_mode;
+output [15:0] status_outstanding_tid;
+output [15:0] status_age_counter;
+output status_timeout;
+output status_stale;
+output status_invalid;
+output status_fallback_active;
+output status_clamp_active;
+input [7:0] req_packet_type;
+input [7:0] req_version;
+input [31:0] req_geometry_token;
+input [7:0] rsp_version;
+input [31:0] rsp_geometry_token;
+input [3:0] fault_latch_clear;
+input [15:0] seq_accept_id;
+input [11:0] intent_value;
+input history_we_n;
+input [4:0] history_addr;
+input store_rsp_valid;
+
+wire [15:0] req_transaction_id_w;
+wire [15:0] req_flow_velocity_mps_w;
+wire [15:0] req_control_field_w;
+wire [15:0] req_freshness_w;
+wire [15:0] req_flags_w;
+wire [15:0] rsp_flow_velocity_mps_w;
+wire [15:0] rsp_control_field_w;
+wire [15:0] rsp_flags_w;
+wire seq_depth_mode;
+wire [15:0] timeout_threshold;
+wire [15:0] freshness_threshold;
+wire sticky_timeout;
+wire sticky_stale;
+wire sticky_invalid_packet;
+wire sticky_clamp_violation;
+wire [15:0] accepted_sequence_counter;
+wire [15:0] outstanding_sequence_counter;
+wire [15:0] version_id;
+wire [15:0] capability_id;
+wire [15:0] seq_outstanding_id;
+wire [15:0] seq_age_counter;
+wire seq_accept;
+wire seq_outstanding_valid;
+wire seq_timeout;
+wire seq_stale;
+wire seq_invalid_packet;
+wire [127:0] host_cmd_data_w;
+wire [63:0] csr_rdata_w;
+wire csr_ready_w;
+wire host_rsp_ready_w;
+wire [7:0] act_cmd_code_w;
+wire [11:0] act_cmd_pos_w;
+wire act_cmd_valid_w;
+wire [1:0] control_mode;
+wire [11:0] clamp_min;
+wire [11:0] clamp_max;
+wire [1:0] safe_fallback_sel;
+wire clamp_active;
+wire clamp_violation;
+wire safe_inhibit;
+wire [127:0] history_dout;
+wire history_csb_n;
+wire [127:0] history_din;
+wire store_req_valid;
+
+assign req_transaction_id_w = accepted_sequence_counter;
+assign req_flow_velocity_mps_w = accepted_sequence_counter;
+assign req_control_field_w = accepted_sequence_counter;
+assign req_freshness_w = accepted_sequence_counter;
+assign req_flags_w = accepted_sequence_counter;
+assign rsp_flow_velocity_mps_w = accepted_sequence_counter;
+assign rsp_control_field_w = accepted_sequence_counter;
+assign rsp_flags_w = accepted_sequence_counter;
+assign host_cmd_data = host_cmd_data_w;
+assign host_rsp_ready = host_rsp_ready_w;
+assign csr_rdata = csr_rdata_w;
+assign csr_ready = csr_ready_w;
+assign act_cmd_code = act_cmd_code_w;
+assign act_cmd_pos = act_cmd_pos_w;
+assign act_cmd_valid = act_cmd_valid_w;
+assign status_mode = control_mode;
+assign status_outstanding_tid = seq_outstanding_id;
+assign status_age_counter = seq_age_counter;
+assign status_timeout = seq_timeout;
+assign status_stale = seq_stale;
+assign status_invalid = seq_invalid_packet;
+assign status_fallback_active = safe_inhibit;
+assign status_clamp_active = clamp_active;
+assign history_csb_n = csr_ready_w;
+assign history_din = host_cmd_data_w;
+assign store_req_valid = host_cmd_valid;
+
+adaptive_aero_stream_ctrl u_stream_ctrl (
+    .clk(clk),
+    .reset_n(reset_n),
+    .host_cmd_valid(host_cmd_valid),
+    .host_cmd_data(host_cmd_data_w),
+    .host_cmd_ready(host_cmd_ready),
+    .host_rsp_valid(host_rsp_valid),
+    .host_rsp_data(host_rsp_data),
+    .host_rsp_ready(host_rsp_ready_w),
+    .req_packet_type(req_packet_type),
+    .req_transaction_id(req_transaction_id_w),
+    .req_version(req_version),
+    .req_flow_velocity_mps(req_flow_velocity_mps_w),
+    .req_control_field(req_control_field_w),
+    .req_geometry_token(req_geometry_token),
+    .req_freshness(req_freshness_w),
+    .req_flags(req_flags_w),
+    .rsp_version(rsp_version),
+    .rsp_flow_velocity_mps(rsp_flow_velocity_mps_w),
+    .rsp_control_field(rsp_control_field_w),
+    .rsp_geometry_token(rsp_geometry_token),
+    .rsp_flags(rsp_flags_w),
+    .seq_accept(seq_accept),
+    .seq_accept_id(seq_accept_id),
+    .seq_age_counter(seq_age_counter),
+    .seq_outstanding_id(seq_outstanding_id),
+    .seq_outstanding_valid(seq_outstanding_valid),
+    .seq_stale(seq_stale),
+    .seq_timeout(seq_timeout),
+    .seq_invalid_packet(seq_invalid_packet),
+    .seq_depth_mode(seq_depth_mode),
+    .timeout_threshold(timeout_threshold),
+    .freshness_threshold(freshness_threshold),
+    .fault_in(fault_in)
+);
+
+adaptive_aero_csr_mmio u_csr_mmio (
+    .clk(clk),
+    .reset_n(reset_n),
+    .csr_addr(csr_addr),
+    .csr_wdata(csr_wdata),
+    .csr_rdata(csr_rdata_w),
+    .csr_valid(csr_valid),
+    .csr_we(csr_we),
+    .csr_ready(csr_ready_w),
+    .control_mode(control_mode),
+    .timeout_threshold(timeout_threshold),
+    .freshness_threshold(freshness_threshold),
+    .clamp_min(clamp_min),
+    .clamp_max(clamp_max),
+    .safe_fallback_sel(safe_fallback_sel),
+    .seq_depth_mode(seq_depth_mode),
+    .accepted_sequence_counter(accepted_sequence_counter),
+    .outstanding_sequence_counter(outstanding_sequence_counter),
+    .sticky_timeout(sticky_timeout),
+    .sticky_stale(sticky_stale),
+    .sticky_invalid_packet(sticky_invalid_packet),
+    .sticky_clamp_violation(sticky_clamp_violation),
+    .version_id(version_id),
+    .capability_id(capability_id),
+    .fault_latch_clear(fault_latch_clear),
+    .seq_accept_id(seq_accept_id),
+    .seq_outstanding_id(seq_outstanding_id),
+    .seq_age_counter(seq_age_counter),
+    .seq_stale(seq_stale),
+    .seq_timeout(seq_timeout),
+    .seq_invalid_packet(seq_invalid_packet),
+    .clamp_violation_in(clamp_violation),
+    .fault_in(fault_in)
+);
+
+adaptive_aero_actuator_validator u_actuator_validator (
+    .clk(clk),
+    .reset_n(reset_n),
+    .control_mode(control_mode),
+    .clamp_min(clamp_min),
+    .clamp_max(clamp_max),
+    .safe_fallback_sel(safe_fallback_sel),
+    .stale_data(seq_stale),
+    .timeout_fault(seq_timeout),
+    .cmd_invalid(seq_invalid_packet),
+    .sensor_fault(sticky_invalid_packet),
+    .host_timeout(sticky_timeout),
+    .overrange(sticky_clamp_violation),
+    .fault_in(fault_in),
+    .intent_mode(control_mode),
+    .intent_value(intent_value),
+    .intent_valid(seq_accept),
+    .act_cmd_code(act_cmd_code_w),
+    .act_cmd_pos(act_cmd_pos_w),
+    .act_cmd_valid(act_cmd_valid_w),
+    .clamp_active(clamp_active),
+    .clamp_violation(clamp_violation),
+    .safe_inhibit(safe_inhibit)
+);
+
+fpga_history_bram_wrapper u_history_store (
+    .clk(clk),
+    .csb_n(history_csb_n),
+    .we_n(history_we_n),
+    .addr(history_addr),
+    .din(history_din),
+    .dout(history_dout)
+);
+
+endmodule
+---END adaptive_aero_control_top.v---
+---BEGIN adaptive_aero_stream_ctrl.v---
+module adaptive_aero_stream_ctrl (
+    clk,
+    reset_n,
+    host_cmd_valid,
+    host_cmd_data,
+    host_cmd_ready,
+    host_rsp_valid,
+    host_rsp_data,
+    host_rsp_ready,
+    req_packet_type,
+    req_transaction_id,
+    req_version,
+    req_flow_velocity_mps,
+    req_control_field,
+    req_geometry_token,
+    req_freshness,
+    req_flags,
+    rsp_version,
+    rsp_flow_velocity_mps,
+    rsp_control_field,
+    rsp_geometry_token,
+    rsp_flags,
+    seq_accept,
+    seq_accept_id,
+    seq_age_counter,
+    seq_outstanding_id,
+    seq_outstanding_valid,
+    seq_stale,
+    seq_timeout,
+    seq_invalid_packet,
+    seq_depth_mode,
+    timeout_threshold,
+    freshness_threshold,
+    fault_in
+);
+input clk;
+input reset_n;
+output reg host_cmd_valid;
+output reg [127:0] host_cmd_data;
+input host_cmd_ready;
+input host_rsp_valid;
+input [127:0] host_rsp_data;
+output reg host_rsp_ready;
+input [7:0] req_packet_type;
+input [15:0] req_transaction_id;
+input [7:0] req_version;
+input [15:0] req_flow_velocity_mps;
+input [15:0] req_control_field;
+input [31:0] req_geometry_token;
+input [15:0] req_freshness;
+input [15:0] req_flags;
+input [7:0] rsp_version;
+input [15:0] rsp_flow_velocity_mps;
+input [15:0] rsp_control_field;
+input [31:0] rsp_geometry_token;
+input [15:0] rsp_flags;
+output reg seq_accept;
+output reg [15:0] seq_accept_id;
+output reg [15:0] seq_age_counter;
+output reg [15:0] seq_outstanding_id;
+output reg seq_outstanding_valid;
+output reg seq_stale;
+output reg seq_timeout;
+output reg seq_invalid_packet;
+input seq_depth_mode;
+input [15:0] timeout_threshold;
+input [15:0] freshness_threshold;
+input [3:0] fault_in;
+
+reg [15:0] outstanding_id_r;
+reg outstanding_valid_r;
+reg [15:0] age_counter_r;
+reg [15:0] freshness_counter_r;
+reg [1:0] depth_count_r;
+reg [15:0] accept_id_next;
+reg [15:0] age_counter_next;
+reg [15:0] freshness_counter_next;
+reg [15:0] outstanding_id_next;
+reg outstanding_valid_next;
+reg [1:0] depth_count_next;
+reg seq_accept_next;
+reg seq_stale_next;
+reg seq_timeout_next;
+reg seq_invalid_packet_next;
+reg host_cmd_valid_next;
+reg [127:0] host_cmd_data_next;
+reg host_rsp_ready_next;
+reg [127:0] rsp_word;
+reg [7:0] rsp_pkt_type;
+reg [15:0] rsp_tid;
+reg [7:0] rsp_ver;
+reg [15:0] rsp_flow;
+reg [15:0] rsp_ctrl;
+reg [31:0] rsp_geom;
+reg [15:0] rsp_fresh;
+reg [15:0] rsp_flg;
+reg rsp_id_match;
+reg rsp_ver_match;
+reg rsp_geom_match;
+reg rsp_fresh_match;
+reg rsp_header_ok;
+reg req_header_ok;
+reg [15:0] timeout_limit;
+reg [15:0] freshness_limit;
+
+always @(*) begin
+    rsp_word = host_rsp_data;
+    rsp_pkt_type = rsp_word[7:0];
+    rsp_tid = rsp_word[23:8];
+    rsp_ver = rsp_word[31:24];
+    rsp_flow = rsp_word[47:32];
+    rsp_ctrl = rsp_word[63:48];
+    rsp_geom = rsp_word[95:64];
+    rsp_fresh = rsp_word[111:96];
+    rsp_flg = rsp_word[127:112];
+    rsp_id_match = outstanding_valid_r && (rsp_tid == outstanding_id_r);
+    rsp_ver_match = (rsp_ver == req_version);
+    rsp_geom_match = (rsp_geom == req_geometry_token);
+    rsp_fresh_match = (rsp_fresh <= freshness_limit);
+    rsp_header_ok = (rsp_pkt_type == req_packet_type) && rsp_ver_match && rsp_geom_match && (rsp_flow == req_flow_velocity_mps) && (rsp_ctrl == req_control_field) && (rsp_flg == req_flags);
+    req_header_ok = (req_packet_type != 8'h00) && (req_version == rsp_version) && (req_geometry_token != 32'h00000000);
+    timeout_limit = timeout_threshold;
+    freshness_limit = freshness_threshold;
+    host_cmd_valid_next = 1'b0;
+    host_cmd_data_next = host_cmd_data;
+    host_rsp_ready_next = 1'b1;
+    seq_accept_next = 1'b0;
+    seq_accept_id = outstanding_id_r;
+    age_counter_next = age_counter_r;
+    freshness_counter_next = freshness_counter_r;
+    outstanding_id_next = outstanding_id_r;
+    outstanding_valid_next = outstanding_valid_r;
+    depth_count_next = depth_count_r;
+    seq_stale_next = seq_stale;
+    seq_timeout_next = seq_timeout;
+    seq_invalid_packet_next = seq_invalid_packet;
+
+    if (reset_n == 1'b0) begin
+        host_cmd_valid_next = 1'b0;
+        host_cmd_data_next = 128'h0;
+        host_rsp_ready_next = 1'b0;
+        seq_accept_next = 1'b0;
+        seq_accept_id = 16'h0000;
+        age_counter_next = 16'h0000;
+        freshness_counter_next = 16'h0000;
+        outstanding_id_next = 16'h0000;
+        outstanding_valid_next = 1'b0;
+        depth_count_next = 2'b00;
+        seq_stale_next = 1'b0;
+        seq_timeout_next = 1'b0;
+        seq_invalid_packet_next = 1'b0;
+    end else begin
+        if (!outstanding_valid_r) begin
+            if (req_header_ok) begin
+                host_cmd_valid_next = 1'b1;
+                host_cmd_data_next[7:0] = req_packet_type;
+                host_cmd_data_next[23:8] = req_transaction_id;
+                host_cmd_data_next[31:24] = req_version;
+                host_cmd_data_next[47:32] = req_flow_velocity_mps;
+                host_cmd_data_next[63:48] = req_control_field;
+                host_cmd_data_next[95:64] = req_geometry_token;
+                host_cmd_data_next[111:96] = req_freshness;
+                host_cmd_data_next[127:112] = req_flags;
+                seq_accept_next = host_cmd_ready;
+                if (host_cmd_ready) begin
+                    outstanding_id_next = req_transaction_id;
+                    outstanding_valid_next = 1'b1;
+                    age_counter_next = 16'h0000;
+                    freshness_counter_next = req_freshness;
+                    seq_accept_id = req_transaction_id;
+                    depth_count_next = 2'b01;
+                end
+            end else begin
+                seq_invalid_packet_next = 1'b1;
+            end
+        end else begin
+            host_cmd_valid_next = 1'b1;
+            host_cmd_data_next[7:0] = req_packet_type;
+            host_cmd_data_next[23:8] = outstanding_id_r;
+            host_cmd_data_next[31:24] = req_version;
+            host_cmd_data_next[47:32] = req_flow_velocity_mps;
+            host_cmd_data_next[63:48] = req_control_field;
+            host_cmd_data_next[95:64] = req_geometry_token;
+            host_cmd_data_next[111:96] = freshness_counter_r;
+            host_cmd_data_next[127:112] = req_flags;
+            if (seq_depth_mode && (depth_count_r < 2)) begin
+                if (host_cmd_ready) begin
+                    depth_count_next = depth_count_r + 2'b01;
+                    seq_accept_next = 1'b1;
+                    seq_accept_id = outstanding_id_r;
+                end
+            end else if (!seq_depth_mode) begin
+                if (host_cmd_ready && host_rsp_valid && rsp_id_match && rsp_header_ok && rsp_fresh_match) begin
+                    seq_accept_next = 1'b1;
+                    seq_accept_id = rsp_tid;
+                end
+            end
+        end
+
+        if (outstanding_valid_r) begin
+            age_counter_next = age_counter_r + 16'h0001;
+            freshness_counter_next = freshness_counter_r + 16'h0001;
+            if (timeout_limit != 16'h0000 && age_counter_r >= timeout_limit) begin
+                seq_timeout_next = 1'b1;
+            end
+            if (freshness_limit != 16'h0000 && freshness_counter_r >= freshness_limit) begin
+                seq_stale_next = 1'b1;
+            end
+            if (fault_in != 4'h0) begin
+                seq_invalid_packet_next = 1'b1;
+            end
+        end
+
+        if (host_rsp_valid) begin
+            if (rsp_id_match && rsp_header_ok && rsp_fresh_match) begin
+                seq_accept_next = 1'b1;
+                seq_accept_id = rsp_tid;
+                outstanding_valid_next = 1'b0;
+                outstanding_id_next = rsp_tid;
+                depth_count_next = 2'b00;
+                age_counter_next = 16'h0000;
+                freshness_counter_next = 16'h0000;
+            end else begin
+                seq_invalid_packet_next = 1'b1;
+            end
+        end
+    end
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        host_cmd_valid <= 1'b0;
+        host_cmd_data <= 128'h0;
+        host_rsp_ready <= 1'b0;
+        seq_accept <= 1'b0;
+        seq_accept_id <= 16'h0000;
+        seq_age_counter <= 16'h0000;
+        seq_outstanding_id <= 16'h0000;
+        seq_outstanding_valid <= 1'b0;
+        seq_stale <= 1'b0;
+        seq_timeout <= 1'b0;
+        seq_invalid_packet <= 1'b0;
+        outstanding_id_r <= 16'h0000;
+        outstanding_valid_r <= 1'b0;
+        age_counter_r <= 16'h0000;
+        freshness_counter_r <= 16'h0000;
+        depth_count_r <= 2'b00;
+    end else begin
+        host_cmd_valid <= host_cmd_valid_next;
+        host_cmd_data <= host_cmd_data_next;
+        host_rsp_ready <= host_rsp_ready_next;
+        seq_accept <= seq_accept_next;
+        seq_accept_id <= seq_accept_id;
+        seq_age_counter <= age_counter_next;
+        seq_outstanding_id <= outstanding_id_next;
+        seq_outstanding_valid <= outstanding_valid_next;
+        seq_stale <= seq_stale_next;
+        seq_timeout <= seq_timeout_next;
+        seq_invalid_packet <= seq_invalid_packet_next;
+        outstanding_id_r <= outstanding_id_next;
+        outstanding_valid_r <= outstanding_valid_next;
+        age_counter_r <= age_counter_next;
+        freshness_counter_r <= freshness_counter_next;
+        depth_count_r <= depth_count_next;
+    end
+end
+
+endmodule
+---END adaptive_aero_stream_ctrl.v---
+---BEGIN adaptive_aero_csr_mmio.v---
+module adaptive_aero_csr_mmio (
+    clk,
+    reset_n,
+    csr_addr,
+    csr_wdata,
+    csr_rdata,
+    csr_valid,
+    csr_we,
+    csr_ready,
+    control_mode,
+    timeout_threshold,
+    freshness_threshold,
+    clamp_min,
+    clamp_max,
+    safe_fallback_sel,
+    seq_depth_mode,
+    accepted_sequence_counter,
+    outstanding_sequence_counter,
+    sticky_timeout,
+    sticky_stale,
+    sticky_invalid_packet,
+    sticky_clamp_violation,
+    version_id,
+    capability_id,
+    fault_latch_clear,
+    seq_accept_id,
+    seq_outstanding_id,
+    seq_age_counter,
+    seq_stale,
+    seq_timeout,
+    seq_invalid_packet,
+    clamp_violation_in,
+    fault_in
+);
+input clk;
+input reset_n;
+input [7:0] csr_addr;
+input [63:0] csr_wdata;
+output reg [63:0] csr_rdata;
+input csr_valid;
+input csr_we;
+output reg csr_ready;
+output reg [1:0] control_mode;
+output reg [15:0] timeout_threshold;
+output reg [15:0] freshness_threshold;
+output reg [11:0] clamp_min;
+output reg [11:0] clamp_max;
+output reg [1:0] safe_fallback_sel;
+output reg seq_depth_mode;
+output reg [15:0] accepted_sequence_counter;
+output reg [15:0] outstanding_sequence_counter;
+output reg sticky_timeout;
+output reg sticky_stale;
+output reg sticky_invalid_packet;
+output reg sticky_clamp_violation;
+output reg [15:0] version_id;
+output reg [15:0] capability_id;
+input [3:0] fault_latch_clear;
+input [15:0] seq_accept_id;
+input [15:0] seq_outstanding_id;
+input [15:0] seq_age_counter;
+input seq_stale;
+input seq_timeout;
+input seq_invalid_packet;
+input clamp_violation_in;
+input [3:0] fault_in;
+
+reg [1:0] control_mode_r;
+reg seq_depth_mode_r;
+reg [15:0] timeout_threshold_r;
+reg [15:0] freshness_threshold_r;
+reg [11:0] clamp_min_r;
+reg [11:0] clamp_max_r;
+reg [1:0] safe_fallback_sel_r;
+reg [15:0] accepted_sequence_counter_r;
+reg [15:0] outstanding_sequence_counter_r;
+reg sticky_timeout_r;
+reg sticky_stale_r;
+reg sticky_invalid_packet_r;
+reg sticky_clamp_violation_r;
+reg [63:0] read_data;
+
+always @(*) begin
+    csr_ready = csr_valid;
+    csr_rdata = 64'h0000000000000000;
+    if (reset_n == 1'b0) begin
+        csr_ready = 1'b0;
+        csr_rdata = 64'h0000000000000000;
+    end else begin
+        case (csr_addr)
+            8'h00: begin
+                csr_rdata[1:0] = control_mode_r;
+                csr_rdata[2] = seq_depth_mode_r;
+            end
+            8'h08: begin
+                csr_rdata[15:0] = timeout_threshold_r;
+                csr_rdata[31:16] = freshness_threshold_r;
+            end
+            8'h10: begin
+                csr_rdata[11:0] = clamp_min_r;
+                csr_rdata[23:12] = clamp_max_r;
+            end
+            8'h18: begin
+                csr_rdata[0] = sticky_timeout_r;
+                csr_rdata[1] = sticky_stale_r;
+                csr_rdata[2] = sticky_invalid_packet_r;
+                csr_rdata[3] = sticky_clamp_violation_r;
+                csr_rdata[7:4] = fault_latch_clear;
+            end
+            8'h20: begin
+                csr_rdata[15:0] = accepted_sequence_counter_r;
+                csr_rdata[31:16] = outstanding_sequence_counter_r;
+            end
+            8'h28: begin
+                csr_rdata[15:0] = version_id;
+                csr_rdata[31:16] = capability_id;
+            end
+            default: begin
+                csr_rdata = 64'h0000000000000000;
+            end
+        endcase
+    end
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        control_mode_r <= 2'b00;
+        seq_depth_mode_r <= 1'b0;
+        timeout_threshold_r <= 16'h0000;
+        freshness_threshold_r <= 16'h0000;
+        clamp_min_r <= 12'h000;
+        clamp_max_r <= 12'hFFF;
+        safe_fallback_sel_r <= 2'b00;
+        accepted_sequence_counter_r <= 16'h0000;
+        outstanding_sequence_counter_r <= 16'h0000;
+        sticky_timeout_r <= 1'b0;
+        sticky_stale_r <= 1'b0;
+        sticky_invalid_packet_r <= 1'b0;
+        sticky_clamp_violation_r <= 1'b0;
+        version_id <= 16'h0101;
+        capability_id <= 16'hA0C0;
+        csr_rdata <= 64'h0000000000000000;
+        csr_ready <= 1'b0;
+    end else begin
+        csr_ready <= csr_valid;
+        control_mode_r <= control_mode_r;
+        seq_depth_mode_r <= seq_depth_mode_r;
+        timeout_threshold_r <= timeout_threshold_r;
+        freshness_threshold_r <= freshness_threshold_r;
+        clamp_min_r <= clamp_min_r;
+        clamp_max_r <= clamp_max_r;
+        safe_fallback_sel_r <= safe_fallback_sel_r;
+        accepted_sequence_counter_r <= accepted_sequence_counter_r + (seq_accept_id != 16'h0000);
+        outstanding_sequence_counter_r <= (seq_outstanding_id != 16'h0000) ? 16'h0001 : 16'h0000;
+        if (seq_timeout || fault_in[0]) sticky_timeout_r <= 1'b1;
+        if (seq_stale || fault_in[1]) sticky_stale_r <= 1'b1;
+        if (seq_invalid_packet || fault_in[2]) sticky_invalid_packet_r <= 1'b1;
+        if (clamp_violation_in || fault_in[3]) sticky_clamp_violation_r <= 1'b1;
+        if (csr_valid && csr_we) begin
+            case (csr_addr)
+                8'h00: begin
+                    control_mode_r <= csr_wdata[1:0];
+                    seq_depth_mode_r <= csr_wdata[2];
+                end
+                8'h08: begin
+                    timeout_threshold_r <= csr_wdata[15:0];
+                    freshness_threshold_r <= csr_wdata[31:16];
+                end
+                8'h10: begin
+                    clamp_min_r <= csr_wdata[11:0];
+                    clamp_max_r <= csr_wdata[23:12];
+                end
+                8'h18: begin
+                    if (fault_latch_clear[0] || csr_wdata[0]) sticky_timeout_r <= 1'b0;
+                    if (fault_latch_clear[1] || csr_wdata[1]) sticky_stale_r <= 1'b0;
+                    if (fault_latch_clear[2] || csr_wdata[2]) sticky_invalid_packet_r <= 1'b0;
+                    if (fault_latch_clear[3] || csr_wdata[3]) sticky_clamp_violation_r <= 1'b0;
+                end
+                default: begin
+                end
+            endcase
+        end
+    end
+end
+
+always @(*) begin
+    control_mode = control_mode_r;
+    timeout_threshold = timeout_threshold_r;
+    freshness_threshold = freshness_threshold_r;
+    clamp_min = clamp_min_r;
+    clamp_max = clamp_max_r;
+    safe_fallback_sel = safe_fallback_sel_r;
+    seq_depth_mode = seq_depth_mode_r;
+    accepted_sequence_counter = accepted_sequence_counter_r;
+    outstanding_sequence_counter = outstanding_sequence_counter_r;
+    sticky_timeout = sticky_timeout_r;
+    sticky_stale = sticky_stale_r;
+    sticky_invalid_packet = sticky_invalid_packet_r;
+    sticky_clamp_violation = sticky_clamp_violation_r;
+end
+
+endmodule
+---END adaptive_aero_csr_mmio.v---
+---BEGIN adaptive_aero_actuator_validator.v---
+module adaptive_aero_actuator_validator (
+    clk,
+    reset_n,
+    control_mode,
+    clamp_min,
+    clamp_max,
+    safe_fallback_sel,
+    stale_data,
+    timeout_fault,
+    cmd_invalid,
+    sensor_fault,
+    host_timeout,
+    overrange,
+    fault_in,
+    intent_mode,
+    intent_value,
+    intent_valid,
+    act_cmd_code,
+    act_cmd_pos,
+    act_cmd_valid,
+    clamp_active,
+    clamp_violation,
+    safe_inhibit
+);
+input clk;
+input reset_n;
+input [1:0] control_mode;
+input [11:0] clamp_min;
+input [11:0] clamp_max;
+input [1:0] safe_fallback_sel;
+input stale_data;
+input timeout_fault;
+input cmd_invalid;
+input sensor_fault;
+input host_timeout;
+input overrange;
+input [3:0] fault_in;
+input [1:0] intent_mode;
+input [11:0] intent_value;
+input intent_valid;
+output reg [7:0] act_cmd_code;
+output reg [11:0] act_cmd_pos;
+output reg act_cmd_valid;
+output reg clamp_active;
+output reg clamp_violation;
+output reg safe_inhibit;
+
+reg [11:0] pos_next;
+reg [7:0] code_next;
+reg valid_next;
+reg clamp_active_next;
+reg clamp_violation_next;
+reg safe_inhibit_next;
+reg inhibit_condition;
+reg clamp_low;
+reg clamp_high;
+reg [11:0] bounded_value;
+
+always @(*) begin
+    inhibit_condition = stale_data | timeout_fault | cmd_invalid | sensor_fault | host_timeout | overrange | (fault_in != 4'h0);
+    clamp_low = (intent_value < clamp_min);
+    clamp_high = (intent_value > clamp_max);
+    bounded_value = intent_value;
+    if (intent_value < clamp_min)
+        bounded_value = clamp_min;
+    else if (intent_value > clamp_max)
+        bounded_value = clamp_max;
+    pos_next = bounded_value;
+    code_next = {control_mode, intent_mode, bounded_value[7:4]};
+    valid_next = intent_valid & ~inhibit_condition & (intent_mode == control_mode);
+    clamp_active_next = clamp_low | clamp_high;
+    clamp_violation_next = intent_valid & (clamp_low | clamp_high);
+    safe_inhibit_next = inhibit_condition | ~intent_valid | (intent_mode != control_mode);
+    if (safe_fallback_sel == 2'b00) begin
+        code_next = {control_mode, 2'b00, 4'h0};
+        pos_next = clamp_min;
+    end else if (safe_fallback_sel == 2'b01) begin
+        code_next = {control_mode, 2'b01, clamp_min[7:4]};
+        pos_next = clamp_min;
+    end else if (safe_fallback_sel == 2'b10) begin
+        code_next = {control_mode, 2'b10, clamp_max[7:4]};
+        pos_next = clamp_max;
+    end else begin
+        code_next = {control_mode, 2'b11, bounded_value[7:4]};
+        pos_next = bounded_value;
+    end
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        act_cmd_code <= 8'h00;
+        act_cmd_pos <= 12'h000;
+        act_cmd_valid <= 1'b0;
+        clamp_active <= 1'b0;
+        clamp_violation <= 1'b0;
+        safe_inhibit <= 1'b1;
+    end else begin
+        act_cmd_code <= code_next;
+        act_cmd_pos <= pos_next;
+        act_cmd_valid <= valid_next;
+        clamp_active <= clamp_active_next;
+        clamp_violation <= clamp_violation_next;
+        safe_inhibit <= safe_inhibit_next;
+    end
+end
+
+endmodule
+---END adaptive_aero_actuator_validator.v---
+---BEGIN adaptive_aero_history_store.v---
+module adaptive_aero_history_store (
+    clk,
+    reset_n,
+    history_csb_n,
+    history_we_n,
+    history_addr,
+    history_din,
+    history_dout,
+    store_req_valid,
+    store_rsp_valid,
+    store_outstanding_id,
+    store_age_counter,
+    store_stale,
+    store_timeout,
+    store_invalid_packet
+);
+input clk;
+input reset_n;
+input history_csb_n;
+input history_we_n;
+input [4:0] history_addr;
+input [127:0] history_din;
+output reg [127:0] history_dout;
+input store_req_valid;
+input store_rsp_valid;
+input [15:0] store_outstanding_id;
+input [15:0] store_age_counter;
+input store_stale;
+input store_timeout;
+input store_invalid_packet;
+
+reg [127:0] mem [0:31];
+reg [127:0] read_data;
+reg [127:0] write_data;
+reg [4:0] addr_q;
+reg we_q;
+reg csb_q;
+integer i;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        history_dout <= 128'h0;
+        addr_q <= 5'h00;
+        we_q <= 1'b1;
+        csb_q <= 1'b1;
+        for (i = 0; i < 32; i = i + 1) begin
+            mem[i] <= 128'h0;
+        end
+    end else begin
+        csb_q <= history_csb_n;
+        we_q <= history_we_n;
+        addr_q <= history_addr;
+        write_data <= history_din;
+        if (!history_csb_n) begin
+            if (!history_we_n) begin
+                mem[history_addr] <= history_din;
+            end
+            history_dout <= mem[history_addr];
+        end
+        if (store_req_valid) begin
+            mem[store_outstanding_id[4:0]] <= {store_outstanding_id, store_age_counter, 16'h0000, {14'h0000, store_stale, store_timeout}, {15'h0000, store_invalid_packet}, history_din[63:0]};
+        end
+        if (store_rsp_valid) begin
+            mem[store_outstanding_id[4:0]] <= {store_outstanding_id, store_age_counter, 16'h0000, {14'h0000, store_stale, store_timeout}, {15'h0000, store_invalid_packet}, history_din[63:0]};
+        end
+    end
+end
+
+always @(*) begin
+    read_data = history_dout;
+    if (!history_csb_n) begin
+        read_data = mem[history_addr];
+    end
+    if (store_stale | store_timeout | store_invalid_packet) begin
+        write_data = {store_outstanding_id, store_age_counter, 16'h0000, {14'h0000, store_stale, store_timeout}, {15'h0000, store_invalid_packet}, history_din[63:0]};
+    end
+    if (reset_n == 1'b0) begin
+        read_data = 128'h0;
+    end
+    history_dout = read_data;
+end
+
+endmodule
+---END adaptive_aero_history_store.v---

@@ -1,0 +1,16 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: adaptive_aero_control_top
+Expected files: ['adaptive_aero_control_top.v', 'adaptive_aero_stream_ctrl.v', 'adaptive_aero_csr_mmio.v', 'adaptive_aero_actuator_validator.v', 'adaptive_aero_history_store.v']
+Materialized files: ['adaptive_aero_actuator_validator.v', 'adaptive_aero_control_top.v', 'adaptive_aero_csr_mmio.v', 'adaptive_aero_history_store.v', 'adaptive_aero_stream_ctrl.v']
+Clock ports: ['clk']
+Reset ports: ['reset_n']
+Icarus compile: fail
+Verilator lint: fatal
+Issue count: 3
+
+Issues:
+- ❌ Required memory macro instance mismatch: expected exactly one 'fpga_history_bram_wrapper u_history_store(...)', found 0. memory_macros[] is authoritative; do not substitute a wrapper, behavioral model, or invented module name.
+- ❌ Icarus Verilog compile failed.
+- ❌ Verilator lint failed.

@@ -1,0 +1,15 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: adaptive_aero_control_top
+Expected files: ['adaptive_aero_control_top.v', 'adaptive_aero_stream_ctrl.v', 'adaptive_aero_csr_mmio.v', 'adaptive_aero_actuator_validator.v', 'adaptive_aero_history_store.v']
+Materialized files: ['adaptive_aero_actuator_validator.v', 'adaptive_aero_control_top.v', 'adaptive_aero_csr_mmio.v', 'adaptive_aero_history_store.v', 'adaptive_aero_stream_ctrl.v']
+Clock ports: ['clk']
+Reset ports: ['reset_n']
+Icarus compile: fail
+Verilator lint: fatal
+Issue count: 2
+
+Issues:
+- ❌ Icarus Verilog compile failed.
+- ❌ Verilator lint failed.

@@ -1,0 +1,18 @@
+=== STDERR ===
+%Error-MODMISSING: pass2/adaptive_aero_control_top.v:264:1: Cannot find file containing module: 'fpga_history_bram_wrapper'
+  264 | fpga_history_bram_wrapper u_history_store (
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~
+                   ... For error description see https://verilator.org/warn/MODMISSING?v=5.047
+                   ... This may be because there's no search path specified with -I<dir>.
+                   ... Looked in:
+                        fpga_history_bram_wrapper
+                        fpga_history_bram_wrapper.v
+                        fpga_history_bram_wrapper.sv
+                        obj_dir/fpga_history_bram_wrapper
+                        obj_dir/fpga_history_bram_wrapper.v
+                        obj_dir/fpga_history_bram_wrapper.sv
+                   ... With current working directory '/root/chiploop-backend/backend/workflows/ee6027bc-9eec-4202-96cd-1b837290e50e/rtl'
+%Error: Exiting due to 1 error(s)
+
+=== RETURN CODE ===
+1
