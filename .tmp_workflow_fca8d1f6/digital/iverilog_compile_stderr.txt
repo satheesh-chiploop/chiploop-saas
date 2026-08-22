@@ -1,0 +1,2 @@
+/root/chiploop-backend/backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:80: sorry: constant selects in always_* processes are not currently supported (all bits will be included).
+/root/chiploop-backend/backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:80: sorry: constant selects in always_* processes are not currently supported (all bits will be included).

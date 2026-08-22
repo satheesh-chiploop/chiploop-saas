@@ -1,0 +1,191 @@
+{
+  "type": "simulation_execution_report",
+  "manifest_path": "backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/simulation_manifest.json",
+  "tests": [
+    "smoke_test",
+    "constrained_random_sanity"
+  ],
+  "seeds": [
+    1
+  ],
+  "pass": 2,
+  "fail": 0,
+  "coverage_json_present": true,
+  "coverage_md_present": true,
+  "code_coverage_json_present": true,
+  "code_coverage": {
+    "type": "code_coverage_summary",
+    "tool": "verilator_coverage",
+    "status": "ok",
+    "coverage_dat_files": [
+      "/root/chiploop-backend/backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/coverage.dat"
+    ],
+    "line_coverage_pct": 46.17,
+    "branch_coverage_pct": 1.12,
+    "condition_coverage_pct": 1.12,
+    "toggle_coverage_pct": 2.28,
+    "condition_source": "verilator_lcov_branch_proxy",
+    "toggle_source": "verilator_coverage_annotate_points",
+    "returncode": 0,
+    "stdout_tail": [],
+    "stderr_tail": [],
+    "tool_execution": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "code_coverage_lcov",
+      "tool": "/usr/local/bin/verilator_coverage",
+      "executable": "/usr/local/bin/verilator_coverage",
+      "command": [
+        "/usr/local/bin/verilator_coverage",
+        "--write-info",
+        "/root/chiploop-backend/backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/code_coverage.info",
+        "/root/chiploop-backend/backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/coverage.dat"
+      ],
+      "cwd": "backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb",
+      "returncode": 0,
+      "stdout": "",
+      "stderr": "",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-08-22T04:06:37.773316+00:00",
+      "ended_at": "2026-08-22T04:06:37.864075+00:00",
+      "elapsed_ms": 90
+    },
+    "lcov_info_path": "/root/chiploop-backend/backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/code_coverage.info",
+    "line_found": 535,
+    "line_hit": 247,
+    "branch_found": 5815,
+    "branch_hit": 65,
+    "condition_found": 5815,
+    "condition_hit": 65,
+    "toggle_found": 5660,
+    "toggle_hit": 129,
+    "annotate_returncode": 0,
+    "annotate_stdout_tail": [
+      "Total coverage (189/535) 35.00%",
+      "See lines with '%00' in /root/chiploop-backend/backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/verilator_coverage_annotated"
+    ],
+    "annotate_stderr_tail": [],
+    "annotate_tool_execution": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "capability": "code_coverage_annotate",
+      "tool": "/usr/local/bin/verilator_coverage",
+      "executable": "/usr/local/bin/verilator_coverage",
+      "command": [
+        "/usr/local/bin/verilator_coverage",
+        "--annotate",
+        "/root/chiploop-backend/backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/verilator_coverage_annotated",
+        "--annotate-points",
+        "--annotate-all",
+        "--annotate-min",
+        "1",
+        "/root/chiploop-backend/backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/coverage.dat"
+      ],
+      "cwd": "backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb",
+      "returncode": 0,
+      "stdout": "Total coverage (189/535) 35.00%\nSee lines with '%00' in /root/chiploop-backend/backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/verilator_coverage_annotated\n",
+      "stderr": "",
+      "status": "success",
+      "error": null,
+      "started_at": "2026-08-22T04:06:37.873107+00:00",
+      "ended_at": "2026-08-22T04:06:37.962716+00:00",
+      "elapsed_ms": 89
+    },
+    "toggle_annotation_dir": "/root/chiploop-backend/backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/verilator_coverage_annotated",
+    "missed_toggle_points": [
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reset_n:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_valid:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_we:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_re:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[0]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[1]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[1]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[2]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[2]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[3]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[3]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[4]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[4]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[5]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[5]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[6]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[6]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[7]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_addr[7]:1->0 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      },
+      {
+        "file": "adaptive_aero_register_bank.v",
+        "point": "comment=reg_wdata[0]:0->1 hier=adaptive_aero_control_top_spi_fpga_top.u_core.u_register_bank"
+      }
+    ]
+  },
+  "toolchain": {
+    "simulator": "verilator",
+    "code_coverage": "verilator_coverage"
+  },
+  "artifacts": {
+    "functional_coverage_summary": "backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/functional_coverage_summary.json",
+    "functional_coverage_md": "backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/COVERAGE.md",
+    "code_coverage_summary": "backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/code_coverage_summary.json",
+    "code_coverage_info": "backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/code_coverage.info",
+    "simulation_execution_summary": "backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/simulation_execution_summary.json",
+    "sim_execution_md": "backend/workflows/fca8d1f6-5127-4f67-ac36-c90825d4284d/vv/tb/reports/SIM_EXECUTION.md"
+  }
+}
