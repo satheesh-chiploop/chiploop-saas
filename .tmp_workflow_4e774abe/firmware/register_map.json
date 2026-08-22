@@ -1,0 +1,274 @@
+{
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem",
+  "base_address": "0x00000000",
+  "bus": "MINIMAL",
+  "registers": [
+    {
+      "name": "CTRL",
+      "offset": "0x00000000",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Command/control register. Software writes command_valid, control_mode, and integrity bits here; readback is defined by the MMIO block implementation.",
+      "fields": [
+        {
+          "name": "command_valid",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Software command-valid qualifier. When written as 1 together with a valid command packet, the command is eligible for acceptance."
+        },
+        {
+          "name": "control_mode",
+          "bit_offset": 4,
+          "bit_width": 4,
+          "access": "RW",
+          "description": "Requested control mode. Must be permitted by cfg_control_mode_permit for acceptance."
+        },
+        {
+          "name": "integrity",
+          "bit_offset": 8,
+          "bit_width": 4,
+          "access": "RW",
+          "description": "Optional integrity bits accompanying the command packet."
+        }
+      ]
+    },
+    {
+      "name": "CMD_ID_SEQ",
+      "offset": "0x00000004",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Command identity and freshness register. Captures command_id, sequence_number, and age_or_timestamp.",
+      "fields": [
+        {
+          "name": "command_id",
+          "bit_offset": 0,
+          "bit_width": 8,
+          "access": "RW",
+          "description": "Command identifier."
+        },
+        {
+          "name": "sequence_number",
+          "bit_offset": 8,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Sequence number used for freshness policy and duplicate/older command rejection."
+        },
+        {
+          "name": "age_or_timestamp",
+          "bit_offset": 24,
+          "bit_width": 8,
+          "access": "RW",
+          "description": "Compact age or timestamp field used for freshness supervision when enabled by firmware policy."
+        }
+      ]
+    },
+    {
+      "name": "CMD_POS",
+      "offset": "0x00000008",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Requested actuator position register.",
+      "fields": [
+        {
+          "name": "requested_actuator_position",
+          "bit_offset": 0,
+          "bit_width": 8,
+          "access": "RW",
+          "description": "Requested actuator position to be validated and clamped by the safety supervisor."
+        }
+      ]
+    },
+    {
+      "name": "CFG_TIMEOUT",
+      "offset": "0x0000000C",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Timeout, sequence policy, and permitted control-mode configuration.",
+      "fields": [
+        {
+          "name": "timeout_limit",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RW",
+          "description": "Freshness watchdog timeout limit in cycles or prescaled ticks."
+        },
+        {
+          "name": "seq_policy",
+          "bit_offset": 16,
+          "bit_width": 2,
+          "access": "RW",
+          "description": "Sequence-number policy selector."
+        },
+        {
+          "name": "control_mode_permit",
+          "bit_offset": 18,
+          "bit_width": 4,
+          "access": "RW",
+          "description": "Permitted control-mode mask."
+        }
+      ]
+    },
+    {
+      "name": "CFG_LIMITS",
+      "offset": "0x00000010",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Actuator and safe-limit clamp bounds.",
+      "fields": [
+        {
+          "name": "act_min",
+          "bit_offset": 0,
+          "bit_width": 8,
+          "access": "RW",
+          "description": "Actuator clamp minimum."
+        },
+        {
+          "name": "act_max",
+          "bit_offset": 8,
+          "bit_width": 8,
+          "access": "RW",
+          "description": "Actuator clamp maximum."
+        },
+        {
+          "name": "safe_min",
+          "bit_offset": 16,
+          "bit_width": 8,
+          "access": "RW",
+          "description": "Lower safe-limit bound used for inhibited-state legality checks."
+        },
+        {
+          "name": "safe_max",
+          "bit_offset": 24,
+          "bit_width": 8,
+          "access": "RW",
+          "description": "Upper safe-limit bound used for inhibited-state legality checks."
+        }
+      ]
+    },
+    {
+      "name": "IRQ_CTRL",
+      "offset": "0x00000014",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Interrupt enable and sticky fault clear control.",
+      "fields": [
+        {
+          "name": "irq_enable",
+          "bit_offset": 0,
+          "bit_width": 4,
+          "access": "RW",
+          "description": "Interrupt enable mask for command and fault events."
+        },
+        {
+          "name": "clear_sticky_faults",
+          "bit_offset": 31,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Write-1-to-clear sticky fault bits."
+        }
+      ]
+    },
+    {
+      "name": "STATUS",
+      "offset": "0x00000018",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Read-only status and telemetry.",
+      "fields": [
+        {
+          "name": "accepted_event",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Accepted-command event indicator."
+        },
+        {
+          "name": "rejected_event",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Rejected-command event indicator."
+        },
+        {
+          "name": "stale_data_fault",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Sticky stale-data fault indicator."
+        },
+        {
+          "name": "timeout_fault",
+          "bit_offset": 3,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Sticky timeout fault indicator."
+        },
+        {
+          "name": "clamp_applied",
+          "bit_offset": 4,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Indicates the commanded actuator value was clamped."
+        },
+        {
+          "name": "fallback_active",
+          "bit_offset": 5,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Indicates output validity is inhibited due to fault/reset/timeout/stale conditions."
+        },
+        {
+          "name": "sequence_number_seen",
+          "bit_offset": 8,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Most recent accepted sequence number for telemetry."
+        },
+        {
+          "name": "last_fault_code",
+          "bit_offset": 24,
+          "bit_width": 8,
+          "access": "RO",
+          "description": "Encoded last fault code for software handling."
+        }
+      ]
+    },
+    {
+      "name": "WATCHDOG",
+      "offset": "0x0000001C",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Watchdog and status-capture telemetry.",
+      "fields": [
+        {
+          "name": "watchdog_count",
+          "bit_offset": 0,
+          "bit_width": 16,
+          "access": "RO",
+          "description": "Freshness watchdog count or tick telemetry."
+        },
+        {
+          "name": "status_capture_valid",
+          "bit_offset": 31,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Status-capture valid strobe."
+        }
+      ]
+    }
+  ],
+  "__source": {
+    "mode": "artifact_passthrough",
+    "path": "state.digital_regmap"
+  }
+}

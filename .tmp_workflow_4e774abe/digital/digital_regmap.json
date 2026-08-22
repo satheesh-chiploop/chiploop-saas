@@ -1,0 +1,329 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 32,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Command/control register. Software writes command_valid, control_mode, and integrity bits here; readback is defined by the MMIO block implementation.",
+        "fields": [
+          {
+            "name": "command_valid",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software command-valid qualifier. When written as 1 together with a valid command packet, the command is eligible for acceptance."
+          },
+          {
+            "name": "control_mode",
+            "lsb": 4,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Requested control mode. Must be permitted by cfg_control_mode_permit for acceptance."
+          },
+          {
+            "name": "integrity",
+            "lsb": 8,
+            "msb": 11,
+            "access": "RW",
+            "reset": 0,
+            "description": "Optional integrity bits accompanying the command packet."
+          }
+        ]
+      },
+      {
+        "name": "CMD_ID_SEQ",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Command identity and freshness register. Captures command_id, sequence_number, and age_or_timestamp.",
+        "fields": [
+          {
+            "name": "command_id",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Command identifier."
+          },
+          {
+            "name": "sequence_number",
+            "lsb": 8,
+            "msb": 23,
+            "access": "RW",
+            "reset": 0,
+            "description": "Sequence number used for freshness policy and duplicate/older command rejection."
+          },
+          {
+            "name": "age_or_timestamp",
+            "lsb": 24,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Compact age or timestamp field used for freshness supervision when enabled by firmware policy."
+          }
+        ]
+      },
+      {
+        "name": "CMD_POS",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Requested actuator position register.",
+        "fields": [
+          {
+            "name": "requested_actuator_position",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Requested actuator position to be validated and clamped by the safety supervisor."
+          }
+        ]
+      },
+      {
+        "name": "CFG_TIMEOUT",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Timeout, sequence policy, and permitted control-mode configuration.",
+        "fields": [
+          {
+            "name": "timeout_limit",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 1000,
+            "description": "Freshness watchdog timeout limit in cycles or prescaled ticks."
+          },
+          {
+            "name": "seq_policy",
+            "lsb": 16,
+            "msb": 17,
+            "access": "RW",
+            "reset": 0,
+            "description": "Sequence-number policy selector."
+          },
+          {
+            "name": "control_mode_permit",
+            "lsb": 18,
+            "msb": 21,
+            "access": "RW",
+            "reset": 15,
+            "description": "Permitted control-mode mask."
+          }
+        ]
+      },
+      {
+        "name": "CFG_LIMITS",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Actuator and safe-limit clamp bounds.",
+        "fields": [
+          {
+            "name": "act_min",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW",
+            "reset": 0,
+            "description": "Actuator clamp minimum."
+          },
+          {
+            "name": "act_max",
+            "lsb": 8,
+            "msb": 15,
+            "access": "RW",
+            "reset": 255,
+            "description": "Actuator clamp maximum."
+          },
+          {
+            "name": "safe_min",
+            "lsb": 16,
+            "msb": 23,
+            "access": "RW",
+            "reset": 0,
+            "description": "Lower safe-limit bound used for inhibited-state legality checks."
+          },
+          {
+            "name": "safe_max",
+            "lsb": 24,
+            "msb": 31,
+            "access": "RW",
+            "reset": 255,
+            "description": "Upper safe-limit bound used for inhibited-state legality checks."
+          }
+        ]
+      },
+      {
+        "name": "IRQ_CTRL",
+        "offset": "0x14",
+        "access": "RW",
+        "description": "Interrupt enable and sticky fault clear control.",
+        "fields": [
+          {
+            "name": "irq_enable",
+            "lsb": 0,
+            "msb": 3,
+            "access": "RW",
+            "reset": 0,
+            "description": "Interrupt enable mask for command and fault events."
+          },
+          {
+            "name": "clear_sticky_faults",
+            "lsb": 31,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Write-1-to-clear sticky fault bits."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x18",
+        "access": "RO",
+        "description": "Read-only status and telemetry.",
+        "fields": [
+          {
+            "name": "accepted_event",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Accepted-command event indicator."
+          },
+          {
+            "name": "rejected_event",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Rejected-command event indicator."
+          },
+          {
+            "name": "stale_data_fault",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky stale-data fault indicator."
+          },
+          {
+            "name": "timeout_fault",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky timeout fault indicator."
+          },
+          {
+            "name": "clamp_applied",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the commanded actuator value was clamped."
+          },
+          {
+            "name": "fallback_active",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates output validity is inhibited due to fault/reset/timeout/stale conditions."
+          },
+          {
+            "name": "sequence_number_seen",
+            "lsb": 8,
+            "msb": 23,
+            "access": "RO",
+            "reset": 0,
+            "description": "Most recent accepted sequence number for telemetry."
+          },
+          {
+            "name": "last_fault_code",
+            "lsb": 24,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Encoded last fault code for software handling."
+          }
+        ]
+      },
+      {
+        "name": "WATCHDOG",
+        "offset": "0x1C",
+        "access": "RO",
+        "description": "Watchdog and status-capture telemetry.",
+        "fields": [
+          {
+            "name": "watchdog_count",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Freshness watchdog count or tick telemetry."
+          },
+          {
+            "name": "status_capture_valid",
+            "lsb": 31,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Status-capture valid strobe."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "accepted_event",
+        "description": "Command acceptance event interrupt when enabled."
+      },
+      {
+        "name": "rejected_event",
+        "description": "Command rejection event interrupt when enabled."
+      },
+      {
+        "name": "stale_data_fault",
+        "description": "Sticky stale-data fault interrupt when enabled."
+      },
+      {
+        "name": "timeout_fault",
+        "description": "Sticky timeout fault interrupt when enabled."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Assert reset and wait for mmio_ready to indicate idle-ready.",
+      "Program CFG_LIMITS with actuator clamp bounds and safe limits.",
+      "Program CFG_TIMEOUT with watchdog timeout, sequence policy, and permitted control-mode mask.",
+      "Program IRQ_CTRL with interrupt enables; leave clear_sticky_faults deasserted unless clearing faults.",
+      "Write CTRL, CMD_ID_SEQ, and CMD_POS with a command packet, then set command_valid in CTRL to submit the command."
+    ],
+    "polling_sequence": [
+      "Read STATUS to observe accepted_event, rejected_event, stale_data_fault, timeout_fault, clamp_applied, fallback_active, sequence_number_seen, and last_fault_code.",
+      "Read WATCHDOG to monitor watchdog_count and status_capture_valid.",
+      "If stale_data_fault or timeout_fault is observed, service software recovery and explicitly clear sticky faults using IRQ_CTRL.clear_sticky_faults if permitted."
+    ],
+    "irq_sequence": [
+      "On interrupt, read STATUS and WATCHDOG to determine whether the event was command acceptance, rejection, stale-data fault, or timeout fault.",
+      "Acknowledge and service the event in firmware.",
+      "If required by policy, write IRQ_CTRL.clear_sticky_faults with a 1 to clear sticky faults after software handling."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "All declared registers are reachable through explicit RTL decode on the 32-bit MMIO window.",
+    "The streaming model transport is auxiliary and does not replace the MMIO control plane.",
+    "No register map is generated for inaccessible internal state or for any physics/model surrogate functionality."
+  ]
+}
