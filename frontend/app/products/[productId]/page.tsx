@@ -1003,6 +1003,8 @@ export default function ProductDetailPage() {
   const [productRun, setProductRun] = useState<ProductRun | null>(null);
   const [stageRuns, setStageRuns] = useState<StageRun[]>([]);
   const [runHistory, setRunHistory] = useState<ProductRunWithStages[]>([]);
+  const [resumeSourceRunId, setResumeSourceRunId] = useState("");
+  const [resumeStageId, setResumeStageId] = useState("");
   const [stageSchemas, setStageSchemas] = useState<Record<string, StageSchema>>(FALLBACK_STAGE_SCHEMAS);
   const [userApps, setUserApps] = useState<UserApp[]>([]);
   const [selectedUserAppId, setSelectedUserAppId] = useState("");
@@ -1036,6 +1038,7 @@ export default function ProductDetailPage() {
           if (latest) {
             setProductRun(latest);
             setStageRuns(latest.stage_runs || []);
+            setResumeSourceRunId(latest.id);
           }
         } catch {
           // Run history is non-blocking; product configuration should still load.
@@ -1063,6 +1066,11 @@ export default function ProductDetailPage() {
   }, []);
 
   const stages = useMemo(() => product?.stage_config?.stages || [], [product]);
+  const enabledResumeStages = useMemo(() => stages.filter(stageEnabled), [stages]);
+  const resumeSourceRun = useMemo(
+    () => runHistory.find((run) => run.id === resumeSourceRunId) || null,
+    [resumeSourceRunId, runHistory],
+  );
 
   useEffect(() => {
     if (!product || !userApps.length) return;
@@ -1421,9 +1429,14 @@ export default function ProductDetailPage() {
 
   async function runProduct(startStage?: string, resumeProductRunId?: string) {
     if (!product) return;
-    if (missingRequirements.length) {
-      setMessage("Complete required configuration before running the product.");
-      setSelectedStageId(missingRequirements[0].stageId);
+    const startIndex = startStage ? stages.findIndex((stage) => stage.id === startStage || stage.app === startStage) : 0;
+    const stagesToRun = new Set(stages.slice(Math.max(0, startIndex)).map((stage) => stage.id));
+    const relevantMissingRequirements = startStage
+      ? missingRequirements.filter((item) => stagesToRun.has(item.stageId))
+      : missingRequirements;
+    if (relevantMissingRequirements.length) {
+      setMessage("Complete required configuration for the stages that will run.");
+      setSelectedStageId(relevantMissingRequirements[0].stageId);
       return;
     }
     setRunning(true);
@@ -1914,6 +1927,41 @@ export default function ProductDetailPage() {
               {running || activeRun ? "Running..." : "Run Product"}
             </button>
           </div>
+          {runHistory.length && enabledResumeStages.length > 1 ? (
+            <div className="mt-4 rounded-lg border border-cyan-500/25 bg-cyan-950/10 p-4">
+              <div className="text-sm font-semibold text-cyan-100">Resume from any product stage</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">
+                Select a prior run and the next stage. Completed predecessor workflow IDs are loaded and validated directly from Supabase; earlier stages are not rerun.
+              </p>
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                <label className="text-xs text-slate-300">Evidence from product run
+                  <select value={resumeSourceRunId} onChange={(event) => setResumeSourceRunId(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3">
+                    <option value="">Select a prior run</option>
+                    {runHistory.map((run) => <option key={run.id} value={run.id}>{run.id} · {run.status}</option>)}
+                  </select>
+                </label>
+                <label className="text-xs text-slate-300">Stage to start
+                  <select value={resumeStageId} onChange={(event) => setResumeStageId(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3">
+                    <option value="">Select a stage</option>
+                    {enabledResumeStages.map((stage) => <option key={stage.id} value={stage.id}>{stage.label}</option>)}
+                  </select>
+                </label>
+              </div>
+              {resumeSourceRun && resumeStageId ? (
+                <div className="mt-3 text-xs text-slate-400">
+                  Supabase predecessors available: {(resumeSourceRun.stage_runs || []).filter((stageRun) => stageRun.status === "completed" && stageRun.workflow_id).length}
+                </div>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => runProduct(resumeStageId, resumeSourceRunId)}
+                disabled={running || activeRun || !resumeStageId || !resumeSourceRunId}
+                className="mt-4 rounded-lg border border-cyan-500/50 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-950/50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Resume Product Journey
+              </button>
+            </div>
+          ) : null}
           {missingRequirements.length ? (
             <div className="mt-4 rounded-lg border border-rose-500/30 bg-rose-950/25 p-4">
               <div className="text-sm font-semibold text-rose-100">Required inputs missing</div>
