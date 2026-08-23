@@ -1,0 +1,259 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "abstract",
+    "base_address": "0x00",
+    "addr_width": 64,
+    "data_width": 64,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Global control register for firmware-visible command supervision.",
+        "fields": [
+          {
+            "name": "enable",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Global command processing enable."
+          },
+          {
+            "name": "safe_fallback_select",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Software-visible safety policy hint retained for compatibility with the documented control plane."
+          }
+        ]
+      },
+      {
+        "name": "MAX_CMD_POS",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Upper signed actuator command bound.",
+        "fields": [
+          {
+            "name": "max_cmd_pos",
+            "lsb": 0,
+            "msb": 63,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum signed actuator position command, represented as a 64-bit two's-complement value."
+          }
+        ]
+      },
+      {
+        "name": "MIN_CMD_POS",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Lower signed actuator command bound.",
+        "fields": [
+          {
+            "name": "min_cmd_pos",
+            "lsb": 0,
+            "msb": 63,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum signed actuator position command, represented as a 64-bit two's-complement value."
+          }
+        ]
+      },
+      {
+        "name": "MAX_CMD_RATE",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Maximum signed command rate bound.",
+        "fields": [
+          {
+            "name": "max_cmd_rate",
+            "lsb": 0,
+            "msb": 63,
+            "access": "RW",
+            "reset": 0,
+            "description": "Maximum signed actuator command rate, represented as a 64-bit two's-complement value."
+          }
+        ]
+      },
+      {
+        "name": "STALE_TIMEOUT_CYCLES",
+        "offset": "0x20",
+        "access": "RW",
+        "description": "Freshness supervision limit.",
+        "fields": [
+          {
+            "name": "stale_timeout_cycles",
+            "lsb": 0,
+            "msb": 63,
+            "access": "RW",
+            "reset": 0,
+            "description": "Number of clk cycles allowed without an accepted request before stale is reported."
+          }
+        ]
+      },
+      {
+        "name": "RESPONSE_TIMEOUT_CYCLES",
+        "offset": "0x28",
+        "access": "RW",
+        "description": "Response supervision limit.",
+        "fields": [
+          {
+            "name": "response_timeout_cycles",
+            "lsb": 0,
+            "msb": 63,
+            "access": "RW",
+            "reset": 0,
+            "description": "Number of clk cycles allowed for request completion before timeout is reported."
+          }
+        ]
+      },
+      {
+        "name": "SEQUENCE_EXPECTED",
+        "offset": "0x30",
+        "access": "RW",
+        "description": "Expected sequence policy value used for replay and ordering checks.",
+        "fields": [
+          {
+            "name": "sequence_expected",
+            "lsb": 0,
+            "msb": 63,
+            "access": "RW",
+            "reset": 0,
+            "description": "Expected sequence value for request validation."
+          }
+        ]
+      },
+      {
+        "name": "STREAM_VELOCITY_SETPOINT",
+        "offset": "0x38",
+        "access": "RW",
+        "description": "Firmware-programmed velocity metadata or setpoint field.",
+        "fields": [
+          {
+            "name": "stream_velocity_setpoint",
+            "lsb": 0,
+            "msb": 63,
+            "access": "RW",
+            "reset": 0,
+            "description": "Velocity setpoint or metadata forwarded through the control plane."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_MASK",
+        "offset": "0x40",
+        "access": "RW",
+        "description": "Fault policy mask visible to software.",
+        "fields": [
+          {
+            "name": "fault_mask",
+            "lsb": 0,
+            "msb": 63,
+            "access": "RW",
+            "reset": 0,
+            "description": "Fault enable or mask bits for software policy handling."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x48",
+        "access": "RO",
+        "description": "Read-only supervisor status summary.",
+        "fields": [
+          {
+            "name": "busy",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Supervisor busy indicator."
+          },
+          {
+            "name": "accepted",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Accepted request indicator."
+          },
+          {
+            "name": "rejected_stale",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Stale request rejection indicator."
+          },
+          {
+            "name": "rejected_seq",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sequence rejection indicator."
+          },
+          {
+            "name": "timeout",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Response timeout indicator."
+          },
+          {
+            "name": "fallback_active",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 0,
+            "description": "Inhibit or fault-active indicator."
+          },
+          {
+            "name": "clamped",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO",
+            "reset": 0,
+            "description": "Command clamping indicator."
+          },
+          {
+            "name": "fault_summary",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Summary fault bit."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Assert reset and wait for cfg_ready to indicate an idle control plane.",
+      "Program MAX_CMD_POS, MIN_CMD_POS, MAX_CMD_RATE, STALE_TIMEOUT_CYCLES, RESPONSE_TIMEOUT_CYCLES, SEQUENCE_EXPECTED, STREAM_VELOCITY_SETPOINT, and FAULT_MASK.",
+      "Clear CTRL.enable before configuration if the host sequence requires a quiescent setup.",
+      "Set CTRL.enable once the configuration is committed and software is ready to submit transactions."
+    ],
+    "polling_sequence": [
+      "Poll STATUS until busy deasserts after a request or supervisory event.",
+      "Read STATUS after each transaction to determine accepted, rejected_stale, rejected_seq, timeout, clamped, and fault_summary conditions.",
+      "If fault_summary or timeout is set, inhibit further requests until software clears the fault condition externally and reinitializes sequence policy if required."
+    ],
+    "irq_sequence": []
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map uses the documented 64-bit cfg_addr/cfg_wdata/cfg_rdata control plane and does not invent a different bus protocol.",
+    "Every declared register is reachable through RTL decode.",
+    "No top-level or software-visible register is introduced beyond the documented control and status set."
+  ]
+}
