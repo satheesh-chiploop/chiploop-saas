@@ -1,0 +1,13 @@
+{
+  "agent": "Embedded Interrupt Mapping Agent",
+  "manifest_present": true,
+  "register_count": 20,
+  "source_count": 5,
+  "sources": [
+    "RESERVED_ERROR_EN",
+    "RESERVED_ERROR_FLAG",
+    "FAULT_CTRL",
+    "FAULT_CLEAR",
+    "FAULT_LATCHED"
+  ]
+}

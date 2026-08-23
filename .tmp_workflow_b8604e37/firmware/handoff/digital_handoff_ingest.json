@@ -1,0 +1,89 @@
+{
+  "source_workflow_id": "b6d7ec65-e78a-4c4f-b0cd-6a639754cb3e",
+  "source_verification_workflow_id": null,
+  "rtl_source_paths": [
+    "backend/workflows/b6d7ec65-e78a-4c4f-b0cd-6a639754cb3e/rtl/stream_rx.v",
+    "backend/workflows/b6d7ec65-e78a-4c4f-b0cd-6a639754cb3e/rtl/host_reg_window.v",
+    "backend/workflows/b6d7ec65-e78a-4c4f-b0cd-6a639754cb3e/rtl/fpga_bram_buffer.v",
+    "backend/workflows/b6d7ec65-e78a-4c4f-b0cd-6a639754cb3e/rtl/telemetry_logger.v",
+    "backend/workflows/b6d7ec65-e78a-4c4f-b0cd-6a639754cb3e/rtl/request_validator.v",
+    "backend/workflows/b6d7ec65-e78a-4c4f-b0cd-6a639754cb3e/rtl/safety_supervisor.v",
+    "backend/workflows/b6d7ec65-e78a-4c4f-b0cd-6a639754cb3e/rtl/command_conditioner.v",
+    "backend/workflows/b6d7ec65-e78a-4c4f-b0cd-6a639754cb3e/rtl/adaptive_aero_control_top.v"
+  ],
+  "rtl_top_resolution": {
+    "resolution": "metadata_top_found_in_rtl",
+    "candidate_top": "adaptive_aero_control_top",
+    "module_map": {
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/stream_rx.v": [
+        "stream_rx"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/host_reg_window.v": [
+        "host_reg_window"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/fpga_bram_buffer.v": [
+        "fpga_bram_buffer"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/telemetry_logger.v": [
+        "telemetry_logger"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/request_validator.v": [
+        "request_validator"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/safety_supervisor.v": [
+        "safety_supervisor"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/command_conditioner.v": [
+        "command_conditioner"
+      ],
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/adaptive_aero_control_top.v": [
+        "adaptive_aero_control_top"
+      ]
+    }
+  },
+  "regmap_source_path": "backend/workflows/b6d7ec65-e78a-4c4f-b0cd-6a639754cb3e/digital/digital_regmap.json",
+  "local_sdc_files": [],
+  "clock_intent": {
+    "type": "digital_clock_intent",
+    "clocks": [
+      {
+        "name": "clk",
+        "port": "clk",
+        "frequency_mhz": null,
+        "period_ns": null,
+        "source": "rtl_port_inference",
+        "needs_user_frequency": true
+      }
+    ],
+    "resets": [
+      {
+        "name": "rst_n",
+        "port": "rst_n",
+        "active_low": true,
+        "source": "rtl_port_inference"
+      }
+    ],
+    "primary_clock": "clk",
+    "primary_reset": "rst_n",
+    "needs_user_review": true,
+    "provenance": {
+      "requested": false,
+      "sdc_clocks": 0,
+      "spec_clocks": 0,
+      "rtl_clocks": 1,
+      "spec_resets": 0,
+      "rtl_resets": 1
+    }
+  },
+  "local_rtl_paths": [
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/stream_rx.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/host_reg_window.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/fpga_bram_buffer.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/telemetry_logger.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/request_validator.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/safety_supervisor.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/command_conditioner.v",
+    "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/rtl/adaptive_aero_control_top.v"
+  ],
+  "local_regmap_path": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/b8604e37-4f3b-454b-9d3d-32c4056d21a6/1f345b97-eb79-4dbe-a04e-ec871fbadbe0/system/digital/digital_regmap.json"
+}

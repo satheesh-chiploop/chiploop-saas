@@ -1,0 +1,31 @@
+{
+  "agent": "Embedded Rust Driver Scaffold Agent",
+  "phase": "driver_scaffold",
+  "regmap_path": "firmware/register_map.json",
+  "hal_path": "firmware/hal/registers.rs",
+  "driver_name": "DigitalSubsystemDriver",
+  "register_count": 20,
+  "register_names": [
+    "CTRL",
+    "RESERVED",
+    "ENV_LIMIT",
+    "STALE_TIMEOUT",
+    "SEQ_BASE",
+    "HEARTBEAT_TIMEOUT",
+    "ACT_CLAMP_MIN",
+    "ACT_CLAMP_MAX",
+    "RATE_LIMIT",
+    "SAFE_OUTPUT",
+    "FAULT_CTRL",
+    "STATUS",
+    "LAST_CMD",
+    "LAST_SEQ",
+    "TELEM_ACCEPTED",
+    "TELEM_REJECTED",
+    "TELEM_TIMEOUT",
+    "TELEM_STALE",
+    "TELEM_FALLBACK",
+    "TELEM_LAST_VALID_SEQ"
+  ],
+  "manifest_present": true
+}
