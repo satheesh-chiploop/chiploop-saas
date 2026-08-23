@@ -1,0 +1,28 @@
+{
+  "agent": "FPGA Constraint Setup Agent",
+  "board": "ulx3s_ecp5_45f_esp32",
+  "clock_constraints_mhz": {
+    "clk": 38.225,
+    "spi_sclk": 10.0
+  },
+  "constrained_ports": [
+    "clk",
+    "reset_n",
+    "spi_sclk",
+    "spi_cs_n",
+    "spi_mosi",
+    "spi_miso",
+    "fault_indicator"
+  ],
+  "constraint_format": "lpf",
+  "constraint_path": "/root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/constraints/adaptive_aero_control_top_spi_fpga_top.lpf",
+  "constraints_generated": true,
+  "cst_path": null,
+  "lpf_path": "/root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/constraints/adaptive_aero_control_top_spi_fpga_top.lpf",
+  "note": "Generated demo constraints cover verified pins only. Custom interfaces must provide board-verified PCF, LPF, PDC, or CST assignments.",
+  "pcf_path": null,
+  "pdc_path": null,
+  "status": "ok",
+  "target_frequency_mhz": 38.225,
+  "unconstrained_ports": []
+}

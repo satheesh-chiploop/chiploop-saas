@@ -1,7 +1,0 @@
-
-
-Issues:
-❌ Required memory macro instance mismatch: expected exactly one 'fpga_history_bram_wrapper u_history_store(...)', found 0. memory_macros[] is authoritative; do not substitute a wrapper, behavioral model, or invented module name.
-
-=== VERILATOR LINT ===
-PASS: Verilator lint completed successfully.

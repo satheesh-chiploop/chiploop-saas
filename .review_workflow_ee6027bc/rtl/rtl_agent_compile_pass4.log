@@ -1,7 +1,0 @@
-
-
-Issues:
-❌ Module 'adaptive_aero_history_store' not found in file 'adaptive_aero_history_store.v'.
-
-=== VERILATOR LINT ===
-PASS: Verilator lint completed successfully.

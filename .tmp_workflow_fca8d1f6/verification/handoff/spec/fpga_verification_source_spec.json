@@ -1,7 +1,0 @@
-{
-  "name": "adaptive_aero_control_top_spi_fpga_top",
-  "source": "fpga_current_workflow",
-  "target": "fpga",
-  "test_intent": null,
-  "verification_plan": null
-}

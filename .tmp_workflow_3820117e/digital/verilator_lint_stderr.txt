@@ -1,0 +1,47 @@
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:15:26: Bits of signal are not used: 'rx_shift'[207]
+                                                                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top'
+   15 |   logic [FRAME_BITS-1:0] rx_shift;
+      |                          ^~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/upstream/adaptive_aero_control_top_mmio.v:71:13: Signal is not used: 'read_data_mux'
+                                                                                                                                                             : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_mmio'
+   71 | wire [63:0] read_data_mux;
+      |             ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/upstream/adaptive_aero_control_top_supervisor.v:36:7: Signal is not used: 'cfg_safe_fallback_select'
+                                                                                                                                                                  : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_supervisor'
+   36 | input cfg_safe_fallback_select;
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/upstream/adaptive_aero_control_top_supervisor.v:39:14: Signal is not used: 'cfg_max_cmd_rate'
+                                                                                                                                                                   : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_supervisor'
+   39 | input [63:0] cfg_max_cmd_rate;
+      |              ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/upstream/adaptive_aero_control_top_supervisor.v:43:14: Bits of signal are not used: 'cfg_stream_velocity_setpoint'[63:32]
+                                                                                                                                                                   : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_supervisor'
+   43 | input [63:0] cfg_stream_velocity_setpoint;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/upstream/adaptive_aero_control_top_supervisor.v:44:14: Signal is not used: 'cfg_fault_mask'
+                                                                                                                                                                   : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_supervisor'
+   44 | input [63:0] cfg_fault_mask;
+      |              ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/upstream/adaptive_aero_control_top_supervisor.v:90:12: Signal is not used: 'cmd_latched_r'
+                                                                                                                                                                   : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_supervisor'
+   90 | reg [63:0] cmd_latched_r;
+      |            ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/upstream/adaptive_aero_control_top_supervisor.v:91:12: Signal is not used: 'clamped_cmd_r'
+                                                                                                                                                                   : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_supervisor'
+   91 | reg [63:0] clamped_cmd_r;
+      |            ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/upstream/adaptive_aero_control_top_supervisor.v:93:20: Signal is not used: 'rsp_cmd_s'
+                                                                                                                                                                   : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_supervisor'
+   93 | wire signed [63:0] rsp_cmd_s;
+      |                    ^~~~~~~~~
+%Warning-SYNCASYNCNET: /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:7:16: Signal flopped as both synchronous and async: 'spi_cs_n'
+                       /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:57:9: ... Location of async usage
+   57 |     if (spi_cs_n) spi_active <= 1'b0;
+      |         ^~~~~~~~
+                       /root/chiploop-backend/backend/workflows/3820117e-e96b-474b-bc30-de28ad2a2ace/fpga/src/fpga/target_explorer/interface_adapter/adaptive_aero_control_top_spi_fpga_top.sv:61:10: ... Location of sync usage
+   61 |     if (!spi_cs_n) begin
+      |          ^~~~~~~~
+                       ... For warning description see https://verilator.org/warn/SYNCASYNCNET?v=5.047
+                       ... Use "/* verilator lint_off SYNCASYNCNET */" and lint_on around source to disable this message.

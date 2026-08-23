@@ -1,7 +1,0 @@
-{
-  "passed": false,
-  "compile_passed": false,
-  "lint_passed": false,
-  "final_pass": "failed",
-  "reason": "RTL failed checks in pass1 through pass4."
-}
