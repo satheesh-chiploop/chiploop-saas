@@ -1,0 +1,251 @@
+{
+  "validation_scope": "full_stack",
+  "generated_at": "2026-08-23T05:43:25.503641+00:00",
+  "agent": "System CoSim Scenario Generator Agent",
+  "contract_ready": true,
+  "blocking_error_count": 0,
+  "scenarios": [
+    {
+      "id": "control_service_boot_smoke",
+      "class": "boot",
+      "enabled": true,
+      "software_target": {
+        "app_name": "control_service",
+        "binary_name": "ss_app_control_service",
+        "cargo_package": "ss_app_control_service"
+      },
+      "deterministic_seed": 101,
+      "description": "Boot the firmware ELF on the RTL sim top and verify reset release and first observable software activity.",
+      "expected_events": [
+        "app=control_service",
+        "scenario=control_service_boot_smoke"
+      ],
+      "expected_registers": {},
+      "expected_interrupts": [],
+      "expected_signals": [
+        "reset_released"
+      ],
+      "expected_observations": [
+        "firmware ELF is loaded",
+        "reset is released",
+        "simulation reaches first software-visible activity"
+      ]
+    },
+    {
+      "id": "control_service_register_rw_basic",
+      "class": "register_read_write",
+      "enabled": true,
+      "software_target": {
+        "app_name": "control_service",
+        "binary_name": "ss_app_control_service",
+        "cargo_package": "ss_app_control_service"
+      },
+      "deterministic_seed": 202,
+      "description": "Perform deterministic register write/readback against known register map content.",
+      "expected_events": [
+        "app=control_service",
+        "scenario=control_service_register_rw_basic",
+        "register_write="
+      ],
+      "expected_registers": {
+        "CTRL": "0x10"
+      },
+      "expected_interrupts": [],
+      "expected_signals": [],
+      "expected_observations": [
+        "write transaction issued",
+        "readback matches expected value",
+        "no unexpected fault/timeout"
+      ]
+    },
+    {
+      "id": "control_service_interrupt_propagation_basic",
+      "class": "interrupt_propagation",
+      "enabled": false,
+      "software_target": {
+        "app_name": "control_service",
+        "binary_name": "ss_app_control_service",
+        "cargo_package": "ss_app_control_service"
+      },
+      "deterministic_seed": 303,
+      "description": "Trigger an interrupt source and validate propagation from RTL event to firmware/software observable handling.",
+      "expected_events": [
+        "app=control_service",
+        "scenario=control_service_interrupt_propagation_basic",
+        "interrupt_triggered=1"
+      ],
+      "expected_registers": {},
+      "expected_interrupts": [],
+      "expected_signals": [],
+      "expected_observations": [
+        "interrupt source event occurs",
+        "interrupt line/state becomes observable",
+        "firmware handler executes"
+      ],
+      "interrupt_targets": []
+    },
+    {
+      "id": "diagnostics_boot_smoke",
+      "class": "boot",
+      "enabled": true,
+      "software_target": {
+        "app_name": "diagnostics",
+        "binary_name": "ss_app_diagnostics",
+        "cargo_package": "ss_app_diagnostics"
+      },
+      "deterministic_seed": 101,
+      "description": "Boot the firmware ELF on the RTL sim top and verify reset release and first observable software activity.",
+      "expected_events": [
+        "app=diagnostics",
+        "scenario=diagnostics_boot_smoke"
+      ],
+      "expected_registers": {},
+      "expected_interrupts": [],
+      "expected_signals": [
+        "reset_released"
+      ],
+      "expected_observations": [
+        "firmware ELF is loaded",
+        "reset is released",
+        "simulation reaches first software-visible activity"
+      ]
+    },
+    {
+      "id": "diagnostics_register_rw_basic",
+      "class": "register_read_write",
+      "enabled": true,
+      "software_target": {
+        "app_name": "diagnostics",
+        "binary_name": "ss_app_diagnostics",
+        "cargo_package": "ss_app_diagnostics"
+      },
+      "deterministic_seed": 202,
+      "description": "Perform deterministic register write/readback against known register map content.",
+      "expected_events": [
+        "app=diagnostics",
+        "scenario=diagnostics_register_rw_basic",
+        "register_write="
+      ],
+      "expected_registers": {
+        "CTRL": "0x10"
+      },
+      "expected_interrupts": [],
+      "expected_signals": [],
+      "expected_observations": [
+        "write transaction issued",
+        "readback matches expected value",
+        "no unexpected fault/timeout"
+      ]
+    },
+    {
+      "id": "diagnostics_interrupt_propagation_basic",
+      "class": "interrupt_propagation",
+      "enabled": false,
+      "software_target": {
+        "app_name": "diagnostics",
+        "binary_name": "ss_app_diagnostics",
+        "cargo_package": "ss_app_diagnostics"
+      },
+      "deterministic_seed": 303,
+      "description": "Trigger an interrupt source and validate propagation from RTL event to firmware/software observable handling.",
+      "expected_events": [
+        "app=diagnostics",
+        "scenario=diagnostics_interrupt_propagation_basic",
+        "interrupt_triggered=1"
+      ],
+      "expected_registers": {},
+      "expected_interrupts": [],
+      "expected_signals": [],
+      "expected_observations": [
+        "interrupt source event occurs",
+        "interrupt line/state becomes observable",
+        "firmware handler executes"
+      ],
+      "interrupt_targets": []
+    },
+    {
+      "id": "demo_cli_boot_smoke",
+      "class": "boot",
+      "enabled": true,
+      "software_target": {
+        "app_name": "demo_cli",
+        "binary_name": "ss_app_demo_cli",
+        "cargo_package": "ss_app_demo_cli"
+      },
+      "deterministic_seed": 101,
+      "description": "Boot the firmware ELF on the RTL sim top and verify reset release and first observable software activity.",
+      "expected_events": [
+        "app=demo_cli",
+        "scenario=demo_cli_boot_smoke"
+      ],
+      "expected_registers": {},
+      "expected_interrupts": [],
+      "expected_signals": [
+        "reset_released"
+      ],
+      "expected_observations": [
+        "firmware ELF is loaded",
+        "reset is released",
+        "simulation reaches first software-visible activity"
+      ]
+    },
+    {
+      "id": "demo_cli_register_rw_basic",
+      "class": "register_read_write",
+      "enabled": true,
+      "software_target": {
+        "app_name": "demo_cli",
+        "binary_name": "ss_app_demo_cli",
+        "cargo_package": "ss_app_demo_cli"
+      },
+      "deterministic_seed": 202,
+      "description": "Perform deterministic register write/readback against known register map content.",
+      "expected_events": [
+        "app=demo_cli",
+        "scenario=demo_cli_register_rw_basic",
+        "register_write="
+      ],
+      "expected_registers": {
+        "CTRL": "0x10"
+      },
+      "expected_interrupts": [],
+      "expected_signals": [],
+      "expected_observations": [
+        "write transaction issued",
+        "readback matches expected value",
+        "no unexpected fault/timeout"
+      ]
+    },
+    {
+      "id": "demo_cli_interrupt_propagation_basic",
+      "class": "interrupt_propagation",
+      "enabled": false,
+      "software_target": {
+        "app_name": "demo_cli",
+        "binary_name": "ss_app_demo_cli",
+        "cargo_package": "ss_app_demo_cli"
+      },
+      "deterministic_seed": 303,
+      "description": "Trigger an interrupt source and validate propagation from RTL event to firmware/software observable handling.",
+      "expected_events": [
+        "app=demo_cli",
+        "scenario=demo_cli_interrupt_propagation_basic",
+        "interrupt_triggered=1"
+      ],
+      "expected_registers": {},
+      "expected_interrupts": [],
+      "expected_signals": [],
+      "expected_observations": [
+        "interrupt source event occurs",
+        "interrupt line/state becomes observable",
+        "firmware handler executes"
+      ],
+      "interrupt_targets": []
+    }
+  ],
+  "summary": {
+    "total": 9,
+    "enabled": 6,
+    "disabled": 3
+  }
+}

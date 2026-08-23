@@ -17,7 +17,7 @@ type ExecutionMode = "architecture" | "cpu_reference" | "validated";
 type ImplementationPath = "architecture_only" | "digital_ip_asic" | "fpga_prototype" | "fpga_then_asic";
 type DeploymentArchitecture = "automatic" | "fpga_onboard_cpu" | "fpga_soft_cpu" | "fpga_external_host" | "asic_digital_ip" | "asic_soc" | "asic_companion";
 type SoftCpuCore = string;
-type HemResumeStage = "arch2rtl" | "verify" | "fpga_exploration" | "fpga_fabric_integration" | "fpga_bitstream" | "asic_tapeout" | "firmware_product";
+type HemResumeStage = "arch2rtl" | "verify" | "fpga_exploration" | "fpga_fabric_integration" | "fpga_bitstream" | "asic_tapeout" | "firmware_product" | "software_product" | "cosim_validation" | "product_demo";
 
 const paths: Array<{ key: ImplementationPath; title: string; body: string }> = [
   { key: "architecture_only", title: "Architecture only", body: "Stop after the architecture and digital-IP plan." },
@@ -118,6 +118,9 @@ export default function PhysicalAiStudioPage() {
   const [resumeIntegrationId, setResumeIntegrationId] = useState("");
   const [resumeBitstreamId, setResumeBitstreamId] = useState("");
   const [resumeAsicId, setResumeAsicId] = useState("");
+  const [resumeFirmwareId, setResumeFirmwareId] = useState("");
+  const [resumeSoftwareId, setResumeSoftwareId] = useState("");
+  const [resumeValidationId, setResumeValidationId] = useState("");
   const [resumeStage, setResumeStage] = useState<HemResumeStage>("fpga_exploration");
   const [resumeRunning, setResumeRunning] = useState(false);
 
@@ -306,10 +309,10 @@ export default function PhysicalAiStudioPage() {
       return;
     }
     const stageOrder: HemResumeStage[] = implementationPath === "fpga_prototype"
-      ? ["arch2rtl", "verify", "fpga_exploration", "fpga_fabric_integration", "fpga_bitstream", "firmware_product"]
+      ? ["arch2rtl", "verify", "fpga_exploration", "fpga_fabric_integration", "fpga_bitstream", "firmware_product", "software_product", "cosim_validation", "product_demo"]
       : implementationPath === "fpga_then_asic"
-        ? ["arch2rtl", "verify", "fpga_exploration", "fpga_fabric_integration", "fpga_bitstream", "asic_tapeout", "firmware_product"]
-        : ["arch2rtl", "verify", "asic_tapeout", "firmware_product"];
+        ? ["arch2rtl", "verify", "fpga_exploration", "fpga_fabric_integration", "fpga_bitstream", "asic_tapeout", "firmware_product", "software_product", "cosim_validation", "product_demo"]
+        : ["arch2rtl", "verify", "asic_tapeout", "firmware_product", "software_product", "cosim_validation", "product_demo"];
     if (!stageOrder.includes(resumeStage)) {
       setError("The selected resume stage is not part of the configured implementation path.");
       return;
@@ -318,6 +321,8 @@ export default function PhysicalAiStudioPage() {
       arch2rtl: resumeRtlId.trim(), verify: resumeVerificationId.trim(),
       fpga_exploration: resumeExplorerId.trim(), fpga_fabric_integration: resumeIntegrationId.trim(), fpga_bitstream: resumeBitstreamId.trim(),
       asic_tapeout: resumeAsicId.trim(),
+      firmware_product: resumeFirmwareId.trim(), software_product: resumeSoftwareId.trim(),
+      cosim_validation: resumeValidationId.trim(),
     };
     const requiredStages = stageOrder.slice(0, stageOrder.indexOf(resumeStage));
     const missingStages = requiredStages.filter((stage) => !enteredIds[stage]);
@@ -397,6 +402,28 @@ export default function PhysicalAiStudioPage() {
     {implementationPath !== "architecture_only" && <section className="mt-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-6"><HemAutomaticRunControls enabled={hemEnabled} adaptive={hemAdaptive} onEnabledChange={setHemEnabled} onAdaptiveChange={setHemAdaptive} currentStageLabel="Physical AI architecture" nextStageLabel="RTL generation" /><p className="mt-4 text-sm text-slate-400">When enabled, ChipLoop continues automatically through the selected path. When disabled, the completed dashboard shows the next workflow button.</p></section>}
     {deploymentArchitecture === "fpga_external_host" && <section className="mt-6 rounded-2xl border border-cyan-400/25 bg-slate-900/50 p-6"><div className="text-xs font-bold uppercase text-cyan-300">External-host interface plan</div><h2 className="mt-2 text-lg font-semibold">Resolve transport before RTL generation</h2><p className="mt-1 text-xs text-slate-400">SPI is the currently qualified transport. This contract drives RTL ports, board filtering, verification, and host-driver generation; it is never selected silently.</p><div className="mt-5 grid gap-4 md:grid-cols-3"><label className="text-xs">Transport<select value="spi" disabled className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="spi">SPI peripheral</option></select></label><label className="text-xs">Maximum SPI clock (MHz)<input type="number" min={1} max={100} value={hostClockMhz} onChange={(event) => setHostClockMhz(Math.max(1, Number(event.target.value) || 10))} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label><label className="text-xs">Host software target<select value={hostTargetTriple} onChange={(event) => setHostTargetTriple(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="x86_64-unknown-linux-gnu">Linux x86-64</option><option value="aarch64-unknown-linux-gnu">Linux ARM64</option><option value="x86_64-apple-darwin">macOS Intel</option><option value="aarch64-apple-darwin">macOS Apple Silicon</option></select></label><label className="text-xs">Event signaling<select value={hostInterruptSignaling} onChange={(event) => setHostInterruptSignaling(event.target.value)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="optional_gpio">Optional IRQ GPIO</option><option value="status_polling">Status polling</option></select></label></div></section>}
     {implementationPath !== "architecture_only" && <section className="mt-6 rounded-2xl border border-cyan-400/30 bg-cyan-500/5 p-6"><div className="text-xs font-bold uppercase tracking-wide text-cyan-300">Resume an existing HEM journey</div><h2 className="mt-2 text-xl font-bold">Start from any implementation stage</h2><p className="mt-2 text-sm text-slate-300">Select the stage to start and provide the completed workflow ID for each preceding stage. ChipLoop validates and reuses that Supabase evidence; earlier stages do not run again and HEM continues downstream.</p><label className="mt-5 block max-w-md text-xs text-slate-300">Stage to start<select value={resumeStage} onChange={(event) => setResumeStage(event.target.value as HemResumeStage)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3"><option value="arch2rtl">RTL generation</option><option value="verify">RTL verification</option>{implementationPath.includes("fpga") && <option value="fpga_exploration">FPGA Explorer</option>}{implementationPath.includes("fpga") && <option value="fpga_fabric_integration">FPGA fabric integration &amp; simulation</option>}{implementationPath.includes("fpga") && <option value="fpga_bitstream">FPGA bitstream</option>}{implementationPath !== "fpga_prototype" && <option value="asic_tapeout">ASIC implementation</option>}<option value="firmware_product">Device layer / firmware</option></select></label><div className="mt-5 grid gap-4 md:grid-cols-3"><label className="text-xs text-slate-300">Physical AI workflow ID<input value={resumePhysicalAiId} onChange={(event) => setResumePhysicalAiId(event.target.value)} placeholder="Physical AI parent UUID" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label><label className="text-xs text-slate-300">RTL generation workflow ID<input value={resumeRtlId} onChange={(event) => setResumeRtlId(event.target.value)} placeholder="Required for stages after RTL" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label><label className="text-xs text-slate-300">RTL verification workflow ID<input value={resumeVerificationId} onChange={(event) => setResumeVerificationId(event.target.value)} placeholder="Required after verification" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>{implementationPath.includes("fpga") && <label className="text-xs text-slate-300">FPGA Explorer workflow ID<input value={resumeExplorerId} onChange={(event) => setResumeExplorerId(event.target.value)} placeholder="Required after Explorer" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>}{implementationPath.includes("fpga") && <label className="text-xs text-slate-300">FPGA fabric integration workflow ID<input value={resumeIntegrationId} onChange={(event) => setResumeIntegrationId(event.target.value)} placeholder="Required after integration simulation" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>}{implementationPath.includes("fpga") && <label className="text-xs text-slate-300">FPGA bitstream workflow ID<input value={resumeBitstreamId} onChange={(event) => setResumeBitstreamId(event.target.value)} placeholder="Required after bitstream" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>}{implementationPath !== "fpga_prototype" && <label className="text-xs text-slate-300">ASIC implementation workflow ID<input value={resumeAsicId} onChange={(event) => setResumeAsicId(event.target.value)} placeholder="Required after ASIC implementation" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>}</div><button type="button" onClick={resumeHemStage} disabled={!token || resumeRunning} className="mt-5 rounded-xl bg-cyan-300 px-5 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">{resumeRunning ? "Queuing selected stage…" : "Resume HEM from selected stage"}</button></section>}
+    {implementationPath !== "architecture_only" && (
+      <section className="mt-4 rounded-xl border border-cyan-900/50 bg-slate-950/40 p-4">
+        <div className="text-sm font-semibold text-cyan-100">Late-stage HEM resume</div>
+        <p className="mt-1 text-xs text-slate-400">Choose a downstream boundary and provide its completed Supabase predecessors in the resume form.</p>
+        <div className="mt-3 grid gap-4 md:grid-cols-2">
+          <label className="text-xs text-slate-300">Downstream stage
+            <select value={resumeStage} onChange={(event) => setResumeStage(event.target.value as HemResumeStage)} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3">
+              <option value="firmware_product">Device layer / firmware</option>
+              <option value="software_product">Software</option>
+              <option value="cosim_validation">Co-simulation / validation</option>
+              <option value="product_demo">Product demo</option>
+            </select>
+          </label>
+        </div>
+        <div className="mt-3 grid gap-4 md:grid-cols-3">
+          <label className="text-xs text-slate-300">Firmware workflow ID<input value={resumeFirmwareId} onChange={(event) => setResumeFirmwareId(event.target.value)} placeholder="Required after firmware" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>
+          <label className="text-xs text-slate-300">Software workflow ID<input value={resumeSoftwareId} onChange={(event) => setResumeSoftwareId(event.target.value)} placeholder="Required for co-simulation" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>
+          <label className="text-xs text-slate-300">Co-simulation workflow ID<input value={resumeValidationId} onChange={(event) => setResumeValidationId(event.target.value)} placeholder="Required for product demo" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>
+        </div>
+        <button type="button" onClick={resumeHemStage} disabled={!token || resumeRunning} className="mt-4 rounded-lg bg-cyan-300 px-4 py-2 text-sm font-bold text-slate-950 disabled:opacity-50">{resumeRunning ? "Queuing selected stage…" : "Resume late-stage HEM"}</button>
+      </section>
+    )}
     {error && <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200">{error}</div>}
     <button onClick={start} disabled={!token || !selected || running} className="mt-6 w-full rounded-xl bg-fuchsia-400 px-6 py-4 text-lg font-bold text-slate-950 disabled:opacity-50">{running ? "Starting the journey…" : hemEnabled && implementationPath !== "architecture_only" ? "Run the complete journey" : "Run Physical AI agents"}</button>
   </div></main>;

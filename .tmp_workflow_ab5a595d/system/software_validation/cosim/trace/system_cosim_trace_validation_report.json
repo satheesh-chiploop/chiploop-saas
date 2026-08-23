@@ -1,0 +1,8 @@
+{
+  "agent": "System Software CoSim Trace Validation Agent",
+  "generated_at": "2026-08-23T05:43:27.970143+00:00",
+  "trace_validation_status": "blocked",
+  "message": "No scenario execution results available.",
+  "scenario_validations": [],
+  "mismatch_categories": []
+}

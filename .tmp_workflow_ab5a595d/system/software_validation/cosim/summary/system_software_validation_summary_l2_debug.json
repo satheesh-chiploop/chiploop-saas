@@ -1,0 +1,8 @@
+{
+  "agent": "System Software Validation Summary (L2)",
+  "generated_at": "2026-08-23T05:43:28.706420+00:00",
+  "harness_status": "blocked",
+  "execution_status": "blocked",
+  "trace_validation_status": "blocked",
+  "final_verdict": "blocked"
+}

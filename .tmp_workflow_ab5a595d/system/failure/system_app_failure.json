@@ -1,0 +1,11 @@
+{
+  "schema": "chiploop.system.app_failure.v1",
+  "status": "failed",
+  "workflow_id": "ab5a595d-09fb-4a13-9713-05480c161552",
+  "run_id": "170b45d7-411e-4d8b-89c5-ef2b0b9241cd",
+  "template_workflow": "System_Software_Validation_L2",
+  "app_name": "system-software-validation",
+  "exception_type": "RuntimeError",
+  "message": "System software L2 production signoff did not pass (verdict=blocked)",
+  "traceback": "Traceback (most recent call last):\n  File \"/root/chiploop-backend/main.py\", line 15224, in execute_system_app_background\n    _run_nodes_with_shared_state(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        workflow_id=workflow_id,\n        ^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n        shared_state=shared_state,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/root/chiploop-backend/main.py\", line 2163, in _run_nodes_with_shared_state\n    result = _execute_agent_with_runtime(\n        label,\n    ...<4 lines>...\n        loop_type,\n    )\n  File \"/root/chiploop-backend/main.py\", line 1975, in _execute_agent_with_runtime\n    runtime_result = execute_legacy_agent(agent_fn, context)\n  File \"/root/chiploop-backend/agents/runtime.py\", line 311, in execute_legacy_agent\n    return execute_agent(context, _handler)\n  File \"/root/chiploop-backend/agents/runtime.py\", line 224, in execute_agent\n    result = AgentResult.from_legacy(handler(context))\n                                     ~~~~~~~^^^^^^^^^\n  File \"/root/chiploop-backend/agents/runtime.py\", line 304, in _handler\n    return agent_fn(ctx.state)\n  File \"/root/chiploop-backend/agents/system/system_software_validation_summary_l2_agent.py\", line 150, in run_agent\n    raise RuntimeError(f\"System software L2 production signoff did not pass (verdict={final_verdict})\")\nRuntimeError: System software L2 production signoff did not pass (verdict=blocked)\n"
+}

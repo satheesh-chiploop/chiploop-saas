@@ -1,0 +1,89 @@
+{
+  "agent": "System CoSim Ingest Agent",
+  "generated_at": "2026-08-23T05:43:23.980008+00:00",
+  "software_resolution": {
+    "state_keys_checked": [
+      "system_software_validation_package",
+      "system_software_package",
+      "software_package"
+    ],
+    "workflow_id_hint": "d547fefe-901e-4bcb-9d52-6263ff34643a",
+    "candidate_paths": [
+      "system/software/package/system_software_package.json",
+      "system/software_validation/package/system_software_validation_package.json",
+      "software/package/system_software_package.json",
+      "validation/l1/system_software_validation_package.json"
+    ],
+    "resolution": "state:system_software_package",
+    "resolved_path": "state:system_software_package",
+    "storage_prefixes": [],
+    "workflow_row_found": false
+  },
+  "firmware_resolution": {
+    "state_keys_checked": [
+      "system_firmware_handoff",
+      "system_software_handoff",
+      "system_firmware_package",
+      "firmware_package"
+    ],
+    "workflow_id_hint": "11e275de-0b3f-4bea-be7c-b8208fbcbb53",
+    "candidate_paths": [
+      "system/software_handoff/system_software_handoff.json",
+      "firmware/package/system_firmware_package.json",
+      "firmware/package/firmware_package.json",
+      "firmware/firmware_manifest.json",
+      "system/firmware/package/system_firmware_package.json"
+    ],
+    "resolution": "supabase",
+    "resolved_path": "backend/workflows/11e275de-0b3f-4bea-be7c-b8208fbcbb53/system/software_handoff/system_software_handoff.json",
+    "storage_prefixes": [
+      "backend/workflows/11e275de-0b3f-4bea-be7c-b8208fbcbb53/",
+      "artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/11e275de-0b3f-4bea-be7c-b8208fbcbb53/",
+      "3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/11e275de-0b3f-4bea-be7c-b8208fbcbb53/"
+    ],
+    "workflow_row_found": true
+  },
+  "rtl_resolution": {
+    "state_keys_checked": [
+      "system_rtl_package",
+      "rtl_package"
+    ],
+    "workflow_id_hint": "f570b970-ecf8-406f-a76f-a3fd7568c818",
+    "candidate_paths": [
+      "system/package/system_rtl_package.json",
+      "system/integration/system_rtl_package.json"
+    ],
+    "resolution": "state:system_rtl_package",
+    "resolved_path": "state:system_rtl_package",
+    "storage_prefixes": [],
+    "workflow_row_found": false
+  },
+  "verified_simulation_bundle": {
+    "status": "incomplete",
+    "source_workflow_id": "0d364a5a-c544-4b16-b82c-4e8cc177e80d",
+    "restore_root": "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ab5a595d-09fb-4a13-9713-05480c161552/170b45d7-411e-4d8b-89c5-ef2b0b9241cd/system/system/restored_rtl_sim/0d364a5a-c544-4b16-b82c-4e8cc177e80d",
+    "restored_file_count": 8,
+    "simulation_manifest_path": "",
+    "simulation_manifest": {},
+    "makefile_path": "",
+    "make_dir": "",
+    "rtl_files": [
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ab5a595d-09fb-4a13-9713-05480c161552/170b45d7-411e-4d8b-89c5-ef2b0b9241cd/system/system/restored_rtl_sim/0d364a5a-c544-4b16-b82c-4e8cc177e80d/handoff/rtl/adaptive_aero_control_top.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ab5a595d-09fb-4a13-9713-05480c161552/170b45d7-411e-4d8b-89c5-ef2b0b9241cd/system/system/restored_rtl_sim/0d364a5a-c544-4b16-b82c-4e8cc177e80d/handoff/rtl/adaptive_aero_control_top_mmio.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ab5a595d-09fb-4a13-9713-05480c161552/170b45d7-411e-4d8b-89c5-ef2b0b9241cd/system/system/restored_rtl_sim/0d364a5a-c544-4b16-b82c-4e8cc177e80d/handoff/rtl/adaptive_aero_control_top_supervisor.v",
+      "/root/chiploop-backend/artifacts/3c6dfa47-ba1d-4be5-857c-c60b38fc0ff6/ab5a595d-09fb-4a13-9713-05480c161552/170b45d7-411e-4d8b-89c5-ef2b0b9241cd/system/system/restored_rtl_sim/0d364a5a-c544-4b16-b82c-4e8cc177e80d/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv"
+    ],
+    "top_module": ""
+  },
+  "manifest_checks": {
+    "software_entry_found": true,
+    "firmware_elf_found": true,
+    "register_map_found": true,
+    "interrupt_count": 0,
+    "dma_present_resolved": false,
+    "rtl_sim_file_count": 3,
+    "software_l1_status_found": true,
+    "digital_spec_found": true,
+    "integration_intent_found": true
+  }
+}

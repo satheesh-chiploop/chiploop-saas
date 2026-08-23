@@ -1,0 +1,24 @@
+{
+  "agent": "System Software Package Audit Agent",
+  "generated_at": "2026-08-23T05:43:15.712313+00:00",
+  "package_manifest_present": true,
+  "package_file_check_count": 37,
+  "expected_sections": {
+    "sdk": true,
+    "apps": true,
+    "build": true,
+    "input_contract": true,
+    "api_contract": true,
+    "tests": true,
+    "mock": true,
+    "tools": true,
+    "adapter": true,
+    "services": true,
+    "executive_summary": true
+  },
+  "required_adapter_package_files": [
+    "system/software/adapter/physical_ai_product_adapter/Cargo.toml",
+    "system/software/adapter/physical_ai_product_adapter/src/lib.rs"
+  ],
+  "missing_required_adapter_package_files": []
+}

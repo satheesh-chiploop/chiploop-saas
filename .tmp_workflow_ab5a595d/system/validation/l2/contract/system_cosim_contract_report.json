@@ -1,0 +1,26 @@
+{
+  "validation_scope": "full_stack",
+  "generated_at": "2026-08-23T05:43:24.740173+00:00",
+  "agent": "System CoSim Contract Agent",
+  "passes": [
+    "L2 ingest manifest is present and marked ready for contract validation.",
+    "System Software L1 validation is ready.",
+    "Software entry point resolved.",
+    "Firmware ELF resolved.",
+    "Register map linkage resolved.",
+    "Interrupt list normalized with 0 entries.",
+    "RTL top module resolved.",
+    "RTL sim compile status is pass.",
+    "RTL sim filelist present with 3 entries."
+  ],
+  "issues": [
+    {
+      "severity": "warning",
+      "code": "DMA_UNRESOLVED",
+      "message": "DMA presence could not be resolved cleanly.",
+      "recommendation": "Export dma_present explicitly in firmware manifest or RTL package."
+    }
+  ],
+  "overall_status": "ready",
+  "blocking_error_count": 0
+}
