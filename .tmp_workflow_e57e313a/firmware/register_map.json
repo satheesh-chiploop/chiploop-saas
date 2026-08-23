@@ -1,0 +1,238 @@
+{
+  "block_name": "digital_subsystem",
+  "module_name": "digital_subsystem",
+  "base_address": "0x00000000",
+  "bus": "ABSTRACT",
+  "registers": [
+    {
+      "name": "CTRL",
+      "offset": "0x00000000",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Global control register for firmware-visible command supervision.",
+      "fields": [
+        {
+          "name": "enable",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Global command processing enable."
+        },
+        {
+          "name": "safe_fallback_select",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RW",
+          "description": "Software-visible safety policy hint retained for compatibility with the documented control plane."
+        }
+      ]
+    },
+    {
+      "name": "MAX_CMD_POS",
+      "offset": "0x00000008",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Upper signed actuator command bound.",
+      "fields": [
+        {
+          "name": "max_cmd_pos",
+          "bit_offset": 0,
+          "bit_width": 64,
+          "access": "RW",
+          "description": "Maximum signed actuator position command, represented as a 64-bit two's-complement value."
+        }
+      ]
+    },
+    {
+      "name": "MIN_CMD_POS",
+      "offset": "0x00000010",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Lower signed actuator command bound.",
+      "fields": [
+        {
+          "name": "min_cmd_pos",
+          "bit_offset": 0,
+          "bit_width": 64,
+          "access": "RW",
+          "description": "Minimum signed actuator position command, represented as a 64-bit two's-complement value."
+        }
+      ]
+    },
+    {
+      "name": "MAX_CMD_RATE",
+      "offset": "0x00000018",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Maximum signed command rate bound.",
+      "fields": [
+        {
+          "name": "max_cmd_rate",
+          "bit_offset": 0,
+          "bit_width": 64,
+          "access": "RW",
+          "description": "Maximum signed actuator command rate, represented as a 64-bit two's-complement value."
+        }
+      ]
+    },
+    {
+      "name": "STALE_TIMEOUT_CYCLES",
+      "offset": "0x00000020",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Freshness supervision limit.",
+      "fields": [
+        {
+          "name": "stale_timeout_cycles",
+          "bit_offset": 0,
+          "bit_width": 64,
+          "access": "RW",
+          "description": "Number of clk cycles allowed without an accepted request before stale is reported."
+        }
+      ]
+    },
+    {
+      "name": "RESPONSE_TIMEOUT_CYCLES",
+      "offset": "0x00000028",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Response supervision limit.",
+      "fields": [
+        {
+          "name": "response_timeout_cycles",
+          "bit_offset": 0,
+          "bit_width": 64,
+          "access": "RW",
+          "description": "Number of clk cycles allowed for request completion before timeout is reported."
+        }
+      ]
+    },
+    {
+      "name": "SEQUENCE_EXPECTED",
+      "offset": "0x00000030",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Expected sequence policy value used for replay and ordering checks.",
+      "fields": [
+        {
+          "name": "sequence_expected",
+          "bit_offset": 0,
+          "bit_width": 64,
+          "access": "RW",
+          "description": "Expected sequence value for request validation."
+        }
+      ]
+    },
+    {
+      "name": "STREAM_VELOCITY_SETPOINT",
+      "offset": "0x00000038",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Firmware-programmed velocity metadata or setpoint field.",
+      "fields": [
+        {
+          "name": "stream_velocity_setpoint",
+          "bit_offset": 0,
+          "bit_width": 64,
+          "access": "RW",
+          "description": "Velocity setpoint or metadata forwarded through the control plane."
+        }
+      ]
+    },
+    {
+      "name": "FAULT_MASK",
+      "offset": "0x00000040",
+      "address": null,
+      "access": "RW",
+      "reset": "0x00000000",
+      "description": "Fault policy mask visible to software.",
+      "fields": [
+        {
+          "name": "fault_mask",
+          "bit_offset": 0,
+          "bit_width": 64,
+          "access": "RW",
+          "description": "Fault enable or mask bits for software policy handling."
+        }
+      ]
+    },
+    {
+      "name": "STATUS",
+      "offset": "0x00000048",
+      "address": null,
+      "access": "RO",
+      "reset": "0x00000000",
+      "description": "Read-only supervisor status summary.",
+      "fields": [
+        {
+          "name": "busy",
+          "bit_offset": 0,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Supervisor busy indicator."
+        },
+        {
+          "name": "accepted",
+          "bit_offset": 1,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Accepted request indicator."
+        },
+        {
+          "name": "rejected_stale",
+          "bit_offset": 2,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Stale request rejection indicator."
+        },
+        {
+          "name": "rejected_seq",
+          "bit_offset": 3,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Sequence rejection indicator."
+        },
+        {
+          "name": "timeout",
+          "bit_offset": 4,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Response timeout indicator."
+        },
+        {
+          "name": "fallback_active",
+          "bit_offset": 5,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Inhibit or fault-active indicator."
+        },
+        {
+          "name": "clamped",
+          "bit_offset": 6,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Command clamping indicator."
+        },
+        {
+          "name": "fault_summary",
+          "bit_offset": 7,
+          "bit_width": 1,
+          "access": "RO",
+          "description": "Summary fault bit."
+        }
+      ]
+    }
+  ],
+  "__source": {
+    "mode": "artifact_passthrough",
+    "path": "state.digital_regmap"
+  }
+}
