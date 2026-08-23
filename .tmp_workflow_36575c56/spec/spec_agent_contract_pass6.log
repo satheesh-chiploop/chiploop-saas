@@ -1,0 +1,2 @@
+Digital Spec Agent deterministic graph closure failure:
+FPGA memory contract is FPGA-only and cannot use ASIC/OpenRAM hard macros: adaptive_aero_history_sram (openram_sram), adaptive_aero_trace_sram (openram_sram). Use a technology-neutral inferred-memory wrapper declared in hierarchy.modules with its own rtl_output_file.
