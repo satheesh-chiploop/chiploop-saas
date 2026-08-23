@@ -2,7 +2,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@/lib/platformClient";
 import AskThisRunPanel from "@/components/AskThisRunPanel";
@@ -55,6 +55,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [running, setRunning] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [workflowId, setWorkflowId] = useState<string | null>(null);
+  const [fpgaConvergence, setFpgaConvergence] = useState<{ hem?: { status?: string; current_stage?: string } | null; attempts?: Array<{ attempt_number: number; board_id: string; status: string }>; children?: Array<{ workflow_id?: string; stage?: string; status?: string }> } | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
   const [workflowRow, setWorkflowRow] = useState<WorkflowRow | null>(null);
   const [closureWorkflowId, setClosureWorkflowId] = useState<string | null>(null);
@@ -82,6 +83,13 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   const [reviewDepth, setReviewDepth] = useState("standard");
   const [notes, setNotes] = useState("");
   const [board, setBoard] = useState("icebreaker");
+  const [deploymentArchitecture, setDeploymentArchitecture] = useState<"fpga_onboard_cpu" | "fpga_soft_cpu" | "fpga_external_host">("fpga_external_host");
+  const [automaticBoardConvergence, setAutomaticBoardConvergence] = useState(fpgaMode === "bitstream" || fpgaMode === "fpga2rtl" || fpgaMode === "implementation");
+  const [softCpuCore, setSoftCpuCore] = useState("picorv32");
+  const [softCpuBus, setSoftCpuBus] = useState("wishbone");
+  const [softCpuInstructionKib, setSoftCpuInstructionKib] = useState("32");
+  const [softCpuDataKib, setSoftCpuDataKib] = useState("16");
+  const [softCpuRtlFiles, setSoftCpuRtlFiles] = useState("");
   const [topModule, setTopModule] = useState("");
   const [pcfText, setPcfText] = useState("");
   const [runFpgaTimingClosureLoop, setRunFpgaTimingClosureLoop] = useState(true);
@@ -234,6 +242,22 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
   }, [workflowId]);
 
   useEffect(() => {
+    if (!workflowId || !accessToken || !automaticBoardConvergence || !fields.includes("fpga")) return;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const poll = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/apps/fpga/${workflowId}/convergence`, { headers: { Authorization: `Bearer ${accessToken}` } });
+        if (response.ok && !stopped) setFpgaConvergence(await response.json());
+      } finally {
+        if (!stopped) timer = setTimeout(poll, 4000);
+      }
+    };
+    poll();
+    return () => { stopped = true; if (timer) clearTimeout(timer); };
+  }, [accessToken, automaticBoardConvergence, fields, workflowId]);
+
+  useEffect(() => {
     if (!closureWorkflowId) return;
     let isActive = true;
     (async () => {
@@ -259,23 +283,19 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
     };
   }, [closureWorkflowId]);
 
-  useEffect(() => {
-    if (!closureRunPath || !fields.includes("verify") || !runVerificationClosureLoop || closureStartedRef.current) return;
-    if (!workflowId || workflowRow?.status !== "completed") return;
-    closureStartedRef.current = true;
-    void runClosureLoop();
-  }, [closureRunPath, fields, runVerificationClosureLoop, workflowId, workflowRow?.status]);
-
-  function authHeaders(): HeadersInit {
+  const authHeaders = useCallback((): HeadersInit => {
     const headers: Record<string, string> = {};
     if (sessionUserId) headers["x-user-id"] = sessionUserId;
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
     return headers;
-  }
+  }, [accessToken, sessionUserId]);
 
   const canRun = useMemo(() => {
     if (running) return false;
     if (fpgaMode === "target-explorer" && (!candidateBoards.length || !designIntent.trim())) return false;
+    if (automaticBoardConvergence && deploymentArchitecture === "fpga_soft_cpu") {
+      if (fpgaMode === "fpga2rtl" || !softCpuRtlFiles.trim()) return false;
+    }
     if (fpgaMode === "formal") {
       if (sourceMode === "from_arch2rtl") return Boolean(sourceWorkflowId.trim());
       if (sourceMode === "generate_arch2rtl") return Boolean(specText.trim());
@@ -289,9 +309,9 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
     if (sourceMode === "generate_arch2rtl") return Boolean(specText.trim());
     if (sourceMode === "repo_path") return Boolean(repoPath.trim());
     return Boolean(rtlText.trim());
-  }, [fields, fpgaMode, running, sourceMode, sourceWorkflowId, repoPath, specText, rtlText, timingText, testIntent, runFpgaVerification, candidateBoards.length, designIntent]);
+  }, [fields, fpgaMode, running, sourceMode, sourceWorkflowId, repoPath, specText, rtlText, timingText, testIntent, runFpgaVerification, candidateBoards.length, designIntent, automaticBoardConvergence, deploymentArchitecture, softCpuRtlFiles]);
 
-  async function runClosureLoop() {
+  const runClosureLoop = useCallback(async () => {
     if (!workflowId || !closureRunPath) return;
     try {
       const body: Record<string, any> = {
@@ -325,7 +345,15 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
     } catch (e: any) {
       setErr(e?.message || String(e));
     }
-  }
+  }, [authHeaders, closureRunPath, coverageTargets, enableFailureDebug, enableFormal, enableGoldenModel, formalSolver, formalTool, randomVsDirected, seedCount, simulatorType, workflowId, maxVerificationClosureIterations]);
+
+  useEffect(() => {
+    if (!closureRunPath || !fields.includes("verify") || !runVerificationClosureLoop || closureStartedRef.current) return;
+    if (!workflowId || workflowRow?.status !== "completed") return;
+    closureStartedRef.current = true;
+    const timer = window.setTimeout(() => void runClosureLoop(), 0);
+    return () => window.clearTimeout(timer);
+  }, [closureRunPath, fields, runClosureLoop, runVerificationClosureLoop, workflowId, workflowRow?.status]);
 
   async function runNow() {
     setErr(null);
@@ -358,6 +386,12 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
         stage,
         review_depth: reviewDepth,
         board: fields.includes("fpga") ? board : undefined,
+        deployment_architecture: fields.includes("fpga") ? deploymentArchitecture : undefined,
+        host_interface_plan: fields.includes("fpga") && deploymentArchitecture === "fpga_external_host" ? { protocol: "spi", role: "fpga_peripheral", clock_mhz: 10, data_width_bits: 8, framing: "register_command_response", flow_control: "chip_select_and_status", interrupt_signaling: "optional_gpio", register_access: "addressed_read_write" } : undefined,
+        soft_cpu_config: fields.includes("fpga") && deploymentArchitecture === "fpga_soft_cpu" ? { core: softCpuCore, bus: softCpuBus, instruction_memory_kib: Number(softCpuInstructionKib || 0), data_memory_kib: Number(softCpuDataKib || 0) } : undefined,
+        soft_cpu_integration_contract: fields.includes("fpga") && deploymentArchitecture === "fpga_soft_cpu" ? { status: "defined", cpu_rtl_files: softCpuRtlFiles.split(/[\n,]/).map((item) => item.trim()).filter(Boolean), memory_interconnect_defined: true, application_bus_connected: true } : undefined,
+        automatic_board_convergence: fields.includes("fpga") && (fpgaMode === "bitstream" || fpgaMode === "fpga2rtl" || fpgaMode === "implementation") ? automaticBoardConvergence : undefined,
+        max_fpga_board_convergence_attempts: fields.includes("fpga") && automaticBoardConvergence ? 3 : undefined,
         top_module: (fields.includes("fpga") || fpgaMode === "target-explorer") && topModule.trim() ? topModule.trim() : undefined,
         pcf_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
         lpf_text: fields.includes("fpga") && pcfText.trim() ? pcfText : undefined,
@@ -595,6 +629,15 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
                 ) : null}
                 {fields.includes("fpga") && fpgaMode !== "target-explorer" ? (
                   <>
+                    {(fpgaMode === "bitstream" || fpgaMode === "fpga2rtl" || fpgaMode === "implementation") ? <><label className="block">
+                      <span className="text-sm text-slate-300">CPU / host placement</span>
+                      <select value={deploymentArchitecture} onChange={(e) => setDeploymentArchitecture(e.target.value as typeof deploymentArchitecture)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white">
+                        <option value="fpga_external_host">External host</option>
+                        <option value="fpga_onboard_cpu">Onboard CPU</option>
+                        <option value="fpga_soft_cpu">Soft CPU in fabric</option>
+                      </select>
+                    </label><label className="flex items-start gap-3 rounded-xl border border-cyan-900/60 bg-cyan-950/20 p-3 text-sm text-slate-200"><input type="checkbox" checked={automaticBoardConvergence} onChange={(e) => setAutomaticBoardConvergence(e.target.checked)} className="mt-1" /><span><span className="block font-semibold text-cyan-200">Automatic board convergence</span><span className="mt-1 block text-xs text-slate-400">Explore, integrate, implement, and retry measured fit/timing failures using the Supabase attempt ledger.</span></span></label></> : null}
+                    {automaticBoardConvergence && deploymentArchitecture === "fpga_soft_cpu" ? <div className="md:col-span-2 rounded-xl border border-amber-700/50 bg-amber-950/15 p-4"><div className="font-semibold text-amber-200">Soft CPU integration contract</div>{fpgaMode === "fpga2rtl" ? <p className="mt-2 text-xs text-amber-300">Generic CPU RTL generation is intentionally blocked until a governed CPU-IP source provider is configured. Use supplied integrated RTL with Bitstream or Implementation.</p> : <div className="mt-3 grid gap-3 md:grid-cols-2"><label className="text-xs text-slate-300">CPU core<input value={softCpuCore} onChange={(e) => setSoftCpuCore(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 p-2" /></label><label className="text-xs text-slate-300">Bus<input value={softCpuBus} onChange={(e) => setSoftCpuBus(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 p-2" /></label><label className="text-xs text-slate-300">Instruction memory KiB<input type="number" min="4" value={softCpuInstructionKib} onChange={(e) => setSoftCpuInstructionKib(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 p-2" /></label><label className="text-xs text-slate-300">Data memory KiB<input type="number" min="4" value={softCpuDataKib} onChange={(e) => setSoftCpuDataKib(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-700 bg-black/40 p-2" /></label><label className="text-xs text-slate-300 md:col-span-2">CPU RTL files<textarea value={softCpuRtlFiles} onChange={(e) => setSoftCpuRtlFiles(e.target.value)} placeholder="rtl/picorv32.v, rtl/cpu_soc_top.sv" className="mt-1 min-h-20 w-full rounded-lg border border-slate-700 bg-black/40 p-2" /></label></div>}</div> : null}
                     <label className="block">
                       <span className="text-sm text-slate-300">Board</span>
                       <select value={board} onChange={(e) => setBoard(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-black/40 px-4 py-3 text-white">
@@ -952,6 +995,7 @@ export default function DigitalReviewAppTemplate({ slug, title, subtitle, runPat
           </div>
         </section>
 
+        {workflowId && fpgaConvergence?.hem ? <section className="rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-bold text-cyan-100">FPGA product convergence</h2><p className="mt-1 text-xs text-slate-400">Supabase-backed Explorer, integration, implementation, and board retry state.</p></div><span className="rounded-full border border-cyan-800 px-3 py-1 text-xs uppercase text-cyan-200">{fpgaConvergence.hem.status || "running"}</span></div><div className="mt-4 grid gap-2">{(fpgaConvergence.attempts || []).map((attempt) => <div key={`${attempt.attempt_number}-${attempt.board_id}`} className="flex flex-wrap items-center justify-between rounded-lg border border-slate-800 bg-black/30 px-3 py-2 text-xs"><span>Attempt {attempt.attempt_number} · {attempt.board_id}</span><span>{attempt.status.replaceAll("_", " ")}</span></div>)}</div></section> : null}
         {workflowId ? (
           <section className="mt-6 space-y-6">
             <WorkflowEvidenceDashboard

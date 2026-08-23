@@ -28,7 +28,8 @@ const paths: Array<{ key: ImplementationPath; title: string; body: string }> = [
 
 type RunSummary = { status?: string; physics_model?: { name?: string }; physics_execution?: { execution_mode?: string; inference_status?: string; implementation_path?: string }; hem?: { enabled?: boolean } };
 type HemChildRun = { workflow_id: string; label: string; status?: string | null; phase?: string | null; logs?: string | null; dashboard_path: string };
-type ApiPayload = { status?: string; phase?: string; logs?: string; hem_children?: unknown; result?: RunSummary; detail?: string; workflow_id?: string };
+type FpgaBoardAttempt = { attempt_number: number; board_id: string; status: string; failure_class?: string | null; failure_reason?: string | null };
+type ApiPayload = { status?: string; phase?: string; logs?: string; hem_children?: unknown; fpga_board_attempts?: FpgaBoardAttempt[]; result?: RunSummary; detail?: string; workflow_id?: string };
 
 async function readApiPayload(response: Response): Promise<ApiPayload> {
   const body = await response.text();
@@ -111,6 +112,7 @@ export default function PhysicalAiStudioPage() {
   const [runLogs, setRunLogs] = useState("");
   const [runResult, setRunResult] = useState<RunSummary | null>(null);
   const [hemChildren, setHemChildren] = useState<HemChildRun[]>([]);
+  const [fpgaBoardAttempts, setFpgaBoardAttempts] = useState<FpgaBoardAttempt[]>([]);
   const [resumePhysicalAiId, setResumePhysicalAiId] = useState("");
   const [resumeRtlId, setResumeRtlId] = useState("");
   const [resumeVerificationId, setResumeVerificationId] = useState("");
@@ -123,6 +125,7 @@ export default function PhysicalAiStudioPage() {
   const [resumeValidationId, setResumeValidationId] = useState("");
   const [resumeStage, setResumeStage] = useState<HemResumeStage>("fpga_exploration");
   const [resumeRunning, setResumeRunning] = useState(false);
+  const [recoverStaleHem, setRecoverStaleHem] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
@@ -163,6 +166,7 @@ export default function PhysicalAiStudioPage() {
         setRunPhase(String(payload.phase || payload.status || "running"));
         setRunLogs(String(payload.logs || ""));
         setHemChildren((previous) => mergeHemChildren(previous, payload.hem_children));
+        if (Array.isArray(payload.fpga_board_attempts)) setFpgaBoardAttempts(payload.fpga_board_attempts);
         if (payload.result) setRunResult(payload.result as RunSummary);
         const normalizedPhase = String(payload.phase || "").toLowerCase();
         const hemIsRunning = Boolean(payload.result?.hem?.enabled);
@@ -199,7 +203,9 @@ export default function PhysicalAiStudioPage() {
     const base = ["Application", "Model mapping", "Partition", "Architecture", "RTL generation", "Verification"];
     if (implementationPath === "architecture_only") return base.slice(0, 4);
     const product = ["Device layer", "Software", "Validation", "Product"];
-    const fpgaIntegration = deploymentArchitecture === "fpga_onboard_cpu"
+    const fpgaIntegration = deploymentArchitecture === "fpga_soft_cpu"
+      ? ["CPU/memory/fabric integration", "Integrated RTL verification", "Board explorer", "Bitstream"]
+      : deploymentArchitecture === "fpga_onboard_cpu"
       ? ["Board explorer", "CPU/fabric integration", "Integrated RTL verification", "Bitstream"]
       : deploymentArchitecture === "fpga_external_host"
         ? ["Board explorer", "Board interface integration", "Integrated RTL verification", "Bitstream"]
@@ -210,7 +216,7 @@ export default function PhysicalAiStudioPage() {
   }, [implementationPath, deploymentArchitecture]);
   const deploymentOptions = useMemo(() => {
     if (implementationPath.includes("fpga")) return [
-      { key: "fpga_onboard_cpu", title: "Onboard CPU", body: "Use a hard CPU connected to FPGA fabric." },
+      { key: "fpga_onboard_cpu", title: "Onboard CPU", body: "Use a hard CPU connected to FPGA fabric, with automatic bounded board-fit convergence." },
       { key: "fpga_soft_cpu", title: "Soft CPU", body: "Implement a CPU in FPGA logic and reserve its resources." },
       { key: "fpga_external_host", title: "External host", body: "Use a PC, Mac, MCU, or embedded host over a board transport." },
     ] as const;
@@ -258,6 +264,7 @@ export default function PhysicalAiStudioPage() {
           execution_mode: executionMode,
           implementation_path: implementationPath,
           deployment_architecture: deploymentArchitecture,
+          max_fpga_board_convergence_attempts: 3,
           soft_cpu_config: softCpuAdvanced ? {
             core: softCpuCore, isa: softCpuIsa, bus: softCpuBus, clock_mhz: softCpuClockMhz,
             instruction_memory_kib: softCpuInstructionKib, data_memory_kib: softCpuDataKib,
@@ -341,7 +348,7 @@ export default function PhysicalAiStudioPage() {
           start_stage: resumeStage,
           upstream_workflow_ids: upstreamWorkflowIds,
           deployment_architecture: deploymentArchitecture,
-          candidate_boards: deploymentArchitecture === "fpga_onboard_cpu" ? ["ulx3s_ecp5_45f_esp32"] : undefined,
+          candidate_boards: undefined,
           target_frequency_mhz: 50,
           requested_recommendation_profile: "best_overall",
           baseline_seed_count: 1,
@@ -355,6 +362,7 @@ export default function PhysicalAiStudioPage() {
           external_host_config: deploymentArchitecture === "fpga_external_host" ? { target_triple: hostTargetTriple } : {},
           hem_mode: hemAdaptive ? "adaptive" : "fixed",
           hem_goal: "product_demo",
+          recover_stale_hem: recoverStaleHem,
         }),
       });
       const data = await readApiPayload(response);
@@ -374,11 +382,11 @@ export default function PhysicalAiStudioPage() {
       runPhase.toLowerCase(),
     );
     return <main className="min-h-screen bg-slate-950 text-white"><div className="mx-auto max-w-7xl px-6 py-10">
-      <div className="flex flex-wrap items-center justify-between gap-3"><button onClick={() => { setWorkflowId(null); setRunResult(null); setRunLogs(""); setHemChildren([]); setRunning(false); }} className="rounded-lg border border-slate-700 px-4 py-2 text-sm">Configure another run</button><span className={`rounded-full px-3 py-2 text-xs font-bold uppercase ${runPhase === "hem_failed" || runPhase === "error" ? "bg-red-500/15 text-red-200" : complete ? "bg-lime-500/15 text-lime-200" : "bg-cyan-500/15 text-cyan-200"}`}>{runPhase.replaceAll("_", " ")}</span></div>
+      <div className="flex flex-wrap items-center justify-between gap-3"><button onClick={() => { setWorkflowId(null); setRunResult(null); setRunLogs(""); setHemChildren([]); setFpgaBoardAttempts([]); setRunning(false); }} className="rounded-lg border border-slate-700 px-4 py-2 text-sm">Configure another run</button><span className={`rounded-full px-3 py-2 text-xs font-bold uppercase ${runPhase === "hem_failed" || runPhase === "error" ? "bg-red-500/15 text-red-200" : complete ? "bg-lime-500/15 text-lime-200" : "bg-cyan-500/15 text-cyan-200"}`}>{runPhase.replaceAll("_", " ")}</span></div>
       <div className="mt-8 flex flex-wrap items-end justify-between gap-4"><div><div className="text-xs font-bold uppercase tracking-widest text-fuchsia-300">Physical AI reference journey</div><h1 className="mt-2 text-4xl font-extrabold">{complete ? "Run dashboard" : "Physical AI agents are running"}</h1><p className="mt-3 text-slate-400">Workflow {workflowId}</p></div><a href={`/dashboard/${workflowId}?stage=physical_ai&app=PhysicalAI`} target="_blank" rel="noreferrer" className="rounded-xl border border-cyan-400 px-5 py-3 text-sm font-bold text-cyan-200">Open Dashboard ↗</a></div>
       <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/50 p-6"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-xl font-bold">Running log</h2><p className="mt-1 text-sm text-slate-400">Agents and automatic child workflows appear here in execution order.</p></div><span className="rounded-full border border-slate-700 px-3 py-1 text-xs font-bold uppercase text-slate-300">{runPhase.replaceAll("_", " ")}</span></div>{activeAgent && <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3"><span className="h-2.5 w-2.5 animate-pulse rounded-full bg-cyan-300" /><div><div className="text-xs font-bold uppercase tracking-wide text-cyan-300">Active agent</div><div className="mt-1 font-semibold text-white">{activeAgent.agent}</div></div><span className="ml-auto rounded-full bg-slate-950 px-3 py-1 text-xs text-slate-300">{activeAgent.stage}</span></div>}<pre className="mt-4 max-h-96 overflow-auto whitespace-pre-wrap rounded-xl bg-slate-950 p-4 text-xs leading-6 text-slate-300">{journeyLogs || "Waiting for the first agent…"}</pre></section>
       {runResult && <section className="mt-6 grid gap-4 md:grid-cols-3"><div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><div className="text-xs uppercase text-slate-500">Physics model</div><div className="mt-2 font-bold">{runResult.physics_model?.name || "Selected model"}</div></div><div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><div className="text-xs uppercase text-slate-500">Mode</div><div className="mt-2 font-bold capitalize">{(runResult.physics_execution?.execution_mode || "validated").replaceAll("_", " ")}</div></div><div className="rounded-xl border border-slate-800 bg-slate-900/50 p-5"><div className="text-xs uppercase text-slate-500">Implementation</div><div className="mt-2 font-bold capitalize">{(runResult.physics_execution?.implementation_path || implementationPath).replaceAll("_", " ")}</div></div></section>}
-      <section className="mt-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-6"><h2 className="text-xl font-bold">HEM and next workflows</h2><p className="mt-2 text-sm text-slate-400">Automatic child workflows remain available here after completion or failure. If HEM is off, use the evidence dashboard to continue manually.</p><HemChildDashboardLinks logs={journeyLogs} runs={hemChildren} rootWorkflowId={workflowId} /></section>
+      <section className="mt-6 rounded-2xl border border-cyan-900/60 bg-cyan-950/15 p-6"><h2 className="text-xl font-bold">HEM and next workflows</h2><p className="mt-2 text-sm text-slate-400">Automatic child workflows remain available here after completion or failure. If HEM is off, use the evidence dashboard to continue manually.</p>{fpgaBoardAttempts.length > 0 && <div className="mt-4 rounded-xl border border-cyan-800/60 bg-slate-950/60 p-4"><div className="text-sm font-semibold text-cyan-200">FPGA board convergence</div><div className="mt-3 grid gap-2">{fpgaBoardAttempts.map((attempt) => <div key={`${attempt.attempt_number}-${attempt.board_id}`} className="flex flex-wrap items-center justify-between gap-2 text-xs"><span>Attempt {attempt.attempt_number} · {attempt.board_id}</span><span className={attempt.status === "fit_verified" ? "text-lime-300" : attempt.status === "fit_failed" ? "text-amber-300" : "text-slate-300"}>{attempt.status.replaceAll("_", " ")}</span></div>)}</div></div>}<HemChildDashboardLinks logs={journeyLogs} runs={hemChildren} rootWorkflowId={workflowId} /></section>
       <div className="mt-6"><WorkflowEvidenceDashboard workflowId={workflowId} status={runStatus} stage="physical_ai" logs={runLogs} /></div>
       {error && <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-200">{error}</div>}
     </div></main>;
@@ -432,6 +440,7 @@ export default function PhysicalAiStudioPage() {
           <label className="text-xs text-slate-300">Software workflow ID<input value={resumeSoftwareId} onChange={(event) => setResumeSoftwareId(event.target.value)} placeholder="Required for co-simulation" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>
           <label className="text-xs text-slate-300">Co-simulation workflow ID<input value={resumeValidationId} onChange={(event) => setResumeValidationId(event.target.value)} placeholder="Required for product demo" className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-3" /></label>
         </div>
+        <label className="mt-4 flex items-start gap-3 rounded-xl border border-amber-800/50 bg-amber-950/15 p-3 text-sm text-slate-300"><input type="checkbox" checked={recoverStaleHem} onChange={(event) => setRecoverStaleHem(event.target.checked)} className="mt-1" /><span><span className="block font-semibold text-amber-200">Recover a stale HEM continuation</span><span className="mt-1 block text-xs text-slate-400">Use only after a backend restart. Recovery is refused while the recorded child workflow is still running.</span></span></label>
         <button type="button" onClick={resumeHemStage} disabled={!token || resumeRunning} className="mt-5 rounded-xl bg-cyan-300 px-5 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">{resumeRunning ? "Queuing selected stage…" : "Resume HEM from selected stage"}</button>
       </section>
     )}
