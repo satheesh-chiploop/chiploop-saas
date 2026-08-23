@@ -1,0 +1,156 @@
+{
+  "top_module": "adaptive_aero_control_top",
+  "soc_mode": false,
+  "clock_names": [
+    "clk"
+  ],
+  "reset_signals": [
+    {
+      "name": "rst_n",
+      "active_low": true,
+      "async": false
+    }
+  ],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "rst_n",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "s_axis_req_data",
+      "direction": "input",
+      "width_expr": "128"
+    },
+    {
+      "name": "s_axis_req_valid",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "s_axis_req_ready",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "m_axis_resp_data",
+      "direction": "output",
+      "width_expr": "128"
+    },
+    {
+      "name": "m_axis_resp_valid",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "m_axis_resp_ready",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "m_axis_act_data",
+      "direction": "output",
+      "width_expr": "64"
+    },
+    {
+      "name": "m_axis_act_valid",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "m_axis_act_ready",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "csr_addr_data",
+      "direction": "input",
+      "width_expr": "64"
+    },
+    {
+      "name": "csr_wr_en",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "csr_wr_data",
+      "direction": "input",
+      "width_expr": "64"
+    },
+    {
+      "name": "csr_rd_data",
+      "direction": "output",
+      "width_expr": "64"
+    },
+    {
+      "name": "csr_rd_valid",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "mem_dout",
+      "direction": "input",
+      "width_expr": "128"
+    },
+    {
+      "name": "model_req_ready",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "model_rsp_valid",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "model_rsp_data",
+      "direction": "input",
+      "width_expr": "128"
+    },
+    {
+      "name": "resp_record_seq",
+      "direction": "input",
+      "width_expr": "32"
+    },
+    {
+      "name": "resp_record_status",
+      "direction": "input",
+      "width_expr": "4"
+    },
+    {
+      "name": "resp_record_freshness",
+      "direction": "input",
+      "width_expr": "4"
+    },
+    {
+      "name": "resp_record_complete",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "resp_record_ctrl_result",
+      "direction": "input",
+      "width_expr": "16"
+    },
+    {
+      "name": "resp_record_valid",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "cmd_raw_data",
+      "direction": "input",
+      "width_expr": "64"
+    },
+    {
+      "name": "cmd_raw_valid",
+      "direction": "input",
+      "width_expr": "1"
+    }
+  ]
+}

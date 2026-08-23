@@ -1,0 +1,59 @@
+Digital Functional Coverage Agent Log
+[2026-08-23T20:02:52.306981] [INFO] Starting Digital Functional Coverage Agent...
+[2026-08-23T20:02:52.307566] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/0e12fd6f-59bd-4c19-8667-aca200434f62/spec/adaptive_aero_control_top_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 4,
+  "top_module": "adaptive_aero_control_top",
+  "soc_mode": false
+}
+[2026-08-23T20:02:52.308263] [INFO] resolved_mode=digital
+[2026-08-23T20:02:52.308337] [INFO] spec_path=/root/chiploop-backend/backend/workflows/0e12fd6f-59bd-4c19-8667-aca200434f62/spec/adaptive_aero_control_top_spec.json
+[2026-08-23T20:02:52.308401] [INFO] top_module=adaptive_aero_control_top
+[2026-08-23T20:02:52.308463] [INFO] rtl_file_count=4
+[2026-08-23T20:02:52.308542] [INFO] port_source=spec
+[2026-08-23T20:02:52.308666] [INFO] clock_candidates=[
+  "clk"
+]
+[2026-08-23T20:02:52.308750] [INFO] reset_candidates=[
+  {
+    "name": "rst_n",
+    "active_low": true,
+    "async": false
+  }
+]
+[2026-08-23T20:02:52.308833] [INFO] coverage_points={
+  "output_points": [
+    "s_axis_req_ready",
+    "m_axis_resp_data",
+    "m_axis_resp_valid",
+    "m_axis_act_data",
+    "m_axis_act_valid",
+    "csr_rd_data",
+    "csr_rd_valid"
+  ],
+  "input_points": [
+    "clk",
+    "rst_n",
+    "s_axis_req_data",
+    "s_axis_req_valid",
+    "m_axis_resp_ready",
+    "m_axis_act_ready",
+    "csr_addr_data",
+    "csr_wr_en",
+    "csr_wr_data",
+    "mem_dout",
+    "model_req_ready",
+    "model_rsp_valid",
+    "model_rsp_data",
+    "resp_record_seq",
+    "resp_record_status",
+    "resp_record_freshness"
+  ],
+  "user_coverage_plan_points": []
+}
+[2026-08-23T20:02:52.309676] [INFO] Generated coverage_model.py
+[2026-08-23T20:02:52.309745] [INFO] Generated coverage_spec.json
+[2026-08-23T20:02:52.309804] [INFO] Generated COVERAGE.md

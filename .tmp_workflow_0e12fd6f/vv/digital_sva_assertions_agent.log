@@ -1,0 +1,63 @@
+Digital Assertions (SVA) Agent Log
+[2026-08-23T20:02:50.729742] [INFO] Starting Digital Assertions (SVA) Agent...
+[2026-08-23T20:02:50.730528] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/0e12fd6f-59bd-4c19-8667-aca200434f62/spec/adaptive_aero_control_top_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 4,
+  "top_module": "adaptive_aero_control_top",
+  "soc_mode": false
+}
+[2026-08-23T20:02:50.731251] [INFO] resolved_mode=digital
+[2026-08-23T20:02:50.731330] [INFO] spec_path=/root/chiploop-backend/backend/workflows/0e12fd6f-59bd-4c19-8667-aca200434f62/spec/adaptive_aero_control_top_spec.json
+[2026-08-23T20:02:50.731400] [INFO] top_module=adaptive_aero_control_top
+[2026-08-23T20:02:50.731463] [INFO] rtl_file_count=4
+[2026-08-23T20:02:50.731555] [INFO] clock_candidates=[
+  "clk"
+]
+[2026-08-23T20:02:50.731664] [INFO] reset_candidates=[
+  {
+    "name": "rst_n",
+    "active_low": true,
+    "async": false
+  }
+]
+[2026-08-23T20:02:50.731759] [INFO] sva_ports={
+  "port_names": [
+    "clk",
+    "rst_n",
+    "s_axis_req_data",
+    "s_axis_req_valid",
+    "s_axis_req_ready",
+    "m_axis_resp_data",
+    "m_axis_resp_valid",
+    "m_axis_resp_ready",
+    "m_axis_act_data",
+    "m_axis_act_valid",
+    "m_axis_act_ready",
+    "csr_addr_data",
+    "csr_wr_en",
+    "csr_wr_data",
+    "csr_rd_data",
+    "csr_rd_valid",
+    "mem_dout",
+    "model_req_ready",
+    "model_rsp_valid",
+    "model_rsp_data",
+    "resp_record_seq",
+    "resp_record_status",
+    "resp_record_freshness",
+    "resp_record_complete",
+    "resp_record_ctrl_result",
+    "resp_record_valid",
+    "cmd_raw_data",
+    "cmd_raw_valid"
+  ],
+  "input_count": 21,
+  "output_count": 7
+}
+[2026-08-23T20:02:50.731918] [INFO] LLM SVA expansion disabled; using deterministic scaffold.
+[2026-08-23T20:02:50.855794] [INFO] Generated adaptive_aero_control_top_assertions.sv
+[2026-08-23T20:02:50.855909] [INFO] Generated sva_spec.json
+[2026-08-23T20:02:50.856015] [INFO] Generated SVA_README.md
