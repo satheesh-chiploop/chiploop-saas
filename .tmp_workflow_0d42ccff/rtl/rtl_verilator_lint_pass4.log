@@ -1,0 +1,82 @@
+=== STDERR ===
+%Warning-PINMISSING: pass4/adaptive_aero_control_top.v:188:35: Instance has missing pin: 'csb'
+  188 |     adaptive_aero_control_bram_if u_bram_if (
+      |                                   ^~~~~~~~~
+                     pass4/adaptive_aero_control_bram_if.v:3:11: ... Location of port declaration
+    3 |     input csb,
+      |           ^~~
+                     ... For warning description see https://verilator.org/warn/PINMISSING?v=5.047
+                     ... Use "/* verilator lint_off PINMISSING */" and lint_on around source to disable this message.
+%Warning-PINMISSING: pass4/adaptive_aero_control_top.v:188:35: Instance has missing pin: 'we'
+  188 |     adaptive_aero_control_bram_if u_bram_if (
+      |                                   ^~~~~~~~~
+                     pass4/adaptive_aero_control_bram_if.v:4:11: ... Location of port declaration
+    4 |     input we,
+      |           ^~
+%Warning-PINMISSING: pass4/adaptive_aero_control_top.v:188:35: Instance has missing pin: 'addr'
+  188 |     adaptive_aero_control_bram_if u_bram_if (
+      |                                   ^~~~~~~~~
+                     pass4/adaptive_aero_control_bram_if.v:5:17: ... Location of port declaration
+    5 |     input [5:0] addr,
+      |                 ^~~~
+%Warning-PINMISSING: pass4/adaptive_aero_control_top.v:188:35: Instance has missing pin: 'din'
+  188 |     adaptive_aero_control_bram_if u_bram_if (
+      |                                   ^~~~~~~~~
+                     pass4/adaptive_aero_control_bram_if.v:6:18: ... Location of port declaration
+    6 |     input [63:0] din,
+      |                  ^~~
+%Warning-PINMISSING: pass4/adaptive_aero_control_top.v:188:35: Instance has missing pin: 'dout'
+  188 |     adaptive_aero_control_bram_if u_bram_if (
+      |                                   ^~~~~~~~~
+                     pass4/adaptive_aero_control_bram_if.v:7:23: ... Location of port declaration
+    7 |     output reg [63:0] dout
+      |                       ^~~~
+%Error-PINNOTFOUND: pass4/adaptive_aero_control_top.v:190:10: Pin not found: 'rst_n'
+  190 |         .rst_n(rst_n),
+      |          ^~~~~
+                                                            : ... Location of instance's module declaration
+    1 | module adaptive_aero_control_bram_if (
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    ... For error description see https://verilator.org/warn/PINNOTFOUND?v=5.047
+%Error-PINNOTFOUND: pass4/adaptive_aero_control_top.v:191:10: Pin not found: 'wr_en'
+  191 |         .wr_en(bram_wr_en),
+      |          ^~~~~
+                                                            : ... Location of instance's module declaration
+    1 | module adaptive_aero_control_bram_if (
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass4/adaptive_aero_control_top.v:192:10: Pin not found: 'wr_addr'
+                                                            : ... Suggested alternative: 'addr'
+  192 |         .wr_addr(bram_wr_addr),
+      |          ^~~~~~~
+                                                            : ... Location of instance's module declaration
+    1 | module adaptive_aero_control_bram_if (
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass4/adaptive_aero_control_top.v:193:10: Pin not found: 'wr_data'
+  193 |         .wr_data(bram_wr_data),
+      |          ^~~~~~~
+                                                            : ... Location of instance's module declaration
+    1 | module adaptive_aero_control_bram_if (
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass4/adaptive_aero_control_top.v:194:10: Pin not found: 'rd_en'
+  194 |         .rd_en(bram_rd_en),
+      |          ^~~~~
+                                                            : ... Location of instance's module declaration
+    1 | module adaptive_aero_control_bram_if (
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass4/adaptive_aero_control_top.v:195:10: Pin not found: 'rd_addr'
+                                                            : ... Suggested alternative: 'addr'
+  195 |         .rd_addr(bram_rd_addr),
+      |          ^~~~~~~
+                                                            : ... Location of instance's module declaration
+    1 | module adaptive_aero_control_bram_if (
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error-PINNOTFOUND: pass4/adaptive_aero_control_top.v:196:10: Pin not found: 'rd_data'
+  196 |         .rd_data(bram_rd_data)
+      |          ^~~~~~~
+                                                            : ... Location of instance's module declaration
+    1 | module adaptive_aero_control_bram_if (
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Error: Exiting due to 7 error(s)
+
+=== RETURN CODE ===
+1

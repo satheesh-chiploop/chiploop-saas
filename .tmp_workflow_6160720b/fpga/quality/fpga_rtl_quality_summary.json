@@ -1,0 +1,131 @@
+{
+  "agent": "FPGA RTL Quality Gate Agent",
+  "pass1": {
+    "rtl_file_count": 9,
+    "status": "fail",
+    "suffix": "pass1",
+    "tools": {
+      "iverilog": {
+        "available": true,
+        "cmd": [
+          "iverilog",
+          "-g2012",
+          "-tnull",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/formal/adaptive_aero_control_top_spi_fpga_top_formal.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions_bind.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_control_top.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_control_top_spi_fpga_top.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_controller_core.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_history_sram.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_history_store.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_mmio_csr.v"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/iverilog_pass1.log",
+        "ok": false,
+        "returncode": 2
+      },
+      "verilator": {
+        "available": true,
+        "cmd": [
+          "verilator",
+          "--lint-only",
+          "-Wall",
+          "-Wno-fatal",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/formal/adaptive_aero_control_top_spi_fpga_top_formal.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/adaptive_aero_control_top_spi_fpga_top_assertions_bind.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_control_top.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_control_top_spi_fpga_top.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_controller_core.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_history_sram.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_history_store.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/src/vv/tb/reports/verilator_coverage_annotated/adaptive_aero_mmio_csr.v"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/verilator_pass1.log",
+        "ok": false,
+        "returncode": 1
+      }
+    }
+  },
+  "pass2": {
+    "rtl_file_count": 9,
+    "status": "fail",
+    "suffix": "pass2",
+    "tools": {
+      "iverilog": {
+        "available": true,
+        "cmd": [
+          "iverilog",
+          "-g2012",
+          "-tnull",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_formal.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_assertions.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_assertions_bind.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_controller_core.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_history_sram.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_history_store.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_mmio_csr.v"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/iverilog_pass2.log",
+        "ok": false,
+        "returncode": 2
+      },
+      "verilator": {
+        "available": true,
+        "cmd": [
+          "verilator",
+          "--lint-only",
+          "-Wall",
+          "-Wno-fatal",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_formal.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_assertions.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_assertions_bind.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top.sv",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_controller_core.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_history_sram.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_history_store.v",
+          "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_mmio_csr.v"
+        ],
+        "log": "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/verilator_pass2.log",
+        "ok": false,
+        "returncode": 1
+      }
+    }
+  },
+  "repair": {
+    "applied": true,
+    "enabled": true,
+    "files_changed": 7,
+    "mode": "safe_format_and_syntax_cleanup",
+    "rtl_files": [
+      "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_formal.sv",
+      "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_assertions.sv",
+      "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_assertions_bind.sv",
+      "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top.v",
+      "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top.sv",
+      "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_controller_core.v",
+      "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_history_sram.v",
+      "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_history_store.v",
+      "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_mmio_csr.v"
+    ],
+    "semantic_changes_allowed": false
+  },
+  "repair_enabled": true,
+  "rtl_file_count": 9,
+  "rtl_files": [
+    "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_formal.sv",
+    "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_assertions.sv",
+    "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top_assertions_bind.sv",
+    "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top.v",
+    "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_control_top_spi_fpga_top.sv",
+    "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_controller_core.v",
+    "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_history_sram.v",
+    "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_history_store.v",
+    "/root/chiploop-backend/backend/workflows/6160720b-9664-47b1-b777-957bef5d84a4/fpga/quality/repaired/adaptive_aero_mmio_csr.v"
+  ],
+  "status": "fail"
+}

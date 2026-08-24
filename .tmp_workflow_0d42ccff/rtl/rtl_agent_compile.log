@@ -1,0 +1,14 @@
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/adaptive_aero_control_top.v:192: error: port ``rst_n'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/adaptive_aero_control_top.v:192: error: port ``wr_en'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/adaptive_aero_control_top.v:192: error: port ``wr_addr'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/adaptive_aero_control_top.v:192: error: port ``wr_data'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/adaptive_aero_control_top.v:192: error: port ``rd_en'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/adaptive_aero_control_top.v:192: error: port ``rd_addr'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/adaptive_aero_control_top.v:192: error: port ``rd_data'' is not a port of u_bram_if.
+7 error(s) during elaboration.
+
+Issues:
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

@@ -1,0 +1,16 @@
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/pass3/adaptive_aero_control_top.v:192: error: port ``rst_n'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/pass3/adaptive_aero_control_top.v:192: error: port ``wr_en'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/pass3/adaptive_aero_control_top.v:192: error: port ``wr_addr'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/pass3/adaptive_aero_control_top.v:192: error: port ``wr_data'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/pass3/adaptive_aero_control_top.v:192: error: port ``rd_en'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/pass3/adaptive_aero_control_top.v:192: error: port ``rd_addr'' is not a port of u_bram_if.
+backend/workflows/0d42ccff-a5ee-4eb6-9fa8-ed80c86a207e/rtl/pass3/adaptive_aero_control_top.v:192: error: port ``rd_data'' is not a port of u_bram_if.
+7 error(s) during elaboration.
+
+Issues:
+❌ Module 'adaptive_aero_control_bram_if' missing ports vs spec: ['rst_n', 'wr_en', 'wr_addr', 'wr_data', 'rd_en', 'rd_addr', 'rd_data']
+❌ Module 'adaptive_aero_control_bram_if' has extra ports vs spec: ['csb', 'we', 'addr', 'din', 'dout']
+❌ Icarus Verilog compile failed.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.

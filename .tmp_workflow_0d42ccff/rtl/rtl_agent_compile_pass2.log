@@ -1,0 +1,8 @@
+
+
+Issues:
+❌ Module 'adaptive_aero_control_bram_if' missing ports vs spec: ['rst_n', 'wr_en', 'wr_addr', 'wr_data', 'rd_en', 'rd_addr', 'rd_data']
+❌ Module 'adaptive_aero_control_bram_if' has extra ports vs spec: ['csb', 'we', 'addr', 'din', 'dout']
+
+=== VERILATOR LINT ===
+PASS: Verilator lint completed successfully.

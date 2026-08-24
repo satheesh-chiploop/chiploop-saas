@@ -1,0 +1,15 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: adaptive_aero_control_top
+Expected files: ['adaptive_aero_control_top.v', 'adaptive_aero_control_bram_if.v']
+Materialized files: ['adaptive_aero_control_bram_if.v', 'adaptive_aero_control_top.v']
+Clock ports: ['clk']
+Reset ports: ['rst_n']
+Icarus compile: pass
+Verilator lint: pass
+Issue count: 2
+
+Issues:
+- ❌ Module 'adaptive_aero_control_bram_if' missing ports vs spec: ['rst_n', 'wr_en', 'wr_addr', 'wr_data', 'rd_en', 'rd_addr', 'rd_data']
+- ❌ Module 'adaptive_aero_control_bram_if' has extra ports vs spec: ['csb', 'we', 'addr', 'din', 'dout']

@@ -1,0 +1,207 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "implementation_style": "Single-clock, synthesizable FPGA supervisory controller with compact streaming transport, CSR/MMIO decode, finite buffering through BRAM abstraction, and bounded actuator sanitization logic.",
+      "control_strategy": "Use straightforward decode/validate/accept/reject sequencing on each received command packet. Prefer synchronous counters and registered status bits. Reject invalid, stale, out-of-range, expired, or timeout-violating traffic before any actuator validity is asserted. Configuration writes update only reachable CSR fields; reads return current state and latched diagnostics.",
+      "state_strategy": "Implement a small explicit controller FSM that covers idle, receive, validate, forward, wait-response, apply, clamp, status reporting, safe inhibit handling, and error hold behavior as described by the spec, without adding unnecessary sub-state complexity. State and fault indicators are registered and exposed through status outputs and CSR reads.",
+      "output_strategy": "Drive all top-level outputs from real RTL logic. Assert actuator_valid only after successful validation, freshness, and clamp completion. When conditions are unsafe, deassert actuator_valid and latch fault/status information. Emit compact response/status words on the streaming response port and expose register read data through the CSR/MMIO interface. The actuator bundle remains bounded to 32 bits total and carries sanitized command plus observability bits as specified.",
+      "ownership_notes": [
+        "Owns command packet decode, packet integrity checking, sequence/freshness supervision, timeout monitoring, clamp enforcement, fault latching, CSR/MMIO decode, and bounded BRAM-backed history control.",
+        "Consumes clk, rst_n, cmd_valid, cmd_data, rsp_ready, reg_addr, reg_wdata, reg_valid, and reg_write.",
+        "Drives cmd_ready, rsp_valid, rsp_data, actuator_valid, actuator_fault, actuator_fallback, actuator_clamp, actuator_mode, actuator_seq_echo, actuator_command, reg_rdata, and reg_ready.",
+        "Does not implement the surrogate model itself and does not expose wide model payloads, tensors, or geometry arrays."
+      ]
+    },
+    {
+      "name": "adaptive_aero_control_bram_if",
+      "implementation_style": "Technology-neutral synchronous BRAM-style storage wrapper intended for FPGA block RAM mapping, with finite depth and 64-bit data width.",
+      "control_strategy": "Provide simple synchronous read/write access for bounded history entries only. No large register-file flattening and no unsynthesizable storage behavior.",
+      "state_strategy": "Use memory-backed state only; reset returns deterministic inactive read data and disables writes until the controller enables access.",
+      "output_strategy": "Return read data from the addressed BRAM entry to the top-level controller for bounded history lookup and diagnostics support.",
+      "ownership_notes": [
+        "Owns bounded command/response history storage only.",
+        "Consumes clk, rst_n, wr_en, wr_addr, wr_data, rd_en, and rd_addr.",
+        "Drives rd_data.",
+        "Does not own transport parsing, actuator control, or firmware register decode."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "state": "IDLE",
+      "intent": "Wait for a valid incoming command or register activity while remaining in a safe inhibited condition.",
+      "transitions": [
+        "On accepted command flow, move to RECEIVE.",
+        "On reset, remain/return to IDLE with outputs inhibited."
+      ]
+    },
+    {
+      "state": "RECEIVE",
+      "intent": "Latch the command packet fields and prepare them for integrity, velocity, and freshness checks.",
+      "transitions": [
+        "After capture, move to VALIDATE.",
+        "On malformed or incomplete capture, reject and report fault."
+      ]
+    },
+    {
+      "state": "VALIDATE",
+      "intent": "Check checksum/parity, velocity envelope, and sequence/freshness constraints before any actuator update.",
+      "transitions": [
+        "If packet is invalid, stale, repeated, out-of-order, or out of range, route to error handling and inhibit actuator validity.",
+        "If valid, move to FORWARD."
+      ]
+    },
+    {
+      "state": "FORWARD",
+      "intent": "Issue bounded transport/lookup activity and prepare for external response supervision without implementing the surrogate itself.",
+      "transitions": [
+        "Proceed to WAIT_RESPONSE after the request is staged.",
+        "If transport cannot proceed, enter ERROR_HOLD."
+      ]
+    },
+    {
+      "state": "WAIT_RESPONSE",
+      "intent": "Monitor for response/update arrival and count down the configurable timeout.",
+      "transitions": [
+        "On timely response, move to APPLY.",
+        "On timeout, assert timeout fault and move to SAFE_FALLBACK behavior as inhibited validity, not substitute command generation.",
+        "On transport fault, move to ERROR_HOLD."
+      ]
+    },
+    {
+      "state": "APPLY",
+      "intent": "Select the sanitized actuator intent for output staging only after successful validation and freshness checks.",
+      "transitions": [
+        "Proceed to CLAMP for bounds enforcement.",
+        "If late fault appears, inhibit output and enter ERROR_HOLD."
+      ]
+    },
+    {
+      "state": "CLAMP",
+      "intent": "Apply absolute bounds and optional rate-of-change limits to the command before any output register update.",
+      "transitions": [
+        "If clamping modifies the command, set clamp status and continue to output staging.",
+        "Then proceed to REPORT_STATUS or directly to output register commit as implemented."
+      ]
+    },
+    {
+      "state": "SAFE_FALLBACK",
+      "intent": "Represent inhibited unsafe handling after timeout, reset, or unresolved fault by deasserting actuator validity rather than generating a substitute command.",
+      "transitions": [
+        "Return to IDLE only after safe conditions and explicit software-managed fault-clear sequencing are satisfied."
+      ]
+    },
+    {
+      "state": "REPORT_STATUS",
+      "intent": "Update observable status fields, sequence echo, and fault/status reporting for firmware and host visibility.",
+      "transitions": [
+        "Return to IDLE when the transaction is complete.",
+        "If another fault is present, move to ERROR_HOLD."
+      ]
+    },
+    {
+      "state": "ERROR_HOLD",
+      "intent": "Latch fault state and preserve diagnostics until explicit software clear sequencing is accepted in a safe idle condition.",
+      "transitions": [
+        "Remain until reset or explicit fault-clear conditions are met while safe idle is established."
+      ]
+    }
+  ],
+  "datapath_intent": [
+    {
+      "name": "streaming_command_datapath",
+      "inputs": [
+        "cmd_valid",
+        "cmd_data[63:0]"
+      ],
+      "internal_storage": [
+        "Decoded command fields: opcode, sequence, velocity descriptor, geometry reference identifier, actuator intent, and integrity metadata.",
+        "Finite counters for freshness and timeout supervision.",
+        "Registered last-accepted and last-rejected sequence tracking.",
+        "BRAM-backed bounded history entries."
+      ],
+      "output_mapping": [
+        "cmd_ready is asserted only when the controller can accept the next command word.",
+        "Accepted packet metadata is forwarded into internal staging and history storage.",
+        "Rejected packets do not update actuator state."
+      ]
+    },
+    {
+      "name": "response_datapath",
+      "inputs": [
+        "rsp_ready"
+      ],
+      "internal_storage": [
+        "Current status/fault summary word.",
+        "Sequence echo and clamp/fault indicators.",
+        "Optional bounded history lookup from BRAM abstraction."
+      ],
+      "output_mapping": [
+        "rsp_valid and rsp_data are driven by real RTL logic to return status/observability information.",
+        "rsp_ready participates in the handshake; the RTL does not rely on a child-input-only tie-off for a top-level output."
+      ]
+    },
+    {
+      "name": "actuator_datapath",
+      "inputs": [
+        "validated command fields",
+        "clamp configuration",
+        "rate-limit configuration",
+        "fault and timeout state"
+      ],
+      "internal_storage": [
+        "Sanitized actuator command register.",
+        "Clamp status register.",
+        "Fallback/inhibit status register as an observability bit, not a substitute-command generator.",
+        "Last safe command bookkeeping if enabled by the chosen synthesis-time policy, subject to the no-command-fallback contract."
+      ],
+      "output_mapping": [
+        "actuator_command carries the bounded sanitized command value.",
+        "actuator_mode, actuator_seq_echo, actuator_clamp, actuator_fault, and actuator_valid reflect registered status and gating.",
+        "actuator_valid only asserts after validation, freshness, and clamp completion."
+      ]
+    },
+    {
+      "name": "csr_mmio_datapath",
+      "inputs": [
+        "reg_addr[7:0]",
+        "reg_wdata[63:0]",
+        "reg_valid",
+        "reg_write"
+      ],
+      "internal_storage": [
+        "Implemented control registers for enable, timeout, freshness, bounds, clamp/rate-limit controls, and explicit fault-clear sequencing.",
+        "Read-only status registers for state, last accepted sequence, fault code, clamp activity, fallback/inhibit observability, and timeout activity.",
+        "Version register fields."
+      ],
+      "output_mapping": [
+        "reg_rdata returns decode-reachable register contents.",
+        "reg_ready indicates acceptance/response of the CSR/MMIO transaction.",
+        "Writes during reset are ignored."
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "Command acceptance follows a simple synchronous path: capture, validate, forward/stage, wait for response/update, clamp, then register the final sanitized outputs if and only if the packet remains valid and fresh.",
+    "Stale command rejection has priority over normal apply behavior.",
+    "Timeout supervision overrides normal operation and inhibits actuator validity when the configurable threshold expires.",
+    "Invalid or incomplete packets are discarded without updating actuator state or generating a substitute command.",
+    "The BRAM-backed storage is used only for finite bounded history/outstanding tracking; queue growth is capped by parameterized depth.",
+    "CSR/MMIO writes update only reachable registers and use explicit valid/write semantics; read data is returned through the declared register interface."
+  ],
+  "timing_notes": [
+    "Single synchronous clock domain clk at nominal 50 MHz per spec.",
+    "rst_n is active-low synchronous reset; reset clears transient accept/valid strobes and places the controller in an inhibited safe state.",
+    "All control paths should remain synchronous-friendly with registered outputs and simple combinational decode to support FPGA timing closure.",
+    "Clamp and status update should be registered before driving actuator outputs to avoid long combinational paths.",
+    "BRAM-style storage is synchronous and finite depth to preserve predictable FPGA implementation quality."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

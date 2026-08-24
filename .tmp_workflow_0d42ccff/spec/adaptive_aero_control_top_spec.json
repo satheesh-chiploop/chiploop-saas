@@ -1,0 +1,702 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "Synthesizable FPGA top-level controller for intelligent active-aerodynamics transport, validation, freshness supervision, bounded command application, clamp enforcement, timeout handling, status reporting, and safe invalid-data inhibition for an external software/GPU surrogate service. The RTL does not implement the surrogate model itself; it only supervises transport and safety. The design includes a concrete firmware-visible CSR/MMIO register contract and a bounded BRAM-backed storage abstraction for command/response history.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "rst_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "The external surrogate is software/GPU-based and communicates through the streaming host command/response interface.",
+      "Geometry reference data and flow-condition encoding are provided by host software as compact identifiers and metadata only; no geometry arrays or tensors appear at the top level.",
+      "The design is fully synchronous to clk and uses rst_n as an active-low reset.",
+      "No fallback command is generated on invalid, stale, timeout, reset, or fault conditions; actuator validity is deasserted and faults are latched for software handling.",
+      "Bulk command/response history is stored through a technology-neutral BRAM abstraction that may map to native FPGA block RAM resources."
+    ]
+  },
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "memory_macros": [
+    {
+      "name": "adaptive_aero_control_bram_if",
+      "kind": "fpga_bram",
+      "depth": 64,
+      "data_width": 64,
+      "addr_width": 6,
+      "instance_name": "u_bram_if",
+      "ports": {
+        "clk": "clk",
+        "rst_n": "rst_n",
+        "wr_en": "wr_en",
+        "wr_addr": "wr_addr",
+        "wr_data": "wr_data",
+        "rd_en": "rd_en",
+        "rd_addr": "rd_addr",
+        "rd_data": "rd_data"
+      },
+      "requires_mbist": false
+    }
+  ],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level adaptive aerodynamics control block with streaming host command/response transport, CSR/MMIO firmware control plane, validation, freshness tracking, bounded buffering, clamping, timeout supervision, fault latching, and inhibited actuator validity on unsafe conditions.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "cmd_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cmd_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "cmd_data",
+          "direction": "input",
+          "width": 64
+        },
+        {
+          "name": "rsp_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "rsp_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rsp_data",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "actuator_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_fault",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_fallback",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_clamp",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_mode",
+          "direction": "output",
+          "width": 3
+        },
+        {
+          "name": "actuator_seq_echo",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_command",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "reg_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "reg_wdata",
+          "direction": "input",
+          "width": 64
+        },
+        {
+          "name": "reg_rdata",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "reg_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reg_write",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reg_ready",
+          "direction": "output",
+          "width": 1
+        }
+      ],
+      "functionality": "Implements the full firmware-visible and streaming transport contract for an external surrogate-based active-aerodynamics controller. It decodes compact command packets, checks integrity, rejects stale or out-of-range inputs, bounds outstanding storage through BRAM-friendly buffering, supervises freshness and timeout expiration, clamps any accepted actuator command to configured safe limits, and inhibits actuator validity on invalid, stale, expired, or faulted conditions. The top exposes a concrete register interface through register_contract for configuration and diagnostics. The top does not implement the surrogate physics or model inference; it only manages transport and safety supervision.",
+      "responsibilities": [
+        "Decode command packets into opcode, sequence, velocity descriptor, geometry reference identifier, actuator intent, and integrity metadata.",
+        "Track sequence monotonicity and bounded freshness age.",
+        "Apply timeout supervision to external response/update arrival.",
+        "Clamp accepted actuator commands before presenting them to the actuator output interface.",
+        "Expose firmware-readable configuration and diagnostic registers through the CSR/MMIO bus.",
+        "Latch fault causes including stale-data, invalid-packet, velocity-out-of-range, timeout, and transport-fault.",
+        "Use bounded BRAM-backed storage for outstanding command and response tracking.",
+        "Keep total top-level I/O compact and synthesizable."
+      ],
+      "must_drive": [
+        "cmd_ready",
+        "rsp_valid",
+        "rsp_data",
+        "actuator_valid",
+        "actuator_fault",
+        "actuator_fallback",
+        "actuator_clamp",
+        "actuator_mode",
+        "actuator_seq_echo",
+        "actuator_command",
+        "reg_rdata",
+        "reg_ready"
+      ],
+      "must_receive": [
+        "clk",
+        "rst_n",
+        "cmd_valid",
+        "cmd_data",
+        "rsp_ready",
+        "reg_addr",
+        "reg_wdata",
+        "reg_valid",
+        "reg_write"
+      ],
+      "must_not_drive": [
+        "cmd_valid",
+        "cmd_data",
+        "rsp_ready",
+        "reg_addr",
+        "reg_wdata",
+        "reg_valid",
+        "reg_write"
+      ],
+      "reset_behavior": "On reset, the controller enters a safe idle condition, clears outstanding transport state, clears transient output-valid strobes, deasserts actuator_valid, and drives a safe inhibited actuator output state while preserving no active command acceptance until reset release. Persistent fault status remains under software control and is only cleared by explicit fault-clear sequencing after return to safe idle.",
+      "behavior_rules": [
+        "Valid packets must satisfy the integrity check before any further processing.",
+        "Velocity outside 20 to 55 m/s inclusive must be rejected or routed to inhibited handling according to configuration; in either case actuator_valid must not assert for invalid data.",
+        "Stale, repeated, out-of-order, or expired sequence numbers must be rejected with priority over normal apply.",
+        "Timeout expiration overrides normal operation and forces inhibited actuator validity with latched timeout fault.",
+        "Clamp occurs before any actuator output register update; clamp flag and sanitized command are reported for observability.",
+        "No fallback command is generated on fault; invalid conditions only inhibit/deassert actuator output validity and latch fault information.",
+        "Queue depth, timeouts, and counters are finite and parameterized with safe maxima.",
+        "Only explicit firmware CSR writes may change configuration fields; writes during reset are ignored.",
+        "Fault-clear requests are only honored when the controller is back in a safe idle state and the explicit clear control is written."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "adaptive_aero_control_bram_if",
+        "description": "Technology-neutral BRAM-style buffer interface for bounded command and response history. It provides the storage abstraction required for FPGA block RAM mapping without flattening bulk storage into registers.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "wr_en",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "wr_addr",
+            "direction": "input",
+            "width": 6
+          },
+          {
+            "name": "wr_data",
+            "direction": "input",
+            "width": 64
+          },
+          {
+            "name": "rd_en",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rd_addr",
+            "direction": "input",
+            "width": 6
+          },
+          {
+            "name": "rd_data",
+            "direction": "output",
+            "width": 64
+          }
+        ],
+        "functionality": "Provides a synthesizable abstraction for bounded buffer storage to hold outstanding command and response words, sequence metadata, and status history. The implementation contract expects mapping to a native FPGA block RAM resource or equivalent vendor BRAM primitive. The buffer is finite and controlled; it shall not infer large register arrays for bulk payload storage.",
+        "responsibilities": [
+          "Store bounded command/response entries in BRAM-friendly form.",
+          "Provide synchronous read/write access for controller-side buffering.",
+          "Avoid register-based flattening of history storage.",
+          "Support finite, parameterized queue depth only."
+        ],
+        "must_drive": [
+          "rd_data"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "wr_en",
+          "wr_addr",
+          "wr_data",
+          "rd_en",
+          "rd_addr"
+        ],
+        "must_not_drive": [
+          "wr_en",
+          "wr_addr",
+          "wr_data",
+          "rd_en",
+          "rd_addr"
+        ],
+        "reset_behavior": "On reset, read data returns deterministic inactive contents and no storage write is performed until explicitly enabled by the controller.",
+        "behavior_rules": [
+          "Storage depth must remain finite and parameterized.",
+          "Implementation shall be compatible with FPGA BRAM inference or instantiation.",
+          "No unsynthesizable constructs or large register-file alternatives are permitted."
+        ],
+        "rtl_output_file": "adaptive_aero_control_bram_if.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_control_bram_if.clk"
+      ],
+      "description": "Top clock fanout to BRAM storage abstraction."
+    },
+    {
+      "top_port": "rst_n",
+      "connected_to": [
+        "adaptive_aero_control_bram_if.rst_n"
+      ],
+      "description": "Top active-low reset fanout to BRAM storage abstraction."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "wr_en",
+      "width": 1,
+      "source": "adaptive_aero_control_top.cmd_ready",
+      "destinations": [
+        "adaptive_aero_control_bram_if.wr_en"
+      ],
+      "description": "Write enable for bounded command/response history storage when the controller accepts a command entry."
+    },
+    {
+      "name": "wr_addr",
+      "width": 6,
+      "source": "adaptive_aero_control_top.actuator_seq_echo",
+      "destinations": [
+        "adaptive_aero_control_bram_if.wr_addr"
+      ],
+      "description": "Write address derived from bounded sequence/entry indexing for BRAM-backed history storage."
+    },
+    {
+      "name": "wr_data",
+      "width": 64,
+      "source": "adaptive_aero_control_top.rsp_data",
+      "destinations": [
+        "adaptive_aero_control_bram_if.wr_data"
+      ],
+      "description": "Stored response/history word written into the BRAM abstraction."
+    },
+    {
+      "name": "rd_addr",
+      "width": 6,
+      "source": "adaptive_aero_control_top.actuator_seq_echo",
+      "destinations": [
+        "adaptive_aero_control_bram_if.rd_addr"
+      ],
+      "description": "Read address used for bounded history lookup."
+    },
+    {
+      "name": "rd_data",
+      "width": 64,
+      "source": "adaptive_aero_control_bram_if.rd_data",
+      "destinations": [
+        "adaptive_aero_control_top.reg_rdata"
+      ],
+      "description": "Read data returned from the BRAM abstraction to the top-level register read path."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "wr_en",
+      "owner": "adaptive_aero_control_top.cmd_ready"
+    },
+    {
+      "signal": "wr_addr",
+      "owner": "adaptive_aero_control_top.actuator_seq_echo"
+    },
+    {
+      "signal": "wr_data",
+      "owner": "adaptive_aero_control_top.rsp_data"
+    },
+    {
+      "signal": "rd_addr",
+      "owner": "adaptive_aero_control_top.actuator_seq_echo"
+    },
+    {
+      "signal": "rd_data",
+      "owner": "adaptive_aero_control_bram_if.rd_data"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "csr_mmio",
+    "address_width": 8,
+    "data_width": 64,
+    "ports": {
+      "reg_addr": "reg_addr",
+      "reg_wdata": "reg_wdata",
+      "reg_rdata": "reg_rdata",
+      "reg_valid": "reg_valid",
+      "reg_write": "reg_write",
+      "reg_ready": "reg_ready"
+    },
+    "registers": [
+      {
+        "name": "CONTROL",
+        "offset": "0x00",
+        "access": "RW",
+        "fields": [
+          {
+            "name": "enable",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW"
+          },
+          {
+            "name": "fault_clear_req",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW"
+          },
+          {
+            "name": "clamp_enable",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW"
+          },
+          {
+            "name": "rate_limit_enable",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RW"
+          },
+          {
+            "name": "reject_out_of_range",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RW"
+          },
+          {
+            "name": "reserved",
+            "lsb": 63,
+            "msb": 5,
+            "access": "RO"
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_CFG",
+        "offset": "0x08",
+        "access": "RW",
+        "fields": [
+          {
+            "name": "timeout_cycles",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW"
+          },
+          {
+            "name": "freshness_cycles",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RW"
+          },
+          {
+            "name": "reserved",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO"
+          }
+        ]
+      },
+      {
+        "name": "LIMITS_MIN",
+        "offset": "0x10",
+        "access": "RW",
+        "fields": [
+          {
+            "name": "actuator_min",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW"
+          },
+          {
+            "name": "rate_down_min",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RW"
+          },
+          {
+            "name": "reserved",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO"
+          }
+        ]
+      },
+      {
+        "name": "LIMITS_MAX",
+        "offset": "0x18",
+        "access": "RW",
+        "fields": [
+          {
+            "name": "actuator_max",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RW"
+          },
+          {
+            "name": "rate_up_max",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RW"
+          },
+          {
+            "name": "reserved",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO"
+          }
+        ]
+      },
+      {
+        "name": "FALLBACK_CFG",
+        "offset": "0x20",
+        "access": "RW",
+        "fields": [
+          {
+            "name": "fallback_mode",
+            "lsb": 1,
+            "msb": 0,
+            "access": "RW"
+          },
+          {
+            "name": "hold_last_safe",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RW"
+          },
+          {
+            "name": "reserved",
+            "lsb": 63,
+            "msb": 3,
+            "access": "RO"
+          }
+        ]
+      },
+      {
+        "name": "STATUS0",
+        "offset": "0x28",
+        "access": "RO",
+        "fields": [
+          {
+            "name": "state_code",
+            "lsb": 4,
+            "msb": 0,
+            "access": "RO"
+          },
+          {
+            "name": "fault_latched",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO"
+          },
+          {
+            "name": "timeout_active",
+            "lsb": 6,
+            "msb": 6,
+            "access": "RO"
+          },
+          {
+            "name": "fallback_active",
+            "lsb": 7,
+            "msb": 7,
+            "access": "RO"
+          },
+          {
+            "name": "clamp_active",
+            "lsb": 8,
+            "msb": 8,
+            "access": "RO"
+          },
+          {
+            "name": "valid_active",
+            "lsb": 9,
+            "msb": 9,
+            "access": "RO"
+          },
+          {
+            "name": "reserved",
+            "lsb": 63,
+            "msb": 10,
+            "access": "RO"
+          }
+        ]
+      },
+      {
+        "name": "STATUS1",
+        "offset": "0x30",
+        "access": "RO",
+        "fields": [
+          {
+            "name": "last_accepted_seq",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RO"
+          },
+          {
+            "name": "last_fault_code",
+            "lsb": 23,
+            "msb": 16,
+            "access": "RO"
+          },
+          {
+            "name": "last_rejected_seq",
+            "lsb": 39,
+            "msb": 24,
+            "access": "RO"
+          },
+          {
+            "name": "reserved",
+            "lsb": 63,
+            "msb": 40,
+            "access": "RO"
+          }
+        ]
+      },
+      {
+        "name": "STATUS2",
+        "offset": "0x38",
+        "access": "RO",
+        "fields": [
+          {
+            "name": "last_sanitized_cmd",
+            "lsb": 15,
+            "msb": 0,
+            "access": "RO"
+          },
+          {
+            "name": "last_applied_cmd",
+            "lsb": 31,
+            "msb": 16,
+            "access": "RO"
+          },
+          {
+            "name": "seq_echo",
+            "lsb": 47,
+            "msb": 32,
+            "access": "RO"
+          },
+          {
+            "name": "reserved",
+            "lsb": 63,
+            "msb": 48,
+            "access": "RO"
+          }
+        ]
+      },
+      {
+        "name": "FAULT_CLEAR",
+        "offset": "0x40",
+        "access": "WO",
+        "fields": [
+          {
+            "name": "clear_key",
+            "lsb": 31,
+            "msb": 0,
+            "access": "WO"
+          },
+          {
+            "name": "clear_valid",
+            "lsb": 32,
+            "msb": 32,
+            "access": "WO"
+          },
+          {
+            "name": "reserved",
+            "lsb": 63,
+            "msb": 33,
+            "access": "RO"
+          }
+        ]
+      },
+      {
+        "name": "VERSION",
+        "offset": "0x48",
+        "access": "RO",
+        "fields": [
+          {
+            "name": "ip_version",
+            "lsb": 31,
+            "msb": 0,
+            "access": "RO"
+          },
+          {
+            "name": "build_id",
+            "lsb": 63,
+            "msb": 32,
+            "access": "RO"
+          }
+        ]
+      }
+    ]
+  }
+}

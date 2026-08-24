@@ -1,0 +1,12 @@
+{
+  "mode": "hierarchical",
+  "top_module": "adaptive_aero_control_top",
+  "expected_files": [
+    "adaptive_aero_control_top.v",
+    "adaptive_aero_control_bram_if.v"
+  ],
+  "has_regmap": true,
+  "has_clock_reset": false,
+  "has_power_intent": false,
+  "prompt_chars": 81958
+}
