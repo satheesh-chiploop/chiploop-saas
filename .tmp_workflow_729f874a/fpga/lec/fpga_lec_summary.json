@@ -1,0 +1,20 @@
+{
+  "agent": "FPGA RTL-to-Netlist Equivalence Agent",
+  "comparison": "two_stage_rtl_generic_and_generic_mapped_equivalence",
+  "enabled": true,
+  "family": "ecp5",
+  "generic_netlist": "/root/chiploop-backend/backend/workflows/729f874a-aac0-4ea7-a4d8-6e987d90b564/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+  "induction_depth": 12,
+  "induction_depths_attempted": [
+    12
+  ],
+  "mapped_netlist": "/root/chiploop-backend/backend/workflows/729f874a-aac0-4ea7-a4d8-6e987d90b564/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "netlist": "/root/chiploop-backend/backend/workflows/729f874a-aac0-4ea7-a4d8-6e987d90b564/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "reason": "LEC requires completed synthesis, source RTL, and both generic and FPGA-mapped netlists.",
+  "required": true,
+  "rtl_file_count": 6,
+  "status": "blocked",
+  "tool": "Yosys",
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "unproven_points": null
+}

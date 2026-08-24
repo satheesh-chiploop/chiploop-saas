@@ -1,3 +1,0 @@
-❌ Digital Spec Agent failed.
-
-Pass1 JSON parse/normalize failed: Required child input 'adaptive_aero_transport_if.tx_req_payload' has no source in top_level_connections or inter_module_signals. Add an explicit top-level input connection or a real child producer. Other required child inputs without sources: 'adaptive_aero_history_store.write_en', 'adaptive_aero_history_store.read_addr', 'adaptive_aero_history_store.trace_write_en', 'adaptive_aero_history_store.trace_write_addr', 'adaptive_aero_history_store.trace_read_addr'. Repair every listed input in the same response.
