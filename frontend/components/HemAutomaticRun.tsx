@@ -411,13 +411,15 @@ export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: s
   }, [rootWorkflowId, supabase]);
 
   const childRuns = useMemo(() => {
-    const authoritative = [...(runs || []), ...linkedRuns].map((run) => ({
-      label: run.label,
-      workflowId: run.workflow_id,
-      dashboardPath: run.dashboard_path,
-      status: run.status || "running",
-      hasArtifacts: run.has_artifacts,
-    }));
+    const authoritative = [...(runs || []), ...linkedRuns]
+      .filter((run) => !rootWorkflowId || run.workflow_id !== rootWorkflowId)
+      .map((run) => ({
+        label: run.label,
+        workflowId: run.workflow_id,
+        dashboardPath: run.dashboard_path,
+        status: run.status || "running",
+        hasArtifacts: run.has_artifacts,
+      }));
     const byId = new Map<string, (typeof authoritative)[number]>();
     for (const run of authoritative) {
       const previous = byId.get(run.workflowId);
@@ -430,6 +432,10 @@ export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: s
       });
     }
     for (const parsed of parseHemChildRuns(logs)) {
+      // A child log contains text such as "HEM started RTL Generation from
+      // Physical AI workflow <root id>". The fallback log parser can read the
+      // root id as another child workflow, so never admit the known root here.
+      if (rootWorkflowId && parsed.workflowId === rootWorkflowId) continue;
       if (!byId.has(parsed.workflowId)) byId.set(parsed.workflowId, { ...parsed, status: parsed.status || "running", hasArtifacts: undefined });
     }
     return Array.from(byId.values()).sort((a, b) => {
@@ -437,7 +443,7 @@ export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: s
       const bIndex = HEM_STAGE_ORDER.indexOf(stageFromLabel(b.label));
       return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
     });
-  }, [linkedRuns, logs, runs]);
+  }, [linkedRuns, logs, rootWorkflowId, runs]);
   const workflowIds = useMemo(() => childRuns.map((child) => child.workflowId), [childRuns]);
   const workflowIdKey = workflowIds.join(",");
   const [workflowStatuses, setWorkflowStatuses] = useState<Record<string, string>>({});

@@ -1,0 +1,110 @@
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top.v:180:6: Instance pin connected by name with empty reference: 'model_req_valid'
+  180 |     .model_req_valid(),
+      |      ^~~~~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top.v:181:6: Instance pin connected by name with empty reference: 'model_req_data'
+  181 |     .model_req_data(),
+      |      ^~~~~~~~~~~~~~
+%Warning-PINCONNECTEMPTY: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top.v:185:6: Instance pin connected by name with empty reference: 'model_rsp_ready'
+  185 |     .model_rsp_ready(),
+      |      ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top.v:90:6: Signal is not used: 'fault_latched_v'
+                                                                                                                                                          : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   90 | wire fault_latched_v;
+      |      ^~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top.v:98:6: Signal is not used: 'model_trace_valid'
+                                                                                                                                                          : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   98 | wire model_trace_valid;
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top.v:99:13: Signal is not used: 'model_trace_data'
+                                                                                                                                                           : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+   99 | wire [31:0] model_trace_data;
+      |             ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top.v:108:6: Signal is not driven, nor used: 'fault_latched_top'
+                                                                                                                                                           : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+  108 | wire fault_latched_top;
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top.v:109:13: Signal is not driven, nor used: 'control_validation_core_validated_req_data'
+                                                                                                                                                            : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+  109 | wire [31:0] control_validation_core_validated_req_data;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top.v:110:6: Signal is not driven, nor used: 'control_validation_core_validated_req_valid'
+                                                                                                                                                           : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core'
+  110 | wire control_validation_core_validated_req_valid;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/actuator_command_limiter.v:19:14: Bits of signal are not used: 'validated_rsp_data'[31:16]
+                                                                                                                                                          : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_actuator_command_limiter'
+   19 | input [31:0] validated_rsp_data;
+      |              ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/actuator_command_limiter.v:21:14: Bits of signal are not used: 'validated_req_data'[31:16]
+                                                                                                                                                          : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_actuator_command_limiter'
+   21 | input [31:0] validated_req_data;
+      |              ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/aero_history_logger.v:30:14: Signal is not used: 'host_cmd_data'
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_aero_history_logger'
+   30 | input [31:0] host_cmd_data;
+      |              ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/aero_history_logger.v:32:14: Bits of signal are not used: 'sensor_airspeed'[15:8]
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_aero_history_logger'
+   32 | input [15:0] sensor_airspeed;
+      |              ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/aero_history_logger.v:33:14: Bits of signal are not used: 'sensor_altitude'[15:8]
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_aero_history_logger'
+   33 | input [15:0] sensor_altitude;
+      |              ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/aero_history_logger.v:34:14: Signal is not used: 'sensor_angle_of_attack'
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_aero_history_logger'
+   34 | input [15:0] sensor_angle_of_attack;
+      |              ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/aero_history_logger.v:35:14: Signal is not used: 'sensor_gload'
+                                                                                                                                                     : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_aero_history_logger'
+   35 | input [15:0] sensor_gload;
+      |              ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/aero_transport_fsm.v:29:14: Bits of signal are not used: 'host_cmd_data'[31:24]
+                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_aero_transport_fsm'
+   29 | input [31:0] host_cmd_data;
+      |              ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/aero_transport_fsm.v:44:11: Signal is not used: 'rsp_phase'
+                                                                                                                                                    : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_aero_transport_fsm'
+   44 | reg [1:0] rsp_phase;
+      |           ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/control_validation_core.v:33:14: Signal is not used: 'sensor_airspeed'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_control_validation_core'
+   33 | input [15:0] sensor_airspeed;
+      |              ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/control_validation_core.v:34:14: Signal is not used: 'sensor_altitude'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_control_validation_core'
+   34 | input [15:0] sensor_altitude;
+      |              ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/control_validation_core.v:35:14: Signal is not used: 'sensor_angle_of_attack'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_control_validation_core'
+   35 | input [15:0] sensor_angle_of_attack;
+      |              ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/control_validation_core.v:36:14: Signal is not used: 'sensor_gload'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_control_validation_core'
+   36 | input [15:0] sensor_gload;
+      |              ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/control_validation_core.v:54:12: Signal is not used: 'rsp_shadow'
+                                                                                                                                                         : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_control_validation_core'
+   54 | reg [31:0] rsp_shadow;
+      |            ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/domino_surrogate_interface.v:31:7: Signal is not used: 'model_rsp_valid'
+                                                                                                                                                           : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_domino_surrogate_interface'
+   31 | input model_rsp_valid;
+      |       ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/domino_surrogate_interface.v:32:14: Signal is not used: 'model_rsp_data'
+                                                                                                                                                            : ... note: In instance 'adaptive_aero_control_top_spi_fpga_top.u_core.u_domino_surrogate_interface'
+   32 | input [31:0] model_rsp_data;
+      |              ^~~~~~~~~~~~~~
+%Warning-SYNCASYNCNET: /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:7:16: Signal flopped as both synchronous and async: 'spi_cs_n'
+                       /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:82:9: ... Location of async usage
+   82 |     if (spi_cs_n) spi_active <= 1'b0;
+      |         ^~~~~~~~
+                       /root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/src/handoff/rtl/adaptive_aero_control_top_spi_fpga_top.sv:86:10: ... Location of sync usage
+   86 |     if (!spi_cs_n) begin
+      |          ^~~~~~~~
+                       ... For warning description see https://verilator.org/warn/SYNCASYNCNET?v=5.047
+                       ... Use "/* verilator lint_off SYNCASYNCNET */" and lint_on around source to disable this message.

@@ -1,0 +1,87 @@
+{
+  "agent": "FPGA Yosys Synthesis Agent",
+  "block_ram_bits_available": 1944000,
+  "block_ram_blocks_available": 108,
+  "block_ram_blocks_used": 0,
+  "block_ram_primitive": "DP16KD",
+  "block_ram_utilization_percent": 0.0,
+  "carry_cells": 39,
+  "cell_type_counts": {
+    "$specify2": 18,
+    "CCU2C": 39,
+    "L6MUX21": 9,
+    "LUT4": 1267,
+    "PFUMX": 27,
+    "TRELLIS_FF": 1176,
+    "actuator_command_limiter": 1,
+    "adaptive_aero_control_top": 1,
+    "aero_history_logger": 1,
+    "aero_transport_fsm": 1,
+    "control_validation_core": 1,
+    "domino_surrogate_interface": 1
+  },
+  "closure_iteration": 0,
+  "combinational_cells": 1348,
+  "command": {
+    "cmd": [
+      "/usr/bin/yosys",
+      "-s",
+      "/root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/synth/synth_ecp5.ys"
+    ],
+    "error": null,
+    "executable": "/usr/bin/yosys",
+    "log": "/root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/synth/yosys_synth.log",
+    "ok": true,
+    "profile_id": "chiploop_saas_default",
+    "returncode": 0,
+    "status": "success",
+    "stderr_tail": "",
+    "stdout_tail": "  Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:                165\n     CCU2C                           4\n     LUT4                          102\n     TRELLIS_FF                     59\n\n=== aero_transport_fsm ===\n\n   Number of wires:                137\n   Number of wire bits:            296\n   Number of public wires:         137\n   Number of public wire bits:     296\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:                207\n     L6MUX21                         4\n     LUT4                          119\n     PFUMX                          15\n     TRELLIS_FF                     69\n\n=== control_validation_core ===\n\n   Number of wires:                162\n   Number of wire bits:            549\n   Number of public wires:         162\n   Number of public wire bits:     549\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:                325\n     CCU2C                           8\n     LUT4                          201\n     PFUMX                           1\n     TRELLIS_FF                    115\n\n=== domino_surrogate_interface ===\n\n   Number of wires:                145\n   Number of wire bits:            463\n   Number of public wires:         145\n   Number of public wire bits:     463\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:                302\n     CCU2C                           4\n     LUT4                          183\n     TRELLIS_FF                    115\n\n=== design hierarchy ===\n\n   adaptive_aero_control_top_spi_fpga_top      1\n     adaptive_aero_control_top       1\n       actuator_command_limiter      1\n       aero_history_logger           1\n       aero_transport_fsm            1\n       control_validation_core       1\n       domino_surrogate_interface      1\n\n   Number of wires:               1335\n   Number of wire bits:           4780\n   Number of public wires:        1335\n   Number of public wire bits:    4780\n   Number of memories:               0\n   Number of memory bits:            0\n   Number of processes:              0\n   Number of cells:               2518\n     CCU2C                          39\n     L6MUX21                         9\n     LUT4                         1267\n     PFUMX                          27\n     TRELLIS_FF                   1176\n\n14.47. Executing CHECK pass (checking for obvious problems).\nChecking module actuator_command_limiter...\nChecking module adaptive_aero_control_top...\nChecking module adaptive_aero_control_top_spi_fpga_top...\nChecking module aero_history_logger...\nChecking module aero_transport_fsm...\nChecking module control_validation_core...\nChecking module domino_surrogate_interface...\nFound and reported 0 problems.\n\n14.48. Executing JSON backend.\n\n15. Executing Verilog backend.\n\n15.1. Executing BMUXMAP pass.\n\n15.2. Executing DEMUXMAP pass.\nDumping module `\\actuator_command_limiter'.\nDumping module `\\adaptive_aero_control_top'.\nDumping module `\\adaptive_aero_control_top_spi_fpga_top'.\nDumping module `\\aero_history_logger'.\nDumping module `\\aero_transport_fsm'.\nDumping module `\\control_validation_core'.\nDumping module `\\domino_surrogate_interface'.\n\n16. Executing Verilog backend.\n\n16.1. Executing BMUXMAP pass.\n\n16.2. Executing DEMUXMAP pass.\nDumping module `\\actuator_command_limiter'.\nDumping module `\\adaptive_aero_control_top'.\nDumping module `\\adaptive_aero_control_top_spi_fpga_top'.\nDumping module `\\aero_history_logger'.\nDumping module `\\aero_transport_fsm'.\nDumping module `\\control_validation_core'.\nDumping module `\\domino_surrogate_interface'.\n\nEnd of script. Logfile hash: 463472e244, CPU: user 4.18s system 0.06s, MEM: 190.05 MB peak\nYosys 0.33 (git sha1 2584903a060)\nTime spent: 18% 1x abc (0 sec), 15% 56x opt_clean (0 sec), ...\n"
+  },
+  "equivalence_netlist": "/root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/synth/adaptive_aero_control_top_spi_fpga_top_generic_equivalence_netlist.v",
+  "fabric_mapped_cells": 2482,
+  "flatten_enabled": false,
+  "flip_flops": 1176,
+  "json_netlist": "/root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5.json",
+  "logic_utilization_percent": 5.552,
+  "logical_cells_available": 44000,
+  "logical_cells_used": 2443,
+  "lut4_cells": 1267,
+  "mapped_equivalence_netlist": "/root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_mapped_equivalence_netlist.v",
+  "memory_intent": {
+    "declarations": [],
+    "estimated_bits": 0,
+    "requires_block_ram": false,
+    "threshold_bits": 4096
+  },
+  "memory_mapping_gate": {
+    "enforced": false,
+    "mapped": false,
+    "primitive": "DP16KD",
+    "required": false,
+    "source_memory_optimized_away": false,
+    "status": "pass",
+    "supported": true
+  },
+  "rtl_file_count": 7,
+  "status": "completed",
+  "tool_effort": {
+    "capability_checked": true,
+    "effective_options": [
+      "-noflatten"
+    ],
+    "flatten": false,
+    "goal": "balanced_timing",
+    "mode": "balanced",
+    "requested": [
+      "technology_mapping",
+      "preserve_hierarchy"
+    ],
+    "retime": false,
+    "strategy": "baseline",
+    "tool_version": null
+  },
+  "top_module": "adaptive_aero_control_top_spi_fpga_top",
+  "total_mapped_cells": 2542,
+  "verilog_netlist": "/root/chiploop-backend/backend/workflows/7b39e309-9409-4b7f-849b-071acd7a0a45/fpga/synth/adaptive_aero_control_top_spi_fpga_top_ecp5_netlist.v"
+}
