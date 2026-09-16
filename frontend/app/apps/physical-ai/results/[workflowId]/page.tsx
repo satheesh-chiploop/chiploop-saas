@@ -10,7 +10,15 @@ const supabase = createClientComponentClient();
 
 function HemChildDashboardLinks(props: React.ComponentProps<typeof HemChildDashboardLinksBase>) {
   const params = useParams<{ workflowId: string }>();
-  return <HemChildDashboardLinksBase {...props} rootWorkflowId={props.rootWorkflowId || params.workflowId} />;
+  const rootWorkflowId = props.rootWorkflowId || params.workflowId;
+  return <HemChildDashboardLinksBase
+    {...props}
+    rootWorkflowId={rootWorkflowId}
+    rootEntry={props.rootEntry || {
+      label: "Physical AI",
+      dashboardPath: `/dashboard/${rootWorkflowId}?stage=physical_ai&app=PhysicalAI`,
+    }}
+  />;
 }
 
 type SweepCase = {

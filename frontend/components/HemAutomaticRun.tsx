@@ -93,6 +93,7 @@ export function systemHemStageOptions(goal: SystemHemGoal, toggles: SystemHemSta
 }
 
 const HEM_STAGE_ORDER = [
+  "physical-ai",
   "rtl",
   "dqa",
   "verification",
@@ -146,6 +147,7 @@ function labelFromStage(stage: string): string {
 
 function stageFromLabel(label: string): string {
   const normalized = label.trim().toLowerCase();
+  if (normalized === "physical ai" || normalized === "application intelligence") return "physical-ai";
   if (normalized === "rtl" || normalized === "rtl generation" || normalized === "arch2rtl") return "rtl";
   if (normalized === "dqa" || normalized === "system dqa") return "dqa";
   if (normalized === "verification" || normalized === "verify" || normalized === "system sim") return "verification";
@@ -369,7 +371,12 @@ function artifactIndexHasEntries(value: unknown): boolean {
   return false;
 }
 
-export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: string | null | undefined; runs?: SupabaseHemChildRun[]; rootWorkflowId?: string | null }) {
+export function HemChildDashboardLinks({ logs, runs, rootWorkflowId, rootEntry }: {
+  logs: string | null | undefined;
+  runs?: SupabaseHemChildRun[];
+  rootWorkflowId?: string | null;
+  rootEntry?: { label: string; dashboardPath: string };
+}) {
   const [linkedRuns, setLinkedRuns] = useState<SupabaseHemChildRun[]>([]);
   const supabase = useMemo(() => createClientComponentClient(), []);
 
@@ -438,12 +445,21 @@ export function HemChildDashboardLinks({ logs, runs, rootWorkflowId }: { logs: s
       if (rootWorkflowId && parsed.workflowId === rootWorkflowId) continue;
       if (!byId.has(parsed.workflowId)) byId.set(parsed.workflowId, { ...parsed, status: parsed.status || "running", hasArtifacts: undefined });
     }
+    if (rootWorkflowId && rootEntry) {
+      byId.set(rootWorkflowId, {
+        label: rootEntry.label,
+        workflowId: rootWorkflowId,
+        dashboardPath: rootEntry.dashboardPath,
+        status: "running",
+        hasArtifacts: undefined,
+      });
+    }
     return Array.from(byId.values()).sort((a, b) => {
       const aIndex = HEM_STAGE_ORDER.indexOf(stageFromLabel(a.label));
       const bIndex = HEM_STAGE_ORDER.indexOf(stageFromLabel(b.label));
       return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
     });
-  }, [linkedRuns, logs, rootWorkflowId, runs]);
+  }, [linkedRuns, logs, rootEntry, rootWorkflowId, runs]);
   const workflowIds = useMemo(() => childRuns.map((child) => child.workflowId), [childRuns]);
   const workflowIdKey = workflowIds.join(",");
   const [workflowStatuses, setWorkflowStatuses] = useState<Record<string, string>>({});
