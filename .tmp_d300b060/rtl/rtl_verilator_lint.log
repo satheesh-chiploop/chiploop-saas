@@ -1,0 +1,59 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.153 MB sources in 6 modules, into 0.075 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.029 s (elab=0.003, cvt=0.015, bld=0.000); cpu 0.029 s on 1 threads; allocated 32.359 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:67:17: Signal is not used: 'hist_dout'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   67 |     wire [31:0] hist_dout;
+      |                 ^~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:70:6: Signal is not driven, nor used: 'adaptive_aero_history_bram_ctrl_hist_csb'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   70 | wire adaptive_aero_history_bram_ctrl_hist_csb;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:71:6: Signal is not driven, nor used: 'adaptive_aero_history_bram_ctrl_hist_we_n'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   71 | wire adaptive_aero_history_bram_ctrl_hist_we_n;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_cmd_safety.v:41:19: Bits of signal are not used: 'cmd_stream_payload'[127:64]
+                                                       : ... note: In instance 'adaptive_aero_control_top.u_cmd_safety'
+   41 |     input [127:0] cmd_stream_payload;
+      |                   ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_cmd_safety.v:43:11: Signal is not used: 'resp_stream_ready'
+                                                       : ... note: In instance 'adaptive_aero_control_top.u_cmd_safety'
+   43 |     input resp_stream_ready;
+      |           ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_cmd_safety.v:89:16: Signal is not used: 'delta_min'
+                                                       : ... note: In instance 'adaptive_aero_control_top.u_cmd_safety'
+   89 |     reg [15:0] delta_min;
+      |                ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_cmd_safety.v:90:16: Signal is not used: 'delta_max'
+                                                       : ... note: In instance 'adaptive_aero_control_top.u_cmd_safety'
+   90 |     reg [15:0] delta_max;
+      |                ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_cmd_safety.v:94:16: Signal is not used: 'req_mode'
+                                                       : ... note: In instance 'adaptive_aero_control_top.u_cmd_safety'
+   94 |     reg [15:0] req_mode;
+      |                ^~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_history_bram_ctrl.v:14:17: Signal is not used: 'hist_addr'
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_history_bram_ctrl'
+   14 |     input [3:0] hist_addr;
+      |                 ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_history_bram_ctrl.v:15:18: Signal is not used: 'hist_din'
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_history_bram_ctrl'
+   15 |     input [31:0] hist_din;
+      |                  ^~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_regfile.v:33:18: Bits of signal are not used: 'host_reg_wdata'[63:16]
+                                                    : ... note: In instance 'adaptive_aero_control_top.u_regfile'
+   33 |     input [63:0] host_reg_wdata;
+      |                  ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_regfile.v:34:17: Signal is not used: 'host_reg_be'
+                                                    : ... note: In instance 'adaptive_aero_control_top.u_regfile'
+   34 |     input [7:0] host_reg_be;
+      |                 ^~~~~~~~~~~
+
+=== RETURN CODE ===
+0

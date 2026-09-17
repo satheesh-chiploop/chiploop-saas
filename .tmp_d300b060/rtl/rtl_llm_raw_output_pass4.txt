@@ -1,0 +1,646 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    clk,
+    rst_n,
+    host_reg_addr,
+    host_reg_wdata,
+    host_reg_be,
+    host_reg_valid,
+    host_reg_write,
+    host_reg_ready,
+    host_reg_rdata,
+    host_reg_rvalid,
+    host_reg_error,
+    cmd_stream_valid,
+    cmd_stream_ready,
+    cmd_stream_payload,
+    resp_stream_valid,
+    resp_stream_ready,
+    resp_stream_payload,
+    actuator_cmd_valid,
+    actuator_cmd_out,
+    fault_irq,
+    hist_we,
+    hist_addr,
+    hist_din
+);
+    input clk;
+    input rst_n;
+    input [7:0] host_reg_addr;
+    input [63:0] host_reg_wdata;
+    input [7:0] host_reg_be;
+    input host_reg_valid;
+    input host_reg_write;
+    output host_reg_ready;
+    output [63:0] host_reg_rdata;
+    output host_reg_rvalid;
+    output host_reg_error;
+    input cmd_stream_valid;
+    output cmd_stream_ready;
+    input [127:0] cmd_stream_payload;
+    output resp_stream_valid;
+    input resp_stream_ready;
+    output [127:0] resp_stream_payload;
+    output actuator_cmd_valid;
+    output [15:0] actuator_cmd_out;
+    output fault_irq;
+    input hist_we;
+    input [3:0] hist_addr;
+    input [31:0] hist_din;
+
+    wire cfg_enable;
+    wire cfg_heartbeat_enable;
+    wire [15:0] cfg_timeout_threshold;
+    wire [15:0] cfg_actuator_min;
+    wire [15:0] cfg_actuator_max;
+    wire [15:0] cfg_slew_limit;
+    wire cfg_clear_sticky_faults;
+
+    wire [15:0] shadow_last_accepted_seq;
+    wire [15:0] shadow_last_applied_cmd;
+    wire [7:0] shadow_last_error_code;
+    wire [15:0] shadow_last_heartbeat_ts;
+    wire sticky_stale_command;
+    wire sticky_timeout;
+    wire sticky_range_violation;
+    wire sticky_sequence_error;
+    wire sticky_fallback_inhibited;
+
+    wire [31:0] hist_dout;
+    wire hist_csb;
+    wire hist_we_n;
+
+    adaptive_aero_regfile u_regfile (
+        .clk(clk),
+        .rst_n(rst_n),
+        .host_reg_addr(host_reg_addr),
+        .host_reg_wdata(host_reg_wdata),
+        .host_reg_be(host_reg_be),
+        .host_reg_valid(host_reg_valid),
+        .host_reg_write(host_reg_write),
+        .host_reg_ready(host_reg_ready),
+        .host_reg_rdata(host_reg_rdata),
+        .host_reg_rvalid(host_reg_rvalid),
+        .host_reg_error(host_reg_error),
+        .cfg_enable(cfg_enable),
+        .cfg_heartbeat_enable(cfg_heartbeat_enable),
+        .cfg_timeout_threshold(cfg_timeout_threshold),
+        .cfg_actuator_min(cfg_actuator_min),
+        .cfg_actuator_max(cfg_actuator_max),
+        .cfg_slew_limit(cfg_slew_limit),
+        .cfg_clear_sticky_faults(cfg_clear_sticky_faults),
+        .shadow_last_accepted_seq(shadow_last_accepted_seq),
+        .shadow_last_applied_cmd(shadow_last_applied_cmd),
+        .shadow_last_error_code(shadow_last_error_code),
+        .shadow_last_heartbeat_ts(shadow_last_heartbeat_ts),
+        .sticky_stale_command(sticky_stale_command),
+        .sticky_timeout(sticky_timeout),
+        .sticky_range_violation(sticky_range_violation),
+        .sticky_sequence_error(sticky_sequence_error),
+        .sticky_fallback_inhibited(sticky_fallback_inhibited)
+    );
+
+    adaptive_aero_cmd_safety u_cmd_safety (
+        .clk(clk),
+        .rst_n(rst_n),
+        .cfg_enable(cfg_enable),
+        .cfg_heartbeat_enable(cfg_heartbeat_enable),
+        .cfg_timeout_threshold(cfg_timeout_threshold),
+        .cfg_actuator_min(cfg_actuator_min),
+        .cfg_actuator_max(cfg_actuator_max),
+        .cfg_slew_limit(cfg_slew_limit),
+        .cfg_clear_sticky_faults(cfg_clear_sticky_faults),
+        .cmd_stream_valid(cmd_stream_valid),
+        .cmd_stream_ready(cmd_stream_ready),
+        .cmd_stream_payload(cmd_stream_payload),
+        .resp_stream_valid(resp_stream_valid),
+        .resp_stream_ready(resp_stream_ready),
+        .resp_stream_payload(resp_stream_payload),
+        .shadow_last_accepted_seq(shadow_last_accepted_seq),
+        .shadow_last_applied_cmd(shadow_last_applied_cmd),
+        .shadow_last_error_code(shadow_last_error_code),
+        .shadow_last_heartbeat_ts(shadow_last_heartbeat_ts),
+        .sticky_stale_command(sticky_stale_command),
+        .sticky_timeout(sticky_timeout),
+        .sticky_range_violation(sticky_range_violation),
+        .sticky_sequence_error(sticky_sequence_error),
+        .sticky_fallback_inhibited(sticky_fallback_inhibited),
+        .actuator_cmd_valid(actuator_cmd_valid),
+        .actuator_cmd_out(actuator_cmd_out),
+        .fault_irq(fault_irq)
+    );
+
+    adaptive_aero_history_bram_ctrl u_history_bram_ctrl (
+        .clk(clk),
+        .rst_n(rst_n),
+        .hist_we(hist_we),
+        .hist_addr(hist_addr),
+        .hist_din(hist_din),
+        .hist_dout(hist_dout),
+        .hist_csb(hist_csb),
+        .hist_we_n(hist_we_n)
+    );
+
+    adaptive_aero_history_bram u_history_bram (
+        .clk(clk),
+        .hist_csb(hist_csb),
+        .hist_we_n(hist_we_n),
+        .hist_addr(hist_addr),
+        .hist_din(hist_din),
+        .hist_dout(hist_dout)
+    );
+endmodule
+---END adaptive_aero_control_top.v---
+---BEGIN adaptive_aero_regfile.v---
+module adaptive_aero_regfile (
+    clk,
+    rst_n,
+    host_reg_addr,
+    host_reg_wdata,
+    host_reg_be,
+    host_reg_valid,
+    host_reg_write,
+    host_reg_ready,
+    host_reg_rdata,
+    host_reg_rvalid,
+    host_reg_error,
+    cfg_enable,
+    cfg_heartbeat_enable,
+    cfg_timeout_threshold,
+    cfg_actuator_min,
+    cfg_actuator_max,
+    cfg_slew_limit,
+    cfg_clear_sticky_faults,
+    shadow_last_accepted_seq,
+    shadow_last_applied_cmd,
+    shadow_last_error_code,
+    shadow_last_heartbeat_ts,
+    sticky_stale_command,
+    sticky_timeout,
+    sticky_range_violation,
+    sticky_sequence_error,
+    sticky_fallback_inhibited
+);
+    input clk;
+    input rst_n;
+    input [7:0] host_reg_addr;
+    input [63:0] host_reg_wdata;
+    input [7:0] host_reg_be;
+    input host_reg_valid;
+    input host_reg_write;
+    output host_reg_ready;
+    output [63:0] host_reg_rdata;
+    output host_reg_rvalid;
+    output host_reg_error;
+    output cfg_enable;
+    output cfg_heartbeat_enable;
+    output [15:0] cfg_timeout_threshold;
+    output [15:0] cfg_actuator_min;
+    output [15:0] cfg_actuator_max;
+    output [15:0] cfg_slew_limit;
+    output cfg_clear_sticky_faults;
+    input [15:0] shadow_last_accepted_seq;
+    input [15:0] shadow_last_applied_cmd;
+    input [7:0] shadow_last_error_code;
+    input [15:0] shadow_last_heartbeat_ts;
+    input sticky_stale_command;
+    input sticky_timeout;
+    input sticky_range_violation;
+    input sticky_sequence_error;
+    input sticky_fallback_inhibited;
+
+    reg cfg_enable_r;
+    reg cfg_heartbeat_enable_r;
+    reg [15:0] cfg_timeout_threshold_r;
+    reg [15:0] cfg_actuator_min_r;
+    reg [15:0] cfg_actuator_max_r;
+    reg [15:0] cfg_slew_limit_r;
+    reg cfg_clear_sticky_faults_r;
+    reg [63:0] host_reg_rdata_r;
+    reg host_reg_rvalid_r;
+    reg host_reg_error_r;
+
+    assign cfg_enable = cfg_enable_r;
+    assign cfg_heartbeat_enable = cfg_heartbeat_enable_r;
+    assign cfg_timeout_threshold = cfg_timeout_threshold_r;
+    assign cfg_actuator_min = cfg_actuator_min_r;
+    assign cfg_actuator_max = cfg_actuator_max_r;
+    assign cfg_slew_limit = cfg_slew_limit_r;
+    assign cfg_clear_sticky_faults = cfg_clear_sticky_faults_r;
+    assign host_reg_ready = 1'b1;
+    assign host_reg_rdata = host_reg_rdata_r;
+    assign host_reg_rvalid = host_reg_rvalid_r;
+    assign host_reg_error = host_reg_error_r;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cfg_enable_r <= 1'b0;
+            cfg_heartbeat_enable_r <= 1'b0;
+            cfg_timeout_threshold_r <= 16'd1000;
+            cfg_actuator_min_r <= 16'd0;
+            cfg_actuator_max_r <= 16'd65535;
+            cfg_slew_limit_r <= 16'd256;
+            cfg_clear_sticky_faults_r <= 1'b0;
+            host_reg_rdata_r <= 64'h0;
+            host_reg_rvalid_r <= 1'b0;
+            host_reg_error_r <= 1'b0;
+        end else begin
+            cfg_clear_sticky_faults_r <= 1'b0;
+            host_reg_rvalid_r <= 1'b0;
+            host_reg_error_r <= 1'b0;
+            if (host_reg_valid) begin
+                if (host_reg_write) begin
+                    case (host_reg_addr[7:0])
+                        8'h00: begin
+                            if (host_reg_be[0]) cfg_enable_r <= host_reg_wdata[0];
+                            if (host_reg_be[0]) cfg_heartbeat_enable_r <= host_reg_wdata[1];
+                        end
+                        8'h01: if (host_reg_be[0] || host_reg_be[1]) cfg_timeout_threshold_r <= host_reg_wdata[15:0];
+                        8'h02: if (host_reg_be[0] || host_reg_be[1]) cfg_actuator_min_r <= host_reg_wdata[15:0];
+                        8'h03: if (host_reg_be[0] || host_reg_be[1]) cfg_actuator_max_r <= host_reg_wdata[15:0];
+                        8'h04: if (host_reg_be[0] || host_reg_be[1]) cfg_slew_limit_r <= host_reg_wdata[15:0];
+                        8'h09: if (host_reg_be[0]) cfg_clear_sticky_faults_r <= |host_reg_wdata[4:0];
+                        default: host_reg_error_r <= 1'b1;
+                    endcase
+                end else begin
+                    host_reg_rvalid_r <= 1'b1;
+                    case (host_reg_addr[7:0])
+                        8'h00: host_reg_rdata_r <= {62'h0, cfg_heartbeat_enable_r, cfg_enable_r};
+                        8'h01: host_reg_rdata_r <= {48'h0, cfg_timeout_threshold_r};
+                        8'h02: host_reg_rdata_r <= {48'h0, cfg_actuator_min_r};
+                        8'h03: host_reg_rdata_r <= {48'h0, cfg_actuator_max_r};
+                        8'h04: host_reg_rdata_r <= {48'h0, cfg_slew_limit_r};
+                        8'h05: host_reg_rdata_r <= {48'h0, shadow_last_accepted_seq};
+                        8'h06: host_reg_rdata_r <= {48'h0, shadow_last_applied_cmd};
+                        8'h07: host_reg_rdata_r <= {56'h0, shadow_last_error_code};
+                        8'h08: host_reg_rdata_r <= {48'h0, shadow_last_heartbeat_ts};
+                        8'h09: host_reg_rdata_r <= {59'h0, sticky_fallback_inhibited, sticky_sequence_error, sticky_range_violation, sticky_timeout, sticky_stale_command};
+                        default: begin
+                            host_reg_rdata_r <= 64'h0;
+                            host_reg_error_r <= 1'b1;
+                        end
+                    endcase
+                end
+            end
+        end
+    end
+endmodule
+---END adaptive_aero_regfile.v---
+---BEGIN adaptive_aero_cmd_safety.v---
+module adaptive_aero_cmd_safety (
+    clk,
+    rst_n,
+    cfg_enable,
+    cfg_heartbeat_enable,
+    cfg_timeout_threshold,
+    cfg_actuator_min,
+    cfg_actuator_max,
+    cfg_slew_limit,
+    cfg_clear_sticky_faults,
+    cmd_stream_valid,
+    cmd_stream_ready,
+    cmd_stream_payload,
+    resp_stream_valid,
+    resp_stream_ready,
+    resp_stream_payload,
+    shadow_last_accepted_seq,
+    shadow_last_applied_cmd,
+    shadow_last_error_code,
+    shadow_last_heartbeat_ts,
+    sticky_stale_command,
+    sticky_timeout,
+    sticky_range_violation,
+    sticky_sequence_error,
+    sticky_fallback_inhibited,
+    actuator_cmd_valid,
+    actuator_cmd_out,
+    fault_irq
+);
+    input clk;
+    input rst_n;
+    input cfg_enable;
+    input cfg_heartbeat_enable;
+    input [15:0] cfg_timeout_threshold;
+    input [15:0] cfg_actuator_min;
+    input [15:0] cfg_actuator_max;
+    input [15:0] cfg_slew_limit;
+    input cfg_clear_sticky_faults;
+    input cmd_stream_valid;
+    output cmd_stream_ready;
+    input [127:0] cmd_stream_payload;
+    output resp_stream_valid;
+    input resp_stream_ready;
+    output [127:0] resp_stream_payload;
+    output [15:0] shadow_last_accepted_seq;
+    output [15:0] shadow_last_applied_cmd;
+    output [7:0] shadow_last_error_code;
+    output [15:0] shadow_last_heartbeat_ts;
+    output sticky_stale_command;
+    output sticky_timeout;
+    output sticky_range_violation;
+    output sticky_sequence_error;
+    output sticky_fallback_inhibited;
+    output actuator_cmd_valid;
+    output [15:0] actuator_cmd_out;
+    output fault_irq;
+
+    reg [15:0] last_accepted_seq_r;
+    reg [15:0] last_applied_cmd_r;
+    reg [7:0] last_error_code_r;
+    reg [15:0] last_heartbeat_ts_r;
+    reg sticky_stale_command_r;
+    reg sticky_timeout_r;
+    reg sticky_range_violation_r;
+    reg sticky_sequence_error_r;
+    reg sticky_fallback_inhibited_r;
+    reg actuator_cmd_valid_r;
+    reg [15:0] actuator_cmd_out_r;
+    reg resp_stream_valid_r;
+    reg [127:0] resp_stream_payload_r;
+    reg [15:0] cycle_counter_r;
+
+    reg [15:0] req_seq;
+    reg [15:0] req_ts;
+    reg [15:0] req_cmd;
+    reg [15:0] next_cmd;
+    reg [15:0] clamped_cmd;
+    reg [15:0] slew_cmd;
+    reg [15:0] age;
+    reg accept;
+    reg range_v;
+    reg seq_err;
+    reg stale_v;
+    reg timeout_v;
+    reg inhibit_v;
+    reg [7:0] error_code;
+    reg [127:0] resp_next;
+    reg [15:0] diff_abs;
+    reg [15:0] tmp_sub;
+    reg [15:0] tmp_add;
+    reg [15:0] tx_cmd;
+    reg [31:0] hist_word;
+
+    assign shadow_last_accepted_seq = last_accepted_seq_r;
+    assign shadow_last_applied_cmd = last_applied_cmd_r;
+    assign shadow_last_error_code = last_error_code_r;
+    assign shadow_last_heartbeat_ts = last_heartbeat_ts_r;
+    assign sticky_stale_command = sticky_stale_command_r;
+    assign sticky_timeout = sticky_timeout_r;
+    assign sticky_range_violation = sticky_range_violation_r;
+    assign sticky_sequence_error = sticky_sequence_error_r;
+    assign sticky_fallback_inhibited = sticky_fallback_inhibited_r;
+    assign actuator_cmd_valid = actuator_cmd_valid_r;
+    assign actuator_cmd_out = actuator_cmd_out_r;
+    assign resp_stream_valid = resp_stream_valid_r;
+    assign resp_stream_payload = resp_stream_payload_r;
+    assign cmd_stream_ready = 1'b1;
+    assign fault_irq = sticky_stale_command_r | sticky_timeout_r | sticky_range_violation_r | sticky_sequence_error_r | sticky_fallback_inhibited_r | (~cfg_enable);
+
+    always @(*) begin
+        req_seq = cmd_stream_payload[15:0];
+        req_ts = cmd_stream_payload[31:16];
+        req_cmd = cmd_stream_payload[47:32];
+        hist_word = cmd_stream_payload[31:0] ^ {16'h0000, cfg_timeout_threshold};
+        next_cmd = req_cmd;
+        clamped_cmd = req_cmd;
+        slew_cmd = req_cmd;
+        age = cycle_counter_r - req_ts;
+        accept = 1'b0;
+        range_v = 1'b0;
+        seq_err = 1'b0;
+        stale_v = 1'b0;
+        timeout_v = 1'b0;
+        inhibit_v = 1'b0;
+        error_code = 8'h00;
+        diff_abs = 16'h0000;
+        tmp_sub = 16'h0000;
+        tmp_add = 16'h0000;
+        tx_cmd = 16'h0000;
+        resp_next = 128'h0;
+
+        if (!cfg_enable) begin
+            inhibit_v = 1'b1;
+            error_code = 8'h05;
+        end else begin
+            if (cmd_stream_valid) begin
+                if (req_seq <= last_accepted_seq_r) begin
+                    seq_err = 1'b1;
+                    error_code = 8'h04;
+                end
+                if (cfg_heartbeat_enable) begin
+                    if (age > cfg_timeout_threshold) begin
+                        stale_v = 1'b1;
+                        timeout_v = 1'b1;
+                        error_code = 8'h02;
+                    end
+                end else begin
+                    if (age > cfg_timeout_threshold) begin
+                        timeout_v = 1'b1;
+                        error_code = 8'h02;
+                    end
+                end
+                if (req_cmd < cfg_actuator_min) begin
+                    clamped_cmd = cfg_actuator_min;
+                    range_v = 1'b1;
+                end else if (req_cmd > cfg_actuator_max) begin
+                    clamped_cmd = cfg_actuator_max;
+                    range_v = 1'b1;
+                end
+                if (clamped_cmd >= last_applied_cmd_r) begin
+                    diff_abs = clamped_cmd - last_applied_cmd_r;
+                end else begin
+                    diff_abs = last_applied_cmd_r - clamped_cmd;
+                end
+                if (diff_abs > cfg_slew_limit) begin
+                    range_v = 1'b1;
+                    if (clamped_cmd >= last_applied_cmd_r) begin
+                        tmp_add = last_applied_cmd_r + cfg_slew_limit;
+                        slew_cmd = (tmp_add < last_applied_cmd_r) ? 16'hFFFF : tmp_add;
+                    end else begin
+                        tmp_sub = last_applied_cmd_r - cfg_slew_limit;
+                        slew_cmd = tmp_sub;
+                    end
+                end else begin
+                    slew_cmd = clamped_cmd;
+                end
+                if (!seq_err && !stale_v && !timeout_v) begin
+                    accept = 1'b1;
+                    next_cmd = slew_cmd;
+                end
+            end
+        end
+
+        tx_cmd = accept ? next_cmd : last_applied_cmd_r;
+        resp_next = 128'h0;
+        resp_next[0] = accept;
+        resp_next[1] = seq_err;
+        resp_next[2] = stale_v;
+        resp_next[3] = timeout_v;
+        resp_next[4] = range_v;
+        resp_next[5] = inhibit_v;
+        resp_next[21:6] = tx_cmd;
+        resp_next[37:22] = req_seq;
+        resp_next[45:38] = error_code;
+        resp_next[46] = cfg_enable;
+        resp_next[47] = cfg_heartbeat_enable;
+        resp_next[63:48] = req_ts;
+        resp_next[79:64] = cycle_counter_r;
+        resp_next[95:80] = last_accepted_seq_r;
+        resp_next[111:96] = last_applied_cmd_r;
+        resp_next[127:112] = cfg_timeout_threshold;
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            last_accepted_seq_r <= 16'h0000;
+            last_applied_cmd_r <= 16'h0000;
+            last_error_code_r <= 8'h00;
+            last_heartbeat_ts_r <= 16'h0000;
+            sticky_stale_command_r <= 1'b0;
+            sticky_timeout_r <= 1'b0;
+            sticky_range_violation_r <= 1'b0;
+            sticky_sequence_error_r <= 1'b0;
+            sticky_fallback_inhibited_r <= 1'b0;
+            actuator_cmd_valid_r <= 1'b0;
+            actuator_cmd_out_r <= 16'h0000;
+            resp_stream_valid_r <= 1'b0;
+            resp_stream_payload_r <= 128'h0;
+            cycle_counter_r <= 16'h0000;
+        end else begin
+            cycle_counter_r <= cycle_counter_r + 16'h0001;
+            resp_stream_valid_r <= 1'b0;
+            actuator_cmd_valid_r <= 1'b0;
+            if (cfg_clear_sticky_faults) begin
+                sticky_stale_command_r <= 1'b0;
+                sticky_timeout_r <= 1'b0;
+                sticky_range_violation_r <= 1'b0;
+                sticky_sequence_error_r <= 1'b0;
+                sticky_fallback_inhibited_r <= 1'b0;
+            end
+            if (cmd_stream_valid) begin
+                last_error_code_r <= error_code;
+                if (inhibit_v) sticky_fallback_inhibited_r <= 1'b1;
+                if (seq_err) sticky_sequence_error_r <= 1'b1;
+                if (stale_v) sticky_stale_command_r <= 1'b1;
+                if (timeout_v) sticky_timeout_r <= 1'b1;
+                if (range_v) sticky_range_violation_r <= 1'b1;
+                if (cfg_enable && !seq_err && !stale_v && !timeout_v) begin
+                    last_accepted_seq_r <= req_seq;
+                    last_applied_cmd_r <= next_cmd;
+                    actuator_cmd_out_r <= next_cmd;
+                    actuator_cmd_valid_r <= 1'b1;
+                    if (cfg_heartbeat_enable) last_heartbeat_ts_r <= req_ts;
+                end
+                resp_stream_payload_r <= resp_next;
+                resp_stream_valid_r <= 1'b1;
+            end
+        end
+    end
+endmodule
+---END adaptive_aero_cmd_safety.v---
+---BEGIN adaptive_aero_history_bram_ctrl.v---
+module adaptive_aero_history_bram_ctrl (
+    clk,
+    rst_n,
+    hist_we,
+    hist_addr,
+    hist_din,
+    hist_dout,
+    hist_csb,
+    hist_we_n
+);
+    input clk;
+    input rst_n;
+    input hist_we;
+    input [3:0] hist_addr;
+    input [31:0] hist_din;
+    output [31:0] hist_dout;
+    output hist_csb;
+    output hist_we_n;
+
+    reg hist_csb_r;
+    reg hist_we_n_r;
+    reg [31:0] hist_dout_r;
+    reg [31:0] hist_mem [0:15];
+
+    assign hist_csb = hist_csb_r;
+    assign hist_we_n = hist_we_n_r;
+    assign hist_dout = hist_dout_r;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            hist_csb_r <= 1'b1;
+            hist_we_n_r <= 1'b1;
+            hist_dout_r <= 32'h00000000;
+        end else begin
+            hist_csb_r <= 1'b0;
+            hist_we_n_r <= ~hist_we;
+            if (hist_we) begin
+                hist_mem[hist_addr] <= hist_din;
+            end
+            hist_dout_r <= hist_mem[hist_addr];
+        end
+    end
+endmodule
+---END adaptive_aero_history_bram_ctrl.v---
+---BEGIN adaptive_aero_history_bram.v---
+module adaptive_aero_history_bram (
+    clk,
+    hist_csb,
+    hist_we_n,
+    hist_addr,
+    hist_din,
+    hist_dout
+);
+    input clk;
+    input hist_csb;
+    input hist_we_n;
+    input [3:0] hist_addr;
+    input [31:0] hist_din;
+    output [31:0] hist_dout;
+
+    reg [31:0] mem0;
+    reg [31:0] mem1;
+    reg [31:0] mem2;
+    reg [31:0] mem3;
+    reg [31:0] mem4;
+    reg [31:0] mem5;
+    reg [31:0] mem6;
+    reg [31:0] mem7;
+    reg [31:0] mem8;
+    reg [31:0] mem9;
+    reg [31:0] mem10;
+    reg [31:0] mem11;
+    reg [31:0] mem12;
+    reg [31:0] mem13;
+    reg [31:0] mem14;
+    reg [31:0] mem15;
+    reg [31:0] dout_r;
+
+    assign hist_dout = dout_r;
+
+    always @(posedge clk) begin
+        if (!hist_csb) begin
+            case (hist_addr)
+                4'h0: begin if (!hist_we_n) mem0 <= hist_din; dout_r <= mem0; end
+                4'h1: begin if (!hist_we_n) mem1 <= hist_din; dout_r <= mem1; end
+                4'h2: begin if (!hist_we_n) mem2 <= hist_din; dout_r <= mem2; end
+                4'h3: begin if (!hist_we_n) mem3 <= hist_din; dout_r <= mem3; end
+                4'h4: begin if (!hist_we_n) mem4 <= hist_din; dout_r <= mem4; end
+                4'h5: begin if (!hist_we_n) mem5 <= hist_din; dout_r <= mem5; end
+                4'h6: begin if (!hist_we_n) mem6 <= hist_din; dout_r <= mem6; end
+                4'h7: begin if (!hist_we_n) mem7 <= hist_din; dout_r <= mem7; end
+                4'h8: begin if (!hist_we_n) mem8 <= hist_din; dout_r <= mem8; end
+                4'h9: begin if (!hist_we_n) mem9 <= hist_din; dout_r <= mem9; end
+                4'ha: begin if (!hist_we_n) mem10 <= hist_din; dout_r <= mem10; end
+                4'hb: begin if (!hist_we_n) mem11 <= hist_din; dout_r <= mem11; end
+                4'hc: begin if (!hist_we_n) mem12 <= hist_din; dout_r <= mem12; end
+                4'hd: begin if (!hist_we_n) mem13 <= hist_din; dout_r <= mem13; end
+                4'he: begin if (!hist_we_n) mem14 <= hist_din; dout_r <= mem14; end
+                4'hf: begin if (!hist_we_n) mem15 <= hist_din; dout_r <= mem15; end
+                default: dout_r <= 32'h0;
+            endcase
+        end
+    end
+endmodule
+---END adaptive_aero_history_bram.v---

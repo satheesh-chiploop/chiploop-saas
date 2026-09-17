@@ -1,0 +1,7 @@
+
+
+Issues:
+❌ Required memory 'adaptive_aero_history_bram u_history_bram' is functionally unreachable: read output 'hist_dout' connects to unconsumed signal 'hist_dout_unused_from_u_history_bram_hist_dout'. Implement a legal input-driven read/write transaction and make read data observable; do not preserve the instance with constant tie-offs or an unused output.
+
+=== VERILATOR LINT FAILURE ===
+Fatal Verilator issues detected. See corresponding rtl_verilator_lint log for details.
