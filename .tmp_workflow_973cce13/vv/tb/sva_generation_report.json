@@ -1,0 +1,30 @@
+{
+  "type": "digital_sva_generation",
+  "version": "1.2",
+  "mode": "digital",
+  "top_module": "pwm_controller",
+  "spec_path": "/root/chiploop-backend/backend/workflows/973cce13-cf3d-4efd-a683-39ac6562508b/spec/pwm_controller_spec.json",
+  "rtl_file_count": 1,
+  "clock_names": [
+    "clk"
+  ],
+  "reset_names": [
+    "reset_n"
+  ],
+  "primary_clock": "clk",
+  "primary_reset": "reset_n",
+  "primary_reset_active_low": true,
+  "generated_dir": "vv/tb",
+  "sva_module_name": "pwm_controller_assertions",
+  "sva_bind_file": "pwm_controller_assertions_bind.sv",
+  "assertion_output_signals": [
+    "pwm_out",
+    "counter_value"
+  ],
+  "artifacts": {
+    "sva_bind_sv": "backend/workflows/973cce13-cf3d-4efd-a683-39ac6562508b/vv/tb/pwm_controller_assertions_bind.sv",
+    "sva_sv": "backend/workflows/973cce13-cf3d-4efd-a683-39ac6562508b/vv/tb/pwm_controller_assertions.sv",
+    "sva_spec_json": "backend/workflows/973cce13-cf3d-4efd-a683-39ac6562508b/vv/tb/sva_spec.json",
+    "sva_readme": "backend/workflows/973cce13-cf3d-4efd-a683-39ac6562508b/vv/tb/SVA_README.md"
+  }
+}
