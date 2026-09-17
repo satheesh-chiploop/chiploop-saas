@@ -1,0 +1,46 @@
+{
+  "type": "application_spec_stimulus_plan",
+  "top_module": "pwm_controller",
+  "source": "resolved_application_spec",
+  "points": [
+    {
+      "name": "enable",
+      "width": 1,
+      "values": [
+        0,
+        1
+      ],
+      "source": "application_spec_port_boundary"
+    },
+    {
+      "name": "duty_cycle",
+      "width": 8,
+      "values": [
+        0,
+        1,
+        255,
+        128,
+        127,
+        85
+      ],
+      "source": "application_spec_port_boundary"
+    },
+    {
+      "name": "period",
+      "width": 8,
+      "values": [
+        0,
+        1,
+        255,
+        128,
+        127,
+        85
+      ],
+      "source": "application_spec_port_boundary"
+    }
+  ],
+  "directed_tests": [
+    "feature_contract_directed",
+    "application_spec_boundary_directed"
+  ]
+}

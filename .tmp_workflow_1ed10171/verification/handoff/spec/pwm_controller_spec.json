@@ -1,0 +1,263 @@
+{
+  "name": "pwm_controller",
+  "description": "Parameterized PWM controller that generates a pulse-width-modulated output by comparing an 8-bit free-running enable-gated counter against an 8-bit duty cycle threshold, with the counter wrapping at the programmed period value and synchronous active-low reset clearing all state to zero.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "reset_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "Single synchronous clock domain.",
+      "All state changes occur on the rising edge of clk when enable is asserted.",
+      "period is treated as an inclusive terminal count; when counter_value reaches period, the next enabled clock edge reloads counter_value to zero.",
+      "If duty_cycle is greater than counter_value, pwm_out is high; otherwise pwm_out is low.",
+      "Because counter_value is reset to zero and compared as an unsigned 8-bit value, a duty_cycle of zero produces a continuously low pwm_out after reset.",
+      "A period of zero results in the counter remaining at zero on each enabled cycle.",
+      "Inputs duty_cycle and period are sampled as register inputs and may change dynamically; output behavior reflects the current sampled values on each cycle."
+    ]
+  },
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "feature_contracts": [
+    {
+      "id": "reset_clears_outputs",
+      "description": "Asserting active-low reset forces the counter and PWM output to zero.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "reset_n": 0,
+              "enable": 1,
+              "duty_cycle": 128,
+              "period": 255
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "pwm_out": 0,
+        "counter_value": 0
+      },
+      "within_cycles": 1
+    },
+    {
+      "id": "counter_holds_when_disabled",
+      "description": "With enable low, the counter does not advance and the PWM output reflects the held count.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "reset_n": 1,
+              "enable": 0,
+              "duty_cycle": 128,
+              "period": 10
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "counter_value": {
+          "eq": 0
+        },
+        "pwm_out": 0
+      },
+      "within_cycles": 1
+    },
+    {
+      "id": "counter_increments_when_enabled",
+      "description": "With enable high and not at terminal count, the counter increments on the next clock.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "reset_n": 1,
+              "enable": 1,
+              "duty_cycle": 128,
+              "period": 10
+            },
+            "cycles": 2
+          }
+        ]
+      },
+      "expected": {
+        "counter_value": {
+          "min": 1,
+          "max": 1
+        }
+      },
+      "within_cycles": 2
+    },
+    {
+      "id": "wraps_at_period",
+      "description": "When the counter reaches the programmed period, the next enabled cycle reloads zero.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "reset_n": 0,
+              "enable": 1,
+              "duty_cycle": 128,
+              "period": 3
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "reset_n": 1,
+              "enable": 1,
+              "duty_cycle": 128,
+              "period": 3
+            },
+            "cycles": 4
+          }
+        ]
+      },
+      "expected": {
+        "counter_value": {
+          "eq": 0
+        }
+      },
+      "within_cycles": 5
+    },
+    {
+      "id": "pwm_high_when_counter_below_duty",
+      "description": "PWM output is high while counter_value is less than duty_cycle.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "reset_n": 1,
+              "enable": 0,
+              "duty_cycle": 10,
+              "period": 255
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "pwm_out": 1
+      },
+      "within_cycles": 1
+    },
+    {
+      "id": "pwm_low_when_counter_not_below_duty",
+      "description": "PWM output is low when counter_value is greater than or equal to duty_cycle.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "reset_n": 0,
+              "enable": 1,
+              "duty_cycle": 0,
+              "period": 255
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "reset_n": 1,
+              "enable": 0,
+              "duty_cycle": 0,
+              "period": 255
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "pwm_out": 0,
+        "counter_value": 0
+      },
+      "within_cycles": 2
+    }
+  ],
+  "memory_macros": [],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "reset_n",
+      "direction": "input",
+      "width": 1,
+      "active_low": true
+    },
+    {
+      "name": "enable",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "duty_cycle",
+      "direction": "input",
+      "width": 8
+    },
+    {
+      "name": "period",
+      "direction": "input",
+      "width": 8
+    },
+    {
+      "name": "pwm_out",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "counter_value",
+      "direction": "output",
+      "width": 8
+    }
+  ],
+  "functionality": "Implements an 8-bit PWM generator with an internal counter that advances only when enable is high. The counter clears to zero on reset, increments on enabled clock edges, and wraps to zero when the current count reaches the programmed period value. The PWM output is asserted when the current counter_value is strictly less than duty_cycle, producing a pulse whose width is controlled by duty_cycle and whose repetition rate is controlled by period.",
+  "responsibilities": [
+    "Maintain a synchronous, enable-gated 8-bit counter.",
+    "Generate pwm_out as a combinational compare of counter_value against duty_cycle.",
+    "Expose the current counter state on counter_value for observability.",
+    "Honor active-low reset by clearing all registers and outputs to zero.",
+    "Respect the programmed period as the counter wrap threshold."
+  ],
+  "must_drive": [
+    "pwm_out",
+    "counter_value"
+  ],
+  "must_receive": [
+    "clk",
+    "reset_n",
+    "enable",
+    "duty_cycle",
+    "period"
+  ],
+  "must_not_drive": [
+    "clk",
+    "reset_n",
+    "enable",
+    "duty_cycle",
+    "period"
+  ],
+  "reset_behavior": "When reset_n is low, all internal registers and visible outputs are forced to zero. Upon deassertion of reset_n, counter_value remains zero until the next rising edge of clk while enable is high; pwm_out evaluates low at reset because counter_value is zero and duty_cycle is sampled as an input value.",
+  "behavior_rules": [
+    "On every rising edge of clk with reset_n high, if enable is low, counter_value holds its previous value.",
+    "On every rising edge of clk with reset_n high, if enable is high and counter_value equals period, counter_value reloads to zero on the next state update.",
+    "On every rising edge of clk with reset_n high, if enable is high and counter_value is less than period, counter_value increments by one.",
+    "pwm_out is high exactly when counter_value is strictly less than duty_cycle; otherwise it is low.",
+    "counter_value is a registered output reflecting the current internal count state and is not independently writable.",
+    "All outputs must remain zero during reset regardless of enable, duty_cycle, or period."
+  ],
+  "rtl_output_file": "pwm_controller.v",
+  "register_contract": {}
+}
