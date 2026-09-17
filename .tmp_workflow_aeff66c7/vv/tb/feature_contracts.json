@@ -1,0 +1,226 @@
+{
+  "type": "application_feature_contracts",
+  "top_module": "pwm_controller",
+  "source": "resolved_application_spec",
+  "contracts": [
+    {
+      "feature_id": "reset_clears_state",
+      "statement": "Synchronous active-low reset clears the counter output state to zero and keeps PWM in its reset-derived value.",
+      "stimulus": {
+        "reset_n": 0,
+        "enable": 1,
+        "duty_cycle": 128,
+        "period": 200
+      },
+      "stimulus_steps": [
+        {
+          "signals": {
+            "reset_n": 0,
+            "enable": 1,
+            "duty_cycle": 128,
+            "period": 200
+          },
+          "cycles": 1
+        }
+      ],
+      "expected": {
+        "counter_value": 0,
+        "pwm_out": 1
+      },
+      "wait_cycles": 1,
+      "monitors": [
+        "counter_value",
+        "pwm_out"
+      ],
+      "registers": [],
+      "coverage_bins": [
+        "reset_clears_state.stimulus_applied",
+        "reset_clears_state.expected_observed"
+      ],
+      "executable": true,
+      "status": "executable",
+      "non_executable_reason": null,
+      "unresolved_bindings": []
+    },
+    {
+      "feature_id": "count_increments_when_enabled",
+      "statement": "With reset released and enable asserted, the counter advances on each clock until wrap conditions apply.",
+      "stimulus": {},
+      "stimulus_steps": [
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 1,
+            "duty_cycle": 255,
+            "period": 200
+          },
+          "cycles": 1
+        },
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 1,
+            "duty_cycle": 255,
+            "period": 200
+          },
+          "cycles": 1
+        }
+      ],
+      "expected": {
+        "counter_value": {
+          "eq": 2
+        },
+        "pwm_out": 1
+      },
+      "wait_cycles": 2,
+      "monitors": [
+        "counter_value",
+        "pwm_out",
+        "enable"
+      ],
+      "registers": [],
+      "coverage_bins": [
+        "count_increments_when_enabled.stimulus_applied",
+        "count_increments_when_enabled.expected_observed"
+      ],
+      "executable": true,
+      "status": "executable",
+      "non_executable_reason": null,
+      "unresolved_bindings": []
+    },
+    {
+      "feature_id": "count_holds_when_disabled",
+      "statement": "When enable is deasserted, the counter holds its current value and PWM remains the comparison result of that held state.",
+      "stimulus": {},
+      "stimulus_steps": [
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 1,
+            "duty_cycle": 10,
+            "period": 200
+          },
+          "cycles": 1
+        },
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 0,
+            "duty_cycle": 10,
+            "period": 200
+          },
+          "cycles": 1
+        }
+      ],
+      "expected": {
+        "counter_value": {
+          "eq": 1
+        },
+        "pwm_out": 1
+      },
+      "wait_cycles": 2,
+      "monitors": [
+        "counter_value",
+        "pwm_out",
+        "enable"
+      ],
+      "registers": [],
+      "coverage_bins": [
+        "count_holds_when_disabled.stimulus_applied",
+        "count_holds_when_disabled.expected_observed"
+      ],
+      "executable": true,
+      "status": "executable",
+      "non_executable_reason": null,
+      "unresolved_bindings": []
+    },
+    {
+      "feature_id": "wraps_at_period",
+      "statement": "The counter wraps to zero when the enabled counter reaches the programmed period value.",
+      "stimulus": {
+        "reset_n": 1,
+        "enable": 1,
+        "duty_cycle": 255,
+        "period": 0
+      },
+      "stimulus_steps": [
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 1,
+            "duty_cycle": 255,
+            "period": 0
+          },
+          "cycles": 1
+        }
+      ],
+      "expected": {
+        "counter_value": 0,
+        "pwm_out": 1
+      },
+      "wait_cycles": 1,
+      "monitors": [
+        "counter_value",
+        "pwm_out",
+        "period"
+      ],
+      "registers": [],
+      "coverage_bins": [
+        "wraps_at_period.stimulus_applied",
+        "wraps_at_period.expected_observed"
+      ],
+      "executable": true,
+      "status": "executable",
+      "non_executable_reason": null,
+      "unresolved_bindings": []
+    },
+    {
+      "feature_id": "pwm_threshold_comparison",
+      "statement": "PWM output is high only while the counter value is strictly less than duty_cycle.",
+      "stimulus": {},
+      "stimulus_steps": [
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 1,
+            "duty_cycle": 1,
+            "period": 200
+          },
+          "cycles": 1
+        },
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 0,
+            "duty_cycle": 1,
+            "period": 200
+          },
+          "cycles": 1
+        }
+      ],
+      "expected": {
+        "counter_value": {
+          "eq": 1
+        },
+        "pwm_out": 0
+      },
+      "wait_cycles": 2,
+      "monitors": [
+        "counter_value",
+        "pwm_out",
+        "duty_cycle"
+      ],
+      "registers": [],
+      "coverage_bins": [
+        "pwm_threshold_comparison.stimulus_applied",
+        "pwm_threshold_comparison.expected_observed"
+      ],
+      "executable": true,
+      "status": "executable",
+      "non_executable_reason": null,
+      "unresolved_bindings": []
+    }
+  ],
+  "executable_count": 5,
+  "trace_only_count": 0
+}
