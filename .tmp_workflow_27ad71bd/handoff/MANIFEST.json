@@ -1,0 +1,29 @@
+{
+  "type": "chiploop_ip_package",
+  "version": "1.0",
+  "top_module": "pwm_controller",
+  "generated_at": "2026-09-17T03:18:16.763209",
+  "file_count": 4,
+  "files": [
+    {
+      "path": "docs/spec/spec_agent_entry.json",
+      "sha256": "049003a5be0f9bfd67c9145264e27e198a185763cd0d1b8515f3b92173bcf967",
+      "bytes": 1909
+    },
+    {
+      "path": "misc/rtl_agent_entry.json",
+      "sha256": "91f7dd94379aa0f28086a422486672a8fca8ecbb26427e0726f5f7361fedb918",
+      "bytes": 251
+    },
+    {
+      "path": "misc/upf_static_check.json",
+      "sha256": "5bee4ba6ceeaf25f2685cc6a005ceda964b66b48990b2e5c8300d150395cd951",
+      "bytes": 2294
+    },
+    {
+      "path": "misc/upf_static_check.md",
+      "sha256": "42df094c4747877edd9f16402e2b7f63a1ac301e9c5d5641db72797a94715dfb",
+      "bytes": 889
+    }
+  ]
+}

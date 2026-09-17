@@ -1,0 +1,217 @@
+{
+  "type": "arch2rtl_dashboard",
+  "version": "1.0",
+  "top_module": "top",
+  "rtl_file_count": 0,
+  "module_count": 0,
+  "modules": [],
+  "interface": {
+    "input_count": 0,
+    "output_count": 0,
+    "inout_count": 0,
+    "input_port_count": 0,
+    "output_port_count": 0,
+    "inout_port_count": 0,
+    "count_basis": "bits",
+    "ports": []
+  },
+  "clock_reset": {
+    "clock_names": [],
+    "reset_names": [],
+    "primary_clock": null,
+    "primary_reset": null
+  },
+  "storage": {
+    "flipflop_count": 0,
+    "latch_count": 0,
+    "memory_bit_count": 0,
+    "memory_target_count": 0,
+    "storage_target_count": 0,
+    "latch_target_count": 0,
+    "sequential_blocks": 0,
+    "posedge_blocks": 0,
+    "negedge_blocks": 0,
+    "combinational_blocks": 0,
+    "sampled_flipflop_targets": [],
+    "sampled_latch_targets": [],
+    "sampled_memory_targets": []
+  },
+  "timing": {
+    "sdc_file_count": 0,
+    "sdc_files": [],
+    "full_cycle_path_count": 0,
+    "half_cycle_path_count": 0,
+    "multicycle_path_count": 0,
+    "false_path_count": 0,
+    "basis": "SDC constraints plus RTL edge-triggered block inference"
+  },
+  "lint": {
+    "status": "missing_rtl",
+    "tool": "verilator",
+    "available": true
+  },
+  "scopes": {
+    "functional": {
+      "name": "functional",
+      "rtl_file_count": 0,
+      "module_count": 0,
+      "modules": [],
+      "interface": {
+        "input_count": 0,
+        "output_count": 0,
+        "inout_count": 0,
+        "input_port_count": 0,
+        "output_port_count": 0,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": []
+      },
+      "storage": {
+        "flipflop_count": 0,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 0,
+        "latch_target_count": 0,
+        "sequential_blocks": 0,
+        "posedge_blocks": 0,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 0,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    },
+    "complete_package": {
+      "name": "complete_package",
+      "rtl_file_count": 0,
+      "module_count": 0,
+      "modules": [],
+      "interface": {
+        "input_count": 0,
+        "output_count": 0,
+        "inout_count": 0,
+        "input_port_count": 0,
+        "output_port_count": 0,
+        "inout_port_count": 0,
+        "count_basis": "bits",
+        "ports": []
+      },
+      "storage": {
+        "flipflop_count": 0,
+        "latch_count": 0,
+        "memory_bit_count": 0,
+        "memory_target_count": 0,
+        "storage_target_count": 0,
+        "latch_target_count": 0,
+        "sequential_blocks": 0,
+        "posedge_blocks": 0,
+        "negedge_blocks": 0,
+        "combinational_blocks": 0,
+        "sampled_flipflop_targets": [],
+        "sampled_latch_targets": [],
+        "sampled_memory_targets": []
+      },
+      "timing": {
+        "sdc_file_count": 0,
+        "sdc_files": [],
+        "full_cycle_path_count": 0,
+        "half_cycle_path_count": 0,
+        "multicycle_path_count": 0,
+        "false_path_count": 0,
+        "basis": "SDC constraints plus RTL edge-triggered block inference"
+      }
+    }
+  },
+  "metric_policy": {
+    "primary_scope": "complete_package",
+    "complete_package_note": "Complete package includes generated MBIST wrappers, algorithms, saboteur/model RTL, and staged SRAM behavioral models.",
+    "storage_note": "Unpacked behavioral memory arrays are reported as memory_bit_count, not flipflop_count."
+  },
+  "tooling": {
+    "tool_profile": {
+      "profile_id": "chiploop_saas_default",
+      "runner": "local_saas",
+      "artifact_policy": "full_sync",
+      "strict_tool_profile": false,
+      "tools": [
+        "atalanta",
+        "autombist",
+        "bash",
+        "boolector",
+        "cadence_genus",
+        "cargo",
+        "docker",
+        "fault",
+        "gcc",
+        "gcov",
+        "gem5_riscv",
+        "gem5_x86",
+        "git",
+        "gowin_pack",
+        "iverilog",
+        "jasper",
+        "llvm_cov",
+        "llvm_profdata",
+        "make",
+        "nextpnr_himbaechel_gowin",
+        "nextpnr_nexus",
+        "ngspice",
+        "openram",
+        "openroad",
+        "podem",
+        "prjoxide",
+        "questa",
+        "riscv64_linux_gnu_gcc",
+        "riscv64_unknown_elf_gcc",
+        "rustc",
+        "sby",
+        "scons",
+        "slang",
+        "sta",
+        "sv2v",
+        "synopsys_dc",
+        "vc_lp",
+        "vcs",
+        "verible_verilog_lint",
+        "verible_verilog_syntax",
+        "verilator",
+        "verilator_coverage",
+        "vvp",
+        "x86_64_linux_gnu_gcc",
+        "xcelium",
+        "yosys",
+        "z3"
+      ],
+      "runtime": [
+        "cocotb_config",
+        "pip",
+        "pytest",
+        "python",
+        "python3"
+      ],
+      "commands": [
+        "upf_power_aware_sim",
+        "upf_static_check"
+      ]
+    },
+    "artifact_policy": "full_sync"
+  },
+  "register_map": {
+    "register_count": 0,
+    "registers": []
+  },
+  "handoff": {
+    "package_dir": null,
+    "package_zip": null
+  }
+}
