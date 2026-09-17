@@ -1407,7 +1407,11 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
           </div>
         );
       }
-      const registers = array(record(evidence["digital_regmap.json"]?.regmap).registers);
+      const registerMapDocument = record(evidence["digital_regmap.json"]);
+      const registerMap = record(registerMapDocument.regmap);
+      const registers = array(registerMap.registers);
+      const registerMapNotApplicable = registerMapDocument.register_map_required === false
+        || firstString(registerMap.status) === "not_applicable";
       const systemDashboard = record(evidence["system_rtl_dashboard.json"]);
       if (Object.keys(systemDashboard).length) {
         const compileSummary = record(evidence["system_full_compile_summary.json"]);
@@ -1532,6 +1536,8 @@ export default function WorkflowEvidenceDashboard({ workflowId, status, stage, l
             })}
           </div>
         </div>
+      ) : registerMapNotApplicable ? (
+        <div className="mt-5 text-sm text-slate-300">No software-visible register map is required for this design.</div>
       ) : <div className="mt-5 text-sm text-amber-300">Register-map artifact is not available for this completed run.</div>;
     }
 
