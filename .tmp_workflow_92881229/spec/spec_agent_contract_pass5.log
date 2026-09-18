@@ -1,0 +1,2 @@
+Digital Spec Agent pass5 contract repair failure:
+Every feature_contracts entry must compile to an executable checker. response_acceptance_updates_command_validity: Requirement references stimulus/expected names that are not declared top-level signals.; timeout_or_fault_inhibits_actuator_validity: Requirement references stimulus/expected names that are not declared top-level signals.

@@ -1,1 +1,0 @@
-ValueError('Reset behavior contradicts executable feature contracts. reset_clears_counter_and_pwm_decode: reset_behavior says pwm_out=0, but feature expected is 1')

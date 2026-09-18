@@ -1,0 +1,2 @@
+Digital Spec Agent pass3 repair failure (contract_repair_pass3):
+Every feature_contracts entry must compile to an executable checker. request_stream_launch_when_enabled: Requirement lacks an explicit, fully bound expected signal map.; response_acceptance_updates_command_validity: Requirement lacks an explicit, fully bound expected signal map.; timeout_or_fault_inhibits_actuator_validity: Requirement lacks an explicit, fully bound expected signal map.

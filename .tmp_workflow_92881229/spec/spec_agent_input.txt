@@ -1,0 +1,80 @@
+The required synthesizable top module is adaptive_aero_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must implement the selected Physical AI application contract, external model request/response transport, validation, safety, timeout, and bounded actuator-command behavior.
+
+EXTERNAL MODEL TRANSPORT DIRECTION CONTRACT (mandatory; this takes precedence over ambiguous ingress/egress wording in upstream prose): the RTL emits model-request valid/data as outputs and receives model-request ready as an input. The RTL receives model-response valid/data as inputs and emits model-response ready as an output. Apply this rule by data flow even when application-specific ports use cmd_*, req_*, rsp_*, or response_* names. A top-level output must have a real RTL driver; never connect a required top-level output only to a child input.
+
+FIRMWARE CONTROL-PLANE CONTRACT (mandatory): this product journey requests generated firmware. The synthesizable top must expose a real firmware-visible CSR/MMIO interface with address, write-data, read-data, transaction-valid/write-enable, and response/ready semantics. DIGITAL_SPEC_JSON.register_contract must describe the implemented registers and fields. Every declared register must be reachable through RTL decode; do not label inaccessible internal state as software-visible. The streaming transport may coexist with, but cannot replace, this interface.
+Module: adaptive_aero_control_top.
+
+Purpose: Synthesizable FPGA digital-IP top for intelligent active-aerodynamics control. The module shall not implement NVIDIA DoMINO inference. Instead, it shall provide compact request/response transport, register programming, buffering, validation, safety gating, timeout detection, command clamping, and safe fallback for an external CPU/GPU-based surrogate execution path.
+
+Clock/reset:
+- Single primary clock input clk and active-low reset rst_n.
+- All sequential logic shall be synchronous to clk with asynchronous assertion, synchronous deassertion of reset allowed if implemented.
+
+Top-level interface constraints:
+- The top level shall expose only a bounded MMIO window or a bounded streaming interface; no top-level tensors, geometry arrays, flow fields, or large payload pin bundles are permitted.
+- Preferred interface is a 32-bit register window for control/status plus 128-bit valid/ready request and response streams.
+- Estimated scalar-equivalent top-level I/O shall remain below 256.
+
+Functional blocks:
+1) Control/status register file:
+   - Implement small synthesizable registers for enable, mode select, fallback mode, watchdog timeout, max command, min command, slew limit, request sequence counter, last accepted sequence, last response age, fault latch, and sticky error bits.
+   - Writes shall only affect defined fields; reserved bits read as zero.
+   - Include clear-on-write bits for sticky faults.
+
+2) Request packager:
+   - Pack a bounded request frame containing command header, sequence number, timestamp, operating-point metadata, geometry reference identifier, and compact flow-condition fields.
+   - The geometry data itself shall not be expanded into pin-level ports; only a reference/tag or bounded descriptor may be carried.
+   - Request frames shall be emitted on req_stream using valid/ready handshake.
+   - The packager shall not issue new requests when back-pressured.
+
+3) Response checker:
+   - Accept 128-bit bounded response frames from rsp_stream.
+   - Verify frame validity, sequence alignment, and freshness against watchdog/age threshold.
+   - Reject stale responses, duplicated sequence numbers, malformed length/status indicators, or responses arriving after timeout.
+   - Only validated responses may update the command pipeline.
+
+4) Safety monitor:
+   - Implement timeout logic driven by cycle counter or programmable age counter.
+   - If no valid response arrives before timeout, assert timeout fault and transition to safe fallback.
+   - Provide stale-data detection based on sequence and age comparison.
+
+5) Command clamp and actuator stage:
+   - Compute output command from validated response metadata or host-provided command fields.
+   - Clamp output to configured min/max values and optional slew-rate limit.
+   - If clamp occurs, assert a status flag.
+   - The actuator output shall update only when command_valid and not faulted.
+
+6) Safe fallback manager:
+   - Define a known-safe aero configuration output when faulted, timed out, or disabled.
+   - Safe fallback shall be deterministic and programmable through registers.
+   - On reset, output shall be safe fallback until enabled and a valid response is accepted.
+
+7) Payload storage:
+   - For FPGA implementation, use FPGA BRAM abstraction or inferred block memory supported by the target FPGA flow.
+   - Do not use Sky130 hard macros in FPGA synthesis.
+   - Do not implement bulk payload storage as flip-flop arrays.
+   - Store only bounded request/response staging and metadata; bulk surrogate tensors are external to RTL.
+
+Handshake behavior:
+- req_stream_valid must assert only when a complete request frame is available.
+- req_stream_ready shall gate frame launch.
+- rsp_stream_valid shall be sampled only when rsp_stream_ready is high.
+- Back-pressure shall not corrupt in-flight frames.
+
+Error handling:
+- On malformed response, stale response, or timeout, latch an error code, suppress normal command update, and route outputs to fallback.
+- Maintain sticky diagnostics until cleared via register write.
+
+Timing and synthesis:
+- All logic shall be synthesizable in FPGA flows.
+- No unsized arithmetic or non-synthesizable system tasks.
+- Use small counters and bounded comparators only.
+
+Reset behavior:
+- On reset deassertion, clear transient state, set safe fallback active, clear pending request, and keep actuator output in fallback until an explicit enable and valid response acceptance occur.
+
+Deliverable intent:
+- This RTL spec supports an Arch2RTL workflow where software/GPU handles the DoMINO surrogate and the FPGA handles transport/control/safety around that surrogate.
+FPGA MEMORY CONTRACT (mandatory): describe bulk payload/history/FIFO storage through a technology-neutral memory wrapper that the FPGA flow can map to native block RAM; do not flatten it into registers.
+NO COMMAND FALLBACK CONTRACT (mandatory; overrides conflicting generated prose): do not create a fallback command, fallback register, fallback status, fallback controller, substitute command, or fallback-on-reset behavior. On invalid, stale, timeout, reset, or fault conditions, inhibit/deassert actuator output validity and latch the fault for software handling. Do not silently replace the requested command.
