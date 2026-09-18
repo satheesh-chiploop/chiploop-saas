@@ -1,0 +1,491 @@
+---BEGIN adaptive_aero_command_parser.v---
+module adaptive_aero_command_parser (
+    clk,
+    reset_n,
+    cmd_valid_in,
+    cmd_ready_out,
+    cmd_data_in,
+    packet_fifo_dout,
+    pkt_type_out,
+    seq_num_out,
+    freshness_out,
+    stream_velocity_out,
+    geometry_handle_out,
+    actuator_request_out,
+    integrity_ok_out,
+    format_ok_out,
+    packet_valid_out
+);
+    input clk;
+    input reset_n;
+    input cmd_valid_in;
+    output cmd_ready_out;
+    input [127:0] cmd_data_in;
+    input [127:0] packet_fifo_dout;
+    output [3:0] pkt_type_out;
+    output [15:0] seq_num_out;
+    output [7:0] freshness_out;
+    output [15:0] stream_velocity_out;
+    output [15:0] geometry_handle_out;
+    output [15:0] actuator_request_out;
+    output integrity_ok_out;
+    output format_ok_out;
+    output packet_valid_out;
+
+    wire [127:0] packet_word;
+    assign packet_word = cmd_valid_in ? cmd_data_in : packet_fifo_dout;
+
+    assign pkt_type_out = packet_word[127:124];
+    assign seq_num_out = packet_word[123:108];
+    assign freshness_out = packet_word[107:100];
+    assign stream_velocity_out = packet_word[99:84];
+    assign geometry_handle_out = packet_word[83:68];
+    assign actuator_request_out = packet_word[67:52];
+
+    assign format_ok_out = (pkt_type_out == 4'h1) || (pkt_type_out == 4'h2) || (pkt_type_out == 4'h3);
+    assign integrity_ok_out = (packet_word[15:0] == (packet_word[127:112] ^ packet_word[111:96] ^ packet_word[95:80] ^ packet_word[79:64] ^ packet_word[63:48] ^ packet_word[47:32] ^ packet_word[31:16]));
+    assign packet_valid_out = cmd_valid_in & format_ok_out;
+
+    assign cmd_ready_out = reset_n & 1'b1;
+endmodule
+---END adaptive_aero_command_parser.v---
+---BEGIN adaptive_aero_safety_controller.v---
+module adaptive_aero_safety_controller (
+    clk,
+    reset_n,
+    pkt_type_in,
+    seq_num_in,
+    freshness_in,
+    stream_velocity_in,
+    geometry_handle_in,
+    actuator_request_in,
+    integrity_ok_in,
+    format_ok_in,
+    packet_valid_in,
+    mode_cfg_in,
+    packet_format_version_cfg_in,
+    watchdog_timeout_cfg_in,
+    clamp_min_cfg_in,
+    clamp_max_cfg_in,
+    fault_clear_pulse_in,
+    accepted_pulse_out,
+    rejected_pulse_out,
+    stale_fault_out,
+    timeout_fault_out,
+    checksum_fault_out,
+    range_fault_out,
+    seq_last_accepted_out,
+    clamped_output_ind_out,
+    actuator_cmd_drive_out,
+    actuator_enable_drive_out,
+    inhibit_active_out,
+    status_summary_out
+);
+    input clk;
+    input reset_n;
+    input [3:0] pkt_type_in;
+    input [15:0] seq_num_in;
+    input [7:0] freshness_in;
+    input [15:0] stream_velocity_in;
+    input [15:0] geometry_handle_in;
+    input [15:0] actuator_request_in;
+    input integrity_ok_in;
+    input format_ok_in;
+    input packet_valid_in;
+    input [1:0] mode_cfg_in;
+    input [3:0] packet_format_version_cfg_in;
+    input [15:0] watchdog_timeout_cfg_in;
+    input [15:0] clamp_min_cfg_in;
+    input [15:0] clamp_max_cfg_in;
+    input fault_clear_pulse_in;
+    output reg accepted_pulse_out;
+    output reg rejected_pulse_out;
+    output reg stale_fault_out;
+    output reg timeout_fault_out;
+    output reg checksum_fault_out;
+    output reg range_fault_out;
+    output reg [15:0] seq_last_accepted_out;
+    output reg clamped_output_ind_out;
+    output reg [15:0] actuator_cmd_drive_out;
+    output reg actuator_enable_drive_out;
+    output reg inhibit_active_out;
+    output reg [31:0] status_summary_out;
+
+    reg [15:0] watchdog_cnt;
+    reg [3:0] fault_latched;
+    reg [15:0] last_seq;
+    reg [15:0] clamp_cmd;
+    wire range_ok;
+    wire fresh_ok;
+    wire seq_ok;
+    wire checksum_ok;
+    wire format_match;
+    wire pkt_ok;
+    wire accepted;
+
+    assign range_ok = (stream_velocity_in >= 16'd20) && (stream_velocity_in <= 16'd55);
+    assign fresh_ok = (freshness_in <= watchdog_timeout_cfg_in[7:0]);
+    assign seq_ok = (seq_num_in != last_seq);
+    assign format_match = (pkt_type_in == {2'b00, packet_format_version_cfg_in[1:0]}) || (format_ok_in);
+    assign checksum_ok = integrity_ok_in & format_ok_in;
+    assign pkt_ok = packet_valid_in & range_ok & fresh_ok & seq_ok & checksum_ok & format_match;
+    assign accepted = pkt_ok & (mode_cfg_in != 2'b11);
+
+    always @(posedge clk or negedge reset_n) begin
+        if (!reset_n) begin
+            accepted_pulse_out <= 1'b0;
+            rejected_pulse_out <= 1'b0;
+            stale_fault_out <= 1'b0;
+            timeout_fault_out <= 1'b0;
+            checksum_fault_out <= 1'b0;
+            range_fault_out <= 1'b0;
+            seq_last_accepted_out <= 16'h0000;
+            clamped_output_ind_out <= 1'b0;
+            actuator_cmd_drive_out <= 16'h0000;
+            actuator_enable_drive_out <= 1'b0;
+            inhibit_active_out <= 1'b1;
+            status_summary_out <= 32'h00000000;
+            watchdog_cnt <= 16'h0000;
+            fault_latched <= 4'h0;
+            last_seq <= 16'h0000;
+            clamp_cmd <= 16'h0000;
+        end else begin
+            accepted_pulse_out <= 1'b0;
+            rejected_pulse_out <= 1'b0;
+            if (fault_clear_pulse_in) begin
+                fault_latched <= 4'h0;
+                stale_fault_out <= 1'b0;
+                timeout_fault_out <= 1'b0;
+                checksum_fault_out <= 1'b0;
+                range_fault_out <= 1'b0;
+            end
+            if (accepted) begin
+                accepted_pulse_out <= 1'b1;
+                last_seq <= seq_num_in;
+                seq_last_accepted_out <= seq_num_in;
+                watchdog_cnt <= 16'h0000;
+                clamp_cmd <= (actuator_request_in < clamp_min_cfg_in) ? clamp_min_cfg_in :
+                             (actuator_request_in > clamp_max_cfg_in) ? clamp_max_cfg_in : actuator_request_in;
+                clamped_output_ind_out <= (actuator_request_in < clamp_min_cfg_in) || (actuator_request_in > clamp_max_cfg_in);
+                actuator_cmd_drive_out <= (actuator_request_in < clamp_min_cfg_in) ? clamp_min_cfg_in :
+                                          (actuator_request_in > clamp_max_cfg_in) ? clamp_max_cfg_in : actuator_request_in;
+                actuator_enable_drive_out <= 1'b1;
+                inhibit_active_out <= 1'b0;
+            end else if (packet_valid_in) begin
+                rejected_pulse_out <= 1'b1;
+                if (!range_ok) begin range_fault_out <= 1'b1; fault_latched[3] <= 1'b1; end
+                if (!checksum_ok) begin checksum_fault_out <= 1'b1; fault_latched[2] <= 1'b1; end
+                if (!seq_ok || !fresh_ok) begin stale_fault_out <= 1'b1; fault_latched[0] <= 1'b1; end
+                actuator_enable_drive_out <= 1'b0;
+                inhibit_active_out <= 1'b1;
+            end
+            if (watchdog_timeout_cfg_in != 16'h0000) begin
+                if (watchdog_cnt < watchdog_timeout_cfg_in) watchdog_cnt <= watchdog_cnt + 16'h0001;
+                else begin
+                    timeout_fault_out <= 1'b1;
+                    fault_latched[1] <= 1'b1;
+                    actuator_enable_drive_out <= 1'b0;
+                    inhibit_active_out <= 1'b1;
+                end
+            end
+            status_summary_out[0] <= accepted_pulse_out;
+            status_summary_out[1] <= rejected_pulse_out;
+            status_summary_out[2] <= clamped_output_ind_out;
+            status_summary_out[3] <= inhibit_active_out;
+            status_summary_out[7:4] <= fault_latched;
+            status_summary_out[23:8] <= seq_last_accepted_out;
+            status_summary_out[31:24] <= watchdog_cnt[7:0];
+        end
+    end
+endmodule
+---END adaptive_aero_safety_controller.v---
+---BEGIN adaptive_aero_csr_mmio.v---
+module adaptive_aero_csr_mmio (
+    clk,
+    reset_n,
+    csr_addr_in,
+    csr_wdata_in,
+    csr_rdata_out,
+    csr_valid_in,
+    csr_write_in,
+    csr_ready_out,
+    mode_cfg_out,
+    packet_format_version_cfg_out,
+    watchdog_timeout_cfg_out,
+    clamp_min_cfg_out,
+    clamp_max_cfg_out,
+    fault_clear_pulse_out,
+    fault_status_in,
+    seq_last_accepted_in,
+    accepted_pulse_in,
+    rejected_pulse_in,
+    inhibit_active_in,
+    clamped_output_ind_in
+);
+    input clk;
+    input reset_n;
+    input [7:0] csr_addr_in;
+    input [63:0] csr_wdata_in;
+    output reg [63:0] csr_rdata_out;
+    input csr_valid_in;
+    input csr_write_in;
+    output reg csr_ready_out;
+    output reg [1:0] mode_cfg_out;
+    output reg [3:0] packet_format_version_cfg_out;
+    output reg [15:0] watchdog_timeout_cfg_out;
+    output reg [15:0] clamp_min_cfg_out;
+    output reg [15:0] clamp_max_cfg_out;
+    output reg fault_clear_pulse_out;
+    input [3:0] fault_status_in;
+    input [15:0] seq_last_accepted_in;
+    input accepted_pulse_in;
+    input rejected_pulse_in;
+    input inhibit_active_in;
+    input clamped_output_ind_in;
+
+    always @(posedge clk or negedge reset_n) begin
+        if (!reset_n) begin
+            mode_cfg_out <= 2'd0;
+            packet_format_version_cfg_out <= 4'd1;
+            watchdog_timeout_cfg_out <= 16'd1000;
+            clamp_min_cfg_out <= 16'd0;
+            clamp_max_cfg_out <= 16'hffff;
+            fault_clear_pulse_out <= 1'b0;
+            csr_ready_out <= 1'b1;
+            csr_rdata_out <= 64'h0;
+        end else begin
+            fault_clear_pulse_out <= 1'b0;
+            csr_ready_out <= csr_valid_in;
+            if (csr_valid_in && csr_write_in) begin
+                case (csr_addr_in)
+                    8'h00: mode_cfg_out <= csr_wdata_in[1:0];
+                    8'h01: packet_format_version_cfg_out <= csr_wdata_in[3:0];
+                    8'h02: watchdog_timeout_cfg_out <= csr_wdata_in[15:0];
+                    8'h03: clamp_min_cfg_out <= csr_wdata_in[15:0];
+                    8'h04: clamp_max_cfg_out <= csr_wdata_in[15:0];
+                    8'h07: if (csr_wdata_in[0]) fault_clear_pulse_out <= 1'b1;
+                    default: ;
+                endcase
+            end
+            if (csr_valid_in && !csr_write_in) begin
+                case (csr_addr_in)
+                    8'h00: csr_rdata_out <= {62'h0, mode_cfg_out};
+                    8'h01: csr_rdata_out <= {60'h0, packet_format_version_cfg_out};
+                    8'h02: csr_rdata_out <= {48'h0, watchdog_timeout_cfg_out};
+                    8'h03: csr_rdata_out <= {48'h0, clamp_min_cfg_out};
+                    8'h04: csr_rdata_out <= {48'h0, clamp_max_cfg_out};
+                    8'h05: csr_rdata_out <= {60'h0, fault_status_in};
+                    8'h06: csr_rdata_out <= {48'h0, seq_last_accepted_in};
+                    8'h07: csr_rdata_out <= 64'h0;
+                    8'h08: csr_rdata_out <= {28'h0, seq_last_accepted_in, inhibit_active_in, clamped_output_ind_in, rejected_pulse_in, accepted_pulse_in};
+                    default: csr_rdata_out <= 64'h0;
+                endcase
+            end else begin
+                csr_rdata_out <= csr_rdata_out;
+            end
+        end
+    end
+endmodule
+---END adaptive_aero_csr_mmio.v---
+---BEGIN adaptive_aero_status_packetizer.v---
+module adaptive_aero_status_packetizer (
+    clk,
+    reset_n,
+    accepted_pulse_in,
+    rejected_pulse_in,
+    stale_fault_in,
+    timeout_fault_in,
+    checksum_fault_in,
+    range_fault_in,
+    inhibit_active_in,
+    seq_last_accepted_in,
+    clamped_output_ind_in,
+    status_valid_out,
+    status_ready_in,
+    status_data_out
+);
+    input clk;
+    input reset_n;
+    input accepted_pulse_in;
+    input rejected_pulse_in;
+    input stale_fault_in;
+    input timeout_fault_in;
+    input checksum_fault_in;
+    input range_fault_in;
+    input inhibit_active_in;
+    input [15:0] seq_last_accepted_in;
+    input clamped_output_ind_in;
+    output reg status_valid_out;
+    input status_ready_in;
+    output reg [63:0] status_data_out;
+
+    always @(posedge clk or negedge reset_n) begin
+        if (!reset_n) begin
+            status_valid_out <= 1'b0;
+            status_data_out <= 64'h0;
+        end else begin
+            if (status_ready_in || !status_valid_out) begin
+                status_data_out <= {28'h0, seq_last_accepted_in, inhibit_active_in, clamped_output_ind_in, range_fault_in, checksum_fault_in, timeout_fault_in, stale_fault_in, rejected_pulse_in, accepted_pulse_in};
+                status_valid_out <= accepted_pulse_in | rejected_pulse_in | stale_fault_in | timeout_fault_in | checksum_fault_in | range_fault_in | inhibit_active_in;
+            end
+        end
+    end
+endmodule
+---END adaptive_aero_status_packetizer.v---
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    clk,
+    reset_n,
+    cmd_valid_in,
+    cmd_ready_out,
+    cmd_data_in,
+    status_valid_out,
+    status_ready_in,
+    status_data_out,
+    csr_addr_in,
+    csr_wdata_in,
+    csr_rdata_out,
+    csr_valid_in,
+    csr_write_in,
+    csr_ready_out,
+    actuator_cmd_out,
+    actuator_enable_out,
+    packet_fifo_dout,
+    fault_status_in
+);
+    input clk;
+    input reset_n;
+    input cmd_valid_in;
+    output cmd_ready_out;
+    input [127:0] cmd_data_in;
+    output status_valid_out;
+    input status_ready_in;
+    output [63:0] status_data_out;
+    input [7:0] csr_addr_in;
+    input [63:0] csr_wdata_in;
+    output [63:0] csr_rdata_out;
+    input csr_valid_in;
+    input csr_write_in;
+    output csr_ready_out;
+    output [15:0] actuator_cmd_out;
+    output actuator_enable_out;
+    input [127:0] packet_fifo_dout;
+    input [3:0] fault_status_in;
+
+    wire [3:0] pkt_type;
+    wire [15:0] seq_num;
+    wire [7:0] freshness;
+    wire [15:0] stream_velocity;
+    wire [15:0] geometry_handle;
+    wire [15:0] actuator_request;
+    wire integrity_ok;
+    wire format_ok;
+    wire packet_valid;
+    wire [1:0] mode_cfg;
+    wire [3:0] packet_format_version_cfg;
+    wire [15:0] watchdog_timeout_cfg;
+    wire [15:0] clamp_min_cfg;
+    wire [15:0] clamp_max_cfg;
+    wire fault_clear_pulse;
+    wire accepted_pulse;
+    wire rejected_pulse;
+    wire stale_fault;
+    wire timeout_fault;
+    wire checksum_fault;
+    wire range_fault;
+    wire inhibit_active;
+    wire [15:0] seq_last_accepted;
+    wire clamped_output_ind;
+    wire [31:0] status_summary;
+
+    adaptive_aero_command_parser u_parser (
+        .clk(clk),
+        .reset_n(reset_n),
+        .cmd_valid_in(cmd_valid_in),
+        .cmd_ready_out(cmd_ready_out),
+        .cmd_data_in(cmd_data_in),
+        .packet_fifo_dout(packet_fifo_dout),
+        .pkt_type_out(pkt_type),
+        .seq_num_out(seq_num),
+        .freshness_out(freshness),
+        .stream_velocity_out(stream_velocity),
+        .geometry_handle_out(geometry_handle),
+        .actuator_request_out(actuator_request),
+        .integrity_ok_out(integrity_ok),
+        .format_ok_out(format_ok),
+        .packet_valid_out(packet_valid)
+    );
+
+    adaptive_aero_safety_controller u_safety (
+        .clk(clk),
+        .reset_n(reset_n),
+        .pkt_type_in(pkt_type),
+        .seq_num_in(seq_num),
+        .freshness_in(freshness),
+        .stream_velocity_in(stream_velocity),
+        .geometry_handle_in(geometry_handle),
+        .actuator_request_in(actuator_request),
+        .integrity_ok_in(integrity_ok),
+        .format_ok_in(format_ok),
+        .packet_valid_in(packet_valid),
+        .mode_cfg_in(mode_cfg),
+        .packet_format_version_cfg_in(packet_format_version_cfg),
+        .watchdog_timeout_cfg_in(watchdog_timeout_cfg),
+        .clamp_min_cfg_in(clamp_min_cfg),
+        .clamp_max_cfg_in(clamp_max_cfg),
+        .fault_clear_pulse_in(fault_clear_pulse),
+        .accepted_pulse_out(accepted_pulse),
+        .rejected_pulse_out(rejected_pulse),
+        .stale_fault_out(stale_fault),
+        .timeout_fault_out(timeout_fault),
+        .checksum_fault_out(checksum_fault),
+        .range_fault_out(range_fault),
+        .seq_last_accepted_out(seq_last_accepted),
+        .clamped_output_ind_out(clamped_output_ind),
+        .actuator_cmd_drive_out(actuator_cmd_out),
+        .actuator_enable_drive_out(actuator_enable_out),
+        .inhibit_active_out(inhibit_active),
+        .status_summary_out(status_summary)
+    );
+
+    adaptive_aero_csr_mmio u_csr (
+        .clk(clk),
+        .reset_n(reset_n),
+        .csr_addr_in(csr_addr_in),
+        .csr_wdata_in(csr_wdata_in),
+        .csr_rdata_out(csr_rdata_out),
+        .csr_valid_in(csr_valid_in),
+        .csr_write_in(csr_write_in),
+        .csr_ready_out(csr_ready_out),
+        .mode_cfg_out(mode_cfg),
+        .packet_format_version_cfg_out(packet_format_version_cfg),
+        .watchdog_timeout_cfg_out(watchdog_timeout_cfg),
+        .clamp_min_cfg_out(clamp_min_cfg),
+        .clamp_max_cfg_out(clamp_max_cfg),
+        .fault_clear_pulse_out(fault_clear_pulse),
+        .fault_status_in(fault_status_in),
+        .seq_last_accepted_in(seq_last_accepted),
+        .accepted_pulse_in(accepted_pulse),
+        .rejected_pulse_in(rejected_pulse),
+        .inhibit_active_in(inhibit_active),
+        .clamped_output_ind_in(clamped_output_ind)
+    );
+
+    adaptive_aero_status_packetizer u_status (
+        .clk(clk),
+        .reset_n(reset_n),
+        .accepted_pulse_in(accepted_pulse),
+        .rejected_pulse_in(rejected_pulse),
+        .stale_fault_in(stale_fault),
+        .timeout_fault_in(timeout_fault),
+        .checksum_fault_in(checksum_fault),
+        .range_fault_in(range_fault),
+        .inhibit_active_in(inhibit_active),
+        .seq_last_accepted_in(seq_last_accepted),
+        .clamped_output_ind_in(clamped_output_ind),
+        .status_valid_out(status_valid_out),
+        .status_ready_in(status_ready_in),
+        .status_data_out(status_data_out)
+    );
+endmodule
+---END adaptive_aero_control_top.v---

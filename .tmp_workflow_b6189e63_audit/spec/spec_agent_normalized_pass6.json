@@ -1,0 +1,1634 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "feature_contracts": [
+    {
+      "id": "stream_ingress_handshake",
+      "description": "The top-level ingress stream must expose ready/valid backpressure and accept 128-bit packets for command transport.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "cmd_valid_in": 1,
+              "cmd_data_in": 170,
+              "status_ready_in": 1,
+              "csr_valid_in": 0,
+              "csr_write_in": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "cmd_ready_out": {
+          "min": 0,
+          "max": 1
+        }
+      },
+      "within_cycles": 1
+    },
+    {
+      "id": "status_egress_handshake",
+      "description": "The top-level status stream must present a 64-bit packet with valid/ready semantics.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "status_ready_in": 1,
+              "cmd_valid_in": 0,
+              "csr_valid_in": 0,
+              "csr_write_in": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "status_valid_out": {
+          "min": 0,
+          "max": 1
+        },
+        "status_data_out": {
+          "min": 0,
+          "max": 18446744073709551615
+        }
+      },
+      "within_cycles": 2
+    },
+    {
+      "id": "csr_ready_response",
+      "description": "The firmware-visible CSR/MMIO interface must provide ready/response semantics on valid transactions.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "csr_valid_in": 1,
+              "csr_write_in": 1,
+              "csr_addr_in": 3,
+              "csr_wdata_in": 4660,
+              "cmd_valid_in": 0,
+              "status_ready_in": 1
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "csr_ready_out": {
+          "min": 0,
+          "max": 1
+        }
+      },
+      "within_cycles": 1
+    },
+    {
+      "id": "actuator_inhibit_on_reset",
+      "description": "Reset must inhibit actuator validity and clear latched state without substituting any fallback command.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "reset_n": 0,
+              "cmd_valid_in": 0,
+              "status_ready_in": 1,
+              "csr_valid_in": 0,
+              "csr_write_in": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "actuator_enable_out": 0
+      },
+      "within_cycles": 1
+    },
+    {
+      "id": "bounded_actuator_output",
+      "description": "When commands are accepted, the actuator command path must remain bounded by programmable clamp limits and report clamping through telemetry channels.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "reset_n": 1,
+              "cmd_valid_in": 1,
+              "status_ready_in": 1,
+              "csr_valid_in": 1,
+              "csr_write_in": 1,
+              "csr_addr_in": 3,
+              "csr_wdata_in": 16,
+              "cmd_data_in": 305419896
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "actuator_enable_out": {
+          "min": 0,
+          "max": 1
+        },
+        "actuator_cmd_out": {
+          "min": 0,
+          "max": 65535
+        }
+      },
+      "within_cycles": 4
+    },
+    {
+      "id": "fault_latching_telemetry",
+      "description": "Fault conditions must be latched and visible through status and CSR-visible fault reporting.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "reset_n": 1,
+              "cmd_valid_in": 1,
+              "cmd_data_in": 4294967295,
+              "status_ready_in": 1,
+              "csr_valid_in": 0,
+              "csr_write_in": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "status_valid_out": {
+          "min": 0,
+          "max": 1
+        }
+      },
+      "within_cycles": 4
+    }
+  ],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level integration for ingress command transport, safety validation, CSR/MMIO control, telemetry emission, and bounded actuator command generation.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cmd_valid_in",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "cmd_ready_out",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "cmd_data_in",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "status_valid_out",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "status_ready_in",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "status_data_out",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "csr_addr_in",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "csr_wdata_in",
+          "direction": "input",
+          "width": 64
+        },
+        {
+          "name": "csr_rdata_out",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "csr_valid_in",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "csr_write_in",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "csr_ready_out",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_out",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_enable_out",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "packet_fifo_dout",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "fault_status_in",
+          "direction": "input",
+          "width": 4
+        }
+      ],
+      "functionality": "Implements the full command/safety/control-plane contract for the aerodynamics command wrapper. It receives compact command packets, decodes packet type, sequence, freshness/age, stream velocity, geometry handle, desired actuator request, and integrity fields, validates packet type and format, enforces the 20-55 m/s operating envelope, compares sequence numbers against the last accepted sequence, verifies freshness against a programmable timeout threshold, and rejects malformed packets. It exposes a firmware-visible CSR/MMIO window to configure operating mode, packet format version, watchdog timeout, actuator clamp limits, and fault clear behavior. It maintains latched faults for stale command, timeout, checksum error, out-of-range input, and clamp/inhibit reporting. It emits a status packet with acceptance/rejection, fault summary, sequence tracking, inhibited-output state, and clamped-output indication. It drives a bounded actuator command output through clamp logic when and only when a command is accepted and not inhibited; otherwise it deasserts actuator enable and preserves fault state for software handling. It does not implement any surrogate neural/network computation.",
+      "responsibilities": [
+        "Parse and validate inbound command packets.",
+        "Provide command-ready backpressure on the ingress stream.",
+        "Maintain last-accepted sequence tracking and freshness checks.",
+        "Implement watchdog countdown from accepted commands.",
+        "Latch and report faults until cleared by CSR.",
+        "Clamp actuator command to programmed minimum and maximum limits.",
+        "Generate 64-bit status telemetry packets.",
+        "Expose a firmware-visible CSR/MMIO control plane.",
+        "Consume FIFO read data from the technology-neutral packet buffer wrapper input port."
+      ],
+      "must_drive": [
+        "cmd_ready_out",
+        "status_valid_out",
+        "status_data_out",
+        "csr_rdata_out",
+        "csr_ready_out",
+        "actuator_cmd_out",
+        "actuator_enable_out"
+      ],
+      "must_receive": [
+        "clk",
+        "reset_n",
+        "cmd_valid_in",
+        "cmd_data_in",
+        "status_ready_in",
+        "csr_addr_in",
+        "csr_wdata_in",
+        "csr_valid_in",
+        "csr_write_in",
+        "packet_fifo_dout",
+        "fault_status_in"
+      ],
+      "must_not_drive": [
+        "cmd_valid_in",
+        "cmd_data_in",
+        "status_ready_in",
+        "csr_addr_in",
+        "csr_wdata_in",
+        "csr_valid_in",
+        "csr_write_in",
+        "packet_fifo_dout"
+      ],
+      "reset_behavior": "On reset_n deassertion, all latched faults clear, watchdog and sequence trackers reset to baseline, CSR response becomes idle, command acceptance is inhibited until the controller is released from reset, and actuator_enable_out is deasserted. The design does not substitute any fallback command on reset; it simply inhibits actuator output validity until a valid, accepted command is processed.",
+      "behavior_rules": [
+        "Incoming command packets are accepted only when packet type and version match the implemented protocol, checksum/integrity passes, velocity is within 20 to 55 m/s inclusive, sequence number is strictly newer than the last accepted sequence under the selected wrap policy, and freshness is within the programmed timeout threshold.",
+        "Any malformed packet, checksum failure, stale sequence, out-of-range velocity, or freshness violation must reject the command and latch the corresponding fault bit.",
+        "The watchdog timer reloads only on accepted commands and forces actuator_enable_out low if idle beyond the configured timeout.",
+        "Actuator command output must be clamped between programmable minimum and maximum limits whenever a valid command is driven; if the command is rejected or a fault inhibits actuation, actuator_enable_out must be deasserted.",
+        "The status packet must report command acceptance/rejection, fault summary, sequence tracking, and clamped-output indication using the 64-bit status stream.",
+        "The CSR/MMIO window must be reachable through RTL decode and must implement readable/writable registers for mode, packet format version, watchdog timeout, clamp min/max, fault status, and fault clear.",
+        "No large payload, tensor, or flow-field memory is inferred; only bounded control state and the optional small packet FIFO wrapper macro are permitted.",
+        "The top module must remain the real design top and must not delegate safety enforcement to a leaf telemetry or register-bank module."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "adaptive_aero_command_parser",
+        "description": "Extracts and validates semantic fields from the 128-bit inbound command packet and presents decoded control fields and validation results to the controller.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cmd_valid_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cmd_ready_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_data_in",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "packet_fifo_dout",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "pkt_type_out",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "seq_num_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "freshness_out",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "stream_velocity_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "geometry_handle_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_request_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "integrity_ok_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "format_ok_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "packet_valid_out",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Decodes packet type, sequence number, freshness/age, stream velocity, geometry descriptor/handle, desired actuator request, and integrity field from the inbound command packet format. It flags malformed packets and reports parse/format validity to the safety controller. It does not implement model inference or any surrogate physics.",
+        "responsibilities": [
+          "Decode packet fields from the compact command payload.",
+          "Check packet format version and packet type.",
+          "Provide semantic fields to the controller.",
+          "Assert packet_valid_out only when structural parsing succeeds."
+        ],
+        "must_drive": [
+          "cmd_ready_out",
+          "pkt_type_out",
+          "seq_num_out",
+          "freshness_out",
+          "stream_velocity_out",
+          "geometry_handle_out",
+          "actuator_request_out",
+          "integrity_ok_out",
+          "format_ok_out",
+          "packet_valid_out"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "cmd_valid_in",
+          "cmd_data_in",
+          "packet_fifo_dout"
+        ],
+        "must_not_drive": [
+          "cmd_valid_in",
+          "cmd_data_in",
+          "packet_fifo_dout"
+        ],
+        "reset_behavior": "On reset, outputs deassert and decoded fields return to zeroed baseline without generating a valid packet indication.",
+        "behavior_rules": [
+          "The parser is purely combinational/registered decode around the top-level command transport.",
+          "The parser must not invent substitute commands or substitute values.",
+          "All decoded semantic outputs are explicit ports for downstream safety checking.",
+          "The parser may ignore packets when cmd_valid_in is low and must not assert packet_valid_out in that condition."
+        ],
+        "rtl_output_file": "adaptive_aero_command_parser.v"
+      },
+      {
+        "name": "adaptive_aero_safety_controller",
+        "description": "Evaluates decoded command semantics, applies envelope and sequence checks, supervises watchdog and fault latching, and produces bounded actuator command control signals and status summary fields.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "pkt_type_in",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "seq_num_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "freshness_in",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "stream_velocity_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "geometry_handle_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "actuator_request_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "integrity_ok_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "format_ok_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "packet_valid_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "mode_cfg_in",
+            "direction": "input",
+            "width": 2
+          },
+          {
+            "name": "packet_format_version_cfg_in",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "watchdog_timeout_cfg_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "clamp_min_cfg_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "clamp_max_cfg_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "fault_clear_pulse_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "accepted_pulse_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "rejected_pulse_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "stale_fault_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "timeout_fault_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "checksum_fault_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "range_fault_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "seq_last_accepted_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "clamped_output_ind_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "actuator_cmd_drive_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "actuator_enable_drive_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "inhibit_active_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_summary_out",
+            "direction": "output",
+            "width": 32
+          }
+        ],
+        "functionality": "Implements the deterministic safety and control policy. It compares sequence numbers against the last accepted sequence, checks freshness against the programmable timeout, enforces the 20-55 m/s envelope, applies clamp limits to the actuator request, latches faults, tracks watchdog expiration, and produces the final actuator command and enable. On invalid, stale, timeout, reset, or fault conditions, it inhibits actuator output validity and latches the fault for software handling; it does not silently replace the requested command.",
+        "responsibilities": [
+          "Enforce velocity envelope and packet validity rules.",
+          "Track last accepted sequence number.",
+          "Apply watchdog timeout and idle detection.",
+          "Latch stale, timeout, checksum, and range faults.",
+          "Clamp the actuator command within programmed limits when accepted.",
+          "Deassert actuator enable on any rejected or faulted condition.",
+          "Drive summary bits for status packet assembly."
+        ],
+        "must_drive": [
+          "accepted_pulse_out",
+          "rejected_pulse_out",
+          "stale_fault_out",
+          "timeout_fault_out",
+          "checksum_fault_out",
+          "range_fault_out",
+          "seq_last_accepted_out",
+          "clamped_output_ind_out",
+          "actuator_cmd_drive_out",
+          "actuator_enable_drive_out",
+          "inhibit_active_out",
+          "status_summary_out"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "pkt_type_in",
+          "seq_num_in",
+          "freshness_in",
+          "stream_velocity_in",
+          "geometry_handle_in",
+          "actuator_request_in",
+          "integrity_ok_in",
+          "format_ok_in",
+          "packet_valid_in",
+          "mode_cfg_in",
+          "packet_format_version_cfg_in",
+          "watchdog_timeout_cfg_in",
+          "clamp_min_cfg_in",
+          "clamp_max_cfg_in",
+          "fault_clear_pulse_in"
+        ],
+        "must_not_drive": [
+          "pkt_type_in",
+          "seq_num_in",
+          "freshness_in",
+          "stream_velocity_in",
+          "geometry_handle_in",
+          "actuator_request_in",
+          "integrity_ok_in",
+          "format_ok_in",
+          "packet_valid_in",
+          "mode_cfg_in",
+          "packet_format_version_cfg_in",
+          "watchdog_timeout_cfg_in",
+          "clamp_min_cfg_in",
+          "clamp_max_cfg_in",
+          "fault_clear_pulse_in"
+        ],
+        "reset_behavior": "On reset, the controller clears accepted/rejected pulses, sequence tracking, watchdog state, and all latched faults, and deasserts actuator_enable_drive_out. No substitute command is produced; the system remains inhibited until a valid command is accepted after reset.",
+        "behavior_rules": [
+          "accepted_pulse_out and rejected_pulse_out are mutually exclusive per packet evaluation.",
+          "stale_fault_out asserts when sequence or freshness rules fail.",
+          "timeout_fault_out asserts when the watchdog expires without accepted commands.",
+          "checksum_fault_out asserts when integrity_ok_in is low or structural packet validation fails.",
+          "range_fault_out asserts when stream_velocity_in is outside the 20 to 55 m/s inclusive envelope.",
+          "inhibit_active_out indicates inhibited output validity due to timeout/fault conditions rather than any substitute control command.",
+          "clamped_output_ind_out asserts when actuator_request_in is limited by clamp_min_cfg_in or clamp_max_cfg_in.",
+          "status_summary_out aggregates current fault and acceptance state for the status packet builder.",
+          "No feature in this module may create a replacement command or internal substitute actuation value when actuation is inhibited."
+        ],
+        "rtl_output_file": "adaptive_aero_safety_controller.v"
+      },
+      {
+        "name": "adaptive_aero_csr_mmio",
+        "description": "Implements the firmware-visible CSR/MMIO register window with address, write-data, read-data, transaction-valid/write-enable, and response/ready semantics. Provides configuration and fault visibility to software and accepts fault-clear requests through reachable register decode.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "csr_addr_in",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "csr_wdata_in",
+            "direction": "input",
+            "width": 64
+          },
+          {
+            "name": "csr_rdata_out",
+            "direction": "output",
+            "width": 64
+          },
+          {
+            "name": "csr_valid_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "csr_write_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "csr_ready_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "mode_cfg_out",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "packet_format_version_cfg_out",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "watchdog_timeout_cfg_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "clamp_min_cfg_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "clamp_max_cfg_out",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "fault_clear_pulse_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "fault_status_in",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "seq_last_accepted_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "accepted_pulse_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rejected_pulse_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "inhibit_active_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "clamped_output_ind_in",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Implements a firmware-visible register map reachable by RTL address decode. It exposes writable configuration registers for mode, packet format version, watchdog timeout, clamp minimum, clamp maximum, and a fault-clear strobe, and readable status registers for fault summary, last accepted sequence, acceptance/rejection, inhibit indication, and clamped-output indication. The fault_status_in port carries the 4-bit aggregated fault vector built by top-level connectivity from the safety controller fault outputs. It does not substitute for the top-level transport or safety control logic.",
+        "responsibilities": [
+          "Provide firmware-accessible CSR/MMIO semantics.",
+          "Decode all implemented registers and fields.",
+          "Expose readable configuration and status state.",
+          "Generate a fault-clear pulse from a legal CSR write transaction.",
+          "Return read data and ready/response semantics within bounded latency."
+        ],
+        "must_drive": [
+          "csr_rdata_out",
+          "csr_ready_out",
+          "mode_cfg_out",
+          "packet_format_version_cfg_out",
+          "watchdog_timeout_cfg_out",
+          "clamp_min_cfg_out",
+          "clamp_max_cfg_out",
+          "fault_clear_pulse_out"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "csr_addr_in",
+          "csr_wdata_in",
+          "csr_valid_in",
+          "csr_write_in",
+          "fault_status_in",
+          "seq_last_accepted_in",
+          "accepted_pulse_in",
+          "rejected_pulse_in",
+          "inhibit_active_in",
+          "clamped_output_ind_in"
+        ],
+        "must_not_drive": [
+          "csr_addr_in",
+          "csr_wdata_in",
+          "csr_valid_in",
+          "csr_write_in",
+          "fault_status_in",
+          "seq_last_accepted_in",
+          "accepted_pulse_in",
+          "rejected_pulse_in",
+          "inhibit_active_in",
+          "clamped_output_ind_in"
+        ],
+        "reset_behavior": "On reset, the CSR interface returns idle/ready state, configuration registers assume safe documented defaults, and read data is cleared. Reset does not create a substitute command or inhibited actuation behavior.",
+        "behavior_rules": [
+          "Every declared register must be reachable through address decode.",
+          "The MMIO window shall be no wider than 64 bits per access.",
+          "Software-visible state must reflect actual RTL-controlled registers and status signals only.",
+          "Fault status is a 4-bit aggregated input composed in the top-level connectivity from the individual latched fault outputs.",
+          "Fault-clear is a write-controlled strobe that is observable by the safety controller.",
+          "The CSR interface may coexist with streaming transport but cannot replace the transport contract."
+        ],
+        "rtl_output_file": "adaptive_aero_csr_mmio.v"
+      },
+      {
+        "name": "adaptive_aero_status_packetizer",
+        "description": "Assembles the outbound 64-bit status packet from acceptance, fault, sequence, inhibit, and clamp indications and manages valid/ready handshaking.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "reset_n",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "accepted_pulse_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rejected_pulse_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "stale_fault_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "timeout_fault_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "checksum_fault_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "range_fault_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "inhibit_active_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "seq_last_accepted_in",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "clamped_output_ind_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_valid_out",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_ready_in",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_data_out",
+            "direction": "output",
+            "width": 64
+          }
+        ],
+        "functionality": "Formats the outbound status stream. The packet includes command acceptance/rejection, fault summary, current sequence tracking, inhibited-output state, and clamped-output indication. It emits a deterministic compact report suitable for software telemetry and does not carry payload memories or surrogate model data.",
+        "responsibilities": [
+          "Serialize control status into a 64-bit packet.",
+          "Honor status_valid/status_ready handshaking.",
+          "Report all required fault categories and acceptance status.",
+          "Provide current sequence tracking and output clamp indication."
+        ],
+        "must_drive": [
+          "status_valid_out",
+          "status_data_out"
+        ],
+        "must_receive": [
+          "clk",
+          "reset_n",
+          "accepted_pulse_in",
+          "rejected_pulse_in",
+          "stale_fault_in",
+          "timeout_fault_in",
+          "checksum_fault_in",
+          "range_fault_in",
+          "inhibit_active_in",
+          "seq_last_accepted_in",
+          "clamped_output_ind_in",
+          "status_ready_in"
+        ],
+        "must_not_drive": [
+          "accepted_pulse_in",
+          "rejected_pulse_in",
+          "stale_fault_in",
+          "timeout_fault_in",
+          "checksum_fault_in",
+          "range_fault_in",
+          "inhibit_active_in",
+          "seq_last_accepted_in",
+          "clamped_output_ind_in",
+          "status_ready_in"
+        ],
+        "reset_behavior": "On reset, status_valid_out is deasserted and status_data_out is cleared until the first valid report can be assembled.",
+        "behavior_rules": [
+          "The status packet must be derived from real controller state and must not invent missing telemetry.",
+          "The packetizer must preserve bounded-latency behavior and backpressure on status_ready_in.",
+          "The packetizer must reflect inhibited actuation by reporting inhibit_active_in or equivalent fault summary bits rather than manufacturing a substitute command."
+        ],
+        "rtl_output_file": "adaptive_aero_status_packetizer.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_command_parser.clk",
+        "adaptive_aero_safety_controller.clk",
+        "adaptive_aero_csr_mmio.clk",
+        "adaptive_aero_status_packetizer.clk"
+      ],
+      "description": "Top clock fans out to all synchronous submodules."
+    },
+    {
+      "top_port": "reset_n",
+      "connected_to": [
+        "adaptive_aero_command_parser.reset_n",
+        "adaptive_aero_safety_controller.reset_n",
+        "adaptive_aero_csr_mmio.reset_n",
+        "adaptive_aero_status_packetizer.reset_n"
+      ],
+      "description": "Active-low synchronous reset fans out to all submodules."
+    },
+    {
+      "top_port": "cmd_valid_in",
+      "connected_to": [
+        "adaptive_aero_command_parser.cmd_valid_in"
+      ],
+      "description": "Inbound command stream valid connects to the parser."
+    },
+    {
+      "top_port": "cmd_ready_out",
+      "connected_to": [
+        "adaptive_aero_command_parser.cmd_ready_out"
+      ],
+      "description": "Parser-generated ready propagates to the top-level ingress backpressure output."
+    },
+    {
+      "top_port": "cmd_data_in",
+      "connected_to": [
+        "adaptive_aero_command_parser.cmd_data_in"
+      ],
+      "description": "Inbound 128-bit command packet payload feeds the parser."
+    },
+    {
+      "top_port": "status_valid_out",
+      "connected_to": [
+        "adaptive_aero_status_packetizer.status_valid_out"
+      ],
+      "description": "Outbound status valid is driven by the packetizer."
+    },
+    {
+      "top_port": "status_ready_in",
+      "connected_to": [
+        "adaptive_aero_status_packetizer.status_ready_in"
+      ],
+      "description": "Outbound status backpressure enters the packetizer."
+    },
+    {
+      "top_port": "status_data_out",
+      "connected_to": [
+        "adaptive_aero_status_packetizer.status_data_out"
+      ],
+      "description": "Outbound status payload is driven by the packetizer."
+    },
+    {
+      "top_port": "csr_addr_in",
+      "connected_to": [
+        "adaptive_aero_csr_mmio.csr_addr_in"
+      ],
+      "description": "Firmware CSR address input routes to the MMIO block."
+    },
+    {
+      "top_port": "csr_wdata_in",
+      "connected_to": [
+        "adaptive_aero_csr_mmio.csr_wdata_in"
+      ],
+      "description": "Firmware CSR write data routes to the MMIO block."
+    },
+    {
+      "top_port": "csr_rdata_out",
+      "connected_to": [
+        "adaptive_aero_csr_mmio.csr_rdata_out"
+      ],
+      "description": "Firmware CSR read data is driven by the MMIO block."
+    },
+    {
+      "top_port": "csr_valid_in",
+      "connected_to": [
+        "adaptive_aero_csr_mmio.csr_valid_in"
+      ],
+      "description": "Firmware CSR transaction valid routes to the MMIO block."
+    },
+    {
+      "top_port": "csr_write_in",
+      "connected_to": [
+        "adaptive_aero_csr_mmio.csr_write_in"
+      ],
+      "description": "Firmware CSR write-enable routes to the MMIO block."
+    },
+    {
+      "top_port": "csr_ready_out",
+      "connected_to": [
+        "adaptive_aero_csr_mmio.csr_ready_out"
+      ],
+      "description": "Firmware CSR ready/response is driven by the MMIO block."
+    },
+    {
+      "top_port": "actuator_cmd_out",
+      "connected_to": [
+        "adaptive_aero_safety_controller.actuator_cmd_drive_out"
+      ],
+      "description": "Final bounded actuator command is driven by the safety controller."
+    },
+    {
+      "top_port": "actuator_enable_out",
+      "connected_to": [
+        "adaptive_aero_safety_controller.actuator_enable_drive_out"
+      ],
+      "description": "Final actuator enable is driven by the safety controller."
+    },
+    {
+      "top_port": "packet_fifo_dout",
+      "connected_to": [
+        "adaptive_aero_command_parser.packet_fifo_dout"
+      ],
+      "description": "Optional small packet-buffer data output is observed by the parser for bounded buffering support."
+    },
+    {
+      "top_port": "fault_status_in",
+      "connected_to": [
+        "adaptive_aero_csr_mmio.fault_status_in"
+      ],
+      "description": "Explicit top-level source for otherwise source-less required child input(s)."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "pkt_type",
+      "width": 4,
+      "source": "adaptive_aero_command_parser.pkt_type_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.pkt_type_in"
+      ],
+      "description": "Decoded packet type from parser to safety controller."
+    },
+    {
+      "name": "seq_num",
+      "width": 16,
+      "source": "adaptive_aero_command_parser.seq_num_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.seq_num_in"
+      ],
+      "description": "Decoded sequence number from parser to safety controller."
+    },
+    {
+      "name": "freshness",
+      "width": 8,
+      "source": "adaptive_aero_command_parser.freshness_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.freshness_in"
+      ],
+      "description": "Decoded freshness/age field from parser to safety controller."
+    },
+    {
+      "name": "stream_velocity",
+      "width": 16,
+      "source": "adaptive_aero_command_parser.stream_velocity_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.stream_velocity_in"
+      ],
+      "description": "Decoded stream velocity used for 20-55 m/s envelope checking."
+    },
+    {
+      "name": "geometry_handle",
+      "width": 16,
+      "source": "adaptive_aero_command_parser.geometry_handle_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.geometry_handle_in"
+      ],
+      "description": "Decoded geometry descriptor or handle associated with the DrivAerML STL reference geometry."
+    },
+    {
+      "name": "actuator_request",
+      "width": 16,
+      "source": "adaptive_aero_command_parser.actuator_request_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.actuator_request_in"
+      ],
+      "description": "Decoded desired actuator request from the command packet."
+    },
+    {
+      "name": "integrity_ok",
+      "width": 1,
+      "source": "adaptive_aero_command_parser.integrity_ok_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.integrity_ok_in"
+      ],
+      "description": "Checksum/integrity result from parser to safety controller."
+    },
+    {
+      "name": "format_ok",
+      "width": 1,
+      "source": "adaptive_aero_command_parser.format_ok_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.format_ok_in"
+      ],
+      "description": "Packet format/version match indication from parser to safety controller."
+    },
+    {
+      "name": "packet_valid",
+      "width": 1,
+      "source": "adaptive_aero_command_parser.packet_valid_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.packet_valid_in"
+      ],
+      "description": "Structural packet validity indication from parser to safety controller."
+    },
+    {
+      "name": "mode_cfg",
+      "width": 2,
+      "source": "adaptive_aero_csr_mmio.mode_cfg_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.mode_cfg_in"
+      ],
+      "description": "Firmware-configured operating mode."
+    },
+    {
+      "name": "packet_format_version_cfg",
+      "width": 4,
+      "source": "adaptive_aero_csr_mmio.packet_format_version_cfg_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.packet_format_version_cfg_in"
+      ],
+      "description": "Firmware-configured packet format version."
+    },
+    {
+      "name": "watchdog_timeout_cfg",
+      "width": 16,
+      "source": "adaptive_aero_csr_mmio.watchdog_timeout_cfg_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.watchdog_timeout_cfg_in"
+      ],
+      "description": "Programmable watchdog timeout threshold."
+    },
+    {
+      "name": "clamp_min_cfg",
+      "width": 16,
+      "source": "adaptive_aero_csr_mmio.clamp_min_cfg_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.clamp_min_cfg_in"
+      ],
+      "description": "Programmable actuator minimum clamp."
+    },
+    {
+      "name": "clamp_max_cfg",
+      "width": 16,
+      "source": "adaptive_aero_csr_mmio.clamp_max_cfg_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.clamp_max_cfg_in"
+      ],
+      "description": "Programmable actuator maximum clamp."
+    },
+    {
+      "name": "fault_clear_pulse",
+      "width": 1,
+      "source": "adaptive_aero_csr_mmio.fault_clear_pulse_out",
+      "destinations": [
+        "adaptive_aero_safety_controller.fault_clear_pulse_in"
+      ],
+      "description": "CSR-generated fault clear pulse into the safety controller."
+    },
+    {
+      "name": "accepted_pulse",
+      "width": 1,
+      "source": "adaptive_aero_safety_controller.accepted_pulse_out",
+      "destinations": [
+        "adaptive_aero_csr_mmio.accepted_pulse_in",
+        "adaptive_aero_status_packetizer.accepted_pulse_in"
+      ],
+      "description": "Acceptance pulse shared with CSR status tracking and status packet assembly."
+    },
+    {
+      "name": "rejected_pulse",
+      "width": 1,
+      "source": "adaptive_aero_safety_controller.rejected_pulse_out",
+      "destinations": [
+        "adaptive_aero_csr_mmio.rejected_pulse_in",
+        "adaptive_aero_status_packetizer.rejected_pulse_in"
+      ],
+      "description": "Rejection pulse shared with CSR status tracking and status packet assembly."
+    },
+    {
+      "name": "stale_fault",
+      "width": 1,
+      "source": "adaptive_aero_safety_controller.stale_fault_out",
+      "destinations": [
+        "adaptive_aero_status_packetizer.stale_fault_in"
+      ],
+      "description": "Latched stale-command fault indication."
+    },
+    {
+      "name": "timeout_fault",
+      "width": 1,
+      "source": "adaptive_aero_safety_controller.timeout_fault_out",
+      "destinations": [
+        "adaptive_aero_status_packetizer.timeout_fault_in"
+      ],
+      "description": "Latched watchdog timeout fault indication."
+    },
+    {
+      "name": "checksum_fault",
+      "width": 1,
+      "source": "adaptive_aero_safety_controller.checksum_fault_out",
+      "destinations": [
+        "adaptive_aero_status_packetizer.checksum_fault_in"
+      ],
+      "description": "Latched checksum or integrity fault indication."
+    },
+    {
+      "name": "range_fault",
+      "width": 1,
+      "source": "adaptive_aero_safety_controller.range_fault_out",
+      "destinations": [
+        "adaptive_aero_status_packetizer.range_fault_in"
+      ],
+      "description": "Latched out-of-range velocity fault indication."
+    },
+    {
+      "name": "inhibit_active",
+      "width": 1,
+      "source": "adaptive_aero_safety_controller.inhibit_active_out",
+      "destinations": [
+        "adaptive_aero_csr_mmio.inhibit_active_in",
+        "adaptive_aero_status_packetizer.inhibit_active_in"
+      ],
+      "description": "Indicates inhibited actuator output validity due to timeout/fault conditions."
+    },
+    {
+      "name": "seq_last_accepted",
+      "width": 16,
+      "source": "adaptive_aero_safety_controller.seq_last_accepted_out",
+      "destinations": [
+        "adaptive_aero_csr_mmio.seq_last_accepted_in",
+        "adaptive_aero_status_packetizer.seq_last_accepted_in"
+      ],
+      "description": "Last accepted sequence number for software visibility and telemetry."
+    },
+    {
+      "name": "clamped_output_ind",
+      "width": 1,
+      "source": "adaptive_aero_safety_controller.clamped_output_ind_out",
+      "destinations": [
+        "adaptive_aero_csr_mmio.clamped_output_ind_in",
+        "adaptive_aero_status_packetizer.clamped_output_ind_in"
+      ],
+      "description": "Indicates that the requested actuator command was clamped."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "pkt_type",
+      "owner": "adaptive_aero_command_parser.pkt_type_out"
+    },
+    {
+      "signal": "seq_num",
+      "owner": "adaptive_aero_command_parser.seq_num_out"
+    },
+    {
+      "signal": "freshness",
+      "owner": "adaptive_aero_command_parser.freshness_out"
+    },
+    {
+      "signal": "stream_velocity",
+      "owner": "adaptive_aero_command_parser.stream_velocity_out"
+    },
+    {
+      "signal": "geometry_handle",
+      "owner": "adaptive_aero_command_parser.geometry_handle_out"
+    },
+    {
+      "signal": "actuator_request",
+      "owner": "adaptive_aero_command_parser.actuator_request_out"
+    },
+    {
+      "signal": "integrity_ok",
+      "owner": "adaptive_aero_command_parser.integrity_ok_out"
+    },
+    {
+      "signal": "format_ok",
+      "owner": "adaptive_aero_command_parser.format_ok_out"
+    },
+    {
+      "signal": "packet_valid",
+      "owner": "adaptive_aero_command_parser.packet_valid_out"
+    },
+    {
+      "signal": "mode_cfg",
+      "owner": "adaptive_aero_csr_mmio.mode_cfg_out"
+    },
+    {
+      "signal": "packet_format_version_cfg",
+      "owner": "adaptive_aero_csr_mmio.packet_format_version_cfg_out"
+    },
+    {
+      "signal": "watchdog_timeout_cfg",
+      "owner": "adaptive_aero_csr_mmio.watchdog_timeout_cfg_out"
+    },
+    {
+      "signal": "clamp_min_cfg",
+      "owner": "adaptive_aero_csr_mmio.clamp_min_cfg_out"
+    },
+    {
+      "signal": "clamp_max_cfg",
+      "owner": "adaptive_aero_csr_mmio.clamp_max_cfg_out"
+    },
+    {
+      "signal": "fault_clear_pulse",
+      "owner": "adaptive_aero_csr_mmio.fault_clear_pulse_out"
+    },
+    {
+      "signal": "accepted_pulse",
+      "owner": "adaptive_aero_safety_controller.accepted_pulse_out"
+    },
+    {
+      "signal": "rejected_pulse",
+      "owner": "adaptive_aero_safety_controller.rejected_pulse_out"
+    },
+    {
+      "signal": "stale_fault",
+      "owner": "adaptive_aero_safety_controller.stale_fault_out"
+    },
+    {
+      "signal": "timeout_fault",
+      "owner": "adaptive_aero_safety_controller.timeout_fault_out"
+    },
+    {
+      "signal": "checksum_fault",
+      "owner": "adaptive_aero_safety_controller.checksum_fault_out"
+    },
+    {
+      "signal": "range_fault",
+      "owner": "adaptive_aero_safety_controller.range_fault_out"
+    },
+    {
+      "signal": "inhibit_active",
+      "owner": "adaptive_aero_safety_controller.inhibit_active_out"
+    },
+    {
+      "signal": "seq_last_accepted",
+      "owner": "adaptive_aero_safety_controller.seq_last_accepted_out"
+    },
+    {
+      "signal": "clamped_output_ind",
+      "owner": "adaptive_aero_safety_controller.clamped_output_ind_out"
+    },
+    {
+      "signal": "fault_status",
+      "owner": "adaptive_aero_safety_controller.status_summary_out"
+    },
+    {
+      "signal": "cmd_ready_out",
+      "owner": "adaptive_aero_command_parser.cmd_ready_out"
+    },
+    {
+      "signal": "status_valid_out",
+      "owner": "adaptive_aero_status_packetizer.status_valid_out"
+    },
+    {
+      "signal": "status_data_out",
+      "owner": "adaptive_aero_status_packetizer.status_data_out"
+    },
+    {
+      "signal": "csr_rdata_out",
+      "owner": "adaptive_aero_csr_mmio.csr_rdata_out"
+    },
+    {
+      "signal": "csr_ready_out",
+      "owner": "adaptive_aero_csr_mmio.csr_ready_out"
+    },
+    {
+      "signal": "actuator_cmd_out",
+      "owner": "adaptive_aero_safety_controller.actuator_cmd_drive_out"
+    },
+    {
+      "signal": "actuator_enable_out",
+      "owner": "adaptive_aero_safety_controller.actuator_enable_drive_out"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "abstract",
+    "registers": [
+      {
+        "name": "CTRL_MODE",
+        "address": 0,
+        "access": "rw",
+        "width": 2,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "mode",
+            "lsb": 0,
+            "msb": 1,
+            "access": "rw",
+            "description": "Operating mode control."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_FORMAT",
+        "address": 1,
+        "access": "rw",
+        "width": 4,
+        "reset": 1,
+        "fields": [
+          {
+            "name": "packet_format_version",
+            "lsb": 0,
+            "msb": 3,
+            "access": "rw",
+            "description": "Implemented packet format version."
+          }
+        ]
+      },
+      {
+        "name": "WATCHDOG_TIMEOUT",
+        "address": 2,
+        "access": "rw",
+        "width": 16,
+        "reset": 1000,
+        "fields": [
+          {
+            "name": "timeout_cycles",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "description": "Watchdog and freshness timeout threshold in cycles."
+          }
+        ]
+      },
+      {
+        "name": "CLAMP_MIN",
+        "address": 3,
+        "access": "rw",
+        "width": 16,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "actuator_min",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "description": "Programmable minimum actuator limit."
+          }
+        ]
+      },
+      {
+        "name": "CLAMP_MAX",
+        "address": 4,
+        "access": "rw",
+        "width": 16,
+        "reset": 65535,
+        "fields": [
+          {
+            "name": "actuator_max",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "description": "Programmable maximum actuator limit."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_STATUS",
+        "address": 5,
+        "access": "ro",
+        "width": 4,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "stale_fault",
+            "lsb": 0,
+            "msb": 0,
+            "access": "ro",
+            "description": "Latched stale command fault."
+          },
+          {
+            "name": "timeout_fault",
+            "lsb": 1,
+            "msb": 1,
+            "access": "ro",
+            "description": "Latched watchdog timeout fault."
+          },
+          {
+            "name": "checksum_fault",
+            "lsb": 2,
+            "msb": 2,
+            "access": "ro",
+            "description": "Latched checksum/integrity fault."
+          },
+          {
+            "name": "range_fault",
+            "lsb": 3,
+            "msb": 3,
+            "access": "ro",
+            "description": "Latched out-of-range velocity fault."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_LAST_ACCEPTED",
+        "address": 6,
+        "access": "ro",
+        "width": 16,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "last_accepted_sequence",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "description": "Last accepted sequence number."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_CLEAR",
+        "address": 7,
+        "access": "wo",
+        "width": 1,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "clear_faults",
+            "lsb": 0,
+            "msb": 0,
+            "access": "wo",
+            "description": "Write-one pulse that requests fault clear."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_SUMMARY",
+        "address": 8,
+        "access": "ro",
+        "width": 32,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "accepted_pulse",
+            "lsb": 0,
+            "msb": 0,
+            "access": "ro",
+            "description": "Acceptance pulse history indication."
+          },
+          {
+            "name": "rejected_pulse",
+            "lsb": 1,
+            "msb": 1,
+            "access": "ro",
+            "description": "Rejection pulse history indication."
+          },
+          {
+            "name": "clamped_output",
+            "lsb": 2,
+            "msb": 2,
+            "access": "ro",
+            "description": "Clamped output indication."
+          },
+          {
+            "name": "inhibit_active",
+            "lsb": 3,
+            "msb": 3,
+            "access": "ro",
+            "description": "Inhibited output validity indication."
+          },
+          {
+            "name": "reserved",
+            "lsb": 4,
+            "msb": 31,
+            "access": "ro",
+            "description": "Reserved."
+          }
+        ]
+      }
+    ]
+  }
+}

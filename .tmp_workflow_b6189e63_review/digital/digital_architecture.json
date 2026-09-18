@@ -1,0 +1,262 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "design_summary": {
+    "purpose": "Adaptive_aero_control_top is the synthesizable FPGA top for a hardware command-and-safety wrapper around a remote GPU-executed automotive aerodynamics surrogate. It provides compact command transport, deterministic validation, watchdog supervision, bounded actuator-command generation, firmware-visible CSR/MMIO control, and status telemetry, while explicitly not implementing the surrogate computation itself.",
+    "operating_model": "The design accepts a 128-bit inbound command stream with ready/valid backpressure, decodes packet type, sequence, freshness, stream velocity, geometry handle, actuator request, and integrity fields, validates them against protocol, envelope, sequence, and timeout rules, and then either accepts the command or inhibits actuation and latches faults for software handling. A 64-bit outbound status stream reports acceptance/rejection, fault summary, sequence tracking, inhibition state, and clamped-output indication. A firmware-visible CSR/MMIO window provides mode, packet format version, watchdog timeout, clamp limits, fault clear, and readable status/control registers. On invalid, stale, timeout, reset, or fault conditions, actuator output validity is deasserted; no substitute or fallback command is generated.",
+    "external_interfaces": [
+      {
+        "name": "cmd_valid_in/cmd_ready_out/cmd_data_in",
+        "type": "streaming ingress",
+        "summary": "128-bit command transport with backpressure for compact command packets."
+      },
+      {
+        "name": "status_valid_out/status_ready_in/status_data_out",
+        "type": "streaming egress",
+        "summary": "64-bit telemetry/status transport with valid/ready semantics."
+      },
+      {
+        "name": "csr_addr_in/csr_wdata_in/csr_rdata_out/csr_valid_in/csr_write_in/csr_ready_out",
+        "type": "firmware CSR/MMIO",
+        "summary": "Reachable register window with address, data, transaction-valid/write-enable, and response/ready behavior."
+      },
+      {
+        "name": "actuator_cmd_out/actuator_enable_out",
+        "type": "control outputs",
+        "summary": "Final bounded actuator command and enable output; enable is deasserted when actuation is inhibited."
+      }
+    ]
+  },
+  "module_architecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "role": "Top-level integration for ingress command transport, safety validation, CSR/MMIO control, telemetry emission, and bounded actuator command generation.",
+      "responsibilities": [
+        "Parse and validate inbound command packets.",
+        "Provide command-ready backpressure on the ingress stream.",
+        "Maintain last-accepted sequence tracking and freshness checks.",
+        "Implement watchdog countdown from accepted commands.",
+        "Latch and report faults for software handling.",
+        "Clamp actuator command to programmed minimum and maximum limits.",
+        "Generate 64-bit status telemetry packets.",
+        "Expose a firmware-visible CSR/MMIO control plane.",
+        "Consume FIFO read data from the technology-neutral packet buffer wrapper input port."
+      ],
+      "interface_notes": [
+        "Owns the top-level ports clk, reset_n, cmd_valid_in, cmd_ready_out, cmd_data_in, status_valid_out, status_ready_in, status_data_out, csr_addr_in, csr_wdata_in, csr_rdata_out, csr_valid_in, csr_write_in, csr_ready_out, actuator_cmd_out, actuator_enable_out, packet_fifo_dout, and fault_status_in.",
+        "Must drive cmd_ready_out, status_valid_out, status_data_out, csr_rdata_out, csr_ready_out, actuator_cmd_out, and actuator_enable_out.",
+        "Must receive the ingress command stream, status backpressure, CSR/MMIO transaction inputs, packet_fifo_dout, and fault_status_in.",
+        "Does not redefine hierarchy, rename ports, or substitute any leaf module as top."
+      ],
+      "ownership_notes": [
+        "Top-level module remains the real design top and is responsible for coordinating all submodule contracts.",
+        "Top-level connectivity composes the aggregated fault_status input for CSR visibility from the safety controller fault outputs.",
+        "Top-level output ports must be driven by real RTL sources, not by child inputs alone."
+      ]
+    },
+    {
+      "name": "adaptive_aero_command_parser",
+      "role": "Semantic decoder for the 128-bit command packet.",
+      "responsibilities": [
+        "Decode packet fields from the compact command payload.",
+        "Check packet format version and packet type.",
+        "Provide semantic fields to the controller.",
+        "Assert packet_valid_out only when structural parsing succeeds."
+      ],
+      "interface_notes": [
+        "Consumes clk, reset_n, cmd_valid_in, cmd_data_in, and packet_fifo_dout.",
+        "Drives pkt_type_out, seq_num_out, freshness_out, stream_velocity_out, geometry_handle_out, actuator_request_out, integrity_ok_out, format_ok_out, packet_valid_out, and cmd_ready_out.",
+        "Does not drive ingress inputs or invent substitute command values.",
+        "packet_fifo_dout is observed as optional bounded buffering support, not as a payload memory substitute."
+      ],
+      "ownership_notes": [
+        "This block performs parser/format validation only and does not implement surrogate inference or large payload storage.",
+        "Command acceptance is not decided here; it only produces decoded fields and parse validity for the safety controller."
+      ]
+    },
+    {
+      "name": "adaptive_aero_safety_controller",
+      "role": "Deterministic safety and control policy engine.",
+      "responsibilities": [
+        "Enforce velocity envelope and packet validity rules.",
+        "Track last accepted sequence number.",
+        "Apply watchdog timeout and idle detection.",
+        "Latch stale, timeout, checksum, and range faults.",
+        "Clamp the actuator command within programmed limits when accepted.",
+        "Deassert actuator enable on any rejected or faulted condition.",
+        "Drive summary bits for status packet assembly."
+      ],
+      "interface_notes": [
+        "Consumes decoded packet fields plus mode_cfg_in, packet_format_version_cfg_in, watchdog_timeout_cfg_in, clamp_min_cfg_in, clamp_max_cfg_in, and fault_clear_pulse_in.",
+        "Drives accepted_pulse_out, rejected_pulse_out, stale_fault_out, timeout_fault_out, checksum_fault_out, range_fault_out, seq_last_accepted_out, clamped_output_ind_out, actuator_cmd_drive_out, actuator_enable_drive_out, inhibit_active_out, and status_summary_out.",
+        "On invalid, stale, timeout, reset, or fault conditions, it inhibits actuation and latches faults; it does not silently replace the requested command.",
+        "The 20-55 m/s envelope and freshness/sequence rules are enforced here."
+      ],
+      "ownership_notes": [
+        "This module owns safety evaluation, watchdog behavior, latched fault state, and bounded actuator output generation.",
+        "It is the sole source of final actuator command and enable drive within the architecture."
+      ]
+    },
+    {
+      "name": "adaptive_aero_csr_mmio",
+      "role": "Firmware-visible control-plane register block with decode and response semantics.",
+      "responsibilities": [
+        "Provide firmware-accessible CSR/MMIO semantics.",
+        "Decode all implemented registers and fields.",
+        "Expose readable configuration and status state.",
+        "Generate a fault-clear pulse from a legal CSR write transaction.",
+        "Return read data and ready/response semantics within bounded latency."
+      ],
+      "interface_notes": [
+        "Consumes csr_addr_in, csr_wdata_in, csr_valid_in, csr_write_in, fault_status_in, seq_last_accepted_in, accepted_pulse_in, rejected_pulse_in, inhibit_active_in, and clamped_output_ind_in.",
+        "Drives csr_rdata_out, csr_ready_out, mode_cfg_out, packet_format_version_cfg_out, watchdog_timeout_cfg_out, clamp_min_cfg_out, clamp_max_cfg_out, and fault_clear_pulse_out.",
+        "Implements a reachable register map for CTRL_MODE, CTRL_FORMAT, WATCHDOG_TIMEOUT, CLAMP_MIN, CLAMP_MAX, FAULT_STATUS, SEQ_LAST_ACCEPTED, FAULT_CLEAR, and STATUS_SUMMARY.",
+        "CSR/MMIO complements streaming transport and does not replace it."
+      ]
+    },
+    {
+      "name": "adaptive_aero_status_packetizer",
+      "role": "Compact status-stream assembler for telemetry and software observability.",
+      "responsibilities": [
+        "Serialize control status into a 64-bit packet.",
+        "Honor status_valid/status_ready handshaking.",
+        "Report all required fault categories and acceptance status.",
+        "Provide current sequence tracking and output clamp indication."
+      ],
+      "interface_notes": [
+        "Consumes accepted_pulse_in, rejected_pulse_in, stale_fault_in, timeout_fault_in, checksum_fault_in, range_fault_in, inhibit_active_in, seq_last_accepted_in, clamped_output_ind_in, and status_ready_in.",
+        "Drives status_valid_out and status_data_out.",
+        "Creates a deterministic compact report derived from real controller state only.",
+        "Preserves bounded-latency operation under backpressure."
+      ]
+    }
+  ],
+  "interface_summary": [
+    {
+      "from": "adaptive_aero_control_top",
+      "to": "adaptive_aero_command_parser",
+      "signals": [
+        "clk",
+        "reset_n",
+        "cmd_valid_in",
+        "cmd_data_in",
+        "packet_fifo_dout"
+      ],
+      "intent": "Ingress command transport is parsed and validated at the packet boundary."
+    },
+    {
+      "from": "adaptive_aero_command_parser",
+      "to": "adaptive_aero_safety_controller",
+      "signals": [
+        "pkt_type_out",
+        "seq_num_out",
+        "freshness_out",
+        "stream_velocity_out",
+        "geometry_handle_out",
+        "actuator_request_out",
+        "integrity_ok_out",
+        "format_ok_out",
+        "packet_valid_out"
+      ],
+      "intent": "Decoded packet semantics and structural validity feed deterministic safety evaluation."
+    },
+    {
+      "from": "adaptive_aero_control_top",
+      "to": "adaptive_aero_csr_mmio",
+      "signals": [
+        "clk",
+        "reset_n",
+        "csr_addr_in",
+        "csr_wdata_in",
+        "csr_valid_in",
+        "csr_write_in",
+        "fault_status_in"
+      ],
+      "intent": "Firmware transactions reach the reachable CSR/MMIO window with response semantics and fault visibility."
+    },
+    {
+      "from": "adaptive_aero_csr_mmio",
+      "to": "adaptive_aero_safety_controller",
+      "signals": [
+        "mode_cfg_out",
+        "packet_format_version_cfg_out",
+        "watchdog_timeout_cfg_out",
+        "clamp_min_cfg_out",
+        "clamp_max_cfg_out",
+        "fault_clear_pulse_out"
+      ],
+      "intent": "Firmware-configured control parameters and fault-clear strobes configure safety behavior."
+    },
+    {
+      "from": "adaptive_aero_safety_controller",
+      "to": "adaptive_aero_status_packetizer",
+      "signals": [
+        "accepted_pulse_out",
+        "rejected_pulse_out",
+        "stale_fault_out",
+        "timeout_fault_out",
+        "checksum_fault_out",
+        "range_fault_out",
+        "inhibit_active_out",
+        "seq_last_accepted_out",
+        "clamped_output_ind_out"
+      ],
+      "intent": "Latched faults, acceptance history, sequence tracking, and clamp/inhibit indications are packaged for telemetry."
+    },
+    {
+      "from": "adaptive_aero_safety_controller",
+      "to": "adaptive_aero_control_top",
+      "signals": [
+        "actuator_cmd_drive_out",
+        "actuator_enable_drive_out"
+      ],
+      "intent": "Final bounded actuator command and enable are exported as top-level control outputs."
+    },
+    {
+      "from": "adaptive_aero_status_packetizer",
+      "to": "adaptive_aero_control_top",
+      "signals": [
+        "status_valid_out",
+        "status_data_out"
+      ],
+      "intent": "Outbound status packets are driven by the telemetry path to the top-level streaming interface."
+    },
+    {
+      "from": "adaptive_aero_csr_mmio",
+      "to": "adaptive_aero_control_top",
+      "signals": [
+        "csr_rdata_out",
+        "csr_ready_out"
+      ],
+      "intent": "CSR read data and transaction ready/response are made visible to firmware at the top level."
+    }
+  ],
+  "data_flow_summary": [
+    "Ingress command data enters adaptive_aero_control_top and is routed to adaptive_aero_command_parser for semantic extraction and packet validity checking.",
+    "The parser produces packet type, sequence, freshness, stream velocity, geometry handle, actuator request, integrity, format validity, and packet-valid indicators that feed adaptive_aero_safety_controller.",
+    "The safety controller compares sequence numbers, verifies freshness and velocity envelope compliance, enforces watchdog timeout, applies clamp limits, latches faults, and determines whether actuation is enabled.",
+    "When a command is accepted, the watchdog reloads and the final actuator command is driven through clamp logic; otherwise actuator_enable_out is deasserted and no substitute command is produced.",
+    "Fault status, sequence tracking, acceptance/rejection, inhibit state, and clamped-output indication are forwarded to adaptive_aero_csr_mmio and adaptive_aero_status_packetizer.",
+    "adaptive_aero_csr_mmio exposes a reachable firmware register map for mode, packet format version, watchdog timeout, clamp minimum, clamp maximum, fault status, sequence last accepted, fault clear, and status summary.",
+    "adaptive_aero_status_packetizer emits a compact 64-bit telemetry packet reflecting actual controller state and backpressure on the status stream.",
+    "No large payload, tensor, or flow-field storage is inferred; any bounded packet buffering remains technology-neutral and FPGA-BRAM-mappable if used."
+  ],
+  "clock_reset_summary": {
+    "clocking": "A single clk domain fans out to all synchronous submodules. The architecture is synchronous and deterministic, with ready/valid interfaces for streaming and transaction-valid/write-enable semantics for CSR/MMIO.",
+    "reset_behavior": "reset_n is active-low and clears latched faults, sequence tracking, watchdog state, status validity, and CSR response state. Actuator_enable_out is deasserted on reset. No fallback command, substitute command, or fallback-on-reset behavior is generated; invalid, stale, timeout, reset, or fault conditions simply inhibit actuator output validity and latch faults for software handling."
+  },
+  "integration_notes": [
+    "External model transport direction is honored by data flow: the RTL emits model-request style outputs when present and receives model-request ready as an input; it receives model-response style valid/data as inputs and emits model-response ready as an output. Application-specific names such as cmd_* and status_* follow the same directionality by data flow.",
+    "The design summary and register contract remain the single source of truth for software-visible behavior; inaccessible internal state is not exposed as firmware-visible.",
+    "Every declared CSR register is reachable through decode and reflected by the register_contract.",
+    "The streaming transport coexists with the CSR/MMIO interface and does not replace it.",
+    "The design remains synthesizable, uses only bounded control state, and does not infer neural-network computation or large memories.",
+    "The packet FIFO/packet buffer mention is technology-neutral and, if instantiated in RTL, must map to native FPGA block RAM rather than Sky130 macros.",
+    "Scalar-equivalent I/O is kept low by using streaming and CSR interfaces rather than wide pin-out buses."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json."
+  ]
+}

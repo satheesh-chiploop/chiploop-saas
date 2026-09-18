@@ -1,0 +1,15 @@
+RTL Agent Summary
+=================
+Mode: hierarchical
+Top module: adaptive_aero_control_top
+Expected files: ['adaptive_aero_control_top.v', 'adaptive_aero_command_parser.v', 'adaptive_aero_safety_controller.v', 'adaptive_aero_csr_mmio.v', 'adaptive_aero_status_packetizer.v']
+Materialized files: ['adaptive_aero_command_parser.v', 'adaptive_aero_control_top.v', 'adaptive_aero_csr_mmio.v', 'adaptive_aero_safety_controller.v', 'adaptive_aero_status_packetizer.v']
+Clock ports: ['clk']
+Reset ports: ['reset_n']
+Icarus compile: pass
+Verilator lint: pass
+Static Spec2RTL compliance: partial
+Issue count: 1
+
+Issues:
+- ❌ Static Spec2RTL compliance failed: status=partial, missing=12, partial=1, inconclusive=0.

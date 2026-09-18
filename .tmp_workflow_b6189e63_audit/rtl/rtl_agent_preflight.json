@@ -1,0 +1,15 @@
+{
+  "mode": "hierarchical",
+  "top_module": "adaptive_aero_control_top",
+  "expected_files": [
+    "adaptive_aero_control_top.v",
+    "adaptive_aero_command_parser.v",
+    "adaptive_aero_safety_controller.v",
+    "adaptive_aero_csr_mmio.v",
+    "adaptive_aero_status_packetizer.v"
+  ],
+  "has_regmap": true,
+  "has_clock_reset": false,
+  "has_power_intent": false,
+  "prompt_chars": 133462
+}

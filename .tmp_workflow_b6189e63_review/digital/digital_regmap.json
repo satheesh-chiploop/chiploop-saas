@@ -1,0 +1,330 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "abstract",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 64,
+    "registers": [
+      {
+        "name": "CTRL_MODE",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Operating mode control register. Software-visible mode selection for the safety/control wrapper.",
+        "fields": [
+          {
+            "name": "MODE",
+            "lsb": 0,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Operating mode control. Encodings are implementation-defined but must remain stable for software."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 2,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "CTRL_FORMAT",
+        "offset": "0x01",
+        "access": "RW",
+        "description": "Packet format version register. Configures the accepted command packet format version.",
+        "fields": [
+          {
+            "name": "PACKET_FORMAT_VERSION",
+            "lsb": 0,
+            "msb": 3,
+            "access": "RW",
+            "reset": 1,
+            "description": "Implemented packet format version."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 4,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "WATCHDOG_TIMEOUT",
+        "offset": "0x02",
+        "access": "RW",
+        "description": "Watchdog and freshness timeout threshold in cycles.",
+        "fields": [
+          {
+            "name": "TIMEOUT_CYCLES",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 1000,
+            "description": "Programmable watchdog timeout threshold in cycles. Accepted commands reload the watchdog; idle beyond this count inhibits actuator validity."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "CLAMP_MIN",
+        "offset": "0x03",
+        "access": "RW",
+        "description": "Programmable minimum actuator limit.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MIN",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum clamp applied to actuator command outputs before driving actuator_cmd_out."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "CLAMP_MAX",
+        "offset": "0x04",
+        "access": "RW",
+        "description": "Programmable maximum actuator limit.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MAX",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 65535,
+            "description": "Maximum clamp applied to actuator command outputs before driving actuator_cmd_out."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_STATUS",
+        "offset": "0x05",
+        "access": "RO",
+        "description": "Latched fault summary register.",
+        "fields": [
+          {
+            "name": "STALE_FAULT",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched stale command fault."
+          },
+          {
+            "name": "TIMEOUT_FAULT",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched watchdog timeout fault."
+          },
+          {
+            "name": "CHECKSUM_FAULT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched checksum or integrity fault."
+          },
+          {
+            "name": "RANGE_FAULT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched out-of-range input fault."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 4,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_LAST_ACCEPTED",
+        "offset": "0x06",
+        "access": "RO",
+        "description": "Last accepted sequence number.",
+        "fields": [
+          {
+            "name": "LAST_ACCEPTED_SEQUENCE",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Last accepted command sequence number."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_CLEAR",
+        "offset": "0x07",
+        "access": "WO",
+        "description": "Write-one strobe that requests fault clear.",
+        "fields": [
+          {
+            "name": "CLEAR_FAULTS",
+            "lsb": 0,
+            "msb": 0,
+            "access": "WO",
+            "reset": 0,
+            "description": "Write-one pulse request that clears latched faults in the safety controller."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 1,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; writes ignored."
+          }
+        ]
+      },
+      {
+        "name": "STATUS_SUMMARY",
+        "offset": "0x08",
+        "access": "RO",
+        "description": "Readable summary of acceptance, rejection, clamp, and inhibit state.",
+        "fields": [
+          {
+            "name": "ACCEPTED_PULSE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Acceptance pulse indication from the last evaluated command."
+          },
+          {
+            "name": "REJECTED_PULSE",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Rejection pulse indication from the last evaluated command."
+          },
+          {
+            "name": "CLAMPED_OUTPUT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates the actuator request was clamped to the configured bounds."
+          },
+          {
+            "name": "INHIBIT_ACTIVE",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Indicates actuator output validity is inhibited due to timeout or fault conditions."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 4,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          },
+          {
+            "name": "FAULT_STATUS_MIRROR",
+            "lsb": 32,
+            "msb": 35,
+            "access": "RO",
+            "reset": 0,
+            "description": "Mirror of the latched fault vector."
+          },
+          {
+            "name": "LAST_ACCEPTED_SEQUENCE_MIRROR",
+            "lsb": 36,
+            "msb": 51,
+            "access": "RO",
+            "reset": 0,
+            "description": "Mirror of the last accepted sequence number."
+          },
+          {
+            "name": "RESERVED2",
+            "lsb": 52,
+            "msb": 63,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Program CTRL_MODE to the desired operating mode.",
+      "Program CTRL_FORMAT with the expected packet format version.",
+      "Program WATCHDOG_TIMEOUT with the desired freshness/watchdog threshold.",
+      "Program CLAMP_MIN and CLAMP_MAX with bounded actuator limits.",
+      "If needed, write FAULT_CLEAR with 1 to clear latched faults after configuration.",
+      "Verify FAULT_STATUS, SEQ_LAST_ACCEPTED, and STATUS_SUMMARY read back as expected."
+    ],
+    "polling_sequence": [
+      "Poll FAULT_STATUS for stale, timeout, checksum, and range faults.",
+      "Poll SEQ_LAST_ACCEPTED to observe the most recently accepted command sequence.",
+      "Poll STATUS_SUMMARY for acceptance/rejection, clamp, and inhibit indications.",
+      "If the status stream is enabled in the system, correlate CSR reads with telemetry packets."
+    ],
+    "irq_sequence": [
+      "No interrupt source is defined in DIGITAL_SPEC_JSON.",
+      "Use CSR polling and the status stream for fault and acceptance observation."
+    ]
+  },
+  "consistency_notes": [
+    "The register map is compatible with DIGITAL_SPEC_JSON and exposes only registers and fields that are explicitly described there.",
+    "The CSR/MMIO interface is treated as a reachable abstract control-plane window with address, write-data, read-data, valid, write-enable, and ready/response semantics.",
+    "No unsupported bus protocol is invented.",
+    "All field bit ranges use lsb <= msb.",
+    "No fallback command or substitute actuation is defined; invalid, stale, timeout, reset, or fault conditions only inhibit actuator validity and preserve latched faults for software handling."
+  ]
+}
