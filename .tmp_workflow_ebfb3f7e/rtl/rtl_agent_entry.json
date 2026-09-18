@@ -1,8 +1,0 @@
-{
-  "workflow_id": "ebfb3f7e-cece-40b2-accb-86491e29f2f3",
-  "workflow_dir": "backend/workflows/ebfb3f7e-cece-40b2-accb-86491e29f2f3",
-  "digital_spec_json": "backend/workflows/ebfb3f7e-cece-40b2-accb-86491e29f2f3/spec/pwm_controller_spec.json",
-  "spec_json": "backend/workflows/ebfb3f7e-cece-40b2-accb-86491e29f2f3/spec/pwm_controller_spec.json",
-  "digital_spec_json_exists": true,
-  "spec_json_exists": true
-}
