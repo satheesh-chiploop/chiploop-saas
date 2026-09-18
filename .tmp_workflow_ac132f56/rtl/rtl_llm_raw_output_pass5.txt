@@ -1,0 +1,549 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    input              clk,
+    input              rst_n,
+    input      [7:0]   csr_addr,
+    input      [31:0]  csr_wdata,
+    input              csr_valid,
+    input              csr_write,
+    output             csr_ready,
+    output     [31:0]  csr_rdata,
+    output             csr_rvalid,
+    input              cmd_in_valid,
+    output             cmd_in_ready,
+    input      [127:0] cmd_in_data,
+    output             status_out_valid,
+    input              status_out_ready,
+    output     [63:0]  status_out_data,
+    output             model_request_valid,
+    output     [127:0] model_request_data,
+    input              model_request_ready,
+    input              model_response_valid,
+    input      [127:0] model_response_data,
+    output             model_response_ready,
+    output             actuator_cmd_valid,
+    output     [31:0]  actuator_cmd_data,
+    output             fault_irq
+);
+
+    wire [15:0] cfg_timeout_limit;
+    wire [31:0] cfg_min_cmd;
+    wire [31:0] cfg_max_cmd;
+    wire        cfg_mode_enable;
+    wire        cfg_slew_enable;
+    wire [7:0]  cfg_slew_limit;
+    wire        cfg_fault_ack;
+
+    wire [3:0]  status_accept_code;
+    wire        status_stale_flag;
+    wire        status_watchdog_expired;
+    wire        status_inhibit_flag;
+    wire        status_clamp_applied;
+    wire [1:0]  status_current_mode;
+    wire [15:0] status_last_sequence;
+    wire        status_sticky_fault;
+
+    wire [15:0] fresh_seq_current;
+    wire [7:0]  fresh_epoch_current;
+
+    wire [1:0]  pkt_command_mode;
+    wire [15:0] pkt_sequence;
+    wire [7:0]  pkt_epoch;
+    wire [7:0]  pkt_age_tag;
+    wire [3:0]  pkt_host_ack;
+    wire [31:0] pkt_target_cmd;
+    wire        pkt_checksum_ok;
+    wire        pkt_malformed;
+    wire        pkt_stale;
+    wire        pkt_command_valid;
+
+    adaptive_aero_control_csr_mmio u_csr (
+        .clk(clk),
+        .rst_n(rst_n),
+        .csr_addr(csr_addr),
+        .csr_wdata(csr_wdata),
+        .csr_valid(csr_valid),
+        .csr_write(csr_write),
+        .csr_ready(csr_ready),
+        .csr_rdata(csr_rdata),
+        .csr_rvalid(csr_rvalid),
+        .cmd_in_data(cmd_in_data),
+        .cfg_timeout_limit(cfg_timeout_limit),
+        .cfg_min_cmd(cfg_min_cmd),
+        .cfg_max_cmd(cfg_max_cmd),
+        .cfg_mode_enable(cfg_mode_enable),
+        .cfg_slew_enable(cfg_slew_enable),
+        .cfg_slew_limit(cfg_slew_limit),
+        .cfg_fault_ack(cfg_fault_ack),
+        .status_accept_code(status_accept_code),
+        .status_stale_flag(status_stale_flag),
+        .status_watchdog_expired(status_watchdog_expired),
+        .status_inhibit_flag(status_inhibit_flag),
+        .status_clamp_applied(status_clamp_applied),
+        .status_current_mode(status_current_mode),
+        .status_last_sequence(status_last_sequence),
+        .status_sticky_fault(status_sticky_fault),
+        .status_out_data(status_out_data),
+        .fresh_seq_current(fresh_seq_current),
+        .fresh_epoch_current(fresh_epoch_current)
+    );
+
+    adaptive_aero_control_transport u_transport (
+        .clk(clk),
+        .rst_n(rst_n),
+        .cmd_in_valid(cmd_in_valid),
+        .cmd_in_ready(cmd_in_ready),
+        .cmd_in_data(cmd_in_data),
+        .model_request_valid(model_request_valid),
+        .model_request_data(model_request_data),
+        .model_request_ready(model_request_ready),
+        .model_response_valid(model_response_valid),
+        .model_response_data(model_response_data),
+        .model_response_ready(model_response_ready),
+        .pkt_command_valid(pkt_command_valid),
+        .pkt_command_mode(pkt_command_mode),
+        .pkt_sequence(pkt_sequence),
+        .pkt_epoch(pkt_epoch),
+        .pkt_age_tag(pkt_age_tag),
+        .pkt_host_ack(pkt_host_ack),
+        .pkt_target_cmd(pkt_target_cmd),
+        .pkt_checksum_ok(pkt_checksum_ok),
+        .pkt_malformed(pkt_malformed),
+        .pkt_stale(pkt_stale),
+        .fresh_seq_current(fresh_seq_current),
+        .fresh_epoch_current(fresh_epoch_current),
+        .status_out_valid(status_out_valid),
+        .status_out_ready(status_out_ready),
+        .status_out_data()
+    );
+
+    adaptive_aero_control_safety_fsm u_safety (
+        .clk(clk),
+        .rst_n(rst_n),
+        .cfg_timeout_limit(cfg_timeout_limit),
+        .cfg_min_cmd(cfg_min_cmd),
+        .cfg_max_cmd(cfg_max_cmd),
+        .cfg_mode_enable(cfg_mode_enable),
+        .cfg_slew_enable(cfg_slew_enable),
+        .cfg_slew_limit(cfg_slew_limit),
+        .cfg_fault_ack(cfg_fault_ack),
+        .pkt_command_valid(pkt_command_valid),
+        .pkt_command_mode(pkt_command_mode),
+        .pkt_sequence(pkt_sequence),
+        .pkt_epoch(pkt_epoch),
+        .pkt_age_tag(pkt_age_tag),
+        .pkt_host_ack(pkt_host_ack),
+        .pkt_target_cmd(pkt_target_cmd),
+        .pkt_checksum_ok(pkt_checksum_ok),
+        .pkt_malformed(pkt_malformed),
+        .pkt_stale(pkt_stale),
+        .fresh_timeout_hit(pkt_stale),
+        .fresh_sequence_gap(pkt_malformed),
+        .actuator_cmd_valid(actuator_cmd_valid),
+        .actuator_cmd_data(actuator_cmd_data),
+        .status_accept_code(status_accept_code),
+        .status_stale_flag(status_stale_flag),
+        .status_watchdog_expired(status_watchdog_expired),
+        .status_inhibit_flag(status_inhibit_flag),
+        .status_clamp_applied(status_clamp_applied),
+        .status_current_mode(status_current_mode),
+        .status_last_sequence(status_last_sequence),
+        .status_sticky_fault(status_sticky_fault)
+    );
+
+    assign fault_irq = status_sticky_fault;
+endmodule
+---END adaptive_aero_control_top.v---
+---BEGIN adaptive_aero_control_csr_mmio.v---
+module adaptive_aero_control_csr_mmio (
+    input              clk,
+    input              rst_n,
+    input      [7:0]   csr_addr,
+    input      [31:0]  csr_wdata,
+    input              csr_valid,
+    input              csr_write,
+    output reg         csr_ready,
+    output reg [31:0]  csr_rdata,
+    output reg         csr_rvalid,
+    input      [127:0] cmd_in_data,
+    output reg [15:0]  cfg_timeout_limit,
+    output reg [31:0]  cfg_min_cmd,
+    output reg [31:0]  cfg_max_cmd,
+    output reg         cfg_mode_enable,
+    output reg         cfg_slew_enable,
+    output reg [7:0]   cfg_slew_limit,
+    output reg         cfg_fault_ack,
+    input      [3:0]   status_accept_code,
+    input              status_stale_flag,
+    input              status_watchdog_expired,
+    input              status_inhibit_flag,
+    input              status_clamp_applied,
+    input      [1:0]   status_current_mode,
+    input      [15:0]  status_last_sequence,
+    input              status_sticky_fault,
+    output reg [63:0]  status_out_data,
+    output reg [15:0]  fresh_seq_current,
+    output reg [7:0]   fresh_epoch_current
+);
+
+    reg [31:0] telemetry_shadow;
+    reg [15:0] seq_counter;
+    reg [7:0]  epoch_counter;
+    reg [31:0] status_shadow;
+
+    wire [7:0]  cmd_age_tag;
+    wire [3:0]  cmd_host_ack;
+    wire [1:0]  cmd_mode_bits;
+    wire [15:0] cmd_sequence_bits;
+    wire [31:0] cmd_target_bits;
+    wire [7:0]  cmd_checksum_byte;
+
+    assign cmd_mode_bits       = cmd_in_data[17:16];
+    assign cmd_sequence_bits   = cmd_in_data[31:16];
+    assign cmd_age_tag         = cmd_in_data[39:32];
+    assign cmd_host_ack        = cmd_in_data[43:40];
+    assign cmd_target_bits     = cmd_in_data[95:64];
+    assign cmd_checksum_byte   = cmd_in_data[7:0];
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cfg_mode_enable     <= 1'b0;
+            cfg_slew_enable     <= 1'b0;
+            cfg_fault_ack       <= 1'b0;
+            cfg_timeout_limit   <= 16'd100;
+            cfg_min_cmd         <= 32'd0;
+            cfg_max_cmd         <= 32'hFFFF_FFFF;
+            cfg_slew_limit      <= 8'd1;
+            telemetry_shadow    <= 32'd0;
+            seq_counter         <= 16'd0;
+            epoch_counter       <= 8'd0;
+            status_shadow       <= 32'd0;
+            csr_ready           <= 1'b1;
+            csr_rdata           <= 32'd0;
+            csr_rvalid          <= 1'b0;
+            status_out_data     <= 64'd0;
+            fresh_seq_current   <= 16'd0;
+            fresh_epoch_current <= 8'd0;
+        end else begin
+            cfg_fault_ack  <= 1'b0;
+            csr_ready      <= 1'b1;
+            csr_rvalid     <= csr_valid & ~csr_write;
+            if (csr_valid) begin
+                if (csr_write) begin
+                    case (csr_addr)
+                        8'h00: begin
+                            cfg_mode_enable <= csr_wdata[0];
+                            cfg_slew_enable <= csr_wdata[1];
+                            cfg_fault_ack   <= csr_wdata[2];
+                        end
+                        8'h04: begin
+                            cfg_timeout_limit <= csr_wdata[15:0];
+                        end
+                        8'h08: begin
+                            cfg_min_cmd <= csr_wdata;
+                        end
+                        8'h0C: begin
+                            cfg_max_cmd <= csr_wdata;
+                        end
+                        8'h10: begin
+                            cfg_slew_limit <= csr_wdata[7:0];
+                        end
+                        default: begin
+                        end
+                    endcase
+                end else begin
+                    case (csr_addr)
+                        8'h00: csr_rdata <= {29'd0, 1'b0, cfg_slew_enable, cfg_mode_enable};
+                        8'h04: csr_rdata <= {16'd0, cfg_timeout_limit};
+                        8'h08: csr_rdata <= cfg_min_cmd;
+                        8'h0C: csr_rdata <= cfg_max_cmd;
+                        8'h10: csr_rdata <= {24'd0, cfg_slew_limit};
+                        8'h14: csr_rdata <= status_shadow;
+                        8'h18: csr_rdata <= telemetry_shadow;
+                        default: csr_rdata <= 32'd0;
+                    endcase
+                end
+            end
+            fresh_seq_current   <= seq_counter;
+            fresh_epoch_current <= epoch_counter;
+            status_shadow <= {status_last_sequence, 5'd0, status_sticky_fault,
+                              status_current_mode[1:0], status_clamp_applied,
+                              status_inhibit_flag, status_watchdog_expired,
+                              status_stale_flag, status_accept_code[3:0]};
+            status_out_data <= {32'd0, status_shadow};
+            telemetry_shadow <= {16'd0, status_shadow[15:0]} ^ {16'd0, cmd_sequence_bits};
+            if (cmd_host_ack != 4'd0) begin
+                seq_counter   <= cmd_sequence_bits;
+                epoch_counter <= cmd_age_tag;
+            end
+        end
+    end
+endmodule
+---END adaptive_aero_control_csr_mmio.v---
+---BEGIN adaptive_aero_control_transport.v---
+module adaptive_aero_control_transport (
+    input              clk,
+    input              rst_n,
+    input              cmd_in_valid,
+    output reg         cmd_in_ready,
+    input      [127:0] cmd_in_data,
+    output reg         model_request_valid,
+    output reg [127:0] model_request_data,
+    input              model_request_ready,
+    input              model_response_valid,
+    input      [127:0] model_response_data,
+    output reg         model_response_ready,
+    output reg         pkt_command_valid,
+    output reg [1:0]   pkt_command_mode,
+    output reg [15:0]  pkt_sequence,
+    output reg [7:0]   pkt_epoch,
+    output reg [7:0]   pkt_age_tag,
+    output reg [3:0]   pkt_host_ack,
+    output reg [31:0]  pkt_target_cmd,
+    output reg         pkt_checksum_ok,
+    output reg         pkt_malformed,
+    output reg         pkt_stale,
+    input      [15:0]  fresh_seq_current,
+    input      [7:0]   fresh_epoch_current,
+    output reg         status_out_valid,
+    input              status_out_ready,
+    output reg [63:0]  status_out_data
+);
+
+    wire [7:0]  pkt_cmd_valid_bit;
+    wire [1:0]  pkt_mode_bits;
+    wire [15:0] pkt_seq_bits;
+    wire [7:0]  pkt_epoch_bits;
+    wire [7:0]  pkt_age_bits;
+    wire [3:0]  pkt_ack_bits;
+    wire [31:0] pkt_target_bits;
+    wire [7:0]  pkt_checksum_bits;
+    wire [7:0]  pkt_header_bits;
+    wire [7:0]  pkt_tail_bits;
+    wire [7:0]  pkt_ref_bits;
+    wire        seq_gap_flag;
+    wire        malformed_struct;
+    wire        checksum_match;
+    wire        stale_match;
+    wire [15:0] seq_delta;
+    wire [63:0] status_snapshot;
+    wire [63:0] response_snapshot;
+
+    assign pkt_cmd_valid_bit = cmd_in_data[127:120];
+    assign pkt_mode_bits      = cmd_in_data[17:16];
+    assign pkt_seq_bits       = cmd_in_data[31:16];
+    assign pkt_epoch_bits     = cmd_in_data[47:40];
+    assign pkt_age_bits       = cmd_in_data[39:32];
+    assign pkt_ack_bits       = cmd_in_data[43:40];
+    assign pkt_target_bits    = cmd_in_data[95:64];
+    assign pkt_checksum_bits  = cmd_in_data[7:0];
+    assign pkt_header_bits    = cmd_in_data[127:120];
+    assign pkt_tail_bits      = cmd_in_data[15:8];
+    assign pkt_ref_bits       = cmd_in_data[55:48];
+    assign seq_delta          = (pkt_seq_bits >= fresh_seq_current) ? (pkt_seq_bits - fresh_seq_current) : (fresh_seq_current - pkt_seq_bits);
+    assign seq_gap_flag       = (pkt_seq_bits != fresh_seq_current) && (pkt_age_bits != fresh_epoch_current);
+    assign malformed_struct   = (pkt_header_bits == 8'd0) || (pkt_tail_bits == 8'd0);
+    assign checksum_match     = ^cmd_in_data;
+    assign stale_match        = (pkt_age_bits != fresh_epoch_current) || (seq_delta > 16'd32);
+    assign status_snapshot    = {48'd0, pkt_target_bits[15:0]} ^ {48'd0, model_response_data[15:0]};
+    assign response_snapshot  = {48'd0, model_response_data[47:0] ^ cmd_in_data[47:0]};
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cmd_in_ready         <= 1'b1;
+            model_request_valid  <= 1'b0;
+            model_request_data   <= 128'd0;
+            model_response_ready <= 1'b1;
+            pkt_command_valid    <= 1'b0;
+            pkt_command_mode     <= 2'd0;
+            pkt_sequence         <= 16'd0;
+            pkt_epoch            <= 8'd0;
+            pkt_age_tag          <= 8'd0;
+            pkt_host_ack         <= 4'd0;
+            pkt_target_cmd       <= 32'd0;
+            pkt_checksum_ok      <= 1'b0;
+            pkt_malformed        <= 1'b0;
+            pkt_stale            <= 1'b0;
+            status_out_valid     <= 1'b0;
+            status_out_data      <= 64'd0;
+        end else begin
+            cmd_in_ready         <= model_request_ready | ~model_request_valid;
+            model_response_ready <= 1'b1;
+            if (cmd_in_valid && cmd_in_ready) begin
+                pkt_command_valid   <= cmd_in_data[127];
+                pkt_command_mode    <= pkt_mode_bits;
+                pkt_sequence        <= pkt_seq_bits;
+                pkt_epoch           <= pkt_epoch_bits;
+                pkt_age_tag         <= pkt_age_bits;
+                pkt_host_ack        <= pkt_ack_bits;
+                pkt_target_cmd      <= pkt_target_bits;
+                pkt_checksum_ok     <= (checksum_match == 1'b1);
+                pkt_malformed       <= malformed_struct | seq_gap_flag | ~cmd_in_data[127];
+                pkt_stale           <= stale_match;
+                model_request_valid <= cmd_in_data[127] & (checksum_match == 1'b1) & ~malformed_struct;
+                model_request_data  <= cmd_in_data;
+                status_out_valid    <= 1'b1;
+                status_out_data     <= {response_snapshot[63:32], status_snapshot[31:0]};
+            end else if (status_out_ready) begin
+                status_out_valid <= 1'b0;
+            end
+            if (model_response_valid) begin
+                model_request_valid <= 1'b0;
+                status_out_data <= {32'd0, model_response_data[31:0]};
+            end
+        end
+    end
+endmodule
+---END adaptive_aero_control_transport.v---
+---BEGIN adaptive_aero_control_safety_fsm.v---
+module adaptive_aero_control_safety_fsm (
+    input              clk,
+    input              rst_n,
+    input      [15:0]  cfg_timeout_limit,
+    input      [31:0]  cfg_min_cmd,
+    input      [31:0]  cfg_max_cmd,
+    input              cfg_mode_enable,
+    input              cfg_slew_enable,
+    input      [7:0]   cfg_slew_limit,
+    input              cfg_fault_ack,
+    input              pkt_command_valid,
+    input      [1:0]   pkt_command_mode,
+    input      [15:0]  pkt_sequence,
+    input      [7:0]   pkt_epoch,
+    input      [7:0]   pkt_age_tag,
+    input      [3:0]   pkt_host_ack,
+    input      [31:0]  pkt_target_cmd,
+    input              pkt_checksum_ok,
+    input              pkt_malformed,
+    input              pkt_stale,
+    input              fresh_timeout_hit,
+    input              fresh_sequence_gap,
+    output reg         actuator_cmd_valid,
+    output reg [31:0]  actuator_cmd_data,
+    output reg [3:0]   status_accept_code,
+    output reg         status_stale_flag,
+    output reg         status_watchdog_expired,
+    output reg         status_inhibit_flag,
+    output reg         status_clamp_applied,
+    output reg [1:0]   status_current_mode,
+    output reg [15:0]  status_last_sequence,
+    output reg         status_sticky_fault
+);
+
+    reg [31:0] last_cmd_reg;
+    reg [15:0] timeout_cnt;
+    reg [1:0]  mode_reg;
+    reg        slew_pending;
+    reg [31:0] clamped_cmd;
+    reg [31:0] slew_cmd;
+    reg [31:0] diff_val;
+    reg [31:0] abs_diff;
+    reg [31:0] min_bound;
+    reg [31:0] max_bound;
+    reg [31:0] slew_step;
+    reg        valid_now;
+    reg        mode_ok;
+    reg        fault_event;
+    reg        clamp_event;
+    reg        timeout_event;
+    reg        gap_event;
+    reg        stale_event;
+    reg [3:0]  accept_code_next;
+    reg        inhibit_next;
+
+    always @(*) begin
+        min_bound = cfg_min_cmd;
+        max_bound = cfg_max_cmd;
+        slew_step = {24'd0, cfg_slew_limit};
+        mode_ok = cfg_mode_enable & (pkt_command_mode == 2'd1);
+        stale_event = pkt_stale | fresh_timeout_hit | (timeout_cnt >= cfg_timeout_limit);
+        gap_event = pkt_malformed | fresh_sequence_gap | ~pkt_checksum_ok | (pkt_host_ack == 4'd0);
+        timeout_event = fresh_timeout_hit | (timeout_cnt >= cfg_timeout_limit);
+        fault_event = stale_event | gap_event | timeout_event;
+        valid_now = pkt_command_valid & mode_ok & ~fault_event;
+        clamp_event = 1'b0;
+        clamped_cmd = pkt_target_cmd;
+        if (pkt_target_cmd < min_bound) begin
+            clamped_cmd = min_bound;
+            clamp_event = 1'b1;
+        end else if (pkt_target_cmd > max_bound) begin
+            clamped_cmd = max_bound;
+            clamp_event = 1'b1;
+        end
+        slew_cmd = clamped_cmd;
+        if (cfg_slew_enable && valid_now) begin
+            diff_val = (clamped_cmd >= last_cmd_reg) ? (clamped_cmd - last_cmd_reg) : (last_cmd_reg - clamped_cmd);
+            abs_diff = diff_val;
+            if (diff_val > slew_step) begin
+                if (clamped_cmd >= last_cmd_reg)
+                    slew_cmd = last_cmd_reg + slew_step;
+                else
+                    slew_cmd = last_cmd_reg - slew_step;
+                clamp_event = 1'b1;
+            end
+        end else begin
+            diff_val = 32'd0;
+            abs_diff = 32'd0;
+        end
+        accept_code_next = 4'd0;
+        inhibit_next = 1'b1;
+        if (valid_now) begin
+            accept_code_next = 4'd1;
+            inhibit_next = 1'b0;
+        end else if (stale_event) begin
+            accept_code_next = 4'd2;
+        end else if (gap_event) begin
+            accept_code_next = 4'd3;
+        end else if (timeout_event) begin
+            accept_code_next = 4'd4;
+        end else if (~mode_ok) begin
+            accept_code_next = 4'd5;
+        end
+    end
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            actuator_cmd_valid      <= 1'b0;
+            actuator_cmd_data       <= 32'd0;
+            status_accept_code      <= 4'd0;
+            status_stale_flag       <= 1'b0;
+            status_watchdog_expired <= 1'b0;
+            status_inhibit_flag     <= 1'b1;
+            status_clamp_applied    <= 1'b0;
+            status_current_mode     <= 2'd0;
+            status_last_sequence    <= 16'd0;
+            status_sticky_fault     <= 1'b0;
+            last_cmd_reg            <= 32'd0;
+            timeout_cnt             <= 16'd0;
+            mode_reg                <= 2'd0;
+            slew_pending            <= 1'b0;
+        end else begin
+            mode_reg <= cfg_mode_enable ? 2'd1 : 2'd0;
+            status_current_mode <= mode_reg;
+            status_last_sequence <= pkt_sequence;
+            status_stale_flag <= pkt_stale;
+            status_watchdog_expired <= fresh_timeout_hit | (timeout_cnt >= cfg_timeout_limit);
+            status_inhibit_flag <= inhibit_next;
+            status_clamp_applied <= clamp_event;
+            status_accept_code <= accept_code_next;
+            if (cfg_fault_ack) begin
+                status_sticky_fault <= 1'b0;
+            end
+            if (valid_now) begin
+                actuator_cmd_valid <= 1'b1;
+                actuator_cmd_data  <= slew_cmd;
+                last_cmd_reg       <= slew_cmd;
+                timeout_cnt        <= 16'd0;
+                slew_pending       <= cfg_slew_enable;
+                status_sticky_fault<= 1'b0;
+            end else begin
+                actuator_cmd_valid <= 1'b0;
+                actuator_cmd_data  <= 32'd0;
+                timeout_cnt        <= timeout_cnt + 16'd1;
+                if (fault_event)
+                    status_sticky_fault <= 1'b1;
+            end
+        end
+    end
+endmodule
+---END adaptive_aero_control_safety_fsm.v---
