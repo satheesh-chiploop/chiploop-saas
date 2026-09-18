@@ -739,6 +739,76 @@ def _validate_hierarchical_endpoint_coverage(spec_json: dict) -> None:
         )
 
 
+def _validate_reset_feature_consistency(spec_json: dict, feature_ports: list, contracts: list) -> None:
+    """Reject explicit reset prose that contradicts executable feature expectations."""
+    hierarchy = spec_json.get("hierarchy") if isinstance(spec_json.get("hierarchy"), dict) else {}
+    top = hierarchy.get("top_module") if isinstance(hierarchy.get("top_module"), dict) else {}
+    owner = spec_json if spec_json.get("reset_behavior") is not None else top
+    reset_behavior = str(owner.get("reset_behavior") or "")
+    if not reset_behavior.strip():
+        return
+    port_names = {
+        str(port.get("name") or "").lower(): str(port.get("name") or "")
+        for port in feature_ports if isinstance(port, dict) and port.get("name")
+    }
+    reset_ports = []
+    for port in feature_ports:
+        if not isinstance(port, dict) or not port.get("name"):
+            continue
+        canonical = str(port.get("name"))
+        lower_name = canonical.lower()
+        if re.search(r"(?:^|_)(?:rst|reset|por)(?:_n)?(?:$|_)", lower_name):
+            polarity = str(port.get("polarity") or "").lower()
+            reset_ports.append({
+                "name": canonical,
+                "active_low": bool(
+                    port.get("active_low") is True
+                    or lower_name.endswith("_n")
+                    or polarity in {"active_low", "low", "0"}
+                ),
+            })
+    declared_values = {}
+    for lower_name, canonical in port_names.items():
+        match = re.search(
+            rf"\b{re.escape(canonical)}\b[^.\n;]{{0,80}}?\b(?:is|shall\s+be|must\s+be|evaluates?|becomes?|remains?|driven|forced|set)\b"
+            r"[^.\n;]{0,24}?\b(low|zero|deasserted|high|one|asserted)\b",
+            reset_behavior,
+            re.I,
+        )
+        if match:
+            declared_values[canonical] = 0 if match.group(1).lower() in {"low", "zero", "deasserted"} else 1
+    if not declared_values or not reset_ports:
+        return
+    conflicts = []
+    for contract in contracts:
+        steps = contract.get("stimulus_steps") or []
+        final_reset_values = {}
+        for step in steps:
+            signals = step.get("signals") if isinstance(step, dict) else {}
+            for reset in reset_ports:
+                if isinstance(signals, dict) and reset["name"] in signals:
+                    final_reset_values[reset["name"]] = signals[reset["name"]]
+        asserted = any(
+            final_reset_values.get(reset["name"]) == (0 if reset["active_low"] else 1)
+            for reset in reset_ports
+            if reset["name"] in final_reset_values
+        )
+        if not asserted:
+            continue
+        expected = contract.get("expected") or {}
+        for signal_name, declared in declared_values.items():
+            value = expected.get(signal_name)
+            if isinstance(value, dict):
+                value = value.get("eq")
+            if isinstance(value, (bool, int, float)) and int(value) != declared:
+                conflicts.append(
+                    f"{contract.get('feature_id')}: reset_behavior says {signal_name}={declared}, "
+                    f"but feature expected is {int(value)}"
+                )
+    if conflicts:
+        raise ValueError("Reset behavior contradicts executable feature contracts. " + "; ".join(conflicts[:8]))
+
+
 def _validate_spec_contract(spec_json: dict, mode: str, require_feature_contracts: bool = False) -> None:
     if require_feature_contracts:
         from .feature_contract_compiler import compile_feature_contracts
@@ -756,6 +826,7 @@ def _validate_spec_contract(spec_json: dict, mode: str, require_feature_contract
                 for item in incomplete[:12]
             )
             raise ValueError(f"Every feature_contracts entry must compile to an executable checker. {detail}")
+        _validate_reset_feature_consistency(spec_json, feature_ports, contracts)
     if mode == "flat":
         _validate_module(spec_json, "spec", require_non_empty_ports=False)
         return

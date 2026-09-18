@@ -1534,6 +1534,64 @@ def test_flat_normalization_preserves_executable_feature_contracts():
     spec_agent._validate_spec_contract(normalized, mode, require_feature_contracts=True)
 
 
+def test_validate_spec_rejects_reset_prose_that_conflicts_with_feature_expected_output():
+    spec = {
+        "name": "controller",
+        "description": "Controller",
+        "ports": [
+            {"name": "clk", "direction": "input", "width": 1},
+            {"name": "reset_n", "direction": "input", "width": 1},
+            {"name": "data_out", "direction": "output", "width": 1},
+        ],
+        "responsibilities": ["Drive data_out."],
+        "must_drive": ["data_out"],
+        "must_receive": ["clk", "reset_n"],
+        "must_not_drive": ["clk", "reset_n"],
+        "reset_behavior": "When reset_n is low, data_out is low.",
+        "behavior_rules": ["Drive data_out from current inputs."],
+        "rtl_output_file": "controller.v",
+        "feature_contracts": [{
+            "id": "reset_observation",
+            "description": "Observe reset behavior.",
+            "stimulus": {"steps": [{"signals": {"reset_n": 0}, "cycles": 1}]},
+            "expected": {"data_out": 1},
+        }],
+    }
+
+    with pytest.raises(ValueError, match="Reset behavior contradicts executable feature contracts"):
+        spec_agent._validate_spec_contract(spec, "flat", require_feature_contracts=True)
+
+
+def test_reset_consistency_uses_reset_state_at_feature_observation_point():
+    spec = {
+        "name": "controller",
+        "functionality": "Drive data_out after reset release.",
+        "ports": [
+            {"name": "clk", "direction": "input", "width": 1},
+            {"name": "reset", "direction": "input", "width": 1, "active_low": True},
+            {"name": "data_out", "direction": "output", "width": 1},
+        ],
+        "responsibilities": ["Drive data_out."],
+        "must_drive": ["data_out"],
+        "must_receive": ["clk", "reset"],
+        "must_not_drive": ["clk", "reset"],
+        "reset_behavior": "When reset is asserted, data_out is low.",
+        "behavior_rules": ["After reset, data_out may become high."],
+        "rtl_output_file": "controller.v",
+        "feature_contracts": [{
+            "id": "post_reset_operation",
+            "description": "Operate after reset release.",
+            "stimulus": {"steps": [
+                {"signals": {"reset": 0}, "cycles": 1},
+                {"signals": {"reset": 1}, "cycles": 1},
+            ]},
+            "expected": {"data_out": 1},
+        }],
+    }
+
+    spec_agent._validate_spec_contract(spec, "flat", require_feature_contracts=True)
+
+
 def test_terminal_graph_closure_exposes_and_fans_out_orphan_child_inputs():
     spec = {
         "hierarchy": {

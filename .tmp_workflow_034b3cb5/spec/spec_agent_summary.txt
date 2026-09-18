@@ -1,0 +1,4 @@
+✅ Digital Spec Agent completed successfully.
+
+Spec mode: flat
+Spec JSON: backend/workflows/034b3cb5-ca8e-4bbf-bbc7-c2419b39152d/spec/pwm_controller_spec.json
