@@ -1,0 +1,36 @@
+{
+  "pass": "pass2",
+  "passed": false,
+  "checks": {
+    "structural": {
+      "status": "pass",
+      "issue_count": 0,
+      "issues": []
+    },
+    "compile": {
+      "status": "pass",
+      "log": "backend/workflows/9b5919d4-b2f3-4c03-bf5b-490e9e57ab3f/rtl/rtl_agent_compile_pass2.log"
+    },
+    "lint": {
+      "status": "pass",
+      "blocking": false,
+      "log": "backend/workflows/9b5919d4-b2f3-4c03-bf5b-490e9e57ab3f/rtl/rtl_verilator_lint_pass2.log"
+    },
+    "static_spec2rtl": {
+      "status": "partial",
+      "blocking": true,
+      "report": "backend/workflows/9b5919d4-b2f3-4c03-bf5b-490e9e57ab3f/rtl/rtl_spec2rtl_conformance_pass2.json",
+      "summary": {
+        "checked": 18,
+        "matched": 17,
+        "partial": 1,
+        "missing": 0,
+        "inconclusive": 0
+      }
+    }
+  },
+  "issue_count": 1,
+  "issues": [
+    "\u274c Static Spec2RTL compliance failed: status=partial, missing=0, partial=1, inconclusive=0."
+  ]
+}

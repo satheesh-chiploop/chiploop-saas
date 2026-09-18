@@ -1,0 +1,20 @@
+Design a parameterized PWM controller.
+
+Inputs:
+- clk
+- reset_n
+- enable
+- duty_cycle[7:0]
+- period[7:0]
+
+Outputs:
+- pwm_out
+- counter_value[7:0]
+
+Behavior:
+- Counter increments every clock when enable is high.
+- Counter resets to zero when it reaches period.
+- pwm_out is high when counter_value is less than duty_cycle.
+- All registers reset to zero when reset_n is low.
+
+Generate synthesizable SystemVerilog, timing constraints, UPF-lite power intent, and a handoff package.

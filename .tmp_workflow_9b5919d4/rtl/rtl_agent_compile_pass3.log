@@ -1,0 +1,403 @@
+
+
+=== VERILATOR LINT ===
+PASS: Verilator lint completed successfully.
+
+=== STATIC SPEC2RTL REPAIR CHECKLIST ===
+Static Spec2RTL result: status=partial, missing=0, partial=1, inconclusive=0.
+REQ-011: partial - The design is fully synchronous to clk and contains no internal clock gating. (checker evidence: clk)
+
+=== STATIC SPEC2RTL COMPLIANCE ===
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "partial",
+  "summary": {
+    "checked": 18,
+    "matched": 17,
+    "partial": 1,
+    "missing": 0,
+    "inconclusive": 0
+  },
+  "setup_issues": [],
+  "top_module": {
+    "expected": "pwm_controller",
+    "modules_found": [
+      "pwm_controller"
+    ],
+    "status": "pass"
+  },
+  "interface": {
+    "status": "pass",
+    "expected_ports": [
+      "clk",
+      "counter_value",
+      "duty_cycle",
+      "enable",
+      "period",
+      "pwm_out",
+      "reset_n"
+    ],
+    "matched_ports": [
+      "clk",
+      "counter_value",
+      "duty_cycle",
+      "enable",
+      "period",
+      "pwm_out",
+      "reset_n"
+    ],
+    "missing_ports": [],
+    "rtl_ports": [
+      "clk",
+      "counter_value",
+      "duty_cycle",
+      "enable",
+      "period",
+      "pwm_out",
+      "reset_n"
+    ]
+  },
+  "register_map": {
+    "expected": [],
+    "matched": [],
+    "expected_registers": [],
+    "matched_registers": [],
+    "expected_addresses": [],
+    "matched_addresses": [],
+    "missing": [],
+    "missing_registers": [],
+    "missing_addresses": [],
+    "status": "not_applicable"
+  },
+  "clock_reset": {
+    "clock_ports": [
+      "clk"
+    ],
+    "reset_ports": [
+      "reset_n"
+    ],
+    "status": "pass"
+  },
+  "feature_contracts": {
+    "status": "pass",
+    "checked": 4,
+    "passed": 4,
+    "failed": 0,
+    "features": [
+      {
+        "feature_id": "reset_clears_state_and_output",
+        "status": "pass",
+        "stimulus_signals": [
+          "duty_cycle",
+          "enable",
+          "period",
+          "reset_n"
+        ],
+        "expected_signals": [
+          "counter_value",
+          "pwm_out"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "counter_increments_when_enabled",
+        "status": "pass",
+        "stimulus_signals": [
+          "duty_cycle",
+          "enable",
+          "period",
+          "reset_n"
+        ],
+        "expected_signals": [
+          "counter_value",
+          "pwm_out"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "counter_holds_when_disabled",
+        "status": "pass",
+        "stimulus_signals": [
+          "duty_cycle",
+          "enable",
+          "period",
+          "reset_n"
+        ],
+        "expected_signals": [
+          "pwm_out"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "wraps_to_zero_at_period",
+        "status": "pass",
+        "stimulus_signals": [
+          "duty_cycle",
+          "enable",
+          "period",
+          "reset_n"
+        ],
+        "expected_signals": [
+          "counter_value",
+          "pwm_out"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      }
+    ],
+    "scope": "static interface binding; behavioral results are verified separately"
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "requirement": "Maintain an 8-bit synchronous counter state.",
+      "status": "matched",
+      "evidence_tokens": [
+        "counter_value"
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "requirement": "Honor synchronous active-low reset by clearing all registers to zero.",
+      "status": "matched",
+      "evidence_tokens": [
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-003",
+      "requirement": "Generate pwm_out as a pure comparison of counter_value and duty_cycle.",
+      "status": "matched",
+      "evidence_tokens": [
+        "pwm_out",
+        "counter_value",
+        "duty_cycle"
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "requirement": "Wrap the counter to zero on the cycle after it reaches period while enabled.",
+      "status": "matched",
+      "evidence_tokens": [
+        "period",
+        "counter_value",
+        "wrap_logic",
+        "period_rollover_logic"
+      ]
+    },
+    {
+      "id": "REQ-005",
+      "requirement": "Expose counter_value as a direct observable output of the internal counter state.",
+      "status": "matched",
+      "evidence_tokens": [
+        "counter_value"
+      ]
+    },
+    {
+      "id": "REQ-006",
+      "requirement": "On each rising edge of clk, if reset_n is low, counter_value is set to 8'h00.",
+      "status": "matched",
+      "evidence_tokens": [
+        "clk",
+        "reset_n",
+        "counter_value",
+        "h00",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-007",
+      "requirement": "On each rising edge of clk, if reset_n is high and enable is high, the counter increments by one unless the current counter_value equals period, in which case it resets to zero.",
+      "status": "matched",
+      "evidence_tokens": [
+        "clk",
+        "reset_n",
+        "enable",
+        "counter_value",
+        "period",
+        "reset_zero",
+        "increment_logic",
+        "period_rollover_logic"
+      ]
+    },
+    {
+      "id": "REQ-008",
+      "requirement": "On each rising edge of clk, if reset_n is high and enable is low, counter_value holds its current value.",
+      "status": "matched",
+      "evidence_tokens": [
+        "clk",
+        "reset_n",
+        "enable",
+        "counter_value",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-009",
+      "requirement": "pwm_out is combinationally high when counter_value < duty_cycle, otherwise low.",
+      "status": "matched",
+      "evidence_tokens": [
+        "pwm_out",
+        "counter_value",
+        "duty_cycle"
+      ]
+    },
+    {
+      "id": "REQ-010",
+      "requirement": "The comparison for pwm_out uses the current registered counter_value and current duty_cycle without additional sequencing.",
+      "status": "matched",
+      "evidence_tokens": [
+        "pwm_out",
+        "counter_value",
+        "duty_cycle"
+      ]
+    },
+    {
+      "id": "REQ-011",
+      "requirement": "The design is fully synchronous to clk and contains no internal clock gating.",
+      "status": "partial",
+      "evidence_tokens": [
+        "clk"
+      ]
+    },
+    {
+      "id": "REQ-012",
+      "requirement": "counter_value",
+      "status": "matched",
+      "evidence_tokens": [
+        "counter_value"
+      ]
+    },
+    {
+      "id": "REQ-013",
+      "requirement": "duty_cycle",
+      "status": "matched",
+      "evidence_tokens": [
+        "duty_cycle"
+      ]
+    },
+    {
+      "id": "REQ-014",
+      "requirement": "When reset_n is low, all sequential state is synchronously cleared to zero on the next clock edge. The counter_value output reads as zero after reset is applied, and pwm_out evaluates low because counter_value is zero and duty_cycle is assu",
+      "status": "matched",
+      "evidence_tokens": [
+        "reset_n",
+        "counter_value",
+        "pwm_out",
+        "duty_cycle",
+        "reset_zero"
+      ]
+    }
+  ],
+  "rtl_files": [
+    "backend/workflows/9b5919d4-b2f3-4c03-bf5b-490e9e57ab3f/rtl/pass3/pwm_controller.v"
+  ],
+  "modules": [
+    {
+      "name": "pwm_controller",
+      "file": "backend/workflows/9b5919d4-b2f3-4c03-bf5b-490e9e57ab3f/rtl/pass3/pwm_controller.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "enable",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "duty_cycle",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "period",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "pwm_out",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "counter_value",
+          "direction": "output",
+          "width": "[7:0]",
+          "bits": 8
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}
+
+=== CONSOLIDATED RTL CHECK RESULTS ===
+{
+  "pass": "pass3",
+  "passed": false,
+  "checks": {
+    "structural": {
+      "status": "pass",
+      "issue_count": 0,
+      "issues": []
+    },
+    "compile": {
+      "status": "pass",
+      "log": "backend/workflows/9b5919d4-b2f3-4c03-bf5b-490e9e57ab3f/rtl/rtl_agent_compile_pass3.log"
+    },
+    "lint": {
+      "status": "pass",
+      "blocking": false,
+      "log": "backend/workflows/9b5919d4-b2f3-4c03-bf5b-490e9e57ab3f/rtl/rtl_verilator_lint_pass3.log"
+    },
+    "static_spec2rtl": {
+      "status": "partial",
+      "blocking": true,
+      "report": "backend/workflows/9b5919d4-b2f3-4c03-bf5b-490e9e57ab3f/rtl/rtl_spec2rtl_conformance_pass3.json",
+      "summary": {
+        "checked": 18,
+        "matched": 17,
+        "partial": 1,
+        "missing": 0,
+        "inconclusive": 0
+      }
+    }
+  },
+  "issue_count": 1,
+  "issues": [
+    "\u274c Static Spec2RTL compliance failed: status=partial, missing=0, partial=1, inconclusive=0."
+  ]
+}
