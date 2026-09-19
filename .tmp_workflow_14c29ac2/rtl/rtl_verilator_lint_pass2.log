@@ -1,0 +1,42 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.070 MB sources in 3 modules, into 0.067 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.017 s (elab=0.002, cvt=0.008, bld=0.000); cpu 0.017 s on 1 threads; allocated 32.359 MB
+
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: pass2/adaptive_aero_control_top.v:120:10: Instance pin connected by name with empty reference: 'dout'
+  120 |         .dout()
+      |          ^~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-WIDTHEXPAND: pass2/adaptive_aero_control_top.v:256:29: Operator ASSIGN expects 8 bits on the Assign RHS, but Assign RHS's VARREF 'request_opcode_q' generates 4 bits.
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+  256 |             req_word[79:72] = request_opcode_q;
+      |                             ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:29:11: Signal is not used: 'req_ready'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   29 |     input req_ready;
+      |           ^~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:33:18: Bits of signal are not used: 'rsp_data'[71:0]
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   33 |     input [95:0] rsp_data;
+      |                  ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:73:16: Signal is not used: 'accepted_cmd_q'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   73 |     reg [31:0] accepted_cmd_q;
+      |                ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:74:9: Signal is not used: 'accepted_cmd_valid_q'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   74 |     reg accepted_cmd_valid_q;
+      |         ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass2/adaptive_aero_control_top.v:93:16: Signal is not used: 'timeout_next'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   93 |     reg [15:0] timeout_next;
+      |                ^~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

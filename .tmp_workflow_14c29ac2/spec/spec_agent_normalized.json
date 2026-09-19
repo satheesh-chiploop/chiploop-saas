@@ -1,0 +1,151 @@
+{
+  "name": "adaptive_aero_control_top",
+  "description": "Top-level integration module that exposes the MMIO/CSR window, request/response streams, sequencing, validation, timeout, and actuator gating. The top module owns all externally visible outputs and implements the complete control/supervision behavior required by the product contract.",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "feature_contracts": [],
+  "memory_macros": [],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "reset_n",
+      "direction": "input",
+      "width": 1,
+      "active_low": true
+    },
+    {
+      "name": "mmio_addr",
+      "direction": "input",
+      "width": 8
+    },
+    {
+      "name": "mmio_wdata",
+      "direction": "input",
+      "width": 32
+    },
+    {
+      "name": "mmio_valid",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "mmio_we",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "mmio_rdata",
+      "direction": "output",
+      "width": 32
+    },
+    {
+      "name": "mmio_ready",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "req_valid",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "req_ready",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "req_data",
+      "direction": "output",
+      "width": 96
+    },
+    {
+      "name": "rsp_valid",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "rsp_ready",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "rsp_data",
+      "direction": "input",
+      "width": 96
+    },
+    {
+      "name": "actuator_cmd",
+      "direction": "output",
+      "width": 32
+    },
+    {
+      "name": "actuator_valid",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "fault_flags",
+      "direction": "output",
+      "width": 8
+    }
+  ],
+  "functionality": "Integrates register decode, control FSM, request/response transport, validation, timeout detection, and command clamping. Maintains a monotonically increasing sequence number and only asserts actuator_valid when a response is accepted as fresh and valid. All fault handling is deterministic and software-visible through fault_flags and MMIO status; no physics model is embedded.",
+  "responsibilities": [
+    "Own all top-level outputs and drive them from real RTL logic.",
+    "Decode MMIO transactions into configuration and status access.",
+    "Generate bounded request packets for the external surrogate service.",
+    "Validate inbound response packets and freshness.",
+    "Implement fault latching and MMIO status reporting.",
+    "Clamp actuator output to configured limits when valid command data is available.",
+    "Inhibit actuator_valid on reset or any fault condition."
+  ],
+  "must_drive": [
+    "mmio_rdata",
+    "mmio_ready",
+    "req_valid",
+    "req_data",
+    "rsp_ready",
+    "actuator_cmd",
+    "actuator_valid",
+    "fault_flags"
+  ],
+  "must_receive": [
+    "clk",
+    "reset_n",
+    "mmio_addr",
+    "mmio_wdata",
+    "mmio_valid",
+    "mmio_we",
+    "req_ready",
+    "rsp_valid",
+    "rsp_data"
+  ],
+  "must_not_drive": [
+    "physics model state",
+    "tensor outputs",
+    "CFD fields",
+    "unbounded memory arrays",
+    "unsafe command replacement when invalid"
+  ],
+  "reset_behavior": "All state is synchronously reset by reset_n: registers clear to defaults, faults clear, outstanding transaction state clears, request/response handshakes are idle, actuator_valid is low, fault_flags are low, and actuator_cmd returns to a deterministic non-authoritative reset value. The module does not assert a valid actuator command until a response has been validated.",
+  "behavior_rules": [
+    "The top module is the sole design top and must not be substituted by a child module.",
+    "Every top-level output must be driven by internal RTL logic, not left unconnected.",
+    "MMIO access is synchronous and write-then-read consistent within the selected register map.",
+    "Request generation must only occur when enabled/armed and there is no pending outstanding request.",
+    "Outbound request data must include opcode, sequence number, geometry reference ID, velocity setpoint, mode bits, and reserved fields within 96 bits.",
+    "Response acceptance requires matching sequence number and completion status; malformed responses are rejected.",
+    "On reject, timeout, or stale response, fault_flags bits are asserted and remain latched until clear.",
+    "The actuator output is not a fallback substitute on fault; instead actuator_valid is deasserted while the fault is latched for software handling.",
+    "The module must remain synthesizable with synchronous state elements and combinational next-state logic only.",
+    "No Sky130 hard macro may be instantiated.",
+    "The MMIO register contract described in register_contract is authoritative and all registers must be reachable through decode."
+  ],
+  "rtl_output_file": "adaptive_aero_control_top.v",
+  "register_contract": {}
+}

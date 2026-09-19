@@ -1,0 +1,23 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.070 MB sources in 3 modules, into 0.067 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.020 s (elab=0.002, cvt=0.010, bld=0.000); cpu 0.020 s on 1 threads; allocated 32.352 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:29:11: Signal is not used: 'req_ready'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   29 |     input req_ready;
+      |           ^~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:33:18: Bits of signal are not used: 'rsp_data'[71:0]
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   33 |     input [95:0] rsp_data;
+      |                  ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:73:16: Signal is not used: 'accepted_cmd_q'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   73 |     reg [31:0] accepted_cmd_q;
+      |                ^~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

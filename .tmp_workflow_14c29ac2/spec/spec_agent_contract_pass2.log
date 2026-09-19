@@ -1,0 +1,2 @@
+Digital Spec Agent parse/normalize failure:
+Spec contract validation failed: NO COMMAND FALLBACK CONTRACT forbids fallback/substitute command ports, modules, and register fields. Remove these structural interfaces and inhibit actuator validity on invalid, stale, timeout, reset, or fault conditions instead. Forbidden names: SAFE_CMD, fallback_active, safe_cmd.

@@ -1,0 +1,4 @@
+=== ERROR ===
+verilator executable was not found in active ChipLoop tool profile
+=== RETURN CODE ===
+None

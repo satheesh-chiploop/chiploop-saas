@@ -1,0 +1,39 @@
+{
+  "pass": "pass2",
+  "passed": false,
+  "checks": {
+    "structural": {
+      "status": "fail",
+      "issue_count": 1,
+      "issues": [
+        "\u274c Required memory 'request_response_fifo_bram u_req_rsp_fifo' is functionally unreachable: active-low select 'csb' is permanently inactive via '1'b1'. Implement a legal input-driven read/write transaction and make read data observable; do not preserve the instance with constant tie-offs or an unused output."
+      ]
+    },
+    "compile": {
+      "status": "pass",
+      "log": "backend/workflows/14c29ac2-740e-4fa0-b1c6-a9769ee9057f/rtl/rtl_agent_compile_pass2.log"
+    },
+    "lint": {
+      "status": "pass",
+      "blocking": false,
+      "log": "backend/workflows/14c29ac2-740e-4fa0-b1c6-a9769ee9057f/rtl/rtl_verilator_lint_pass2.log"
+    },
+    "static_spec2rtl": {
+      "status": "partial",
+      "blocking": true,
+      "report": "backend/workflows/14c29ac2-740e-4fa0-b1c6-a9769ee9057f/rtl/rtl_spec2rtl_conformance_pass2.json",
+      "summary": {
+        "checked": 38,
+        "matched": 29,
+        "partial": 0,
+        "missing": 9,
+        "inconclusive": 0
+      }
+    }
+  },
+  "issue_count": 2,
+  "issues": [
+    "\u274c Required memory 'request_response_fifo_bram u_req_rsp_fifo' is functionally unreachable: active-low select 'csb' is permanently inactive via '1'b1'. Implement a legal input-driven read/write transaction and make read data observable; do not preserve the instance with constant tie-offs or an unused output.",
+    "\u274c Static Spec2RTL compliance failed: status=partial, missing=9, partial=0, inconclusive=0."
+  ]
+}

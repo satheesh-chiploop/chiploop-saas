@@ -1,0 +1,29 @@
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:29:11: Signal is not used: 'req_ready'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   29 |     input req_ready;
+      |           ^~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:33:18: Bits of signal are not used: 'rsp_data'[71:0]
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   33 |     input [95:0] rsp_data;
+      |                  ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:73:16: Signal is not used: 'accepted_cmd_q'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   73 |     reg [31:0] accepted_cmd_q;
+      |                ^~~~~~~~~~~~~~
+%Error-BLKANDNBLK: pass3/adaptive_aero_control_top.v:75:16: Unsupported: Blocking and non-blocking assignments to potentially overlapping bits of same packed variable: 'adaptive_aero_control_top.req_word'
+   75 |     reg [95:0] req_word;
+      |                ^~~~~~~~
+                   pass3/adaptive_aero_control_top.v:256:13: ... Location of blocking assignment (bits [47:0])
+  256 |             req_word[47:44] = control_mode_q;
+      |             ^~~~~~~~
+                   pass3/request_response_fifo_bram.v:14:13: ... Location of nonblocking assignment (bits [95:0])
+   14 |             dout <= mem[addr];
+      |             ^~~~
+                   ... For error description see https://verilator.org/warn/BLKANDNBLK?v=5.047
+%Error: Exiting due to 1 error(s)
+
+=== RETURN CODE ===
+1

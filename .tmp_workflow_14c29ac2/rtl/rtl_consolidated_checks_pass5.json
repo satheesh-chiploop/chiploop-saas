@@ -1,0 +1,37 @@
+{
+  "pass": "pass5",
+  "passed": false,
+  "checks": {
+    "structural": {
+      "status": "pass",
+      "issue_count": 0,
+      "issues": []
+    },
+    "compile": {
+      "status": "fail",
+      "log": "backend/workflows/14c29ac2-740e-4fa0-b1c6-a9769ee9057f/rtl/rtl_agent_compile_pass5.log"
+    },
+    "lint": {
+      "status": "pass",
+      "blocking": false,
+      "log": "backend/workflows/14c29ac2-740e-4fa0-b1c6-a9769ee9057f/rtl/rtl_verilator_lint_pass5.log"
+    },
+    "static_spec2rtl": {
+      "status": "partial",
+      "blocking": true,
+      "report": "backend/workflows/14c29ac2-740e-4fa0-b1c6-a9769ee9057f/rtl/rtl_spec2rtl_conformance_pass5.json",
+      "summary": {
+        "checked": 38,
+        "matched": 29,
+        "partial": 0,
+        "missing": 9,
+        "inconclusive": 0
+      }
+    }
+  },
+  "issue_count": 2,
+  "issues": [
+    "\u274c Icarus Verilog compile failed.",
+    "\u274c Static Spec2RTL compliance failed: status=partial, missing=9, partial=0, inconclusive=0."
+  ]
+}

@@ -1,1 +1,0 @@
-ValueError('Required memory read data must be functionally observable: openram_sram_64x32.dout is unconsumed; connect it to a real child input or a top-level output')

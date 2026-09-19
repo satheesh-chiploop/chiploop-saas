@@ -1,0 +1,39 @@
+{
+  "pass": "current",
+  "passed": false,
+  "checks": {
+    "structural": {
+      "status": "fail",
+      "issue_count": 1,
+      "issues": [
+        "\u274c Required memory 'request_response_fifo_bram u_req_rsp_fifo' is functionally unreachable: read output 'dout' connects to unconsumed signal 'fifo_dout'. Implement a legal input-driven read/write transaction and make read data observable; do not preserve the instance with constant tie-offs or an unused output."
+      ]
+    },
+    "compile": {
+      "status": "pass",
+      "log": "C:\\Users\\satheesh\\chiploop-saas\\.tmp_workflow_14c29ac2\\final_replay\\rtl_agent_compile_current.log"
+    },
+    "lint": {
+      "status": "warning_only",
+      "blocking": false,
+      "log": "C:\\Users\\satheesh\\chiploop-saas\\.tmp_workflow_14c29ac2\\final_replay\\rtl_verilator_lint_current.log"
+    },
+    "static_spec2rtl": {
+      "status": "partial",
+      "blocking": true,
+      "report": "C:\\Users\\satheesh\\chiploop-saas\\.tmp_workflow_14c29ac2\\final_replay\\rtl_spec2rtl_conformance_current.json",
+      "summary": {
+        "checked": 38,
+        "matched": 36,
+        "partial": 0,
+        "missing": 2,
+        "inconclusive": 0
+      }
+    }
+  },
+  "issue_count": 2,
+  "issues": [
+    "\u274c Required memory 'request_response_fifo_bram u_req_rsp_fifo' is functionally unreachable: read output 'dout' connects to unconsumed signal 'fifo_dout'. Implement a legal input-driven read/write transaction and make read data observable; do not preserve the instance with constant tie-offs or an unused output.",
+    "\u274c Static Spec2RTL compliance failed: status=partial, missing=2, partial=0, inconclusive=0."
+  ]
+}
