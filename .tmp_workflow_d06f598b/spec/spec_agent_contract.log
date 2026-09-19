@@ -1,2 +1,0 @@
-Digital Spec Agent parse/normalize failure:
-Every feature_contracts entry must compile to an executable checker. feature_1_dc8a439a: Requirement lacks an explicit, fully bound expected signal map.; feature_2_abf85630: Requirement lacks an explicit, fully bound expected signal map.; feature_3_7d900f1d: Requirement lacks an explicit, fully bound expected signal map.; feature_4_e96dc3c2: Requirement lacks an explicit, fully bound expected signal map.

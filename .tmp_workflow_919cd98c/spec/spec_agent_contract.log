@@ -1,2 +1,0 @@
-Digital Spec Agent LLM failure:
-model_rate_limited provider=openai model=gpt-5.4-mini: RateLimitError: Error code: 429 - {'error': {'message': 'You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.', 'type': 'insufficient_quota', 'param': None, 'code': 'credit_balance_exhausted'}}

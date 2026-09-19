@@ -1,0 +1,2 @@
+Digital Spec Agent parse/normalize failure:
+Required child input 'adaptive_aero_history_wrapper.write_en' has no source in top_level_connections or inter_module_signals. Add an explicit top-level input connection or a real child producer. Other required child inputs without sources: 'adaptive_aero_history_wrapper.read_en', 'adaptive_aero_history_wrapper.write_addr', 'adaptive_aero_history_wrapper.read_addr', 'adaptive_aero_history_wrapper.write_data'. Repair every listed input in the same response.
