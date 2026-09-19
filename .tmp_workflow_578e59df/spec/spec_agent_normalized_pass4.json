@@ -1,0 +1,211 @@
+{
+  "name": "adaptive_aero_control_top",
+  "description": "Safety and validity supervisor that compares surrogate and reference outputs, checks timeout/stale conditions, validates the airspeed envelope, and determines whether the actuator command may be considered valid. It latches faults and can request fault clear handling through software-visible control inputs, but it never generates a substitute command.",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "feature_contracts": [],
+  "memory_macros": [],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "reset_n",
+      "direction": "input",
+      "width": 1,
+      "active_low": true
+    },
+    {
+      "name": "cfg_enable",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "cfg_timeout_cycles",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "cfg_airspeed_min_mps",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "cfg_airspeed_max_mps",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "cfg_cmd_min",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "cfg_cmd_max",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "cfg_cmd_rate_limit",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "cfg_clear_fault",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "airspd_mps",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "reference_valid",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "reference_cmd",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "surrogate_cmd_valid",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "surrogate_cmd_data",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "surrogate_rsp_fresh",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "surrogate_rsp_age",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "vehicle_state_valid",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "vehicle_state_data",
+      "direction": "input",
+      "width": 64
+    },
+    {
+      "name": "actuator_cmd_valid",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "actuator_cmd_data",
+      "direction": "output",
+      "width": 16
+    },
+    {
+      "name": "fault_latched",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "timeout_flag",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "stale_flag",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "invalid_flag",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "safe_gate_open",
+      "direction": "output",
+      "width": 1
+    }
+  ],
+  "functionality": "Evaluates reference-versus-surrogate agreement, freshness, timeout, airspeed envelope, and vehicle-state validity. It asserts safe_gate_open only when command generation is safe and bounded, and otherwise deasserts actuator_cmd_valid while latching fault conditions for software handling. It does not provide or select any fallback actuator command.",
+  "responsibilities": [
+    "Latch and expose fault state.",
+    "Detect timeout and stale surrogate data.",
+    "Validate airspeed against configured 20-55 m/s operation envelope.",
+    "Compare surrogate command against the transparent reference and configured command bounds.",
+    "Permit actuation only when safety conditions are met.",
+    "Suppress actuation on invalid or faulted conditions."
+  ],
+  "must_drive": [
+    "actuator_cmd_valid",
+    "actuator_cmd_data",
+    "fault_latched",
+    "timeout_flag",
+    "stale_flag",
+    "invalid_flag",
+    "safe_gate_open"
+  ],
+  "must_receive": [
+    "clk",
+    "reset_n",
+    "cfg_enable",
+    "cfg_timeout_cycles",
+    "cfg_airspeed_min_mps",
+    "cfg_airspeed_max_mps",
+    "cfg_cmd_min",
+    "cfg_cmd_max",
+    "cfg_cmd_rate_limit",
+    "cfg_clear_fault",
+    "airspd_mps",
+    "reference_valid",
+    "reference_cmd",
+    "surrogate_cmd_valid",
+    "surrogate_cmd_data",
+    "surrogate_rsp_fresh",
+    "surrogate_rsp_age",
+    "vehicle_state_valid",
+    "vehicle_state_data"
+  ],
+  "must_not_drive": [
+    "cfg_enable",
+    "cfg_timeout_cycles",
+    "cfg_airspeed_min_mps",
+    "cfg_airspeed_max_mps",
+    "cfg_cmd_min",
+    "cfg_cmd_max",
+    "cfg_cmd_rate_limit",
+    "cfg_clear_fault",
+    "airspd_mps",
+    "reference_valid",
+    "reference_cmd",
+    "surrogate_cmd_valid",
+    "surrogate_cmd_data",
+    "surrogate_rsp_fresh",
+    "surrogate_rsp_age",
+    "vehicle_state_valid",
+    "vehicle_state_data"
+  ],
+  "reset_behavior": "Deasserts actuator_cmd_valid, clears safe_gate_open, and initializes fault/timeout/stale/invalid outputs to a safe reset state. No substitute command is asserted on reset.",
+  "behavior_rules": [
+    "When cfg_enable is low, safe_gate_open remains low and actuator_cmd_valid is deasserted.",
+    "Airspeed outside the configured envelope forces invalid_flag and prevents actuation validity.",
+    "surrogate_rsp_age greater than or equal to cfg_timeout_cycles asserts timeout_flag and inhibits actuation.",
+    "A stale or invalid surrogate response inhibits actuation and may latch fault_latched.",
+    "If cfg_clear_fault is asserted, the supervisor may clear the latched fault only when the design rules permit; clearing fault never synthesizes an actuator command.",
+    "actuator_cmd_data is only meaningful when actuator_cmd_valid is asserted and remains bounded by cfg_cmd_min/cfg_cmd_max and rate-limit policy."
+  ],
+  "rtl_output_file": "adaptive_aero_control_top.v",
+  "register_contract": {}
+}
