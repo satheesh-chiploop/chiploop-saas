@@ -1,0 +1,36 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.114 MB sources in 5 modules, into 0.055 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.020 s (elab=0.002, cvt=0.010, bld=0.000); cpu 0.020 s on 1 threads; allocated 32.355 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: pass5/adaptive_aero_control_top.v:63:13: Signal is not used: 'history_dout_from_u_adaptive_aero_history_wrapper'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   63 | wire [63:0] history_dout_from_u_adaptive_aero_history_wrapper;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass5/adaptive_aero_controller_core.v:40:12: Signal is not used: 'latched_cmd_data'
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_controller_core'
+   40 | reg [15:0] latched_cmd_data;
+      |            ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass5/adaptive_aero_controller_core.v:41:5: Signal is not used: 'latched_cmd_valid'
+                                                                 : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_controller_core'
+   41 | reg latched_cmd_valid;
+      |     ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass5/adaptive_aero_controller_core.v:64:13: Bits of signal are not used: 'history_mix'[63:32]
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_controller_core'
+   64 | wire [63:0] history_mix;
+      |             ^~~~~~~~~~~
+%Warning-SYNCASYNCNET: pass5/adaptive_aero_control_top.v:3:19: Signal flopped as both synchronous and async: 'reset_n'
+                       pass5/aero_mmio_csr_block.v:72:10: ... Location of async usage
+   72 |     if (!reset_n) begin
+      |          ^~~~~~~
+                       pass5/adaptive_aero_history_wrapper.v:16:10: ... Location of sync usage
+   16 |     if (!reset_n) begin
+      |          ^~~~~~~
+                       ... For warning description see https://verilator.org/warn/SYNCASYNCNET?v=5.047
+                       ... Use "/* verilator lint_off SYNCASYNCNET */" and lint_on around source to disable this message.
+
+=== RETURN CODE ===
+0

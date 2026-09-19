@@ -1,0 +1,187 @@
+{
+  "status": "fail",
+  "attempt_count": 5,
+  "final_pass": "pass5",
+  "passes": [
+    {
+      "pass": "pass1",
+      "passed": false,
+      "checks": {
+        "structural": {
+          "status": "pass",
+          "issue_count": 0,
+          "issues": []
+        },
+        "compile": {
+          "status": "pass",
+          "log": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_agent_compile.log"
+        },
+        "lint": {
+          "status": "pass",
+          "blocking": false,
+          "log": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_verilator_lint.log"
+        },
+        "static_spec2rtl": {
+          "status": "partial",
+          "blocking": true,
+          "report": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_spec2rtl_conformance_pass1.json",
+          "summary": {
+            "checked": 137,
+            "matched": 112,
+            "partial": 0,
+            "missing": 25,
+            "inconclusive": 0
+          }
+        }
+      },
+      "issue_count": 1,
+      "issues": [
+        "\u274c Static Spec2RTL compliance failed: status=partial, missing=25, partial=0, inconclusive=0."
+      ]
+    },
+    {
+      "pass": "pass2",
+      "passed": false,
+      "checks": {
+        "structural": {
+          "status": "pass",
+          "issue_count": 0,
+          "issues": []
+        },
+        "compile": {
+          "status": "pass",
+          "log": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_agent_compile_pass2.log"
+        },
+        "lint": {
+          "status": "pass",
+          "blocking": false,
+          "log": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_verilator_lint_pass2.log"
+        },
+        "static_spec2rtl": {
+          "status": "partial",
+          "blocking": true,
+          "report": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_spec2rtl_conformance_pass2.json",
+          "summary": {
+            "checked": 137,
+            "matched": 112,
+            "partial": 0,
+            "missing": 25,
+            "inconclusive": 0
+          }
+        }
+      },
+      "issue_count": 1,
+      "issues": [
+        "\u274c Static Spec2RTL compliance failed: status=partial, missing=25, partial=0, inconclusive=0."
+      ]
+    },
+    {
+      "pass": "pass3",
+      "passed": false,
+      "checks": {
+        "structural": {
+          "status": "pass",
+          "issue_count": 0,
+          "issues": []
+        },
+        "compile": {
+          "status": "pass",
+          "log": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_agent_compile_pass3.log"
+        },
+        "lint": {
+          "status": "pass",
+          "blocking": false,
+          "log": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_verilator_lint_pass3.log"
+        },
+        "static_spec2rtl": {
+          "status": "partial",
+          "blocking": true,
+          "report": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_spec2rtl_conformance_pass3.json",
+          "summary": {
+            "checked": 137,
+            "matched": 112,
+            "partial": 0,
+            "missing": 25,
+            "inconclusive": 0
+          }
+        }
+      },
+      "issue_count": 1,
+      "issues": [
+        "\u274c Static Spec2RTL compliance failed: status=partial, missing=25, partial=0, inconclusive=0."
+      ]
+    },
+    {
+      "pass": "pass4",
+      "passed": false,
+      "checks": {
+        "structural": {
+          "status": "pass",
+          "issue_count": 0,
+          "issues": []
+        },
+        "compile": {
+          "status": "pass",
+          "log": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_agent_compile_pass4.log"
+        },
+        "lint": {
+          "status": "pass",
+          "blocking": false,
+          "log": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_verilator_lint_pass4.log"
+        },
+        "static_spec2rtl": {
+          "status": "partial",
+          "blocking": true,
+          "report": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_spec2rtl_conformance_pass4.json",
+          "summary": {
+            "checked": 137,
+            "matched": 112,
+            "partial": 0,
+            "missing": 25,
+            "inconclusive": 0
+          }
+        }
+      },
+      "issue_count": 1,
+      "issues": [
+        "\u274c Static Spec2RTL compliance failed: status=partial, missing=25, partial=0, inconclusive=0."
+      ]
+    },
+    {
+      "pass": "pass5",
+      "passed": false,
+      "checks": {
+        "structural": {
+          "status": "pass",
+          "issue_count": 0,
+          "issues": []
+        },
+        "compile": {
+          "status": "pass",
+          "log": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_agent_compile_pass5.log"
+        },
+        "lint": {
+          "status": "pass",
+          "blocking": false,
+          "log": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_verilator_lint_pass5.log"
+        },
+        "static_spec2rtl": {
+          "status": "partial",
+          "blocking": true,
+          "report": "backend/workflows/2cc9d056-df70-4ffe-a9f1-5a84596ea3f9/rtl/rtl_spec2rtl_conformance_pass5.json",
+          "summary": {
+            "checked": 137,
+            "matched": 112,
+            "partial": 0,
+            "missing": 25,
+            "inconclusive": 0
+          }
+        }
+      },
+      "issue_count": 1,
+      "issues": [
+        "\u274c Static Spec2RTL compliance failed: status=partial, missing=25, partial=0, inconclusive=0."
+      ]
+    }
+  ]
+}

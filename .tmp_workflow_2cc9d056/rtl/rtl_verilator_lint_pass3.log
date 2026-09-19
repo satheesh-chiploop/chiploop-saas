@@ -1,0 +1,34 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.110 MB sources in 5 modules, into 0.044 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.024 s (elab=0.003, cvt=0.012, bld=0.000); cpu 0.024 s on 1 threads; allocated 32.355 MB
+
+=== STDERR ===
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_controller_core.v:56:19: Operator ASSIGNW expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 112 bits.
+                                                                : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_controller_core'
+   56 | assign req_packet = {16'h0000, vehicle_speed_mps, cfg_min_speed_mps, cfg_max_speed_mps, cfg_cmd_min, cfg_cmd_max, cfg_model_select, 14'h0000};
+      |                   ^
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:63:13: Signal is not used: 'history_dout_from_u_adaptive_aero_history_wrapper'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   63 | wire [63:0] history_dout_from_u_adaptive_aero_history_wrapper;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_controller_core.v:21:19: Bits of signal are not used: 'model_rsp_data'[63:16]
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_controller_core'
+   21 |     input  [63:0] model_rsp_data,
+      |                   ^~~~~~~~~~~~~~
+%Warning-SYNCASYNCNET: pass3/adaptive_aero_control_top.v:3:19: Signal flopped as both synchronous and async: 'reset_n'
+                       pass3/aero_mmio_csr_block.v:72:10: ... Location of async usage
+   72 |     if (!reset_n) begin
+      |          ^~~~~~~
+                       pass3/adaptive_aero_history_wrapper.v:16:10: ... Location of sync usage
+   16 |     if (!reset_n) begin
+      |          ^~~~~~~
+                       ... For warning description see https://verilator.org/warn/SYNCASYNCNET?v=5.047
+                       ... Use "/* verilator lint_off SYNCASYNCNET */" and lint_on around source to disable this message.
+
+=== RETURN CODE ===
+0

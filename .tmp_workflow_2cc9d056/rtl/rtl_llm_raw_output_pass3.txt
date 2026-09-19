@@ -1,0 +1,445 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    input         clk,
+    input         reset_n,
+    input         mmio_valid,
+    input         mmio_write,
+    input  [15:0] mmio_addr,
+    input  [31:0] mmio_wdata,
+    output [31:0] mmio_rdata,
+    output        mmio_ready,
+    output        model_req_valid,
+    output [63:0] model_req_data,
+    input         model_req_ready,
+    input         model_rsp_valid,
+    input  [63:0] model_rsp_data,
+    output        model_rsp_ready,
+    input  [15:0] vehicle_speed_mps,
+    input         sensor_valid,
+    input         sensor_fault,
+    input         sensor_stale,
+    output        actuator_cmd_valid,
+    output [15:0] actuator_cmd_data,
+    output        fault_latched,
+    output        safety_inhibit,
+    output        history_csb,
+    output        history_we,
+    output [9:0]  history_addr,
+    output [63:0] history_din,
+    input  [63:0] history_dout
+);
+
+wire cfg_enable;
+wire [15:0] cfg_min_speed_mps;
+wire [15:0] cfg_max_speed_mps;
+wire [15:0] cfg_cmd_min;
+wire [15:0] cfg_cmd_max;
+wire [15:0] cfg_timeout_cycles;
+wire [15:0] cfg_stale_limit_cycles;
+wire [1:0]  cfg_model_select;
+wire cfg_fault_clear;
+
+wire status_fault_latched;
+wire status_safety_inhibit;
+wire status_last_cmd_valid;
+wire [15:0] status_last_cmd_data;
+wire [15:0] status_last_speed_mps;
+wire status_timeout_active;
+
+wire history_wr_en;
+wire [9:0] history_wr_addr;
+wire [63:0] history_wr_data;
+wire [63:0] history_rd_data;
+
+wire [31:0] mmio_rdata_i;
+wire mmio_ready_i;
+wire model_req_valid_i;
+wire [63:0] model_req_data_i;
+wire model_rsp_ready_i;
+wire actuator_cmd_valid_i;
+wire [15:0] actuator_cmd_data_i;
+wire fault_latched_i;
+wire safety_inhibit_i;
+
+wire history_csb_i;
+wire history_we_i;
+wire [9:0] history_addr_i;
+wire [63:0] history_din_i;
+
+assign mmio_rdata = mmio_rdata_i;
+assign mmio_ready = mmio_ready_i;
+assign model_req_valid = model_req_valid_i;
+assign model_req_data = model_req_data_i;
+assign model_rsp_ready = model_rsp_ready_i;
+assign actuator_cmd_valid = actuator_cmd_valid_i;
+assign actuator_cmd_data = actuator_cmd_data_i;
+assign fault_latched = fault_latched_i;
+assign safety_inhibit = safety_inhibit_i;
+
+assign history_csb = history_csb_i;
+assign history_we = history_we_i;
+assign history_addr = history_addr_i;
+assign history_din = history_din_i;
+
+assign history_rd_data = history_dout;
+
+aero_mmio_csr_block u_aero_mmio_csr_block (
+    .clk(clk),
+    .reset_n(reset_n),
+    .mmio_valid(mmio_valid),
+    .mmio_write(mmio_write),
+    .mmio_addr(mmio_addr),
+    .mmio_wdata(mmio_wdata),
+    .mmio_rdata(mmio_rdata_i),
+    .mmio_ready(mmio_ready_i),
+    .cfg_enable(cfg_enable),
+    .cfg_min_speed_mps(cfg_min_speed_mps),
+    .cfg_max_speed_mps(cfg_max_speed_mps),
+    .cfg_cmd_min(cfg_cmd_min),
+    .cfg_cmd_max(cfg_cmd_max),
+    .cfg_timeout_cycles(cfg_timeout_cycles),
+    .cfg_stale_limit_cycles(cfg_stale_limit_cycles),
+    .cfg_model_select(cfg_model_select),
+    .cfg_fault_clear(cfg_fault_clear),
+    .status_fault_latched(status_fault_latched),
+    .status_safety_inhibit(status_safety_inhibit),
+    .status_last_cmd_valid(status_last_cmd_valid),
+    .status_last_cmd_data(status_last_cmd_data),
+    .status_last_speed_mps(status_last_speed_mps),
+    .status_timeout_active(status_timeout_active)
+);
+
+adaptive_aero_controller_core u_adaptive_aero_controller_core (
+    .clk(clk),
+    .reset_n(reset_n),
+    .cfg_enable(cfg_enable),
+    .cfg_min_speed_mps(cfg_min_speed_mps),
+    .cfg_max_speed_mps(cfg_max_speed_mps),
+    .cfg_cmd_min(cfg_cmd_min),
+    .cfg_cmd_max(cfg_cmd_max),
+    .cfg_timeout_cycles(cfg_timeout_cycles),
+    .cfg_stale_limit_cycles(cfg_stale_limit_cycles),
+    .cfg_model_select(cfg_model_select),
+    .cfg_fault_clear(cfg_fault_clear),
+    .vehicle_speed_mps(vehicle_speed_mps),
+    .sensor_valid(sensor_valid),
+    .sensor_fault(sensor_fault),
+    .sensor_stale(sensor_stale),
+    .model_req_valid(model_req_valid_i),
+    .model_req_data(model_req_data_i),
+    .model_req_ready(model_req_ready),
+    .model_rsp_valid(model_rsp_valid),
+    .model_rsp_data(model_rsp_data),
+    .model_rsp_ready(model_rsp_ready_i),
+    .actuator_cmd_valid(actuator_cmd_valid_i),
+    .actuator_cmd_data(actuator_cmd_data_i),
+    .fault_latched(fault_latched_i),
+    .safety_inhibit(safety_inhibit_i),
+    .status_last_cmd_valid(status_last_cmd_valid),
+    .status_last_cmd_data(status_last_cmd_data),
+    .status_last_speed_mps(status_last_speed_mps),
+    .status_timeout_active(status_timeout_active),
+    .history_wr_en(history_wr_en),
+    .history_wr_addr(history_wr_addr),
+    .history_wr_data(history_wr_data),
+    .history_rd_data(history_rd_data)
+);
+
+assign history_csb_i = history_wr_en;
+assign history_we_i = history_wr_en;
+assign history_addr_i = history_wr_addr;
+assign history_din_i = history_wr_data;
+
+adaptive_aero_history_wrapper u_adaptive_aero_history_wrapper (
+    .clk(clk),
+    .reset_n(reset_n),
+    .history_csb(history_csb_i),
+    .history_we(history_we_i),
+    .history_addr(history_addr_i),
+    .history_din(history_din_i),
+    .history_dout(history_dout)
+);
+
+endmodule
+---END adaptive_aero_control_top.v---
+---BEGIN aero_mmio_csr_block.v---
+module aero_mmio_csr_block (
+    input         clk,
+    input         reset_n,
+    input         mmio_valid,
+    input         mmio_write,
+    input  [15:0] mmio_addr,
+    input  [31:0] mmio_wdata,
+    output reg [31:0] mmio_rdata,
+    output reg        mmio_ready,
+    output reg        cfg_enable,
+    output reg [15:0] cfg_min_speed_mps,
+    output reg [15:0] cfg_max_speed_mps,
+    output reg [15:0] cfg_cmd_min,
+    output reg [15:0] cfg_cmd_max,
+    output reg [15:0] cfg_timeout_cycles,
+    output reg [15:0] cfg_stale_limit_cycles,
+    output reg [1:0]  cfg_model_select,
+    output reg        cfg_fault_clear,
+    input         status_fault_latched,
+    input         status_safety_inhibit,
+    input         status_last_cmd_valid,
+    input  [15:0] status_last_cmd_data,
+    input  [15:0] status_last_speed_mps,
+    input         status_timeout_active
+);
+
+localparam [15:0] ADDR_CTRL       = 16'h0000;
+localparam [15:0] ADDR_SPEED      = 16'h0004;
+localparam [15:0] ADDR_CMD        = 16'h0008;
+localparam [15:0] ADDR_TIMING     = 16'h000C;
+localparam [15:0] ADDR_STATUS     = 16'h0010;
+localparam [15:0] ADDR_LAST_SPEED = 16'h0014;
+
+reg [31:0] read_data_next;
+reg ready_next;
+reg cfg_fault_clear_next;
+
+always @(*) begin
+    read_data_next = 32'h00000000;
+    ready_next = 1'b1;
+    cfg_fault_clear_next = 1'b0;
+
+    case (mmio_addr)
+        ADDR_CTRL: begin
+            read_data_next = {27'b0, 1'b0, cfg_model_select, cfg_fault_clear, cfg_enable};
+            if (mmio_valid && mmio_write) begin
+                cfg_fault_clear_next = mmio_wdata[3];
+            end
+        end
+        ADDR_SPEED: begin
+            read_data_next = {cfg_max_speed_mps, cfg_min_speed_mps};
+        end
+        ADDR_CMD: begin
+            read_data_next = {cfg_cmd_max, cfg_cmd_min};
+        end
+        ADDR_TIMING: begin
+            read_data_next = {cfg_stale_limit_cycles, cfg_timeout_cycles};
+        end
+        ADDR_STATUS: begin
+            read_data_next = {status_last_cmd_data, 12'b000000000000, status_timeout_active, status_last_cmd_valid, status_safety_inhibit, status_fault_latched};
+        end
+        ADDR_LAST_SPEED: begin
+            read_data_next = {16'h0000, status_last_speed_mps};
+        end
+        default: begin
+            read_data_next = 32'h00000000;
+        end
+    endcase
+end
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        cfg_enable <= 1'b0;
+        cfg_min_speed_mps <= 16'd20;
+        cfg_max_speed_mps <= 16'd55;
+        cfg_cmd_min <= 16'd0;
+        cfg_cmd_max <= 16'd1023;
+        cfg_timeout_cycles <= 16'd64;
+        cfg_stale_limit_cycles <= 16'd16;
+        cfg_model_select <= 2'b00;
+        cfg_fault_clear <= 1'b0;
+        mmio_rdata <= 32'h00000000;
+        mmio_ready <= 1'b1;
+    end else begin
+        mmio_rdata <= read_data_next;
+        mmio_ready <= ready_next;
+        cfg_fault_clear <= cfg_fault_clear_next;
+        if (mmio_valid && mmio_write) begin
+            case (mmio_addr)
+                ADDR_CTRL: begin
+                    cfg_enable <= mmio_wdata[0];
+                    cfg_model_select <= mmio_wdata[2:1];
+                end
+                ADDR_SPEED: begin
+                    cfg_min_speed_mps <= mmio_wdata[15:0];
+                    cfg_max_speed_mps <= mmio_wdata[31:16];
+                end
+                ADDR_CMD: begin
+                    cfg_cmd_min <= mmio_wdata[15:0];
+                    cfg_cmd_max <= mmio_wdata[31:16];
+                end
+                ADDR_TIMING: begin
+                    cfg_timeout_cycles <= mmio_wdata[15:0];
+                    cfg_stale_limit_cycles <= mmio_wdata[31:16];
+                end
+                default: begin
+                end
+            endcase
+        end
+    end
+end
+
+endmodule
+---END aero_mmio_csr_block.v---
+---BEGIN adaptive_aero_controller_core.v---
+module adaptive_aero_controller_core (
+    input         clk,
+    input         reset_n,
+    input         cfg_enable,
+    input  [15:0] cfg_min_speed_mps,
+    input  [15:0] cfg_max_speed_mps,
+    input  [15:0] cfg_cmd_min,
+    input  [15:0] cfg_cmd_max,
+    input  [15:0] cfg_timeout_cycles,
+    input  [15:0] cfg_stale_limit_cycles,
+    input  [1:0]  cfg_model_select,
+    input         cfg_fault_clear,
+    input  [15:0] vehicle_speed_mps,
+    input         sensor_valid,
+    input         sensor_fault,
+    input         sensor_stale,
+    output reg        model_req_valid,
+    output reg [63:0] model_req_data,
+    input         model_req_ready,
+    input         model_rsp_valid,
+    input  [63:0] model_rsp_data,
+    output reg        model_rsp_ready,
+    output reg        actuator_cmd_valid,
+    output reg [15:0] actuator_cmd_data,
+    output reg        fault_latched,
+    output reg        safety_inhibit,
+    output reg        status_last_cmd_valid,
+    output reg [15:0] status_last_cmd_data,
+    output reg [15:0] status_last_speed_mps,
+    output reg        status_timeout_active,
+    output reg        history_wr_en,
+    output reg [9:0]  history_wr_addr,
+    output reg [63:0] history_wr_data,
+    input  [63:0] history_rd_data
+);
+
+reg [15:0] timeout_cnt;
+reg [15:0] stale_cnt;
+reg [9:0] history_ptr;
+
+wire speed_in_range;
+wire sensor_ok;
+wire timeout_active_int;
+wire invalid_condition;
+wire [15:0] raw_cmd;
+wire [15:0] bounded_cmd;
+wire [63:0] req_packet;
+wire [63:0] hist_packet;
+
+assign speed_in_range = (vehicle_speed_mps >= cfg_min_speed_mps) && (vehicle_speed_mps <= cfg_max_speed_mps);
+assign sensor_ok = sensor_valid && !sensor_fault && !sensor_stale;
+assign timeout_active_int = (cfg_timeout_cycles != 16'd0) && (timeout_cnt >= cfg_timeout_cycles);
+assign invalid_condition = (!cfg_enable) || (!speed_in_range) || (!sensor_ok) || timeout_active_int || ((cfg_stale_limit_cycles != 16'd0) && (stale_cnt >= cfg_stale_limit_cycles));
+assign raw_cmd = model_rsp_data[15:0] ^ {14'b0, cfg_model_select};
+assign bounded_cmd = (raw_cmd < cfg_cmd_min) ? cfg_cmd_min : ((raw_cmd > cfg_cmd_max) ? cfg_cmd_max : raw_cmd);
+assign req_packet = {16'h0000, vehicle_speed_mps, cfg_min_speed_mps, cfg_max_speed_mps, cfg_cmd_min, cfg_cmd_max, cfg_model_select, 14'h0000};
+assign hist_packet = history_rd_data ^ req_packet;
+
+always @(posedge clk or negedge reset_n) begin
+    if (!reset_n) begin
+        model_req_valid <= 1'b0;
+        model_req_data <= 64'h0000000000000000;
+        model_rsp_ready <= 1'b1;
+        actuator_cmd_valid <= 1'b0;
+        actuator_cmd_data <= 16'h0000;
+        fault_latched <= 1'b0;
+        safety_inhibit <= 1'b1;
+        status_last_cmd_valid <= 1'b0;
+        status_last_cmd_data <= 16'h0000;
+        status_last_speed_mps <= 16'h0000;
+        status_timeout_active <= 1'b0;
+        history_wr_en <= 1'b0;
+        history_wr_addr <= 10'h000;
+        history_wr_data <= 64'h0000000000000000;
+        timeout_cnt <= 16'h0000;
+        stale_cnt <= 16'h0000;
+        history_ptr <= 10'h000;
+    end else begin
+        model_req_valid <= cfg_enable && sensor_ok && speed_in_range && !fault_latched;
+        model_req_data <= req_packet;
+        model_rsp_ready <= 1'b1;
+
+        if (sensor_valid && !sensor_fault && !sensor_stale) begin
+            stale_cnt <= 16'h0000;
+        end else if (stale_cnt != 16'hffff) begin
+            stale_cnt <= stale_cnt + 16'h0001;
+        end
+
+        if (cfg_enable && sensor_ok && speed_in_range && !fault_latched) begin
+            if (model_req_ready) begin
+                timeout_cnt <= 16'h0000;
+            end else if (timeout_cnt != 16'hffff) begin
+                timeout_cnt <= timeout_cnt + 16'h0001;
+            end
+        end else begin
+            timeout_cnt <= 16'h0000;
+        end
+
+        status_timeout_active <= timeout_active_int;
+
+        if (cfg_fault_clear && !invalid_condition) begin
+            fault_latched <= 1'b0;
+        end else if (invalid_condition) begin
+            fault_latched <= 1'b1;
+        end
+
+        safety_inhibit <= invalid_condition || fault_latched || (!cfg_enable);
+
+        if (!invalid_condition && model_rsp_valid) begin
+            actuator_cmd_valid <= 1'b1;
+            actuator_cmd_data <= bounded_cmd;
+            status_last_cmd_valid <= 1'b1;
+            status_last_cmd_data <= bounded_cmd;
+            status_last_speed_mps <= vehicle_speed_mps;
+        end else begin
+            actuator_cmd_valid <= 1'b0;
+        end
+
+        if (invalid_condition) begin
+            actuator_cmd_valid <= 1'b0;
+        end
+
+        history_wr_en <= (model_req_valid && model_req_ready) || model_rsp_valid || actuator_cmd_valid;
+        history_wr_addr <= history_ptr;
+        history_wr_data <= hist_packet;
+
+        if (history_wr_en) begin
+            history_ptr <= history_ptr + 10'h001;
+        end
+    end
+end
+
+endmodule
+---END adaptive_aero_controller_core.v---
+---BEGIN adaptive_aero_history_wrapper.v---
+module adaptive_aero_history_wrapper (
+    input         clk,
+    input         reset_n,
+    input         history_csb,
+    input         history_we,
+    input  [9:0]  history_addr,
+    input  [63:0] history_din,
+    output [63:0] history_dout
+);
+
+reg [63:0] mem [0:1023];
+reg [63:0] history_dout_r;
+
+assign history_dout = history_dout_r;
+
+always @(posedge clk) begin
+    if (!reset_n) begin
+        history_dout_r <= 64'h0000000000000000;
+    end else begin
+        if (!history_csb) begin
+            if (history_we) begin
+                mem[history_addr] <= history_din;
+            end
+            history_dout_r <= mem[history_addr];
+        end
+    end
+end
+
+endmodule
+---END adaptive_aero_history_wrapper.v---

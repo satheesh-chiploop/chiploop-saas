@@ -1,0 +1,43 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.110 MB sources in 5 modules, into 0.047 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.018 s (elab=0.002, cvt=0.009, bld=0.000); cpu 0.018 s on 1 threads; allocated 32.355 MB
+
+=== STDERR ===
+%Warning-WIDTHEXPAND: adaptive_aero_controller_core.v:58:39: Operator XOR expects 22 bits on the LHS, but LHS's SEL generates 16 bits.
+                                                           : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_controller_core'
+   58 | assign raw_cmd = model_rsp_data[15:0] ^ {6'b000000, cfg_model_select, cfg_model_select, cfg_model_select, cfg_model_select, cfg_model_select, cfg_model_select, cfg_model_select, cfg_model_select};
+      |                                       ^
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: adaptive_aero_controller_core.v:58:16: Operator ASSIGNW expects 16 bits on the Assign RHS, but Assign RHS's XOR generates 22 bits.
+                                                          : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_controller_core'
+   58 | assign raw_cmd = model_rsp_data[15:0] ^ {6'b000000, cfg_model_select, cfg_model_select, cfg_model_select, cfg_model_select, cfg_model_select, cfg_model_select, cfg_model_select, cfg_model_select};
+      |                ^
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: adaptive_aero_controller_core.v:62:19: Operator ASSIGNW expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 104 bits.
+                                                          : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_controller_core'
+   62 | assign req_packet = {cfg_model_select, 14'h0000, vehicle_speed_mps, cfg_min_speed_mps, cfg_max_speed_mps, cfg_cmd_min, cfg_cmd_max, 8'hA5};
+      |                   ^
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:28:19: Signal is not used: 'history_dout'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   28 |     input  [63:0] history_dout
+      |                   ^~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:64:13: Signal is not driven, nor used: 'history_rd_data'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   64 | wire [63:0] history_rd_data;
+      |             ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_controller_core.v:21:19: Bits of signal are not used: 'model_rsp_data'[63:16]
+                                                            : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_controller_core'
+   21 |     input  [63:0] model_rsp_data,
+      |                   ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_controller_core.v:45:6: Signal is not used: 'clear_allowed'
+                                                           : ... note: In instance 'adaptive_aero_control_top.u_adaptive_aero_controller_core'
+   45 | wire clear_allowed;
+      |      ^~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0
