@@ -1,2 +1,0 @@
-Digital Spec Agent parse/normalize failure:
-Required memory read data must be functionally observable: adaptive_aero_msg_fifo_bram.dout is unconsumed; connect it to a real child input or a top-level output
