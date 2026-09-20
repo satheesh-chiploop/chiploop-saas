@@ -1,4 +1,0 @@
-✅ Digital Spec Agent completed successfully.
-
-Spec mode: flat
-Spec JSON: backend/workflows/14c29ac2-740e-4fa0-b1c6-a9769ee9057f/spec/adaptive_aero_control_top_spec.json
