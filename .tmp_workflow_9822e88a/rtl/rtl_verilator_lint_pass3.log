@@ -1,0 +1,43 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.118 MB sources in 5 modules, into 0.066 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.019 s (elab=0.002, cvt=0.009, bld=0.000); cpu 0.019 s on 1 threads; allocated 32.359 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:62:12: Signal is not driven, nor used: 'adaptive_aero_control_transport_payload_mem_addr'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   62 | wire [5:0] adaptive_aero_control_transport_payload_mem_addr;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:63:6: Signal is not driven, nor used: 'adaptive_aero_control_transport_payload_mem_csb'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   63 | wire adaptive_aero_control_transport_payload_mem_csb;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:64:14: Signal is not driven, nor used: 'adaptive_aero_control_transport_payload_mem_din'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   64 | wire [127:0] adaptive_aero_control_transport_payload_mem_din;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:65:14: Signal is not driven, nor used: 'fpga_bram_generic_payload_mem_dout'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   65 | wire [127:0] fpga_bram_generic_payload_mem_dout;
+      |              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:66:6: Signal is not driven, nor used: 'adaptive_aero_control_transport_payload_mem_we'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   66 | wire adaptive_aero_control_transport_payload_mem_we;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_csr.v:32:18: Bits of signal are not used: 'csr_wdata'[31:16]
+                                                              : ... note: In instance 'adaptive_aero_control_top.u_csr'
+   32 |     input [31:0] csr_wdata;
+      |                  ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_transport.v:70:19: Signal is not used: 'payload_mem_dout'
+                                                                    : ... note: In instance 'adaptive_aero_control_top.u_transport'
+   70 |     input [127:0] payload_mem_dout;
+      |                   ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_transport.v:73:17: Signal is not used: 'resp_shadow'
+                                                                    : ... note: In instance 'adaptive_aero_control_top.u_transport'
+   73 |     reg [127:0] resp_shadow;
+      |                 ^~~~~~~~~~~
+
+=== RETURN CODE ===
+0

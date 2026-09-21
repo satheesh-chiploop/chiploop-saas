@@ -1,0 +1,1497 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "Synthesizable single-clock FPGA control-and-safety top for automotive aerodynamics host-managed surrogate execution. Implements firmware-visible CSR/MMIO control and status, compact 128-bit host request/response transport, validation, sequence tracking, watchdog timeout handling, safety gating, and registered actuator command outputs without instantiating the surrogate model in RTL.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "rst_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "Single synchronous clock domain only.",
+      "Top-level ports are limited to clk and rst_n plus the required streaming, CSR/MMIO, and actuator command interfaces.",
+      "No vehicle geometry arrays, flow fields, pressure maps, or model tensors are exposed as top-level ports.",
+      "No external surrogate model is instantiated in RTL; the top only implements transport, validation, timeout, status, and command gating.",
+      "No fallback command is silently substituted on invalid, stale, timeout, reset, or fault conditions; actuator command validity is deasserted and faults are latched for software handling.",
+      "Any bulk payload/history buffering beyond scalar state shall be technology-neutral and BRAM-mappable if required."
+    ]
+  },
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "feature_contracts": [
+    {
+      "id": "reset_safe_baseline",
+      "description": "After reset, externally visible command validity is deasserted, safe-state indication is asserted, and faults are cleared or in their reset-defined state until a valid request is accepted.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "actuator_cmd_valid": 0,
+        "actuator_cmd_safe": 1,
+        "actuator_cmd_fault": 0
+      },
+      "within_cycles": 1
+    },
+    {
+      "id": "csr_write_and_readback",
+      "description": "A firmware CSR write updates the register block and produces ready/acknowledge semantics, with readable status/configuration reflected on csr_rdata.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 1,
+              "csr_valid": 1,
+              "csr_write": 1,
+              "csr_addr": 0,
+              "csr_wdata": 1
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "csr_ready": 1
+      },
+      "within_cycles": 2
+    },
+    {
+      "id": "request_handshake_valid_accept",
+      "description": "A valid host request can be accepted when ready, allowing the transport engine to drive a registered response and command path behavior according to configuration.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 1,
+              "req_valid": 1,
+              "rsp_ready": 1,
+              "req_data": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "req_ready": 1,
+        "rsp_valid": 1,
+        "rsp_data": 0
+      },
+      "within_cycles": 2
+    },
+    {
+      "id": "timeout_fault_inhibits_command",
+      "description": "When the watchdog expires, command validity is suppressed and safe-state indication is asserted for software handling.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 1,
+              "req_valid": 1,
+              "rsp_ready": 1,
+              "req_data": 0
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "req_valid": 0,
+              "rsp_ready": 1
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "actuator_cmd_valid": 0,
+        "actuator_cmd_safe": 1
+      },
+      "within_cycles": 2
+    },
+    {
+      "id": "stale_request_rejected",
+      "description": "A stale request is rejected rather than accepted into the command path.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 1,
+              "req_valid": 1,
+              "req_data": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "actuator_cmd_valid": 0
+      },
+      "within_cycles": 1
+    },
+    {
+      "id": "clamp_within_bounds",
+      "description": "When a valid command exceeds configured bounds, the transport path clamps it to the programmed minimum or maximum before forwarding and flags the clamp event.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 1,
+              "req_valid": 1,
+              "rsp_ready": 1,
+              "req_data": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "actuator_cmd_valid": 1,
+        "actuator_cmd_value": 32767
+      },
+      "within_cycles": 2
+    }
+  ],
+  "memory_macros": [
+    {
+      "name": "fpga_bram_generic",
+      "kind": "fpga_bram",
+      "depth": 64,
+      "data_width": 128,
+      "addr_width": 6,
+      "instance_name": "u_payload_buf",
+      "ports": {
+        "clk": "clk",
+        "csb": "payload_mem_csb",
+        "we": "payload_mem_we",
+        "addr": "payload_mem_addr",
+        "din": "payload_mem_din",
+        "dout": "payload_mem_dout"
+      },
+      "requires_mbist": false,
+      "technology_binding": "technology_neutral_inferred_memory"
+    }
+  ],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level FPGA control-and-safety block for host-managed aerodynamic surrogate operation. It exposes the firmware-visible CSR/MMIO interface, the 128-bit request/response transport, and the registered actuator command outputs. It performs protocol decode, opcode validation, sequence checking, freshness checking, watchdog management, fault latching, and command gating, while keeping state minimal and deterministic.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "req_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "req_data",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "req_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "rsp_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "rsp_data",
+          "direction": "output",
+          "width": 128
+        },
+        {
+          "name": "rsp_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "csr_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "csr_write",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "csr_addr",
+          "direction": "input",
+          "width": 6
+        },
+        {
+          "name": "csr_wdata",
+          "direction": "input",
+          "width": 32
+        },
+        {
+          "name": "csr_rdata",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "csr_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_value",
+          "direction": "output",
+          "width": 16
+        },
+        {
+          "name": "actuator_cmd_mode",
+          "direction": "output",
+          "width": 4
+        },
+        {
+          "name": "actuator_cmd_fault",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "actuator_cmd_safe",
+          "direction": "output",
+          "width": 1
+        }
+      ],
+      "functionality": "Implements a compact host-to-FPGA request transport and FPGA-to-host response transport for aerodynamic surrogate control. The top accepts 128-bit request packets containing compact control metadata such as opcode, sequence number, freshness/age, target, bounds index, and integrity metadata; validates them against configured policy; tracks last accepted sequence; manages watchdog timeout; clamps requested command values to programmable bounds when permitted; and drives registered actuator command outputs only when all safety checks pass. On invalid, stale, out-of-order, malformed, or timed-out conditions, it suppresses command validity, asserts fault indicators, and leaves actuation to software handling.",
+      "responsibilities": [
+        "Expose firmware-visible CSR/MMIO configuration and status registers with address, write-data, read-data, valid, write-enable, and ready semantics.",
+        "Decode compact 128-bit host request records and produce compact 128-bit response records.",
+        "Validate opcode, sequence ordering, freshness/age, packet length indicators, and optional integrity metadata.",
+        "Maintain a single in-flight command shadow and minimal sequence/watchdog state.",
+        "Clamp command values to programmable bounds before forward propagation when validation succeeds.",
+        "Assert and latch protocol, stale, timeout, and clamp-related status for software observability.",
+        "Prevent unsafe actuator command output after timeout or any validation failure.",
+        "Keep all externally visible outputs registered and synchronous."
+      ],
+      "must_drive": [
+        "req_ready",
+        "rsp_valid",
+        "rsp_data",
+        "csr_rdata",
+        "csr_ready",
+        "actuator_cmd_valid",
+        "actuator_cmd_value",
+        "actuator_cmd_mode",
+        "actuator_cmd_fault",
+        "actuator_cmd_safe"
+      ],
+      "must_receive": [
+        "clk",
+        "rst_n",
+        "req_valid",
+        "req_data",
+        "rsp_ready",
+        "csr_valid",
+        "csr_write",
+        "csr_addr",
+        "csr_wdata"
+      ],
+      "must_not_drive": [
+        "vehicle_geometry",
+        "flow_field",
+        "pressure_map",
+        "model_tensor",
+        "bulk_payload_memory_as_registers",
+        "fallback_command",
+        "substitute_command"
+      ],
+      "reset_behavior": "On reset, all safety state initializes to benign safe values: command outputs are invalid, faults are cleared, sequence tracking is reset to a deterministic baseline, watchdog state is cleared, and CSR readback returns reset-defined defaults. No actuation command is asserted during reset or immediately after reset release until a valid request/session is accepted.",
+      "behavior_rules": [
+        "All outputs are registered and change only on clk edges.",
+        "The top shall not instantiate the surrogate model in RTL.",
+        "A request is accepted only when req_valid and req_ready are asserted together and the decoded packet satisfies all protocol, freshness, sequence, and integrity checks.",
+        "Sequence duplication or out-of-order behavior is rejected when the corresponding CSR policy enables ordering enforcement.",
+        "Freshness/age is compared against a programmable stale threshold; stale packets are rejected.",
+        "Watchdog starts on request acceptance and is cleared only by valid response acceptance, explicit host heartbeat, or firmware clear action as implemented in CSR control.",
+        "If the watchdog expires, timeout fault is asserted, command validity is suppressed, and the timed-out session remains blocked until software clears the fault or a new valid session is established according to CSR policy.",
+        "When a command is valid and all safety checks pass, actuator_cmd_value is clamped within configured bounds before being registered and forwarded.",
+        "If any validation fails, actuator_cmd_valid must be deasserted and actuator_cmd_fault must be asserted; no silent substitution of a fallback command is permitted.",
+        "CSR writes update configuration registers only through registered decode logic.",
+        "CSR reads reflect current status registers, sticky fault bits, sequence tracking, watchdog state, and configuration values.",
+        "Formal assertions shall capture: no unsafe command after timeout, no command acceptance when stale, clamp within bounds, and safe reset baseline."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "adaptive_aero_control_csr",
+        "description": "Firmware-visible CSR/MMIO decode and register block. It implements the 32-bit, 6-bit-address control/status window for configuration, status, sticky fault clear, watchdog policy, sequence policy, stale threshold, and command bounds. It exposes semantic configuration outputs and status inputs to the transport/control path and provides CSR read data and ready/acknowledge semantics to the top.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "csr_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "csr_write",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "csr_addr",
+            "direction": "input",
+            "width": 6
+          },
+          {
+            "name": "csr_wdata",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "csr_rdata",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "csr_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_enforce_sequence",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_stale_threshold",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_watchdog_limit",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_min_bound",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_max_bound",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_default_mode",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "cfg_clear_sticky",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_mode",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "status_last_sequence",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_watchdog_count",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "status_stale_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_timeout_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_clamp_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_protocol_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_safe_active",
+            "direction": "input",
+            "width": 1
+          }
+        ],
+        "functionality": "Maps the firmware-visible register file and performs decode of the small CSR window. The block stores configuration for enable, sequence enforcement, stale threshold, watchdog limit, minimum and maximum command bounds, default mode, and sticky-fault clear control. It returns readback of current status and configuration. Every declared register must be reachable through decode.",
+        "responsibilities": [
+          "Decode 6-bit CSR addresses into implemented registers and fields.",
+          "Expose writable configuration fields for enable, sequence policy, stale threshold, watchdog limit, bounds, default mode, and sticky-fault clear.",
+          "Expose readable status fields for mode, sequence, watchdog, and fault indicators.",
+          "Provide ready/acknowledge semantics for CSR transactions.",
+          "Clear sticky faults when commanded by firmware through the CSR interface."
+        ],
+        "must_drive": [
+          "cfg_enable",
+          "cfg_enforce_sequence",
+          "cfg_stale_threshold",
+          "cfg_watchdog_limit",
+          "cfg_min_bound",
+          "cfg_max_bound",
+          "cfg_default_mode",
+          "cfg_clear_sticky",
+          "csr_rdata",
+          "csr_ready"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "csr_valid",
+          "csr_write",
+          "csr_addr",
+          "csr_wdata",
+          "status_mode",
+          "status_last_sequence",
+          "status_watchdog_count",
+          "status_stale_fault",
+          "status_timeout_fault",
+          "status_clamp_fault",
+          "status_protocol_fault",
+          "status_safe_active"
+        ],
+        "must_not_drive": [
+          "req_valid",
+          "req_data",
+          "rsp_valid",
+          "actuator_cmd_valid"
+        ],
+        "reset_behavior": "On reset, configuration registers initialize to safe defaults with enable deasserted, sequence enforcement enabled, stale threshold and watchdog limit set to conservative safe values, bounds set to neutral-safe limits, default mode cleared to benign default, and sticky-fault clear deasserted. CSR read data and ready are returned deterministically from the registered state.",
+        "behavior_rules": [
+          "Every implemented register field must be reachable via the decode map.",
+          "Writes only affect writable fields; read-only status fields are not directly writable.",
+          "Sticky-fault clear is pulsed or level-encoded as implemented, but only through a CSR write to the designated register.",
+          "CSR responses must be deterministic and registered.",
+          "No registers other than the declared fields are software-visible."
+        ],
+        "rtl_output_file": "adaptive_aero_control_csr.v"
+      },
+      {
+        "name": "adaptive_aero_control_transport",
+        "description": "Protocol and safety transport engine for 128-bit request and response packets. It validates opcode, sequence ordering, freshness/age, length, integrity metadata, and heartbeat/session management; tracks one in-flight request shadow; manages watchdog state; and emits compact response records for host consumption. It generates the final actuator command control signals only when the request is accepted and the safety policy permits propagation.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "req_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "req_data",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "req_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "rsp_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "rsp_data",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "rsp_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_enforce_sequence",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_stale_threshold",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_watchdog_limit",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_min_bound",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_max_bound",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_default_mode",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "cfg_clear_sticky",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_mode",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "status_last_sequence",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "status_watchdog_count",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "status_stale_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_timeout_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_clamp_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_protocol_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_safe_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_value",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cmd_mode",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "cmd_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_safe",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "payload_mem_csb",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "payload_mem_we",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "payload_mem_addr",
+            "direction": "output",
+            "width": 6
+          },
+          {
+            "name": "payload_mem_din",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "payload_mem_dout",
+            "direction": "input",
+            "width": 128
+          }
+        ],
+        "functionality": "Consumes host request packets and emits host response packets while maintaining a minimal in-flight shadow and optional technology-neutral BRAM-mappable payload/history buffer. It validates packet structure and metadata, enforces sequence and freshness policy, tracks watchdog and timeout conditions, and produces registered actuator command outputs only when the packet is accepted and safety conditions permit. The payload/history memory macro is used only for compact transport buffering or history where required, not for model tensors or bulk geometry storage.",
+        "responsibilities": [
+          "Decode and validate request opcode, sequence number, freshness/age metadata, length indicators, target, bounds index, and optional integrity metadata.",
+          "Manage request acceptance and ready/valid handshake for host transport.",
+          "Generate response packets with acknowledgment, fault codes, watchdog status, and command summary.",
+          "Maintain watchdog state and timeout detection.",
+          "Latch protocol, stale, clamp, and timeout faults according to policy.",
+          "Drive actuator command outputs only when request acceptance and safety checks succeed.",
+          "Use only minimal control metadata and one in-flight command shadow."
+        ],
+        "must_drive": [
+          "req_ready",
+          "rsp_valid",
+          "rsp_data",
+          "status_mode",
+          "status_last_sequence",
+          "status_watchdog_count",
+          "status_stale_fault",
+          "status_timeout_fault",
+          "status_clamp_fault",
+          "status_protocol_fault",
+          "status_safe_active",
+          "cmd_valid",
+          "cmd_value",
+          "cmd_mode",
+          "cmd_fault",
+          "cmd_safe",
+          "payload_mem_csb",
+          "payload_mem_we",
+          "payload_mem_addr",
+          "payload_mem_din"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "req_valid",
+          "req_data",
+          "rsp_ready",
+          "cfg_enable",
+          "cfg_enforce_sequence",
+          "cfg_stale_threshold",
+          "cfg_watchdog_limit",
+          "cfg_min_bound",
+          "cfg_max_bound",
+          "cfg_default_mode",
+          "cfg_clear_sticky",
+          "payload_mem_dout"
+        ],
+        "must_not_drive": [
+          "cfg_enable",
+          "cfg_stale_threshold",
+          "cfg_watchdog_limit",
+          "vehicle_geometry",
+          "model_tensor"
+        ],
+        "reset_behavior": "On reset, transport outputs deassert valid, response data is cleared to a deterministic reset encoding, watchdog and sequence tracking are reset, faults are cleared, the command outputs are invalid, and the payload/history buffer interface is idle. No command is propagated until a request is accepted after reset.",
+        "behavior_rules": [
+          "The request-valid/request-ready handshake governs acceptance; no implicit acceptance is allowed.",
+          "Out-of-order or duplicate sequence behavior is rejected when sequence enforcement is enabled.",
+          "Stale requests are rejected according to the programmable threshold.",
+          "Unsupported opcodes, malformed packets, invalid length indicators, and integrity failures are rejected.",
+          "Command clamping is applied only after a request is otherwise valid; if any validation fails, cmd_valid remains deasserted.",
+          "Timeout forces safe-active status and suppresses command validity until cleared.",
+          "Response emission must be compact and deterministically derived from the accepted request and status state.",
+          "No fallback command may be substituted on invalid, stale, timeout, reset, or fault conditions."
+        ],
+        "rtl_output_file": "adaptive_aero_control_transport.v"
+      },
+      {
+        "name": "fpga_bram_generic",
+        "description": "Memory macro interface module derived from memory_macros.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "payload_mem_csb",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "payload_mem_we",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "payload_mem_addr",
+            "direction": "input",
+            "width": 6
+          },
+          {
+            "name": "payload_mem_din",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "payload_mem_dout",
+            "direction": "output",
+            "width": 128
+          }
+        ],
+        "functionality": "Single-port memory macro abstraction.",
+        "responsibilities": [
+          "Expose the memory macro interface for RTL generation and downstream collateral."
+        ],
+        "must_drive": [
+          "payload_mem_dout"
+        ],
+        "must_receive": [
+          "clk",
+          "payload_mem_csb",
+          "payload_mem_we",
+          "payload_mem_addr",
+          "payload_mem_din"
+        ],
+        "must_not_drive": [
+          "clk",
+          "payload_mem_csb",
+          "payload_mem_we",
+          "payload_mem_addr",
+          "payload_mem_din"
+        ],
+        "reset_behavior": "Memory macro contents are not reset by the controller reset.",
+        "behavior_rules": [
+          "Preserve the declared memory macro port interface."
+        ],
+        "rtl_output_file": "fpga_bram_generic.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_control_csr.clk",
+        "adaptive_aero_control_transport.clk",
+        "fpga_bram_generic.clk"
+      ],
+      "description": "Top-level clock fanout to CSR and transport control logic."
+    },
+    {
+      "top_port": "rst_n",
+      "connected_to": [
+        "adaptive_aero_control_csr.rst_n",
+        "adaptive_aero_control_transport.rst_n"
+      ],
+      "description": "Top-level active-low reset fanout to CSR and transport control logic."
+    },
+    {
+      "top_port": "csr_valid",
+      "connected_to": [
+        "adaptive_aero_control_csr.csr_valid"
+      ],
+      "description": "Firmware-visible CSR valid strobe into the register block."
+    },
+    {
+      "top_port": "csr_write",
+      "connected_to": [
+        "adaptive_aero_control_csr.csr_write"
+      ],
+      "description": "Firmware-visible CSR write-enable into the register block."
+    },
+    {
+      "top_port": "csr_addr",
+      "connected_to": [
+        "adaptive_aero_control_csr.csr_addr"
+      ],
+      "description": "Firmware-visible CSR address into the register block."
+    },
+    {
+      "top_port": "csr_wdata",
+      "connected_to": [
+        "adaptive_aero_control_csr.csr_wdata"
+      ],
+      "description": "Firmware-visible CSR write data into the register block."
+    },
+    {
+      "top_port": "req_valid",
+      "connected_to": [
+        "adaptive_aero_control_transport.req_valid"
+      ],
+      "description": "Host-to-FPGA request stream valid into the transport engine."
+    },
+    {
+      "top_port": "req_data",
+      "connected_to": [
+        "adaptive_aero_control_transport.req_data"
+      ],
+      "description": "Host-to-FPGA request packet into the transport engine."
+    },
+    {
+      "top_port": "rsp_ready",
+      "connected_to": [
+        "adaptive_aero_control_transport.rsp_ready"
+      ],
+      "description": "Host backpressure into the FPGA-to-host response stream."
+    },
+    {
+      "top_port": "csr_rdata",
+      "connected_to": [
+        "adaptive_aero_control_csr.csr_rdata"
+      ],
+      "description": "Registered CSR read data driven by the CSR block."
+    },
+    {
+      "top_port": "csr_ready",
+      "connected_to": [
+        "adaptive_aero_control_csr.csr_ready"
+      ],
+      "description": "Registered CSR ready/acknowledge driven by the CSR block."
+    },
+    {
+      "top_port": "req_ready",
+      "connected_to": [
+        "adaptive_aero_control_transport.req_ready"
+      ],
+      "description": "Request stream ready driven by the transport engine."
+    },
+    {
+      "top_port": "rsp_valid",
+      "connected_to": [
+        "adaptive_aero_control_transport.rsp_valid"
+      ],
+      "description": "Response stream valid driven by the transport engine."
+    },
+    {
+      "top_port": "rsp_data",
+      "connected_to": [
+        "adaptive_aero_control_transport.rsp_data"
+      ],
+      "description": "Response packet driven by the transport engine."
+    },
+    {
+      "top_port": "actuator_cmd_valid",
+      "connected_to": [
+        "adaptive_aero_control_transport.cmd_valid"
+      ],
+      "description": "Registered actuator command validity driven by the transport engine."
+    },
+    {
+      "top_port": "actuator_cmd_value",
+      "connected_to": [
+        "adaptive_aero_control_transport.cmd_value"
+      ],
+      "description": "Registered bounded actuator command value driven by the transport engine."
+    },
+    {
+      "top_port": "actuator_cmd_mode",
+      "connected_to": [
+        "adaptive_aero_control_transport.cmd_mode"
+      ],
+      "description": "Registered actuator command mode driven by the transport engine."
+    },
+    {
+      "top_port": "actuator_cmd_fault",
+      "connected_to": [
+        "adaptive_aero_control_transport.cmd_fault"
+      ],
+      "description": "Registered actuator command fault indicator driven by the transport engine."
+    },
+    {
+      "top_port": "actuator_cmd_safe",
+      "connected_to": [
+        "adaptive_aero_control_transport.cmd_safe"
+      ],
+      "description": "Registered safe-state indicator driven by the transport engine."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "cfg_enable",
+      "width": 1,
+      "source": "adaptive_aero_control_csr.cfg_enable",
+      "destinations": [
+        "adaptive_aero_control_transport.cfg_enable"
+      ],
+      "description": "Global control enable from CSR into transport policy."
+    },
+    {
+      "name": "cfg_enforce_sequence",
+      "width": 1,
+      "source": "adaptive_aero_control_csr.cfg_enforce_sequence",
+      "destinations": [
+        "adaptive_aero_control_transport.cfg_enforce_sequence"
+      ],
+      "description": "Sequence enforcement policy from CSR into transport policy."
+    },
+    {
+      "name": "cfg_stale_threshold",
+      "width": 8,
+      "source": "adaptive_aero_control_csr.cfg_stale_threshold",
+      "destinations": [
+        "adaptive_aero_control_transport.cfg_stale_threshold"
+      ],
+      "description": "Programmable freshness/staleness threshold."
+    },
+    {
+      "name": "cfg_watchdog_limit",
+      "width": 16,
+      "source": "adaptive_aero_control_csr.cfg_watchdog_limit",
+      "destinations": [
+        "adaptive_aero_control_transport.cfg_watchdog_limit"
+      ],
+      "description": "Programmable watchdog limit."
+    },
+    {
+      "name": "cfg_min_bound",
+      "width": 16,
+      "source": "adaptive_aero_control_csr.cfg_min_bound",
+      "destinations": [
+        "adaptive_aero_control_transport.cfg_min_bound"
+      ],
+      "description": "Programmable minimum actuator bound."
+    },
+    {
+      "name": "cfg_max_bound",
+      "width": 16,
+      "source": "adaptive_aero_control_csr.cfg_max_bound",
+      "destinations": [
+        "adaptive_aero_control_transport.cfg_max_bound"
+      ],
+      "description": "Programmable maximum actuator bound."
+    },
+    {
+      "name": "cfg_default_mode",
+      "width": 4,
+      "source": "adaptive_aero_control_csr.cfg_default_mode",
+      "destinations": [
+        "adaptive_aero_control_transport.cfg_default_mode"
+      ],
+      "description": "Programmable default mode encoding."
+    },
+    {
+      "name": "cfg_clear_sticky",
+      "width": 1,
+      "source": "adaptive_aero_control_csr.cfg_clear_sticky",
+      "destinations": [
+        "adaptive_aero_control_transport.cfg_clear_sticky"
+      ],
+      "description": "Sticky-fault clear pulse or level to transport."
+    },
+    {
+      "name": "status_mode",
+      "width": 4,
+      "source": "adaptive_aero_control_transport.status_mode",
+      "destinations": [
+        "adaptive_aero_control_csr.status_mode"
+      ],
+      "description": "Current mode status back to CSR for readback."
+    },
+    {
+      "name": "status_last_sequence",
+      "width": 16,
+      "source": "adaptive_aero_control_transport.status_last_sequence",
+      "destinations": [
+        "adaptive_aero_control_csr.status_last_sequence"
+      ],
+      "description": "Last accepted sequence number readback."
+    },
+    {
+      "name": "status_watchdog_count",
+      "width": 16,
+      "source": "adaptive_aero_control_transport.status_watchdog_count",
+      "destinations": [
+        "adaptive_aero_control_csr.status_watchdog_count"
+      ],
+      "description": "Current watchdog counter readback."
+    },
+    {
+      "name": "status_stale_fault",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.status_stale_fault",
+      "destinations": [
+        "adaptive_aero_control_csr.status_stale_fault"
+      ],
+      "description": "Sticky stale fault status."
+    },
+    {
+      "name": "status_timeout_fault",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.status_timeout_fault",
+      "destinations": [
+        "adaptive_aero_control_csr.status_timeout_fault"
+      ],
+      "description": "Sticky timeout fault status."
+    },
+    {
+      "name": "status_clamp_fault",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.status_clamp_fault",
+      "destinations": [
+        "adaptive_aero_control_csr.status_clamp_fault"
+      ],
+      "description": "Clamp-event status readback."
+    },
+    {
+      "name": "status_protocol_fault",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.status_protocol_fault",
+      "destinations": [
+        "adaptive_aero_control_csr.status_protocol_fault"
+      ],
+      "description": "Protocol fault status readback."
+    },
+    {
+      "name": "status_safe_active",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.status_safe_active",
+      "destinations": [
+        "adaptive_aero_control_csr.status_safe_active"
+      ],
+      "description": "Safe-active state readback."
+    },
+    {
+      "name": "adaptive_aero_control_transport_payload_mem_addr",
+      "width": 6,
+      "source": "adaptive_aero_control_transport.payload_mem_addr",
+      "destinations": [
+        "fpga_bram_generic.payload_mem_addr"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_transport.payload_mem_addr."
+    },
+    {
+      "name": "adaptive_aero_control_transport_payload_mem_csb",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.payload_mem_csb",
+      "destinations": [
+        "fpga_bram_generic.payload_mem_csb"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_transport.payload_mem_csb."
+    },
+    {
+      "name": "adaptive_aero_control_transport_payload_mem_din",
+      "width": 128,
+      "source": "adaptive_aero_control_transport.payload_mem_din",
+      "destinations": [
+        "fpga_bram_generic.payload_mem_din"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_transport.payload_mem_din."
+    },
+    {
+      "name": "fpga_bram_generic_payload_mem_dout",
+      "width": 128,
+      "source": "fpga_bram_generic.payload_mem_dout",
+      "destinations": [
+        "adaptive_aero_control_transport.payload_mem_dout"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer fpga_bram_generic.payload_mem_dout."
+    },
+    {
+      "name": "adaptive_aero_control_transport_payload_mem_we",
+      "width": 1,
+      "source": "adaptive_aero_control_transport.payload_mem_we",
+      "destinations": [
+        "fpga_bram_generic.payload_mem_we"
+      ],
+      "description": "Derived child-to-child signal from the unique matching producer adaptive_aero_control_transport.payload_mem_we."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "cfg_enable",
+      "owner": "adaptive_aero_control_csr.cfg_enable"
+    },
+    {
+      "signal": "cfg_enforce_sequence",
+      "owner": "adaptive_aero_control_csr.cfg_enforce_sequence"
+    },
+    {
+      "signal": "cfg_stale_threshold",
+      "owner": "adaptive_aero_control_csr.cfg_stale_threshold"
+    },
+    {
+      "signal": "cfg_watchdog_limit",
+      "owner": "adaptive_aero_control_csr.cfg_watchdog_limit"
+    },
+    {
+      "signal": "cfg_min_bound",
+      "owner": "adaptive_aero_control_csr.cfg_min_bound"
+    },
+    {
+      "signal": "cfg_max_bound",
+      "owner": "adaptive_aero_control_csr.cfg_max_bound"
+    },
+    {
+      "signal": "cfg_default_mode",
+      "owner": "adaptive_aero_control_csr.cfg_default_mode"
+    },
+    {
+      "signal": "cfg_clear_sticky",
+      "owner": "adaptive_aero_control_csr.cfg_clear_sticky"
+    },
+    {
+      "signal": "status_mode",
+      "owner": "adaptive_aero_control_transport.status_mode"
+    },
+    {
+      "signal": "status_last_sequence",
+      "owner": "adaptive_aero_control_transport.status_last_sequence"
+    },
+    {
+      "signal": "status_watchdog_count",
+      "owner": "adaptive_aero_control_transport.status_watchdog_count"
+    },
+    {
+      "signal": "status_stale_fault",
+      "owner": "adaptive_aero_control_transport.status_stale_fault"
+    },
+    {
+      "signal": "status_timeout_fault",
+      "owner": "adaptive_aero_control_transport.status_timeout_fault"
+    },
+    {
+      "signal": "status_clamp_fault",
+      "owner": "adaptive_aero_control_transport.status_clamp_fault"
+    },
+    {
+      "signal": "status_protocol_fault",
+      "owner": "adaptive_aero_control_transport.status_protocol_fault"
+    },
+    {
+      "signal": "status_safe_active",
+      "owner": "adaptive_aero_control_transport.status_safe_active"
+    },
+    {
+      "signal": "req_ready",
+      "owner": "adaptive_aero_control_transport.req_ready"
+    },
+    {
+      "signal": "rsp_valid",
+      "owner": "adaptive_aero_control_transport.rsp_valid"
+    },
+    {
+      "signal": "rsp_data",
+      "owner": "adaptive_aero_control_transport.rsp_data"
+    },
+    {
+      "signal": "csr_rdata",
+      "owner": "adaptive_aero_control_csr.csr_rdata"
+    },
+    {
+      "signal": "csr_ready",
+      "owner": "adaptive_aero_control_csr.csr_ready"
+    },
+    {
+      "signal": "actuator_cmd_valid",
+      "owner": "adaptive_aero_control_transport.cmd_valid"
+    },
+    {
+      "signal": "actuator_cmd_value",
+      "owner": "adaptive_aero_control_transport.cmd_value"
+    },
+    {
+      "signal": "actuator_cmd_mode",
+      "owner": "adaptive_aero_control_transport.cmd_mode"
+    },
+    {
+      "signal": "actuator_cmd_fault",
+      "owner": "adaptive_aero_control_transport.cmd_fault"
+    },
+    {
+      "signal": "actuator_cmd_safe",
+      "owner": "adaptive_aero_control_transport.cmd_safe"
+    },
+    {
+      "signal": "adaptive_aero_control_transport_payload_mem_addr",
+      "owner": "adaptive_aero_control_transport.payload_mem_addr"
+    },
+    {
+      "signal": "adaptive_aero_control_transport_payload_mem_csb",
+      "owner": "adaptive_aero_control_transport.payload_mem_csb"
+    },
+    {
+      "signal": "adaptive_aero_control_transport_payload_mem_din",
+      "owner": "adaptive_aero_control_transport.payload_mem_din"
+    },
+    {
+      "signal": "fpga_bram_generic_payload_mem_dout",
+      "owner": "fpga_bram_generic.payload_mem_dout"
+    },
+    {
+      "signal": "adaptive_aero_control_transport_payload_mem_we",
+      "owner": "adaptive_aero_control_transport.payload_mem_we"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "minimal",
+    "registers": [
+      {
+        "name": "CTRL",
+        "address": 0,
+        "access": "rw",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "enable",
+            "lsb": 0,
+            "msb": 0,
+            "access": "rw",
+            "reset": 0,
+            "description": "Global enable for request acceptance and command propagation."
+          },
+          {
+            "name": "enforce_sequence",
+            "lsb": 1,
+            "msb": 1,
+            "access": "rw",
+            "reset": 1,
+            "description": "Enable duplicate and out-of-order sequence rejection."
+          },
+          {
+            "name": "clear_sticky",
+            "lsb": 2,
+            "msb": 2,
+            "access": "w1p",
+            "reset": 0,
+            "description": "Write-one-to-pulse or equivalent sticky fault clear control."
+          }
+        ]
+      },
+      {
+        "name": "STALENESS",
+        "address": 1,
+        "access": "rw",
+        "reset": 8,
+        "fields": [
+          {
+            "name": "stale_threshold",
+            "lsb": 0,
+            "msb": 7,
+            "access": "rw",
+            "reset": 8,
+            "description": "Maximum permitted request age."
+          }
+        ]
+      },
+      {
+        "name": "WATCHDOG",
+        "address": 2,
+        "access": "rw",
+        "reset": 100,
+        "fields": [
+          {
+            "name": "watchdog_limit",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 100,
+            "description": "Watchdog expiration threshold in cycles."
+          }
+        ]
+      },
+      {
+        "name": "BOUNDS_MIN",
+        "address": 3,
+        "access": "rw",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "min_bound",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 0,
+            "description": "Minimum actuator command bound."
+          }
+        ]
+      },
+      {
+        "name": "BOUNDS_MAX",
+        "address": 4,
+        "access": "rw",
+        "reset": 32767,
+        "fields": [
+          {
+            "name": "max_bound",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 32767,
+            "description": "Maximum actuator command bound."
+          }
+        ]
+      },
+      {
+        "name": "DEFAULT_MODE",
+        "address": 5,
+        "access": "rw",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "default_mode",
+            "lsb": 0,
+            "msb": 3,
+            "access": "rw",
+            "reset": 0,
+            "description": "Default actuator mode encoding."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "address": 8,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "mode",
+            "lsb": 0,
+            "msb": 3,
+            "access": "ro",
+            "reset": 0,
+            "description": "Current operational mode."
+          },
+          {
+            "name": "safe_active",
+            "lsb": 4,
+            "msb": 4,
+            "access": "ro",
+            "reset": 1,
+            "description": "Indicates safe state is active."
+          },
+          {
+            "name": "protocol_fault",
+            "lsb": 5,
+            "msb": 5,
+            "access": "ro",
+            "reset": 0,
+            "description": "Protocol fault sticky/status."
+          },
+          {
+            "name": "stale_fault",
+            "lsb": 6,
+            "msb": 6,
+            "access": "ro",
+            "reset": 0,
+            "description": "Stale request fault sticky/status."
+          },
+          {
+            "name": "timeout_fault",
+            "lsb": 7,
+            "msb": 7,
+            "access": "ro",
+            "reset": 0,
+            "description": "Watchdog timeout fault sticky/status."
+          },
+          {
+            "name": "clamp_fault",
+            "lsb": 8,
+            "msb": 8,
+            "access": "ro",
+            "reset": 0,
+            "description": "Clamp event status."
+          }
+        ]
+      },
+      {
+        "name": "SEQ",
+        "address": 9,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "last_sequence",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Last accepted sequence number."
+          }
+        ]
+      },
+      {
+        "name": "WD",
+        "address": 10,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "watchdog_count",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Current watchdog counter value."
+          }
+        ]
+      }
+    ]
+  }
+}
