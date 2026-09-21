@@ -1,0 +1,245 @@
+{
+  "type": "simulation_summary_coverage",
+  "simulation": {
+    "total": 5,
+    "pass": 4,
+    "fail": 1
+  },
+  "coverage": {
+    "status": "ok",
+    "functional_coverage_pct": 50.0,
+    "bins_hit": 7,
+    "total_bins": 14,
+    "functional": {
+      "status": "ok",
+      "coverage_pct": 50.0,
+      "bins_hit": 7,
+      "total_bins": 14,
+      "gap_count": 7,
+      "gaps": [
+        {
+          "type": "functional_bin_gap",
+          "signal": "counter_value",
+          "group": "outputs",
+          "coverage_point": "outputs.counter_value",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "pwm_out",
+          "group": "outputs",
+          "coverage_point": "outputs.pwm_out",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "clk",
+          "group": "inputs",
+          "coverage_point": "inputs.clk",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            1
+          ],
+          "missing_bins": [
+            "zero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "duty_cycle",
+          "group": "inputs",
+          "coverage_point": "inputs.duty_cycle",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "enable",
+          "group": "inputs",
+          "coverage_point": "inputs.enable",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "period",
+          "group": "inputs",
+          "coverage_point": "inputs.period",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            0
+          ],
+          "missing_bins": [
+            "nonzero"
+          ]
+        },
+        {
+          "type": "functional_bin_gap",
+          "signal": "reset_n",
+          "group": "inputs",
+          "coverage_point": "inputs.reset_n",
+          "hit_bins": 1,
+          "total_bins": 2,
+          "seen_values": [
+            1
+          ],
+          "missing_bins": [
+            "zero"
+          ]
+        }
+      ]
+    },
+    "code": {
+      "status": "ok",
+      "line_coverage_pct": 20.51,
+      "line_hit": 16,
+      "line_found": 78,
+      "branch_coverage_pct": 55.56,
+      "branch_hit": 5,
+      "branch_found": 9,
+      "condition_coverage_pct": null,
+      "condition_hit": null,
+      "condition_found": null,
+      "condition_source": "unavailable_from_verilator_lcov",
+      "toggle_coverage_pct": 4.69,
+      "toggle_hit": 6,
+      "toggle_found": 128,
+      "toggle_source": "verilator_coverage_annotate_points",
+      "missed_toggle_points": [
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=reset_n:1->0 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=enable:0->1 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=enable:1->0 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[0]:0->1 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[0]:1->0 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[1]:0->1 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[1]:1->0 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[2]:0->1 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[2]:1->0 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[3]:0->1 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[3]:1->0 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[4]:0->1 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[4]:1->0 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[5]:0->1 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[5]:1->0 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[6]:0->1 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[6]:1->0 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[7]:0->1 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=duty_cycle[7]:1->0 hier=pwm_controller"
+        },
+        {
+          "file": "pwm_controller.v",
+          "point": "comment=period[0]:0->1 hier=pwm_controller"
+        }
+      ],
+      "tool": "verilator_coverage"
+    },
+    "assertions": {
+      "status": "failed",
+      "assertions_generated": 15,
+      "assertion_failures": 3,
+      "assertion_pass_pct": 80.0
+    }
+  },
+  "formal": {
+    "status": "not_enabled",
+    "available": null,
+    "attempted": null,
+    "returncode": null,
+    "reason": null
+  },
+  "golden_model": {
+    "status": "not_enabled",
+    "top_module": null
+  },
+  "toolchain": {
+    "simulator": "verilator",
+    "code_coverage": "verilator_coverage",
+    "formal": "none",
+    "formal_solver": null,
+    "golden_model": "none"
+  }
+}
