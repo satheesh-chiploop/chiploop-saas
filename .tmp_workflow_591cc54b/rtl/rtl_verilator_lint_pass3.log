@@ -1,0 +1,99 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.204 MB sources in 9 modules, into 0.050 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.020 s (elab=0.002, cvt=0.009, bld=0.000); cpu 0.020 s on 1 threads; allocated 32.355 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:8:11: Signal is not used: 'ctrl_out_ready'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+    8 |     input ctrl_out_ready,
+      |           ^~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:24:6: Signal is not used: 'opcode_legal'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   24 | wire opcode_legal;
+      |      ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:25:6: Signal is not used: 'seq_legal'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   25 | wire seq_legal;
+      |      ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:27:6: Signal is not used: 'flow_legal'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   27 | wire flow_legal;
+      |      ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:28:6: Signal is not used: 'target_legal'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   28 | wire target_legal;
+      |      ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:31:13: Signal is not used: 'watchdog_count'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   31 | wire [15:0] watchdog_count;
+      |             ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:35:6: Signal is not used: 'target_clamp_event'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   35 | wire target_clamp_event;
+      |      ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:36:6: Signal is not used: 'actuator_safe'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   36 | wire actuator_safe;
+      |      ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:51:13: Signal is not used: 'applied_command'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   51 | wire [15:0] applied_command;
+      |             ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:52:13: Signal is not used: 'last_accepted_seq'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   52 | wire [15:0] last_accepted_seq;
+      |             ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:53:13: Signal is not used: 'status_watchdog_count'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   53 | wire [15:0] status_watchdog_count;
+      |             ^~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:54:6: Signal is not used: 'safe_state'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   54 | wire safe_state;
+      |      ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:63:6: Signal is not driven, nor used: 'actuator_valid_in'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   63 | wire actuator_valid_in;
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:64:13: Signal is not driven, nor used: 'buf_seq'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   64 | wire [15:0] buf_seq;
+      |             ^~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:65:13: Signal is not driven, nor used: 'buf_target'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   65 | wire [15:0] buf_target;
+      |             ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:66:13: Signal is not driven, nor used: 'buf_age'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   66 | wire [11:0] buf_age;
+      |             ^~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:67:12: Signal is not driven, nor used: 'buf_flow_mps'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   67 | wire [7:0] buf_flow_mps;
+      |            ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:68:12: Signal is not driven, nor used: 'buf_diag'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   68 | wire [7:0] buf_diag;
+      |            ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/request_validator.v:8:18: Signal is not used: 'rx_actuator_target'
+                                                     : ... note: In instance 'adaptive_aero_control_top.u_request_validator'
+    8 |     input [15:0] rx_actuator_target,
+      |                  ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/safety_manager.v:19:5: Signal is not used: 'target_low_clamp'
+                                                  : ... note: In instance 'adaptive_aero_control_top.u_safety_manager'
+   19 | reg target_low_clamp;
+      |     ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/safety_manager.v:20:5: Signal is not used: 'target_high_clamp'
+                                                  : ... note: In instance 'adaptive_aero_control_top.u_safety_manager'
+   20 | reg target_high_clamp;
+      |     ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/status_regs.v:7:18: Bits of signal are not used: 'csr_wdata'[31:16]
+                                               : ... note: In instance 'adaptive_aero_control_top.u_status_regs'
+    7 |     input [31:0] csr_wdata,
+      |                  ^~~~~~~~~
+
+=== RETURN CODE ===
+0

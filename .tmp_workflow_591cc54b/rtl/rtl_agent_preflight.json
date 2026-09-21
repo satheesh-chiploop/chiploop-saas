@@ -1,0 +1,18 @@
+{
+  "mode": "hierarchical",
+  "top_module": "adaptive_aero_control_top",
+  "expected_files": [
+    "adaptive_aero_control_top.v",
+    "stream_rx_parser.v",
+    "request_validator.v",
+    "watchdog_timer.v",
+    "safety_manager.v",
+    "cmd_buffer.v",
+    "actuator_command_fsm.v",
+    "status_regs.v"
+  ],
+  "has_regmap": true,
+  "has_clock_reset": false,
+  "has_power_intent": false,
+  "prompt_chars": 145443
+}

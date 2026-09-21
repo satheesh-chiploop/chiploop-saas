@@ -1,0 +1,350 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 6,
+    "data_width": 32,
+    "registers": [
+      {
+        "name": "CONTROL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Control bits for enabling operation and clearing sticky status bits.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Firmware-visible enable bit. When cleared, operation is inhibited by control-plane policy."
+          },
+          {
+            "name": "CLEAR_STICKY_FAULTS",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW",
+            "reset": 0,
+            "description": "Write-1-to-clear request for sticky fault bits that are managed by the status register block."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 2,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x01",
+        "access": "RO",
+        "description": "Sticky faults and safe-state indicator.",
+        "fields": [
+          {
+            "name": "STICKY_STALE_FAULT",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky stale-data fault indicator."
+          },
+          {
+            "name": "STICKY_INVALID_FRAME",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky invalid-frame indicator."
+          },
+          {
+            "name": "STICKY_TIMEOUT_FAULT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky timeout fault indicator."
+          },
+          {
+            "name": "STICKY_CLAMP_EVENT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky clamp-event indicator."
+          },
+          {
+            "name": "STICKY_COMM_LOSS_FAULT",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sticky communication-loss indicator."
+          },
+          {
+            "name": "SAFE_STATE",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO",
+            "reset": 1,
+            "description": "Indicates the design is in a safe/inhibited state."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 6,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "APPLIED_COMMAND",
+        "offset": "0x02",
+        "access": "RO",
+        "description": "Current applied command value for firmware readback.",
+        "fields": [
+          {
+            "name": "APPLIED_COMMAND",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Currently applied actuator command, bounded by safety logic."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "LAST_ACCEPTED_SEQ",
+        "offset": "0x03",
+        "access": "RO",
+        "description": "Most recent accepted sequence number.",
+        "fields": [
+          {
+            "name": "LAST_ACCEPTED_SEQ",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Sequence number captured from the last accepted frame."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "WATCHDOG_COUNT",
+        "offset": "0x04",
+        "access": "RO",
+        "description": "Freshness counter since the last accepted frame.",
+        "fields": [
+          {
+            "name": "WATCHDOG_COUNT",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Cycle count since the last accepted frame, saturated/limited to implemented width."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "TARGET_MIN",
+        "offset": "0x08",
+        "access": "RW",
+        "description": "Programmable minimum actuator target bound.",
+        "fields": [
+          {
+            "name": "TARGET_MIN",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Lower bound used by safety clamping logic."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "TARGET_MAX",
+        "offset": "0x09",
+        "access": "RW",
+        "description": "Programmable maximum actuator target bound.",
+        "fields": [
+          {
+            "name": "TARGET_MAX",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 65535,
+            "description": "Upper bound used by safety clamping logic."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_RANGE_MIN",
+        "offset": "0x0A",
+        "access": "RW",
+        "description": "Programmable safe-range minimum bound used by safety policy.",
+        "fields": [
+          {
+            "name": "SAFE_RANGE_MIN",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum value considered safe by policy."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "SAFE_RANGE_MAX",
+        "offset": "0x0B",
+        "access": "RW",
+        "description": "Programmable safe-range maximum bound used by safety policy.",
+        "fields": [
+          {
+            "name": "SAFE_RANGE_MAX",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 65535,
+            "description": "Maximum value considered safe by policy."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "STALE_THRESHOLD",
+        "offset": "0x0C",
+        "access": "RW",
+        "description": "Watchdog timeout threshold in clk cycles.",
+        "fields": [
+          {
+            "name": "STALE_THRESHOLD",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 256,
+            "description": "Number of cycles without an accepted frame before stale fault is asserted."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      },
+      {
+        "name": "WATCHDOG_PRELOAD",
+        "offset": "0x0D",
+        "access": "RW",
+        "description": "Optional watchdog preload value.",
+        "fields": [
+          {
+            "name": "WATCHDOG_PRELOAD",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 0,
+            "description": "Initial or reload value used by the watchdog policy, if enabled by firmware/software policy."
+          },
+          {
+            "name": "RESERVED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Reserved; reads as zero."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Write TARGET_MIN and TARGET_MAX with the desired actuator bounds.",
+      "Write SAFE_RANGE_MIN and SAFE_RANGE_MAX with the policy-safe bounds.",
+      "Write STALE_THRESHOLD and WATCHDOG_PRELOAD as needed for the operating profile.",
+      "Optionally write CONTROL.ENABLE to permit operation under firmware policy.",
+      "Poll STATUS until SAFE_STATE is deasserted only after a valid frame has been accepted and the design is ready for normal operation."
+    ],
+    "polling_sequence": [
+      "Read STATUS for sticky fault bits and SAFE_STATE.",
+      "Read APPLIED_COMMAND to observe the current bounded actuator command.",
+      "Read LAST_ACCEPTED_SEQ and WATCHDOG_COUNT for freshness and protocol monitoring.",
+      "If a fault is observed, clear sticky faults by writing CONTROL.CLEAR_STICKY_FAULTS=1 per software policy, then re-read STATUS."
+    ],
+    "irq_sequence": []
+  },
+  "consistency_notes": [
+    "The register map is compatible with DIGITAL_SPEC_JSON.register_contract and uses the declared top-level CSR/MMIO ports csr_valid, csr_write, csr_addr[5:0], csr_wdata[31:0], csr_rdata[31:0], and csr_ready.",
+    "Every declared register in DIGITAL_SPEC_JSON.register_contract is reachable through RTL decode.",
+    "No additional hierarchy, ports, or protocol assumptions are introduced.",
+    "The streaming transport remains separate from the CSR/MMIO control plane.",
+    "Field bit ordering uses lsb <= msb for every field."
+  ]
+}
