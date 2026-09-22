@@ -1,0 +1,1 @@
+ValueError('Spec contract validation failed: Every feature_contracts entry must compile to an executable checker. history_buffer_readback: Requirement references stimulus/expected names that are not declared top-level signals. Unresolved bindings: hist_read_data.')

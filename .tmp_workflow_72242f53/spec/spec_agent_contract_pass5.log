@@ -1,0 +1,2 @@
+Digital Spec Agent pass5 contract repair failure:
+Spec contract validation failed: Hierarchical graph validation failed: Required child input 'aero_history_buffer.write_data' has no source in top_level_connections or inter_module_signals. Add an explicit top-level input connection or a real child producer. Other required child inputs without sources: 'aero_history_buffer.hist_dout'. Repair every listed input in the same response.
