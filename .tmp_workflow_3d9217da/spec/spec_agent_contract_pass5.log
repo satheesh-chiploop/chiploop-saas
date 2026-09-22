@@ -1,0 +1,2 @@
+Digital Spec Agent pass5 contract repair failure:
+Spec contract validation failed: Hierarchical graph validation failed: Required child input 'adaptive_aero_control_regfile.cfg_fault_status' has no source in top_level_connections or inter_module_signals. Add an explicit top-level input connection or a real child producer. Other required child inputs without sources: 'adaptive_aero_control_regfile.cfg_current_mode_status', 'adaptive_aero_control_history_wrapper.hist_addr'. Repair every listed input in the same response.

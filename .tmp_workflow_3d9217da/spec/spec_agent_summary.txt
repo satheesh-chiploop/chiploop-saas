@@ -1,0 +1,3 @@
+❌ Digital Spec Agent failed.
+
+Pass1 JSON parse/normalize failed: Spec contract validation failed: Feature contracts must contain behavior-discriminating checkers; full-domain min/max expectations accept every possible output and provide no verification coverage. Use exact expected values or a strict subrange derived from the feature scenario. Vacuous contracts: request_transport_direction: req_valid; response_transport_direction: rsp_ready; bounded_actuator_command: actuator_cmd
