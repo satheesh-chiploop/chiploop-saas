@@ -1,0 +1,69 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.186 MB sources in 7 modules, into 0.079 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.028 s (elab=0.004, cvt=0.012, bld=0.000); cpu 0.028 s on 1 threads; allocated 32.359 MB
+
+=== STDERR ===
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top_transport.v:101:14: Operator ASSIGN expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 168 bits.
+                                                                       : ... note: In instance 'adaptive_aero_control_top.u_transport'
+  101 |     req_pack = {req_flow_summary, 32'h00000000, req_geometry_hash, req_velocity_setpoint, req_operating_point_id, cfg_request_sequence, cfg_response_sequence, 32'h00000000};
+      |              ^
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:60:12: Signal is not used: 'tx_expected_sequence'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   60 | wire [7:0] tx_expected_sequence;
+      |            ^~~~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:61:6: Signal is not used: 'tx_request_issued'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   61 | wire tx_request_issued;
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:78:13: Signal is not used: 'cmd_target_sat'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   78 | wire [15:0] cmd_target_sat;
+      |             ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:79:12: Signal is not used: 'cmd_rate_limit_sat'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   79 | wire [7:0] cmd_rate_limit_sat;
+      |            ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:81:13: Signal is not driven, nor used: 'rsp_output_target'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   81 | wire [15:0] rsp_output_target;
+      |             ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:82:12: Signal is not driven, nor used: 'rsp_rate_limit'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   82 | wire [7:0] rsp_rate_limit;
+      |            ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:83:12: Signal is not driven, nor used: 'rsp_mode_bits'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   83 | wire [3:0] rsp_mode_bits;
+      |            ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:84:12: Signal is not driven, nor used: 'adaptive_aero_control_top_transport_tx_last_fault_code'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   84 | wire [3:0] adaptive_aero_control_top_transport_tx_last_fault_code;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:85:12: Signal is not driven, nor used: 'adaptive_aero_control_top_transport_tx_last_sequence'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   85 | wire [7:0] adaptive_aero_control_top_transport_tx_last_sequence;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top_fault_manager.v:30:7: Signal is not used: 'cfg_enable'
+                                                                           : ... note: In instance 'adaptive_aero_control_top.u_fault_manager'
+   30 | input cfg_enable;
+      |       ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top_fault_manager.v:31:7: Signal is not used: 'cfg_arm'
+                                                                           : ... note: In instance 'adaptive_aero_control_top.u_fault_manager'
+   31 | input cfg_arm;
+      |       ^~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top_mmio.v:35:14: Bits of signal are not used: 'ctrl_wdata'[63:56]
+                                                                   : ... note: In instance 'adaptive_aero_control_top.u_mmio'
+   35 | input [63:0] ctrl_wdata;
+      |              ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top_transport.v:49:15: Bits of signal are not used: 'host_rsp_data'[127:20,7:0]
+                                                                        : ... note: In instance 'adaptive_aero_control_top.u_transport'
+   49 | input [127:0] host_rsp_data;
+      |               ^~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

@@ -1,0 +1,41 @@
+{
+  "pass": "pass2",
+  "passed": false,
+  "checks": {
+    "structural": {
+      "status": "fail",
+      "issue_count": 1,
+      "issues": [
+        "\u274c Module 'adaptive_aero_control_top_mmio' has extra ports vs spec: ['cfg_fallback_mode']"
+      ]
+    },
+    "compile": {
+      "status": "pass",
+      "log": "backend/workflows/2ba3e32c-6aa6-4f2b-91bc-f74878436468/rtl/rtl_agent_compile_pass2.log"
+    },
+    "lint": {
+      "status": "fatal",
+      "blocking": true,
+      "log": "backend/workflows/2ba3e32c-6aa6-4f2b-91bc-f74878436468/rtl/rtl_verilator_lint_pass2.log"
+    },
+    "static_spec2rtl": {
+      "status": "partial",
+      "blocking": true,
+      "report": "backend/workflows/2ba3e32c-6aa6-4f2b-91bc-f74878436468/rtl/rtl_spec2rtl_conformance_pass2.json",
+      "summary": {
+        "checked": 133,
+        "matched": 129,
+        "partial": 0,
+        "missing": 4,
+        "inconclusive": 0,
+        "pending_verification": 60
+      }
+    }
+  },
+  "issue_count": 3,
+  "issues": [
+    "\u274c Module 'adaptive_aero_control_top_mmio' has extra ports vs spec: ['cfg_fallback_mode']",
+    "\u274c Verilator lint failed.",
+    "\u274c Static Spec2RTL compliance failed: status=partial, missing=4, partial=0, inconclusive=0."
+  ]
+}

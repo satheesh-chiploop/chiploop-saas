@@ -1,0 +1,41 @@
+{
+  "type": "simulation_execution_report",
+  "manifest_path": "backend/workflows/9856ac71-d413-49ad-8a89-a72dcd0ef566/vv/tb/simulation_manifest.json",
+  "tests": [
+    "smoke_test",
+    "feature_contract_directed",
+    "application_spec_boundary_directed"
+  ],
+  "seeds": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "pass": 0,
+  "fail": 12,
+  "coverage_json_present": false,
+  "coverage_md_present": false,
+  "code_coverage_json_present": true,
+  "code_coverage": {
+    "type": "code_coverage_summary",
+    "tool": "verilator_coverage",
+    "status": "missing_data",
+    "coverage_dat_files": [],
+    "line_coverage_pct": null,
+    "branch_coverage_pct": null,
+    "condition_coverage_pct": null,
+    "toggle_coverage_pct": null,
+    "condition_source": "unavailable",
+    "toggle_source": "not_reported_by_verilator_lcov"
+  },
+  "toolchain": {
+    "simulator": "verilator",
+    "code_coverage": "verilator_coverage"
+  },
+  "artifacts": {
+    "code_coverage_summary": "backend/workflows/9856ac71-d413-49ad-8a89-a72dcd0ef566/vv/tb/reports/code_coverage_summary.json",
+    "simulation_execution_summary": "backend/workflows/9856ac71-d413-49ad-8a89-a72dcd0ef566/vv/tb/reports/simulation_execution_summary.json",
+    "sim_execution_md": "backend/workflows/9856ac71-d413-49ad-8a89-a72dcd0ef566/vv/tb/reports/SIM_EXECUTION.md"
+  }
+}

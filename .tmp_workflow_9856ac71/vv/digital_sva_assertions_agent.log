@@ -1,0 +1,43 @@
+Digital Assertions (SVA) Agent Log
+[2026-09-24T02:44:23.280678] [INFO] Starting Digital Assertions (SVA) Agent...
+[2026-09-24T02:44:23.281000] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/9856ac71-d413-49ad-8a89-a72dcd0ef566/spec/pwm_controller_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 1,
+  "top_module": "pwm_controller",
+  "soc_mode": false
+}
+[2026-09-24T02:44:23.282139] [INFO] resolved_mode=digital
+[2026-09-24T02:44:23.282233] [INFO] spec_path=/root/chiploop-backend/backend/workflows/9856ac71-d413-49ad-8a89-a72dcd0ef566/spec/pwm_controller_spec.json
+[2026-09-24T02:44:23.282306] [INFO] top_module=pwm_controller
+[2026-09-24T02:44:23.282373] [INFO] rtl_file_count=1
+[2026-09-24T02:44:23.282466] [INFO] clock_candidates=[
+  "clk"
+]
+[2026-09-24T02:44:23.282546] [INFO] reset_candidates=[
+  {
+    "name": "reset_n",
+    "active_low": true,
+    "async": false
+  }
+]
+[2026-09-24T02:44:23.282671] [INFO] sva_ports={
+  "port_names": [
+    "clk",
+    "reset_n",
+    "enable",
+    "duty_cycle",
+    "period",
+    "pwm_out",
+    "counter_value"
+  ],
+  "input_count": 5,
+  "output_count": 2
+}
+[2026-09-24T02:44:29.671239] [INFO] LLM expansion completed.
+[2026-09-24T02:44:36.796287] [INFO] SVA completeness attempt 2/3; missing=[]; quality_issues=[]
+[2026-09-24T02:44:36.993838] [INFO] Generated pwm_controller_assertions.sv
+[2026-09-24T02:44:36.993930] [INFO] Generated sva_spec.json
+[2026-09-24T02:44:36.993999] [INFO] Generated SVA_README.md

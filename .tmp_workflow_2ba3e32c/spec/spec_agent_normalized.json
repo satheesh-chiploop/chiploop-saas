@@ -1,0 +1,2066 @@
+{
+  "design_name": "adaptive_aero_control_top",
+  "design_summary": "",
+  "operating_constraints": {},
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "feature_contracts": [
+    {
+      "id": "reset_safe_inhibit",
+      "description": "After reset deassertion, the design must remain in safe inhibited state with no valid command or request asserted until explicitly configured and armed.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 0
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "rst_n": 1
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "host_req_valid": 0,
+        "host_rsp_ready": 0,
+        "cmd_valid": 0
+      },
+      "within_cycles": 1
+    },
+    {
+      "id": "mmio_register_access",
+      "description": "A firmware write through the CSR/MMIO window shall be decoded into the corresponding semantic register outputs and reflected in readback status without exposing inaccessible internal state.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "ctrl_valid": 1,
+              "ctrl_write": 1,
+              "ctrl_addr": 0,
+              "ctrl_wdata": 3
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "ctrl_valid": 0,
+              "ctrl_write": 0,
+              "ctrl_addr": 0,
+              "ctrl_wdata": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "ctrl_ready": 1
+      },
+      "within_cycles": 2
+    },
+    {
+      "id": "host_request_transport",
+      "description": "When enabled and armed with compact request metadata present, the transport block shall issue a bounded host request and hold valid until host_req_ready is observed.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "ctrl_valid": 1,
+              "ctrl_write": 1,
+              "ctrl_addr": 0,
+              "ctrl_wdata": 3
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "host_req_ready": 0
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "host_req_ready": 1
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "host_req_valid": 1
+      },
+      "within_cycles": 3
+    },
+    {
+      "id": "response_acceptance",
+      "description": "A matching valid host response with acceptable status shall be qualified as a valid response and may drive command shaping.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "host_rsp_valid": 1,
+              "host_rsp_data": 305419896
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "host_rsp_valid": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "cmd_valid": 1
+      },
+      "within_cycles": 2
+    },
+    {
+      "id": "fault_readback",
+      "description": "Fault conditions shall be exposed in the compact fault output and status readback for software logging and recovery.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "host_rsp_valid": 1,
+              "host_rsp_data": 4294967295
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "fault_out": {
+          "min": 0,
+          "max": 65535
+        }
+      },
+      "within_cycles": 2
+    }
+  ],
+  "memory_macros": [],
+  "hierarchy": {
+    "top_module": {
+      "name": "adaptive_aero_control_top",
+      "description": "Top-level FPGA RTL wrapper for a host-executed intelligent active-aerodynamics controller. It exposes a real firmware-visible CSR/MMIO interface, emits bounded model/request transport, receives bounded model response transport, validates responses, enforces timeout/staleness policy, shapes actuator commands, and provides explicit fault/status readback. On reset or on invalid/stale/timeout/not-armed conditions, actuator command validity is deasserted and the design remains in safe inhibited state until software explicitly configures and arms a new transaction.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1,
+          "active_low": true
+        },
+        {
+          "name": "ctrl_addr",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "ctrl_wdata",
+          "direction": "input",
+          "width": 64
+        },
+        {
+          "name": "ctrl_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "ctrl_write",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "ctrl_rdata",
+          "direction": "output",
+          "width": 64
+        },
+        {
+          "name": "ctrl_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "host_req_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "host_req_ready",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "host_req_data",
+          "direction": "output",
+          "width": 128
+        },
+        {
+          "name": "host_rsp_valid",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "host_rsp_ready",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "host_rsp_data",
+          "direction": "input",
+          "width": 128
+        },
+        {
+          "name": "aero_cmd_out",
+          "direction": "output",
+          "width": 32
+        },
+        {
+          "name": "cmd_valid",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "fault_out",
+          "direction": "output",
+          "width": 16
+        }
+      ],
+      "functionality": "Implements the full control-plane and transport wrapper for external active-aerodynamics intelligence. Firmware programs compact descriptors and operating thresholds through MMIO/CSR writes, arms the transaction, and reads back status and logging fields. The top forms a compact request frame containing only metadata such as sequence ID, operating-point ID, velocity setpoint, geometry handle/hash, and flow-condition summary. It holds host_req_valid high until host_req_ready is observed or a local timeout aborts the transaction. The response path only accepts a matching sequence when the transaction is active, the response is valid, and the response age has not expired. The response is then validated and translated into a deterministic packed actuator command word, with saturation to configured limits. If the response is invalid, mismatched, stale, timed out, or the module is not armed/enabled, cmd_valid is deasserted, aero_cmd_out is inhibited, and fault_out reflects latched fault state for software handling.",
+      "responsibilities": [
+        "Expose a compact firmware-visible CSR/MMIO control/status window.",
+        "Emit host request valid/data and accept host request ready according to the transport contract.",
+        "Accept host response valid/data and emit host response ready according to the transport contract.",
+        "Implement timeout, stale-data rejection, invalid-response rejection, and explicit fault latching.",
+        "Shape compact active-aerodynamic command words with saturation to configured bounds.",
+        "Provide status readback including busy, valid_response, stale_data, timeout, invalid_response, fallback_active-equivalent inhibit indication, last accepted sequence, last fault code, and response age.",
+        "Maintain deterministic reset and explicit safe inhibited output behavior."
+      ],
+      "must_drive": [
+        "ctrl_rdata",
+        "ctrl_ready",
+        "host_req_valid",
+        "host_req_data",
+        "host_rsp_ready",
+        "aero_cmd_out",
+        "cmd_valid",
+        "fault_out"
+      ],
+      "must_receive": [
+        "clk",
+        "rst_n",
+        "ctrl_addr",
+        "ctrl_wdata",
+        "ctrl_valid",
+        "ctrl_write",
+        "host_req_ready",
+        "host_rsp_valid",
+        "host_rsp_data"
+      ],
+      "must_not_drive": [
+        "host_req_ready",
+        "host_rsp_valid",
+        "host_rsp_data",
+        "ctrl_addr",
+        "ctrl_wdata",
+        "ctrl_valid",
+        "ctrl_write"
+      ],
+      "reset_behavior": "On rst_n deassertion, clear pending transactions, deassert host_req_valid and cmd_valid, drive aero_cmd_out to a deterministic inhibited safe value, set ctrl_ready to indicate idle/ready decode availability, clear fault latches to their reset values, and initialize sequence/age/timeout counters to zero. No actuator command is asserted valid on reset.",
+      "behavior_rules": [
+        "ctrl_ready shall be a real output driven by the top-level MMIO control block and shall indicate transaction acceptance capability for the current cycle.",
+        "The control-plane shall decode every declared register in register_contract; inaccessible state shall not be exposed as software-visible.",
+        "Writes to enable, arm, clear_faults, request_sequence, response_sequence, timeout_threshold, clamp_min, clamp_max, and status control fields shall be reflected through the MMIO decode path and internal semantic outputs.",
+        "host_req_valid shall remain asserted after issuance until host_req_ready is sampled high or the local timeout policy aborts the request.",
+        "host_req_data shall contain only compact metadata and no bulk geometry, tensor, or flow-field payload.",
+        "host_rsp_valid shall be accepted only when the transaction is active, the expected sequence matches, and the response is still within the configured age limit.",
+        "Any invalid response status, sequence mismatch, stale age, timeout expiration, or not-armed/not-enabled state shall inhibit cmd_valid and preserve or latch fault state for firmware handling.",
+        "aero_cmd_out shall be clamped to the configured min/max range when a valid response is accepted; otherwise it shall remain inhibited at the safe reset-coded command value.",
+        "fault_out shall encode both latched and live fault indications as a compact status summary.",
+        "Last accepted sequence number, last fault code, and response age shall be readable through MMIO status registers."
+      ],
+      "rtl_output_file": "adaptive_aero_control_top.v"
+    },
+    "modules": [
+      {
+        "name": "adaptive_aero_control_top_mmio",
+        "description": "Firmware-visible CSR/MMIO register decode and status readback block. It accepts the top-level control bus, decodes writes to control registers, returns 64-bit read data, and emits semantic configuration/status outputs used by the transport, validation, and command-shaping logic. It also captures live status inputs for software logging without inventing inaccessible software-visible state.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "ctrl_addr",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "ctrl_wdata",
+            "direction": "input",
+            "width": 64
+          },
+          {
+            "name": "ctrl_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "ctrl_write",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "ctrl_rdata",
+            "direction": "output",
+            "width": 64
+          },
+          {
+            "name": "ctrl_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_arm",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_clear_faults",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cfg_request_sequence",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_response_sequence",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cfg_timeout_threshold",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_clamp_min",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_clamp_max",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cfg_fallback_mode",
+            "direction": "output",
+            "width": 2
+          },
+          {
+            "name": "status_busy",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_valid_response",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_stale_data",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_timeout",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_invalid_response",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_fallback_active",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "status_last_sequence",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "status_last_fault_code",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "status_response_age",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "fault_latched",
+            "direction": "input",
+            "width": 16
+          }
+        ],
+        "functionality": "Implements the full firmware-visible register bank for configuration and readback. Writable fields are decoded into semantic control outputs. Read-only fields are assembled from live status inputs and exposed through ctrl_rdata. The register block is the sole software-accessible source for enable, arm, clear_faults, request/response sequence selection, timeout threshold, clamp bounds, and fallback mode selection. It does not infer or alter aerodynamic behavior itself.",
+        "responsibilities": [
+          "Decode 64-bit MMIO writes into explicit semantic control outputs.",
+          "Return 64-bit MMIO readback words for status and configuration.",
+          "Provide deterministic read/write semantics for every declared register field.",
+          "Expose live status and fault summary inputs to firmware through readback.",
+          "Ensure every declared register is reachable through RTL decode."
+        ],
+        "must_drive": [
+          "ctrl_rdata",
+          "ctrl_ready",
+          "cfg_enable",
+          "cfg_arm",
+          "cfg_clear_faults",
+          "cfg_request_sequence",
+          "cfg_response_sequence",
+          "cfg_timeout_threshold",
+          "cfg_clamp_min",
+          "cfg_clamp_max",
+          "cfg_fallback_mode"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "ctrl_addr",
+          "ctrl_wdata",
+          "ctrl_valid",
+          "ctrl_write",
+          "status_busy",
+          "status_valid_response",
+          "status_stale_data",
+          "status_timeout",
+          "status_invalid_response",
+          "status_fallback_active",
+          "status_last_sequence",
+          "status_last_fault_code",
+          "status_response_age",
+          "fault_latched"
+        ],
+        "must_not_drive": [
+          "ctrl_addr",
+          "ctrl_wdata",
+          "ctrl_valid",
+          "ctrl_write",
+          "status_busy",
+          "status_valid_response",
+          "status_stale_data",
+          "status_timeout",
+          "status_invalid_response",
+          "status_fallback_active",
+          "status_last_sequence",
+          "status_last_fault_code",
+          "status_response_age",
+          "fault_latched"
+        ],
+        "reset_behavior": "On reset, drive all writable control outputs to zero except deterministic safe defaults for clamp_min, clamp_max, and timeout_threshold as implemented by the top-level integration contract. ctrl_rdata shall return a deterministic reset value. ctrl_ready shall indicate an idle-ready state. No live status is asserted by the register block on reset.",
+        "behavior_rules": [
+          "Every register defined in register_contract shall be directly decodable and readable.",
+          "Writable control fields are semantic outputs and shall be explicitly connected to downstream modules.",
+          "RO live/status fields are semantic inputs and shall not be modeled as writable storage in the MMIO block.",
+          "The MMIO block shall not expose inaccessible internal state as software-visible registers."
+        ],
+        "rtl_output_file": "adaptive_aero_control_top_mmio.v"
+      },
+      {
+        "name": "adaptive_aero_control_top_transport",
+        "description": "Host request/response transport and transaction sequencing block. It forms compact request frames, holds request valid until accepted or aborted by local timeout, tracks expected sequence identity, qualifies incoming host responses, and forwards compact response metadata to validation and command shaping logic. It does not perform surrogate inference.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_arm",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_clear_faults",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_request_sequence",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_response_sequence",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "cfg_timeout_threshold",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "req_operating_point_id",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "req_velocity_setpoint",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "req_geometry_hash",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "req_flow_summary",
+            "direction": "input",
+            "width": 32
+          },
+          {
+            "name": "host_req_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "host_req_ready",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "host_req_data",
+            "direction": "output",
+            "width": 128
+          },
+          {
+            "name": "host_rsp_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "host_rsp_ready",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "host_rsp_data",
+            "direction": "input",
+            "width": 128
+          },
+          {
+            "name": "tx_busy",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "tx_expected_sequence",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "tx_request_issued",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "tx_response_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "tx_response_sequence",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "tx_response_age",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "tx_timeout_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "tx_stale_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "tx_invalid_response_fault",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "tx_last_sequence",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "tx_last_fault_code",
+            "direction": "output",
+            "width": 4
+          }
+        ],
+        "functionality": "Implements bounded transport state for one active request at a time. It composes a compact request frame from operating-point ID, setpoint, geometry handle/hash, and flow-condition summary. It asserts host_req_valid until accepted or timed out. It monitors a cycle counter against cfg_timeout_threshold and raises timeout/stale conditions when the threshold is exceeded before a matching response arrives. It qualifies host_rsp_valid by expected sequence and active transaction state, and exposes response age and fault indications to the downstream validation block and to status reporting.",
+        "responsibilities": [
+          "Compose the compact model-request frame.",
+          "Maintain request valid until host_req_ready or local timeout abort.",
+          "Track expected and last-seen sequence numbers.",
+          "Count response age against timeout_threshold.",
+          "Qualify response availability and report transaction faults.",
+          "Provide the transport-side last sequence and fault summary for software readback."
+        ],
+        "must_drive": [
+          "host_req_valid",
+          "host_req_data",
+          "host_rsp_ready",
+          "tx_busy",
+          "tx_expected_sequence",
+          "tx_request_issued",
+          "tx_response_valid",
+          "tx_response_sequence",
+          "tx_response_age",
+          "tx_timeout_fault",
+          "tx_stale_fault",
+          "tx_invalid_response_fault",
+          "tx_last_sequence",
+          "tx_last_fault_code"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_enable",
+          "cfg_arm",
+          "cfg_clear_faults",
+          "cfg_request_sequence",
+          "cfg_response_sequence",
+          "cfg_timeout_threshold",
+          "req_operating_point_id",
+          "req_velocity_setpoint",
+          "req_geometry_hash",
+          "req_flow_summary",
+          "host_req_ready",
+          "host_rsp_valid",
+          "host_rsp_data"
+        ],
+        "must_not_drive": [
+          "host_req_ready",
+          "host_rsp_valid",
+          "host_rsp_data",
+          "cfg_enable",
+          "cfg_arm",
+          "cfg_clear_faults",
+          "cfg_request_sequence",
+          "cfg_response_sequence",
+          "cfg_timeout_threshold",
+          "req_operating_point_id",
+          "req_velocity_setpoint",
+          "req_geometry_hash",
+          "req_flow_summary"
+        ],
+        "reset_behavior": "On reset, deassert host_req_valid and host_rsp_ready, clear transaction active state, clear request-issued indication, zero expected sequence, age, and last-sequence tracking, and clear latched transport faults to a deterministic reset value. No request remains pending across reset.",
+        "behavior_rules": [
+          "host_req_valid shall persist until accepted or timeout-aborted.",
+          "host_req_data shall encode only compact metadata and shall not carry bulk tensors, geometry arrays, or flow fields.",
+          "host_rsp_ready shall be asserted only when the transaction is armed and a response is expected by state.",
+          "Responses with mismatched sequence or inactive transaction state shall not be promoted to tx_response_valid.",
+          "Age counting shall be bounded and deterministic.",
+          "Fault codes shall identify timeout, stale-data, invalid-response, and not-armed/not-enabled conditions in a compact encoding."
+        ],
+        "rtl_output_file": "adaptive_aero_control_top_transport.v"
+      },
+      {
+        "name": "adaptive_aero_control_top_validation",
+        "description": "Response validation and safety filter block. It checks response status, sequence alignment, age validity, and output range compliance. It then produces a bounded actuator target and valid qualifier for the command shaper. Invalid, stale, mismatched, or out-of-range responses are rejected and do not produce a valid command.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_arm",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_clamp_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_clamp_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "tx_response_valid",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "tx_response_sequence",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "tx_response_age",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "tx_stale_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "tx_timeout_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "tx_invalid_response_fault",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rsp_status_code",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "rsp_output_target",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "rsp_rate_limit",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "rsp_mode_bits",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "cfg_response_sequence",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "valid_response",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "validated_target",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "validated_rate_limit",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "validated_mode_bits",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "validation_fault_invalid_response",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "validation_fault_stale_data",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "validation_fault_timeout",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "validation_fault_not_armed",
+            "direction": "output",
+            "width": 1
+          }
+        ],
+        "functionality": "Performs the safety and acceptance checks for host-generated compact active-aerodynamics results. It requires active transaction state, correct sequence match, acceptable response status, and non-expired age before qualifying a response as valid. It clamps the target command into the configured range and forwards rate-limit and mode bits only when the response is valid. On any rejection condition, valid_response is deasserted and fault indicators are raised for status reporting.",
+        "responsibilities": [
+          "Verify response sequence and transaction state alignment.",
+          "Check response status codes and reject invalid status values.",
+          "Reject expired or stale responses.",
+          "Clamp the candidate output target to configured min/max limits.",
+          "Forward only validated target, rate-limit, and mode fields to command shaping.",
+          "Generate explicit validation fault indicators for status and software recovery."
+        ],
+        "must_drive": [
+          "valid_response",
+          "validated_target",
+          "validated_rate_limit",
+          "validated_mode_bits",
+          "validation_fault_invalid_response",
+          "validation_fault_stale_data",
+          "validation_fault_timeout",
+          "validation_fault_not_armed"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_enable",
+          "cfg_arm",
+          "cfg_clamp_min",
+          "cfg_clamp_max",
+          "tx_response_valid",
+          "tx_response_sequence",
+          "tx_response_age",
+          "tx_stale_fault",
+          "tx_timeout_fault",
+          "tx_invalid_response_fault",
+          "rsp_status_code",
+          "rsp_output_target",
+          "rsp_rate_limit",
+          "rsp_mode_bits",
+          "cfg_response_sequence"
+        ],
+        "must_not_drive": [
+          "cfg_enable",
+          "cfg_arm",
+          "cfg_clamp_min",
+          "cfg_clamp_max",
+          "tx_response_valid",
+          "tx_response_sequence",
+          "tx_response_age",
+          "tx_stale_fault",
+          "tx_timeout_fault",
+          "tx_invalid_response_fault",
+          "rsp_status_code",
+          "rsp_output_target",
+          "rsp_rate_limit",
+          "rsp_mode_bits",
+          "cfg_response_sequence"
+        ],
+        "reset_behavior": "On reset, deassert valid_response, clear validation fault outputs, and drive validated fields to deterministic safe values with no claim of a valid actuator update.",
+        "behavior_rules": [
+          "Only matching, active, non-expired responses may be marked valid.",
+          "Out-of-range target values shall be clamped before command shaping.",
+          "Invalid status codes shall force rejection and fault reporting.",
+          "Not-armed or not-enabled conditions shall prevent response acceptance and produce explicit rejection indication.",
+          "The block shall not silently substitute a fallback command; it only qualifies or rejects the response."
+        ],
+        "rtl_output_file": "adaptive_aero_control_top_validation.v"
+      },
+      {
+        "name": "adaptive_aero_control_top_command_shaper",
+        "description": "Deterministic actuator command packing and saturation block. It converts validated compact target, rate-limit, and mode information into a packed aero command word. It performs internal saturation to the configured range and provides a command-valid qualifier only when validation has accepted the response.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "valid_response",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "validated_target",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "validated_rate_limit",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "validated_mode_bits",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "cfg_clamp_min",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "cfg_clamp_max",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "aero_cmd_out",
+            "direction": "output",
+            "width": 32
+          },
+          {
+            "name": "cmd_valid",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "cmd_target_sat",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "cmd_rate_limit_sat",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "cmd_mode_bits_sat",
+            "direction": "output",
+            "width": 4
+          }
+        ],
+        "functionality": "Produces a packed actuator command word for active aerodynamic surfaces. The packed word carries a saturated target position or deflection command plus optional rate-limit and mode bits. The output is deterministic and only valid when a corresponding validated response is available. When no valid response exists, cmd_valid is deasserted and the command output remains in a safe inhibited encoding.",
+        "responsibilities": [
+          "Pack the final actuator command word in a deterministic format.",
+          "Apply saturation to the validated target using configured limits.",
+          "Propagate validated rate-limit and mode bits into the packed command encoding.",
+          "Provide explicit command-valid indication only for accepted responses.",
+          "Keep output deterministic and synthesis-friendly."
+        ],
+        "must_drive": [
+          "aero_cmd_out",
+          "cmd_valid",
+          "cmd_target_sat",
+          "cmd_rate_limit_sat",
+          "cmd_mode_bits_sat"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "valid_response",
+          "validated_target",
+          "validated_rate_limit",
+          "validated_mode_bits",
+          "cfg_clamp_min",
+          "cfg_clamp_max"
+        ],
+        "must_not_drive": [
+          "valid_response",
+          "validated_target",
+          "validated_rate_limit",
+          "validated_mode_bits",
+          "cfg_clamp_min",
+          "cfg_clamp_max"
+        ],
+        "reset_behavior": "On reset, deassert cmd_valid and drive aero_cmd_out and the saturated field outputs to deterministic inhibited values. No active actuator command is asserted on reset.",
+        "behavior_rules": [
+          "The command word shall be deterministic and compact.",
+          "The command word shall include at least target/deflection, optional rate-limit, and mode bits.",
+          "Saturation shall prevent out-of-range actuator values from propagating.",
+          "No fallback command substitution is generated; absence of validation results in command invalidation only."
+        ],
+        "rtl_output_file": "adaptive_aero_control_top_command_shaper.v"
+      },
+      {
+        "name": "adaptive_aero_control_top_fault_manager",
+        "description": "Fault aggregation and status encoding block. It collects live fault indicators and latched conditions, encodes a compact fault_out word, and provides software-readable summary status such as busy, valid response, stale, timeout, invalid-response, and inhibit state. It supports explicit clear-faults control while preserving deterministic reset behavior.",
+        "ports": [
+          {
+            "name": "clk",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "rst_n",
+            "direction": "input",
+            "width": 1,
+            "active_low": true
+          },
+          {
+            "name": "cfg_clear_faults",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_enable",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "cfg_arm",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "tx_busy",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "valid_response",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "validation_fault_invalid_response",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "validation_fault_stale_data",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "validation_fault_timeout",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "validation_fault_not_armed",
+            "direction": "input",
+            "width": 1
+          },
+          {
+            "name": "tx_last_sequence",
+            "direction": "input",
+            "width": 8
+          },
+          {
+            "name": "tx_last_fault_code",
+            "direction": "input",
+            "width": 4
+          },
+          {
+            "name": "tx_response_age",
+            "direction": "input",
+            "width": 16
+          },
+          {
+            "name": "fault_latched",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "status_busy",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_valid_response",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_stale_data",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_timeout",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_invalid_response",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_fallback_active",
+            "direction": "output",
+            "width": 1
+          },
+          {
+            "name": "status_last_sequence",
+            "direction": "output",
+            "width": 8
+          },
+          {
+            "name": "status_last_fault_code",
+            "direction": "output",
+            "width": 4
+          },
+          {
+            "name": "status_response_age",
+            "direction": "output",
+            "width": 16
+          },
+          {
+            "name": "fault_out",
+            "direction": "output",
+            "width": 16
+          }
+        ],
+        "functionality": "Aggregates live and latched fault conditions into a compact status summary for firmware and system logging. It determines when the design is busy, whether a valid response was accepted, whether stale/timeout/invalid/not-armed conditions are present, and encodes the last accepted sequence, last fault code, and response age. It supports explicit clear-faults behavior under software control.",
+        "responsibilities": [
+          "Aggregate validation and transport faults into compact live and latched status.",
+          "Encode a deterministic fault_out summary word.",
+          "Expose last accepted sequence and response age for software logging.",
+          "Hold faults latched until explicitly cleared under safe conditions.",
+          "Report busy and valid-response status for observability."
+        ],
+        "must_drive": [
+          "fault_latched",
+          "status_busy",
+          "status_valid_response",
+          "status_stale_data",
+          "status_timeout",
+          "status_invalid_response",
+          "status_fallback_active",
+          "status_last_sequence",
+          "status_last_fault_code",
+          "status_response_age",
+          "fault_out"
+        ],
+        "must_receive": [
+          "clk",
+          "rst_n",
+          "cfg_clear_faults",
+          "cfg_enable",
+          "cfg_arm",
+          "tx_busy",
+          "valid_response",
+          "validation_fault_invalid_response",
+          "validation_fault_stale_data",
+          "validation_fault_timeout",
+          "validation_fault_not_armed",
+          "tx_last_sequence",
+          "tx_last_fault_code",
+          "tx_response_age"
+        ],
+        "must_not_drive": [
+          "cfg_clear_faults",
+          "cfg_enable",
+          "cfg_arm",
+          "tx_busy",
+          "valid_response",
+          "validation_fault_invalid_response",
+          "validation_fault_stale_data",
+          "validation_fault_timeout",
+          "validation_fault_not_armed",
+          "tx_last_sequence",
+          "tx_last_fault_code",
+          "tx_response_age"
+        ],
+        "reset_behavior": "On reset, clear latched faults to a deterministic value, deassert busy and valid-response indicators, clear stale/timeout/invalid status bits, and initialize last sequence, last fault code, and response age to zero. fault_out shall be driven to a deterministic reset encoding.",
+        "behavior_rules": [
+          "Faults shall remain latched until clear_faults is written and the system is not in an active fault-triggering condition.",
+          "status_fallback_active shall indicate inhibited operation due to not-armed, stale, timeout, or invalid conditions rather than command substitution.",
+          "No automatic silent recovery is permitted without explicit software action or a valid new request/response cycle.",
+          "The status block shall not drive any transport or command behavior directly; it only reports and aggregates state."
+        ],
+        "rtl_output_file": "adaptive_aero_control_top_fault_manager.v"
+      }
+    ]
+  },
+  "top_level_connections": [
+    {
+      "top_port": "clk",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.clk",
+        "adaptive_aero_control_top_transport.clk",
+        "adaptive_aero_control_top_validation.clk",
+        "adaptive_aero_control_top_command_shaper.clk",
+        "adaptive_aero_control_top_fault_manager.clk"
+      ],
+      "description": "Fan out the synchronous clock to all submodules."
+    },
+    {
+      "top_port": "rst_n",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.rst_n",
+        "adaptive_aero_control_top_transport.rst_n",
+        "adaptive_aero_control_top_validation.rst_n",
+        "adaptive_aero_control_top_command_shaper.rst_n",
+        "adaptive_aero_control_top_fault_manager.rst_n"
+      ],
+      "description": "Fan out the active-low reset to all submodules."
+    },
+    {
+      "top_port": "ctrl_addr",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.ctrl_addr"
+      ],
+      "description": "Firmware address bus into the MMIO register block."
+    },
+    {
+      "top_port": "ctrl_wdata",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.ctrl_wdata"
+      ],
+      "description": "Firmware write-data bus into the MMIO register block."
+    },
+    {
+      "top_port": "ctrl_valid",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.ctrl_valid"
+      ],
+      "description": "Firmware transaction-valid into the MMIO register block."
+    },
+    {
+      "top_port": "ctrl_write",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.ctrl_write"
+      ],
+      "description": "Firmware write-enable into the MMIO register block."
+    },
+    {
+      "top_port": "ctrl_rdata",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.ctrl_rdata"
+      ],
+      "description": "MMIO read-data driven by the register block."
+    },
+    {
+      "top_port": "ctrl_ready",
+      "connected_to": [
+        "adaptive_aero_control_top_mmio.ctrl_ready"
+      ],
+      "description": "MMIO ready/response indicator driven by the register block."
+    },
+    {
+      "top_port": "host_req_valid",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.host_req_valid"
+      ],
+      "description": "Host request valid emitted by transport logic."
+    },
+    {
+      "top_port": "host_req_ready",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.host_req_ready"
+      ],
+      "description": "Host request ready consumed by transport logic."
+    },
+    {
+      "top_port": "host_req_data",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.host_req_data"
+      ],
+      "description": "Host request packed data emitted by transport logic."
+    },
+    {
+      "top_port": "host_rsp_valid",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.host_rsp_valid"
+      ],
+      "description": "Host response valid accepted by transport logic."
+    },
+    {
+      "top_port": "host_rsp_ready",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.host_rsp_ready"
+      ],
+      "description": "Host response ready emitted by transport logic."
+    },
+    {
+      "top_port": "host_rsp_data",
+      "connected_to": [
+        "adaptive_aero_control_top_transport.host_rsp_data"
+      ],
+      "description": "Host response packed data consumed by transport logic."
+    },
+    {
+      "top_port": "aero_cmd_out",
+      "connected_to": [
+        "adaptive_aero_control_top_command_shaper.aero_cmd_out"
+      ],
+      "description": "Packed actuator command output driven by the command shaper."
+    },
+    {
+      "top_port": "cmd_valid",
+      "connected_to": [
+        "adaptive_aero_control_top_command_shaper.cmd_valid"
+      ],
+      "description": "Command validity output driven by the command shaper."
+    },
+    {
+      "top_port": "fault_out",
+      "connected_to": [
+        "adaptive_aero_control_top_fault_manager.fault_out"
+      ],
+      "description": "Compact fault summary output driven by the fault manager."
+    }
+  ],
+  "inter_module_signals": [
+    {
+      "name": "cfg_enable",
+      "width": 1,
+      "source": "adaptive_aero_control_top_mmio.cfg_enable",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_enable",
+        "adaptive_aero_control_top_validation.cfg_enable",
+        "adaptive_aero_control_top_fault_manager.cfg_enable"
+      ],
+      "description": "Software enable control decoded by MMIO and consumed by transport, validation, and fault logic."
+    },
+    {
+      "name": "cfg_arm",
+      "width": 1,
+      "source": "adaptive_aero_control_top_mmio.cfg_arm",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_arm",
+        "adaptive_aero_control_top_validation.cfg_arm",
+        "adaptive_aero_control_top_fault_manager.cfg_arm"
+      ],
+      "description": "Software arm control decoded by MMIO and consumed by transaction, validation, and fault logic."
+    },
+    {
+      "name": "cfg_clear_faults",
+      "width": 1,
+      "source": "adaptive_aero_control_top_mmio.cfg_clear_faults",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_clear_faults",
+        "adaptive_aero_control_top_fault_manager.cfg_clear_faults"
+      ],
+      "description": "Explicit fault-clear control decoded by MMIO and consumed by transport and fault manager."
+    },
+    {
+      "name": "cfg_request_sequence",
+      "width": 8,
+      "source": "adaptive_aero_control_top_mmio.cfg_request_sequence",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_request_sequence"
+      ],
+      "description": "Requested sequence identifier for the outbound host request frame."
+    },
+    {
+      "name": "cfg_response_sequence",
+      "width": 8,
+      "source": "adaptive_aero_control_top_mmio.cfg_response_sequence",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_response_sequence",
+        "adaptive_aero_control_top_validation.cfg_response_sequence"
+      ],
+      "description": "Expected response sequence identifier consumed by transport and validation."
+    },
+    {
+      "name": "cfg_timeout_threshold",
+      "width": 16,
+      "source": "adaptive_aero_control_top_mmio.cfg_timeout_threshold",
+      "destinations": [
+        "adaptive_aero_control_top_transport.cfg_timeout_threshold"
+      ],
+      "description": "Local timeout threshold for request and response age counting."
+    },
+    {
+      "name": "cfg_clamp_min",
+      "width": 16,
+      "source": "adaptive_aero_control_top_mmio.cfg_clamp_min",
+      "destinations": [
+        "adaptive_aero_control_top_validation.cfg_clamp_min",
+        "adaptive_aero_control_top_command_shaper.cfg_clamp_min"
+      ],
+      "description": "Lower saturation bound for validated actuator commands."
+    },
+    {
+      "name": "cfg_clamp_max",
+      "width": 16,
+      "source": "adaptive_aero_control_top_mmio.cfg_clamp_max",
+      "destinations": [
+        "adaptive_aero_control_top_validation.cfg_clamp_max",
+        "adaptive_aero_control_top_command_shaper.cfg_clamp_max"
+      ],
+      "description": "Upper saturation bound for validated actuator commands."
+    },
+    {
+      "name": "req_operating_point_id",
+      "width": 8,
+      "source": "adaptive_aero_control_top_mmio.cfg_request_sequence",
+      "destinations": [
+        "adaptive_aero_control_top_transport.req_operating_point_id"
+      ],
+      "description": "Compact operating-point identifier used in the outbound request frame."
+    },
+    {
+      "name": "tx_busy",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.tx_busy",
+      "destinations": [
+        "adaptive_aero_control_top_fault_manager.tx_busy"
+      ],
+      "description": "Transport busy indication forwarded to the fault/status manager."
+    },
+    {
+      "name": "tx_response_valid",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.tx_response_valid",
+      "destinations": [
+        "adaptive_aero_control_top_validation.tx_response_valid"
+      ],
+      "description": "Qualified response-valid indication from transport into validation."
+    },
+    {
+      "name": "tx_response_sequence",
+      "width": 8,
+      "source": "adaptive_aero_control_top_transport.tx_response_sequence",
+      "destinations": [
+        "adaptive_aero_control_top_validation.tx_response_sequence"
+      ],
+      "description": "Response sequence number forwarded from transport to validation."
+    },
+    {
+      "name": "tx_response_age",
+      "width": 16,
+      "source": "adaptive_aero_control_top_transport.tx_response_age",
+      "destinations": [
+        "adaptive_aero_control_top_validation.tx_response_age",
+        "adaptive_aero_control_top_fault_manager.tx_response_age"
+      ],
+      "description": "Response age counter used by validation and status logging."
+    },
+    {
+      "name": "tx_timeout_fault",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.tx_timeout_fault",
+      "destinations": [
+        "adaptive_aero_control_top_validation.tx_timeout_fault",
+        "adaptive_aero_control_top_fault_manager.validation_fault_timeout"
+      ],
+      "description": "Timeout fault indication from transport into validation and fault aggregation."
+    },
+    {
+      "name": "tx_stale_fault",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.tx_stale_fault",
+      "destinations": [
+        "adaptive_aero_control_top_validation.tx_stale_fault",
+        "adaptive_aero_control_top_fault_manager.validation_fault_stale_data"
+      ],
+      "description": "Stale-response fault indication from transport into validation and fault aggregation."
+    },
+    {
+      "name": "tx_invalid_response_fault",
+      "width": 1,
+      "source": "adaptive_aero_control_top_transport.tx_invalid_response_fault",
+      "destinations": [
+        "adaptive_aero_control_top_validation.tx_invalid_response_fault",
+        "adaptive_aero_control_top_fault_manager.validation_fault_invalid_response"
+      ],
+      "description": "Invalid-response fault indication from transport into validation and fault aggregation."
+    },
+    {
+      "name": "tx_last_sequence",
+      "width": 8,
+      "source": "adaptive_aero_control_top_transport.tx_last_sequence",
+      "destinations": [
+        "adaptive_aero_control_top_fault_manager.tx_last_sequence"
+      ],
+      "description": "Last accepted sequence number for logging and readback."
+    },
+    {
+      "name": "tx_last_fault_code",
+      "width": 4,
+      "source": "adaptive_aero_control_top_transport.tx_last_fault_code",
+      "destinations": [
+        "adaptive_aero_control_top_fault_manager.tx_last_fault_code"
+      ],
+      "description": "Compact transport-side fault code for logging and readback."
+    },
+    {
+      "name": "valid_response",
+      "width": 1,
+      "source": "adaptive_aero_control_top_validation.valid_response",
+      "destinations": [
+        "adaptive_aero_control_top_command_shaper.valid_response",
+        "adaptive_aero_control_top_fault_manager.valid_response"
+      ],
+      "description": "Validated response qualifier used by command shaping and fault/status reporting."
+    },
+    {
+      "name": "validated_target",
+      "width": 16,
+      "source": "adaptive_aero_control_top_validation.validated_target",
+      "destinations": [
+        "adaptive_aero_control_top_command_shaper.validated_target"
+      ],
+      "description": "Validated and clamped actuator target provided to the command shaper."
+    },
+    {
+      "name": "validated_rate_limit",
+      "width": 8,
+      "source": "adaptive_aero_control_top_validation.validated_rate_limit",
+      "destinations": [
+        "adaptive_aero_control_top_command_shaper.validated_rate_limit"
+      ],
+      "description": "Validated rate-limit control provided to the command shaper."
+    },
+    {
+      "name": "validated_mode_bits",
+      "width": 4,
+      "source": "adaptive_aero_control_top_validation.validated_mode_bits",
+      "destinations": [
+        "adaptive_aero_control_top_command_shaper.validated_mode_bits"
+      ],
+      "description": "Validated mode bits provided to the command shaper."
+    },
+    {
+      "name": "validation_fault_not_armed",
+      "width": 1,
+      "source": "adaptive_aero_control_top_validation.validation_fault_not_armed",
+      "destinations": [
+        "adaptive_aero_control_top_fault_manager.validation_fault_not_armed"
+      ],
+      "description": "Validation fault indicating the system was not armed when response qualification occurred."
+    },
+    {
+      "name": "status_busy",
+      "width": 1,
+      "source": "adaptive_aero_control_top_fault_manager.status_busy",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_busy"
+      ],
+      "description": "Busy status returned to the MMIO readback block."
+    },
+    {
+      "name": "status_valid_response",
+      "width": 1,
+      "source": "adaptive_aero_control_top_fault_manager.status_valid_response",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_valid_response"
+      ],
+      "description": "Valid-response status returned to the MMIO readback block."
+    },
+    {
+      "name": "status_stale_data",
+      "width": 1,
+      "source": "adaptive_aero_control_top_fault_manager.status_stale_data",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_stale_data"
+      ],
+      "description": "Stale-data status returned to the MMIO readback block."
+    },
+    {
+      "name": "status_timeout",
+      "width": 1,
+      "source": "adaptive_aero_control_top_fault_manager.status_timeout",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_timeout"
+      ],
+      "description": "Timeout status returned to the MMIO readback block."
+    },
+    {
+      "name": "status_invalid_response",
+      "width": 1,
+      "source": "adaptive_aero_control_top_fault_manager.status_invalid_response",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_invalid_response"
+      ],
+      "description": "Invalid-response status returned to the MMIO readback block."
+    },
+    {
+      "name": "status_fallback_active",
+      "width": 1,
+      "source": "adaptive_aero_control_top_fault_manager.status_fallback_active",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_fallback_active"
+      ],
+      "description": "Inhibit/fallback-active status returned to the MMIO readback block."
+    },
+    {
+      "name": "status_last_sequence",
+      "width": 8,
+      "source": "adaptive_aero_control_top_fault_manager.status_last_sequence",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_last_sequence"
+      ],
+      "description": "Last accepted sequence number returned to the MMIO readback block."
+    },
+    {
+      "name": "status_last_fault_code",
+      "width": 4,
+      "source": "adaptive_aero_control_top_fault_manager.status_last_fault_code",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_last_fault_code"
+      ],
+      "description": "Last fault code returned to the MMIO readback block."
+    },
+    {
+      "name": "status_response_age",
+      "width": 16,
+      "source": "adaptive_aero_control_top_fault_manager.status_response_age",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.status_response_age"
+      ],
+      "description": "Response age returned to the MMIO readback block."
+    },
+    {
+      "name": "fault_latched",
+      "width": 16,
+      "source": "adaptive_aero_control_top_fault_manager.fault_latched",
+      "destinations": [
+        "adaptive_aero_control_top_mmio.fault_latched"
+      ],
+      "description": "Latched fault summary returned to the MMIO readback block."
+    }
+  ],
+  "signal_ownership": [
+    {
+      "signal": "cfg_enable",
+      "owner": "adaptive_aero_control_top_mmio.cfg_enable"
+    },
+    {
+      "signal": "cfg_arm",
+      "owner": "adaptive_aero_control_top_mmio.cfg_arm"
+    },
+    {
+      "signal": "cfg_clear_faults",
+      "owner": "adaptive_aero_control_top_mmio.cfg_clear_faults"
+    },
+    {
+      "signal": "cfg_request_sequence",
+      "owner": "adaptive_aero_control_top_mmio.cfg_request_sequence"
+    },
+    {
+      "signal": "cfg_response_sequence",
+      "owner": "adaptive_aero_control_top_mmio.cfg_response_sequence"
+    },
+    {
+      "signal": "cfg_timeout_threshold",
+      "owner": "adaptive_aero_control_top_mmio.cfg_timeout_threshold"
+    },
+    {
+      "signal": "cfg_clamp_min",
+      "owner": "adaptive_aero_control_top_mmio.cfg_clamp_min"
+    },
+    {
+      "signal": "cfg_clamp_max",
+      "owner": "adaptive_aero_control_top_mmio.cfg_clamp_max"
+    },
+    {
+      "signal": "cfg_fallback_mode",
+      "owner": "adaptive_aero_control_top_mmio.cfg_fallback_mode"
+    },
+    {
+      "signal": "host_req_valid",
+      "owner": "adaptive_aero_control_top_transport.host_req_valid"
+    },
+    {
+      "signal": "host_req_data",
+      "owner": "adaptive_aero_control_top_transport.host_req_data"
+    },
+    {
+      "signal": "host_rsp_ready",
+      "owner": "adaptive_aero_control_top_transport.host_rsp_ready"
+    },
+    {
+      "signal": "tx_busy",
+      "owner": "adaptive_aero_control_top_transport.tx_busy"
+    },
+    {
+      "signal": "tx_expected_sequence",
+      "owner": "adaptive_aero_control_top_transport.tx_expected_sequence"
+    },
+    {
+      "signal": "tx_request_issued",
+      "owner": "adaptive_aero_control_top_transport.tx_request_issued"
+    },
+    {
+      "signal": "tx_response_valid",
+      "owner": "adaptive_aero_control_top_transport.tx_response_valid"
+    },
+    {
+      "signal": "tx_response_sequence",
+      "owner": "adaptive_aero_control_top_transport.tx_response_sequence"
+    },
+    {
+      "signal": "tx_response_age",
+      "owner": "adaptive_aero_control_top_transport.tx_response_age"
+    },
+    {
+      "signal": "tx_timeout_fault",
+      "owner": "adaptive_aero_control_top_transport.tx_timeout_fault"
+    },
+    {
+      "signal": "tx_stale_fault",
+      "owner": "adaptive_aero_control_top_transport.tx_stale_fault"
+    },
+    {
+      "signal": "tx_invalid_response_fault",
+      "owner": "adaptive_aero_control_top_transport.tx_invalid_response_fault"
+    },
+    {
+      "signal": "tx_last_sequence",
+      "owner": "adaptive_aero_control_top_transport.tx_last_sequence"
+    },
+    {
+      "signal": "tx_last_fault_code",
+      "owner": "adaptive_aero_control_top_transport.tx_last_fault_code"
+    },
+    {
+      "signal": "valid_response",
+      "owner": "adaptive_aero_control_top_validation.valid_response"
+    },
+    {
+      "signal": "validated_target",
+      "owner": "adaptive_aero_control_top_validation.validated_target"
+    },
+    {
+      "signal": "validated_rate_limit",
+      "owner": "adaptive_aero_control_top_validation.validated_rate_limit"
+    },
+    {
+      "signal": "validated_mode_bits",
+      "owner": "adaptive_aero_control_top_validation.validated_mode_bits"
+    },
+    {
+      "signal": "validation_fault_invalid_response",
+      "owner": "adaptive_aero_control_top_validation.validation_fault_invalid_response"
+    },
+    {
+      "signal": "validation_fault_stale_data",
+      "owner": "adaptive_aero_control_top_validation.validation_fault_stale_data"
+    },
+    {
+      "signal": "validation_fault_timeout",
+      "owner": "adaptive_aero_control_top_validation.validation_fault_timeout"
+    },
+    {
+      "signal": "validation_fault_not_armed",
+      "owner": "adaptive_aero_control_top_validation.validation_fault_not_armed"
+    },
+    {
+      "signal": "cmd_valid",
+      "owner": "adaptive_aero_control_top_command_shaper.cmd_valid"
+    },
+    {
+      "signal": "cmd_target_sat",
+      "owner": "adaptive_aero_control_top_command_shaper.cmd_target_sat"
+    },
+    {
+      "signal": "cmd_rate_limit_sat",
+      "owner": "adaptive_aero_control_top_command_shaper.cmd_rate_limit_sat"
+    },
+    {
+      "signal": "cmd_mode_bits_sat",
+      "owner": "adaptive_aero_control_top_command_shaper.cmd_mode_bits_sat"
+    },
+    {
+      "signal": "aero_cmd_out",
+      "owner": "adaptive_aero_control_top_command_shaper.aero_cmd_out"
+    },
+    {
+      "signal": "fault_latched",
+      "owner": "adaptive_aero_control_top_fault_manager.fault_latched"
+    },
+    {
+      "signal": "status_busy",
+      "owner": "adaptive_aero_control_top_fault_manager.status_busy"
+    },
+    {
+      "signal": "status_valid_response",
+      "owner": "adaptive_aero_control_top_fault_manager.status_valid_response"
+    },
+    {
+      "signal": "status_stale_data",
+      "owner": "adaptive_aero_control_top_fault_manager.status_stale_data"
+    },
+    {
+      "signal": "status_timeout",
+      "owner": "adaptive_aero_control_top_fault_manager.status_timeout"
+    },
+    {
+      "signal": "status_invalid_response",
+      "owner": "adaptive_aero_control_top_fault_manager.status_invalid_response"
+    },
+    {
+      "signal": "status_fallback_active",
+      "owner": "adaptive_aero_control_top_fault_manager.status_fallback_active"
+    },
+    {
+      "signal": "status_last_sequence",
+      "owner": "adaptive_aero_control_top_fault_manager.status_last_sequence"
+    },
+    {
+      "signal": "status_last_fault_code",
+      "owner": "adaptive_aero_control_top_fault_manager.status_last_fault_code"
+    },
+    {
+      "signal": "status_response_age",
+      "owner": "adaptive_aero_control_top_fault_manager.status_response_age"
+    },
+    {
+      "signal": "fault_out",
+      "owner": "adaptive_aero_control_top_fault_manager.fault_out"
+    },
+    {
+      "signal": "req_operating_point_id",
+      "owner": "adaptive_aero_control_top_mmio.cfg_request_sequence"
+    },
+    {
+      "signal": "ctrl_rdata",
+      "owner": "adaptive_aero_control_top_mmio.ctrl_rdata"
+    },
+    {
+      "signal": "ctrl_ready",
+      "owner": "adaptive_aero_control_top_mmio.ctrl_ready"
+    }
+  ],
+  "register_contract": {
+    "bus_type": "abstract",
+    "registers": [
+      {
+        "name": "CTRL0",
+        "addr": 0,
+        "access": "RW",
+        "width": 64,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "enable",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW"
+          },
+          {
+            "name": "arm",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RW"
+          },
+          {
+            "name": "clear_faults",
+            "lsb": 2,
+            "msb": 2,
+            "access": "W1P"
+          },
+          {
+            "name": "fallback_mode",
+            "lsb": 4,
+            "msb": 5,
+            "access": "RW"
+          },
+          {
+            "name": "request_sequence",
+            "lsb": 8,
+            "msb": 15,
+            "access": "RW"
+          },
+          {
+            "name": "response_sequence",
+            "lsb": 16,
+            "msb": 23,
+            "access": "RW"
+          }
+        ],
+        "description": "Primary control register containing enable, arm, clear_faults, fallback_mode, request_sequence, and response_sequence."
+      },
+      {
+        "name": "CTRL1",
+        "addr": 1,
+        "access": "RW",
+        "width": 64,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "timeout_threshold",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW"
+          },
+          {
+            "name": "clamp_min",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RW"
+          },
+          {
+            "name": "clamp_max",
+            "lsb": 32,
+            "msb": 47,
+            "access": "RW"
+          }
+        ],
+        "description": "Timing and clamp configuration register."
+      },
+      {
+        "name": "STATUS0",
+        "addr": 2,
+        "access": "RO",
+        "width": 64,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "busy",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO"
+          },
+          {
+            "name": "valid_response",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO"
+          },
+          {
+            "name": "stale_data",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO"
+          },
+          {
+            "name": "timeout",
+            "lsb": 3,
+            "msb": 3,
+            "access": "RO"
+          },
+          {
+            "name": "invalid_response",
+            "lsb": 4,
+            "msb": 4,
+            "access": "RO"
+          },
+          {
+            "name": "fallback_active",
+            "lsb": 5,
+            "msb": 5,
+            "access": "RO"
+          },
+          {
+            "name": "last_sequence",
+            "lsb": 8,
+            "msb": 15,
+            "access": "RO"
+          },
+          {
+            "name": "last_fault_code",
+            "lsb": 16,
+            "msb": 19,
+            "access": "RO"
+          },
+          {
+            "name": "response_age",
+            "lsb": 32,
+            "msb": 47,
+            "access": "RO"
+          }
+        ],
+        "description": "Live status and logging register."
+      },
+      {
+        "name": "FAULT0",
+        "addr": 3,
+        "access": "RO",
+        "width": 64,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "fault_latched",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RO"
+          }
+        ],
+        "description": "Latched fault summary register."
+      },
+      {
+        "name": "REQ0",
+        "addr": 4,
+        "access": "RW",
+        "width": 64,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "operating_point_id",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RW"
+          },
+          {
+            "name": "velocity_setpoint",
+            "lsb": 8,
+            "msb": 23,
+            "access": "RW"
+          },
+          {
+            "name": "geometry_hash",
+            "lsb": 24,
+            "msb": 55,
+            "access": "RW"
+          }
+        ],
+        "description": "Compact request descriptor register containing the metadata used to form the outbound host request frame."
+      },
+      {
+        "name": "REQ1",
+        "addr": 5,
+        "access": "RW",
+        "width": 64,
+        "reset": 0,
+        "fields": [
+          {
+            "name": "flow_summary",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW"
+          }
+        ],
+        "description": "Compact flow-condition summary register used to form the outbound host request frame."
+      }
+    ]
+  }
+}

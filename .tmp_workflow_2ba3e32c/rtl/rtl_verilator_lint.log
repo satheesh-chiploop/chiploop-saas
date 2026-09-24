@@ -1,0 +1,71 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.184 MB sources in 7 modules, into 0.054 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.021 s (elab=0.003, cvt=0.009, bld=0.000); cpu 0.021 s on 1 threads; allocated 32.352 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:59:12: Signal is not used: 'tx_expected_sequence'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   59 | wire [7:0] tx_expected_sequence;
+      |            ^~~~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:60:6: Signal is not used: 'tx_request_issued'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   60 | wire tx_request_issued;
+      |      ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:77:13: Signal is not used: 'cmd_target_sat'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   77 | wire [15:0] cmd_target_sat;
+      |             ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:78:12: Signal is not used: 'cmd_rate_limit_sat'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   78 | wire [7:0] cmd_rate_limit_sat;
+      |            ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:79:12: Signal is not used: 'cmd_mode_bits_sat'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   79 | wire [3:0] cmd_mode_bits_sat;
+      |            ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:80:13: Signal is not driven, nor used: 'rsp_output_target'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   80 | wire [15:0] rsp_output_target;
+      |             ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:81:12: Signal is not driven, nor used: 'rsp_rate_limit'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   81 | wire [7:0] rsp_rate_limit;
+      |            ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:82:12: Signal is not driven, nor used: 'rsp_mode_bits'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   82 | wire [3:0] rsp_mode_bits;
+      |            ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:83:12: Signal is not driven, nor used: 'adaptive_aero_control_top_transport_tx_last_fault_code'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   83 | wire [3:0] adaptive_aero_control_top_transport_tx_last_fault_code;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:84:12: Signal is not driven, nor used: 'adaptive_aero_control_top_transport_tx_last_sequence'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   84 | wire [7:0] adaptive_aero_control_top_transport_tx_last_sequence;
+      |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top_fault_manager.v:30:7: Signal is not used: 'cfg_enable'
+                                                                     : ... note: In instance 'adaptive_aero_control_top.u_fault_manager'
+   30 | input cfg_enable;
+      |       ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top_fault_manager.v:31:7: Signal is not used: 'cfg_arm'
+                                                                     : ... note: In instance 'adaptive_aero_control_top.u_fault_manager'
+   31 | input cfg_arm;
+      |       ^~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top_mmio.v:35:14: Bits of signal are not used: 'ctrl_wdata'[63:56]
+                                                             : ... note: In instance 'adaptive_aero_control_top.u_mmio'
+   35 | input [63:0] ctrl_wdata;
+      |              ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top_transport.v:49:15: Bits of signal are not used: 'host_rsp_data'[127:20,7:0]
+                                                                  : ... note: In instance 'adaptive_aero_control_top.u_transport'
+   49 | input [127:0] host_rsp_data;
+      |               ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top_transport.v:63:5: Signal is not used: 'request_accepted'
+                                                                 : ... note: In instance 'adaptive_aero_control_top.u_transport'
+   63 | reg request_accepted;
+      |     ^~~~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

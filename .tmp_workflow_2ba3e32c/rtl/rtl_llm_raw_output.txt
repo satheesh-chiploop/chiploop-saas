@@ -1,0 +1,795 @@
+---BEGIN adaptive_aero_control_top_mmio.v---
+module adaptive_aero_control_top_mmio (
+    clk,
+    rst_n,
+    ctrl_addr,
+    ctrl_wdata,
+    ctrl_valid,
+    ctrl_write,
+    ctrl_rdata,
+    ctrl_ready,
+    cfg_enable,
+    cfg_arm,
+    cfg_clear_faults,
+    cfg_request_sequence,
+    cfg_response_sequence,
+    cfg_timeout_threshold,
+    cfg_clamp_min,
+    cfg_clamp_max,
+    status_busy,
+    status_valid_response,
+    status_stale_data,
+    status_timeout,
+    status_invalid_response,
+    status_last_sequence,
+    status_last_fault_code,
+    status_response_age,
+    fault_latched,
+    req_operating_point_id,
+    req_velocity_setpoint,
+    req_geometry_hash,
+    req_flow_summary
+);
+input clk;
+input rst_n;
+input [7:0] ctrl_addr;
+input [63:0] ctrl_wdata;
+input ctrl_valid;
+input ctrl_write;
+output reg [63:0] ctrl_rdata;
+output reg ctrl_ready;
+output reg cfg_enable;
+output reg cfg_arm;
+output reg cfg_clear_faults;
+output reg [7:0] cfg_request_sequence;
+output reg [7:0] cfg_response_sequence;
+output reg [15:0] cfg_timeout_threshold;
+output reg [15:0] cfg_clamp_min;
+output reg [15:0] cfg_clamp_max;
+input status_busy;
+input status_valid_response;
+input status_stale_data;
+input status_timeout;
+input status_invalid_response;
+input [7:0] status_last_sequence;
+input [3:0] status_last_fault_code;
+input [15:0] status_response_age;
+input [15:0] fault_latched;
+output reg [7:0] req_operating_point_id;
+output reg [15:0] req_velocity_setpoint;
+output reg [31:0] req_geometry_hash;
+output reg [31:0] req_flow_summary;
+
+localparam [7:0] ADDR_CTRL0  = 8'h00;
+localparam [7:0] ADDR_CTRL1  = 8'h01;
+localparam [7:0] ADDR_STATUS0 = 8'h02;
+localparam [7:0] ADDR_FAULT0 = 8'h03;
+localparam [7:0] ADDR_REQ0   = 8'h04;
+localparam [7:0] ADDR_REQ1   = 8'h05;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        cfg_enable <= 1'b0;
+        cfg_arm <= 1'b0;
+        cfg_clear_faults <= 1'b0;
+        cfg_request_sequence <= 8'h00;
+        cfg_response_sequence <= 8'h00;
+        cfg_timeout_threshold <= 16'h0010;
+        cfg_clamp_min <= 16'h0000;
+        cfg_clamp_max <= 16'h7FFF;
+        req_operating_point_id <= 8'h00;
+        req_velocity_setpoint <= 16'h0000;
+        req_geometry_hash <= 32'h00000000;
+        req_flow_summary <= 32'h00000000;
+        ctrl_ready <= 1'b1;
+        ctrl_rdata <= 64'h0000000000000000;
+    end else begin
+        cfg_clear_faults <= 1'b0;
+        ctrl_ready <= ctrl_valid;
+        if (ctrl_valid && ctrl_write) begin
+            case (ctrl_addr)
+                ADDR_CTRL0: begin
+                    cfg_enable <= ctrl_wdata[0];
+                    cfg_arm <= ctrl_wdata[1];
+                    cfg_clear_faults <= ctrl_wdata[2];
+                    cfg_request_sequence <= ctrl_wdata[15:8];
+                    cfg_response_sequence <= ctrl_wdata[23:16];
+                end
+                ADDR_CTRL1: begin
+                    cfg_timeout_threshold <= ctrl_wdata[15:0];
+                    cfg_clamp_min <= ctrl_wdata[31:16];
+                    cfg_clamp_max <= ctrl_wdata[47:32];
+                end
+                ADDR_REQ0: begin
+                    req_operating_point_id <= ctrl_wdata[7:0];
+                    req_velocity_setpoint <= ctrl_wdata[23:8];
+                    req_geometry_hash <= ctrl_wdata[55:24];
+                end
+                ADDR_REQ1: begin
+                    req_flow_summary <= ctrl_wdata[31:0];
+                end
+                default: begin
+                end
+            endcase
+        end
+        case (ctrl_addr)
+            ADDR_CTRL0: ctrl_rdata <= {40'h0000000000, cfg_response_sequence, cfg_request_sequence, 5'h00, cfg_clear_faults, cfg_arm, cfg_enable};
+            ADDR_CTRL1: ctrl_rdata <= {17'h00000, cfg_clamp_max, cfg_clamp_min, cfg_timeout_threshold, 16'h0000};
+            ADDR_STATUS0: ctrl_rdata <= {16'h0000, status_response_age, 12'h000, status_last_fault_code, 4'h0, status_last_sequence, 3'b000, status_invalid_response, status_timeout, status_stale_data, status_valid_response, status_busy};
+            ADDR_FAULT0: ctrl_rdata <= {48'h000000000000, fault_latched};
+            ADDR_REQ0: ctrl_rdata <= {8'h00, req_geometry_hash, req_velocity_setpoint, req_operating_point_id};
+            ADDR_REQ1: ctrl_rdata <= {32'h00000000, req_flow_summary};
+            default: ctrl_rdata <= 64'h0000000000000000;
+        endcase
+    end
+end
+endmodule
+---END adaptive_aero_control_top_mmio.v---
+
+---BEGIN adaptive_aero_control_top_transport.v---
+module adaptive_aero_control_top_transport (
+    clk,
+    rst_n,
+    cfg_enable,
+    cfg_arm,
+    cfg_clear_faults,
+    cfg_request_sequence,
+    cfg_response_sequence,
+    cfg_timeout_threshold,
+    req_operating_point_id,
+    req_velocity_setpoint,
+    req_geometry_hash,
+    req_flow_summary,
+    host_req_valid,
+    host_req_ready,
+    host_req_data,
+    host_rsp_valid,
+    host_rsp_ready,
+    host_rsp_data,
+    tx_busy,
+    tx_expected_sequence,
+    tx_request_issued,
+    tx_response_valid,
+    tx_response_sequence,
+    tx_response_age,
+    tx_timeout_fault,
+    tx_stale_fault,
+    tx_invalid_response_fault,
+    tx_last_sequence,
+    tx_last_fault_code
+);
+input clk;
+input rst_n;
+input cfg_enable;
+input cfg_arm;
+input cfg_clear_faults;
+input [7:0] cfg_request_sequence;
+input [7:0] cfg_response_sequence;
+input [15:0] cfg_timeout_threshold;
+input [7:0] req_operating_point_id;
+input [15:0] req_velocity_setpoint;
+input [31:0] req_geometry_hash;
+input [31:0] req_flow_summary;
+output reg host_req_valid;
+input host_req_ready;
+output reg [127:0] host_req_data;
+input host_rsp_valid;
+output reg host_rsp_ready;
+input [127:0] host_rsp_data;
+output reg tx_busy;
+output reg [7:0] tx_expected_sequence;
+output reg tx_request_issued;
+output reg tx_response_valid;
+output reg [7:0] tx_response_sequence;
+output reg [15:0] tx_response_age;
+output reg tx_timeout_fault;
+output reg tx_stale_fault;
+output reg tx_invalid_response_fault;
+output reg [7:0] tx_last_sequence;
+output reg [3:0] tx_last_fault_code;
+
+reg [15:0] age_count;
+reg request_pending;
+reg request_accepted;
+reg [7:0] last_rsp_seq;
+reg [3:0] last_fault_code_r;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        host_req_valid <= 1'b0;
+        host_req_data <= 128'h00000000000000000000000000000000;
+        host_rsp_ready <= 1'b0;
+        tx_busy <= 1'b0;
+        tx_expected_sequence <= 8'h00;
+        tx_request_issued <= 1'b0;
+        tx_response_valid <= 1'b0;
+        tx_response_sequence <= 8'h00;
+        tx_response_age <= 16'h0000;
+        tx_timeout_fault <= 1'b0;
+        tx_stale_fault <= 1'b0;
+        tx_invalid_response_fault <= 1'b0;
+        tx_last_sequence <= 8'h00;
+        tx_last_fault_code <= 4'h0;
+        age_count <= 16'h0000;
+        request_pending <= 1'b0;
+        request_accepted <= 1'b0;
+        last_rsp_seq <= 8'h00;
+        last_fault_code_r <= 4'h0;
+    end else begin
+        if (cfg_clear_faults) begin
+            tx_timeout_fault <= 1'b0;
+            tx_stale_fault <= 1'b0;
+            tx_invalid_response_fault <= 1'b0;
+            last_fault_code_r <= 4'h0;
+        end
+        tx_request_issued <= 1'b0;
+        tx_response_valid <= 1'b0;
+        tx_timeout_fault <= tx_timeout_fault;
+        tx_stale_fault <= tx_stale_fault;
+        tx_invalid_response_fault <= tx_invalid_response_fault;
+        if (!cfg_enable || !cfg_arm) begin
+            host_req_valid <= 1'b0;
+            host_rsp_ready <= 1'b0;
+            tx_busy <= 1'b0;
+            request_pending <= 1'b0;
+            request_accepted <= 1'b0;
+            age_count <= 16'h0000;
+            tx_response_age <= 16'h0000;
+            tx_expected_sequence <= cfg_request_sequence;
+            tx_last_sequence <= last_rsp_seq;
+            tx_last_fault_code <= last_fault_code_r;
+        end else begin
+            tx_busy <= request_pending | host_req_valid;
+            tx_expected_sequence <= cfg_response_sequence;
+            host_rsp_ready <= request_pending & ~tx_timeout_fault;
+            if (!request_pending && !host_req_valid) begin
+                host_req_data <= {req_flow_summary, req_geometry_hash, req_velocity_setpoint, req_operating_point_id, cfg_request_sequence, cfg_response_sequence, 48'h000000000000};
+                host_req_valid <= 1'b1;
+                request_pending <= 1'b1;
+                age_count <= 16'h0000;
+                tx_response_age <= 16'h0000;
+                tx_request_issued <= 1'b1;
+            end else if (host_req_valid && host_req_ready) begin
+                host_req_valid <= 1'b0;
+                request_pending <= 1'b1;
+                request_accepted <= 1'b1;
+            end else if (request_pending) begin
+                if (age_count != 16'hFFFF)
+                    age_count <= age_count + 16'h0001;
+                tx_response_age <= age_count + 16'h0001;
+                if ((cfg_timeout_threshold != 16'h0000) && (age_count + 16'h0001 > cfg_timeout_threshold)) begin
+                    tx_timeout_fault <= 1'b1;
+                    tx_stale_fault <= 1'b1;
+                    last_fault_code_r <= 4'h1;
+                    tx_last_fault_code <= 4'h1;
+                    host_req_valid <= 1'b0;
+                    request_pending <= 1'b0;
+                end
+                if (host_rsp_valid && host_rsp_ready) begin
+                    tx_response_sequence <= host_rsp_data[15:8];
+                    tx_response_valid <= (host_rsp_data[15:8] == cfg_response_sequence) && (host_rsp_data[19:16] == 4'h0) && !tx_timeout_fault;
+                    last_rsp_seq <= host_rsp_data[15:8];
+                    tx_last_sequence <= host_rsp_data[15:8];
+                    if (host_rsp_data[15:8] != cfg_response_sequence) begin
+                        tx_invalid_response_fault <= 1'b1;
+                        last_fault_code_r <= 4'h3;
+                        tx_last_fault_code <= 4'h3;
+                    end else if (host_rsp_data[19:16] != 4'h0) begin
+                        tx_invalid_response_fault <= 1'b1;
+                        last_fault_code_r <= 4'h2;
+                        tx_last_fault_code <= 4'h2;
+                    end else begin
+                        last_fault_code_r <= 4'h0;
+                        tx_last_fault_code <= 4'h0;
+                    end
+                    request_pending <= 1'b0;
+                    host_req_valid <= 1'b0;
+                    host_rsp_ready <= 1'b0;
+                end
+            end else begin
+                host_req_valid <= 1'b0;
+                host_rsp_ready <= 1'b0;
+            end
+        end
+        if (cfg_clear_faults && !request_pending && !host_req_valid) begin
+            tx_last_fault_code <= 4'h0;
+            last_fault_code_r <= 4'h0;
+        end
+    end
+end
+endmodule
+---END adaptive_aero_control_top_transport.v---
+
+---BEGIN adaptive_aero_control_top_validation.v---
+module adaptive_aero_control_top_validation (
+    clk,
+    rst_n,
+    cfg_enable,
+    cfg_arm,
+    cfg_clamp_min,
+    cfg_clamp_max,
+    tx_response_valid,
+    tx_response_sequence,
+    tx_response_age,
+    tx_stale_fault,
+    tx_timeout_fault,
+    tx_invalid_response_fault,
+    rsp_status_code,
+    rsp_output_target,
+    rsp_rate_limit,
+    rsp_mode_bits,
+    cfg_response_sequence,
+    valid_response,
+    validated_target,
+    validated_rate_limit,
+    validated_mode_bits,
+    validation_fault_invalid_response,
+    validation_fault_stale_data,
+    validation_fault_timeout,
+    validation_fault_not_armed
+);
+input clk;
+input rst_n;
+input cfg_enable;
+input cfg_arm;
+input [15:0] cfg_clamp_min;
+input [15:0] cfg_clamp_max;
+input tx_response_valid;
+input [7:0] tx_response_sequence;
+input [15:0] tx_response_age;
+input tx_stale_fault;
+input tx_timeout_fault;
+input tx_invalid_response_fault;
+input [3:0] rsp_status_code;
+input [15:0] rsp_output_target;
+input [7:0] rsp_rate_limit;
+input [3:0] rsp_mode_bits;
+input [7:0] cfg_response_sequence;
+output reg valid_response;
+output reg [15:0] validated_target;
+output reg [7:0] validated_rate_limit;
+output reg [3:0] validated_mode_bits;
+output reg validation_fault_invalid_response;
+output reg validation_fault_stale_data;
+output reg validation_fault_timeout;
+output reg validation_fault_not_armed;
+
+reg [15:0] clamped_target;
+reg [15:0] min_v;
+reg [15:0] max_v;
+
+always @(*) begin
+    min_v = cfg_clamp_min;
+    max_v = cfg_clamp_max;
+    if (min_v > max_v) begin
+        min_v = cfg_clamp_max;
+        max_v = cfg_clamp_min;
+    end
+    clamped_target = rsp_output_target;
+    if (clamped_target < min_v)
+        clamped_target = min_v;
+    if (clamped_target > max_v)
+        clamped_target = max_v;
+end
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        valid_response <= 1'b0;
+        validated_target <= 16'h0000;
+        validated_rate_limit <= 8'h00;
+        validated_mode_bits <= 4'h0;
+        validation_fault_invalid_response <= 1'b0;
+        validation_fault_stale_data <= 1'b0;
+        validation_fault_timeout <= 1'b0;
+        validation_fault_not_armed <= 1'b0;
+    end else begin
+        valid_response <= 1'b0;
+        if (!cfg_enable || !cfg_arm) begin
+            validation_fault_not_armed <= 1'b1;
+        end else begin
+            if (tx_response_valid && (tx_response_sequence == cfg_response_sequence) && (rsp_status_code == 4'h0) && !tx_stale_fault && !tx_timeout_fault && !tx_invalid_response_fault && (tx_response_age <= 16'hFFFE)) begin
+                valid_response <= 1'b1;
+                validated_target <= clamped_target;
+                validated_rate_limit <= rsp_rate_limit;
+                validated_mode_bits <= rsp_mode_bits;
+            end
+            if (tx_invalid_response_fault || (tx_response_valid && (rsp_status_code != 4'h0))) begin
+                validation_fault_invalid_response <= 1'b1;
+            end
+            if (tx_stale_fault || (tx_response_valid && (tx_response_age > 16'hFFFE))) begin
+                validation_fault_stale_data <= 1'b1;
+            end
+            if (tx_timeout_fault) begin
+                validation_fault_timeout <= 1'b1;
+            end
+            if (!cfg_enable || !cfg_arm) begin
+                validation_fault_not_armed <= 1'b1;
+            end
+        end
+    end
+end
+endmodule
+---END adaptive_aero_control_top_validation.v---
+
+---BEGIN adaptive_aero_control_top_command_shaper.v---
+module adaptive_aero_control_top_command_shaper (
+    clk,
+    rst_n,
+    valid_response,
+    validated_target,
+    validated_rate_limit,
+    validated_mode_bits,
+    cfg_clamp_min,
+    cfg_clamp_max,
+    aero_cmd_out,
+    cmd_valid,
+    cmd_target_sat,
+    cmd_rate_limit_sat,
+    cmd_mode_bits_sat
+);
+input clk;
+input rst_n;
+input valid_response;
+input [15:0] validated_target;
+input [7:0] validated_rate_limit;
+input [3:0] validated_mode_bits;
+input [15:0] cfg_clamp_min;
+input [15:0] cfg_clamp_max;
+output reg [31:0] aero_cmd_out;
+output reg cmd_valid;
+output reg [15:0] cmd_target_sat;
+output reg [7:0] cmd_rate_limit_sat;
+output reg [3:0] cmd_mode_bits_sat;
+
+reg [15:0] sat_min;
+reg [15:0] sat_max;
+reg [15:0] target_tmp;
+
+always @(*) begin
+    sat_min = cfg_clamp_min;
+    sat_max = cfg_clamp_max;
+    if (sat_min > sat_max) begin
+        sat_min = cfg_clamp_max;
+        sat_max = cfg_clamp_min;
+    end
+    target_tmp = validated_target;
+    if (target_tmp < sat_min)
+        target_tmp = sat_min;
+    if (target_tmp > sat_max)
+        target_tmp = sat_max;
+end
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        aero_cmd_out <= 32'h00000000;
+        cmd_valid <= 1'b0;
+        cmd_target_sat <= 16'h0000;
+        cmd_rate_limit_sat <= 8'h00;
+        cmd_mode_bits_sat <= 4'h0;
+    end else begin
+        if (valid_response) begin
+            cmd_valid <= 1'b1;
+            cmd_target_sat <= target_tmp;
+            cmd_rate_limit_sat <= validated_rate_limit;
+            cmd_mode_bits_sat <= validated_mode_bits;
+            aero_cmd_out <= {validated_mode_bits, validated_rate_limit, target_tmp};
+        end else begin
+            cmd_valid <= 1'b0;
+        end
+    end
+end
+endmodule
+---END adaptive_aero_control_top_command_shaper.v---
+
+---BEGIN adaptive_aero_control_top_fault_manager.v---
+module adaptive_aero_control_top_fault_manager (
+    clk,
+    rst_n,
+    cfg_clear_faults,
+    cfg_enable,
+    cfg_arm,
+    tx_busy,
+    valid_response,
+    validation_fault_invalid_response,
+    validation_fault_stale_data,
+    validation_fault_timeout,
+    validation_fault_not_armed,
+    tx_last_sequence,
+    tx_last_fault_code,
+    tx_response_age,
+    fault_latched,
+    status_busy,
+    status_valid_response,
+    status_stale_data,
+    status_timeout,
+    status_invalid_response,
+    status_last_sequence,
+    status_last_fault_code,
+    status_response_age,
+    fault_out
+);
+input clk;
+input rst_n;
+input cfg_clear_faults;
+input cfg_enable;
+input cfg_arm;
+input tx_busy;
+input valid_response;
+input validation_fault_invalid_response;
+input validation_fault_stale_data;
+input validation_fault_timeout;
+input validation_fault_not_armed;
+input [7:0] tx_last_sequence;
+input [3:0] tx_last_fault_code;
+input [15:0] tx_response_age;
+output reg [15:0] fault_latched;
+output reg status_busy;
+output reg status_valid_response;
+output reg status_stale_data;
+output reg status_timeout;
+output reg status_invalid_response;
+output reg [7:0] status_last_sequence;
+output reg [3:0] status_last_fault_code;
+output reg [15:0] status_response_age;
+output reg [15:0] fault_out;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        fault_latched <= 16'h0000;
+        status_busy <= 1'b0;
+        status_valid_response <= 1'b0;
+        status_stale_data <= 1'b0;
+        status_timeout <= 1'b0;
+        status_invalid_response <= 1'b0;
+        status_last_sequence <= 8'h00;
+        status_last_fault_code <= 4'h0;
+        status_response_age <= 16'h0000;
+        fault_out <= 16'h0000;
+    end else begin
+        status_busy <= tx_busy;
+        status_valid_response <= valid_response;
+        status_stale_data <= validation_fault_stale_data;
+        status_timeout <= validation_fault_timeout;
+        status_invalid_response <= validation_fault_invalid_response;
+        status_last_sequence <= tx_last_sequence;
+        status_last_fault_code <= tx_last_fault_code;
+        status_response_age <= tx_response_age;
+        if (validation_fault_invalid_response || validation_fault_stale_data || validation_fault_timeout || validation_fault_not_armed) begin
+            fault_latched[0] <= validation_fault_not_armed;
+            fault_latched[1] <= validation_fault_invalid_response;
+            fault_latched[2] <= validation_fault_stale_data;
+            fault_latched[3] <= validation_fault_timeout;
+            fault_latched[15:4] <= fault_latched[15:4];
+        end else if (cfg_clear_faults && !tx_busy) begin
+            fault_latched <= 16'h0000;
+        end else if (valid_response) begin
+            fault_latched[0] <= fault_latched[0];
+            fault_latched[1] <= fault_latched[1];
+            fault_latched[2] <= fault_latched[2];
+            fault_latched[3] <= fault_latched[3];
+        end
+        fault_out <= fault_latched | {12'h000, validation_fault_not_armed, validation_fault_invalid_response, validation_fault_stale_data, validation_fault_timeout};
+    end
+end
+endmodule
+---END adaptive_aero_control_top_fault_manager.v---
+
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    clk,
+    rst_n,
+    ctrl_addr,
+    ctrl_wdata,
+    ctrl_valid,
+    ctrl_write,
+    ctrl_rdata,
+    ctrl_ready,
+    host_req_valid,
+    host_req_ready,
+    host_req_data,
+    host_rsp_valid,
+    host_rsp_ready,
+    host_rsp_data,
+    aero_cmd_out,
+    cmd_valid,
+    fault_out
+);
+input clk;
+input rst_n;
+input [7:0] ctrl_addr;
+input [63:0] ctrl_wdata;
+input ctrl_valid;
+input ctrl_write;
+output [63:0] ctrl_rdata;
+output ctrl_ready;
+output host_req_valid;
+input host_req_ready;
+output [127:0] host_req_data;
+input host_rsp_valid;
+output host_rsp_ready;
+input [127:0] host_rsp_data;
+output [31:0] aero_cmd_out;
+output cmd_valid;
+output [15:0] fault_out;
+
+wire cfg_enable;
+wire cfg_arm;
+wire cfg_clear_faults;
+wire [7:0] cfg_request_sequence;
+wire [7:0] cfg_response_sequence;
+wire [15:0] cfg_timeout_threshold;
+wire [15:0] cfg_clamp_min;
+wire [15:0] cfg_clamp_max;
+wire status_busy;
+wire status_valid_response;
+wire status_stale_data;
+wire status_timeout;
+wire status_invalid_response;
+wire [7:0] status_last_sequence;
+wire [3:0] status_last_fault_code;
+wire [15:0] status_response_age;
+wire [15:0] fault_latched;
+wire [7:0] req_operating_point_id;
+wire [15:0] req_velocity_setpoint;
+wire [31:0] req_geometry_hash;
+wire [31:0] req_flow_summary;
+wire tx_busy;
+wire [7:0] tx_expected_sequence;
+wire tx_request_issued;
+wire tx_response_valid;
+wire [7:0] tx_response_sequence;
+wire [15:0] tx_response_age;
+wire tx_timeout_fault;
+wire tx_stale_fault;
+wire tx_invalid_response_fault;
+wire [7:0] tx_last_sequence;
+wire [3:0] tx_last_fault_code;
+wire valid_response;
+wire [15:0] validated_target;
+wire [7:0] validated_rate_limit;
+wire [3:0] validated_mode_bits;
+wire validation_fault_invalid_response;
+wire validation_fault_stale_data;
+wire validation_fault_timeout;
+wire validation_fault_not_armed;
+wire [15:0] cmd_target_sat;
+wire [7:0] cmd_rate_limit_sat;
+wire [3:0] cmd_mode_bits_sat;
+
+adaptive_aero_control_top_mmio u_mmio (
+    .clk(clk),
+    .rst_n(rst_n),
+    .ctrl_addr(ctrl_addr),
+    .ctrl_wdata(ctrl_wdata),
+    .ctrl_valid(ctrl_valid),
+    .ctrl_write(ctrl_write),
+    .ctrl_rdata(ctrl_rdata),
+    .ctrl_ready(ctrl_ready),
+    .cfg_enable(cfg_enable),
+    .cfg_arm(cfg_arm),
+    .cfg_clear_faults(cfg_clear_faults),
+    .cfg_request_sequence(cfg_request_sequence),
+    .cfg_response_sequence(cfg_response_sequence),
+    .cfg_timeout_threshold(cfg_timeout_threshold),
+    .cfg_clamp_min(cfg_clamp_min),
+    .cfg_clamp_max(cfg_clamp_max),
+    .status_busy(status_busy),
+    .status_valid_response(status_valid_response),
+    .status_stale_data(status_stale_data),
+    .status_timeout(status_timeout),
+    .status_invalid_response(status_invalid_response),
+    .status_last_sequence(status_last_sequence),
+    .status_last_fault_code(status_last_fault_code),
+    .status_response_age(status_response_age),
+    .fault_latched(fault_latched),
+    .req_operating_point_id(req_operating_point_id),
+    .req_velocity_setpoint(req_velocity_setpoint),
+    .req_geometry_hash(req_geometry_hash),
+    .req_flow_summary(req_flow_summary)
+);
+
+adaptive_aero_control_top_transport u_transport (
+    .clk(clk),
+    .rst_n(rst_n),
+    .cfg_enable(cfg_enable),
+    .cfg_arm(cfg_arm),
+    .cfg_clear_faults(cfg_clear_faults),
+    .cfg_request_sequence(cfg_request_sequence),
+    .cfg_response_sequence(cfg_response_sequence),
+    .cfg_timeout_threshold(cfg_timeout_threshold),
+    .req_operating_point_id(req_operating_point_id),
+    .req_velocity_setpoint(req_velocity_setpoint),
+    .req_geometry_hash(req_geometry_hash),
+    .req_flow_summary(req_flow_summary),
+    .host_req_valid(host_req_valid),
+    .host_req_ready(host_req_ready),
+    .host_req_data(host_req_data),
+    .host_rsp_valid(host_rsp_valid),
+    .host_rsp_ready(host_rsp_ready),
+    .host_rsp_data(host_rsp_data),
+    .tx_busy(tx_busy),
+    .tx_expected_sequence(tx_expected_sequence),
+    .tx_request_issued(tx_request_issued),
+    .tx_response_valid(tx_response_valid),
+    .tx_response_sequence(tx_response_sequence),
+    .tx_response_age(tx_response_age),
+    .tx_timeout_fault(tx_timeout_fault),
+    .tx_stale_fault(tx_stale_fault),
+    .tx_invalid_response_fault(tx_invalid_response_fault),
+    .tx_last_sequence(tx_last_sequence),
+    .tx_last_fault_code(tx_last_fault_code)
+);
+
+adaptive_aero_control_top_validation u_validation (
+    .clk(clk),
+    .rst_n(rst_n),
+    .cfg_enable(cfg_enable),
+    .cfg_arm(cfg_arm),
+    .cfg_clamp_min(cfg_clamp_min),
+    .cfg_clamp_max(cfg_clamp_max),
+    .tx_response_valid(tx_response_valid),
+    .tx_response_sequence(tx_response_sequence),
+    .tx_response_age(tx_response_age),
+    .tx_stale_fault(tx_stale_fault),
+    .tx_timeout_fault(tx_timeout_fault),
+    .tx_invalid_response_fault(tx_invalid_response_fault),
+    .rsp_status_code(tx_last_fault_code),
+    .rsp_output_target(req_velocity_setpoint),
+    .rsp_rate_limit(req_operating_point_id),
+    .rsp_mode_bits(req_geometry_hash[3:0]),
+    .cfg_response_sequence(cfg_response_sequence),
+    .valid_response(valid_response),
+    .validated_target(validated_target),
+    .validated_rate_limit(validated_rate_limit),
+    .validated_mode_bits(validated_mode_bits),
+    .validation_fault_invalid_response(validation_fault_invalid_response),
+    .validation_fault_stale_data(validation_fault_stale_data),
+    .validation_fault_timeout(validation_fault_timeout),
+    .validation_fault_not_armed(validation_fault_not_armed)
+);
+
+adaptive_aero_control_top_command_shaper u_command_shaper (
+    .clk(clk),
+    .rst_n(rst_n),
+    .valid_response(valid_response),
+    .validated_target(validated_target),
+    .validated_rate_limit(validated_rate_limit),
+    .validated_mode_bits(validated_mode_bits),
+    .cfg_clamp_min(cfg_clamp_min),
+    .cfg_clamp_max(cfg_clamp_max),
+    .aero_cmd_out(aero_cmd_out),
+    .cmd_valid(cmd_valid),
+    .cmd_target_sat(cmd_target_sat),
+    .cmd_rate_limit_sat(cmd_rate_limit_sat),
+    .cmd_mode_bits_sat(cmd_mode_bits_sat)
+);
+
+adaptive_aero_control_top_fault_manager u_fault_manager (
+    .clk(clk),
+    .rst_n(rst_n),
+    .cfg_clear_faults(cfg_clear_faults),
+    .cfg_enable(cfg_enable),
+    .cfg_arm(cfg_arm),
+    .tx_busy(tx_busy),
+    .valid_response(valid_response),
+    .validation_fault_invalid_response(validation_fault_invalid_response),
+    .validation_fault_stale_data(validation_fault_stale_data),
+    .validation_fault_timeout(validation_fault_timeout),
+    .validation_fault_not_armed(validation_fault_not_armed),
+    .tx_last_sequence(tx_last_sequence),
+    .tx_last_fault_code(tx_last_fault_code),
+    .tx_response_age(tx_response_age),
+    .fault_latched(fault_latched),
+    .status_busy(status_busy),
+    .status_valid_response(status_valid_response),
+    .status_stale_data(status_stale_data),
+    .status_timeout(status_timeout),
+    .status_invalid_response(status_invalid_response),
+    .status_last_sequence(status_last_sequence),
+    .status_last_fault_code(status_last_fault_code),
+    .status_response_age(status_response_age),
+    .fault_out(fault_out)
+);
+
+endmodule
+---END adaptive_aero_control_top.v---
