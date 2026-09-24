@@ -1,0 +1,77 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.163 MB sources in 7 modules, into 0.041 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.018 s (elab=0.002, cvt=0.009, bld=0.000); cpu 0.018 s on 1 threads; allocated 32.359 MB
+
+=== STDERR ===
+%Warning-WIDTHEXPAND: adaptive_aero_history_store.v:27:22: Operator ASSIGNDLY expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 113 bits.
+                                                         : ... note: In instance 'adaptive_aero_control_top.u_history_store'
+   27 |         mem[wr_addr] <= {96'd0, cfg_history_base, cfg_payload_base};
+      |                      ^~
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:27:13: Signal is not used: 'cfg_timeout_cycles'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   27 | wire [15:0] cfg_timeout_cycles;
+      |             ^~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:28:13: Signal is not used: 'cfg_stale_limit_cycles'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   28 | wire [15:0] cfg_stale_limit_cycles;
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:54:6: Signal is not used: 'history_busy'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   54 | wire history_busy;
+      |      ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:55:6: Signal is not used: 'payload_busy'
+                                                       : ... note: In instance 'adaptive_aero_control_top'
+   55 | wire payload_busy;
+      |      ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:56:13: Signal is not used: 'model_req_data_sh'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   56 | wire [31:0] model_req_data_sh;
+      |             ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:57:14: Signal is not used: 'model_rsp_data_sh'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   57 | wire [127:0] model_rsp_data_sh;
+      |              ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_history_store.v:13:13: Signal is not used: 'rd_data'
+                                                          : ... note: In instance 'adaptive_aero_control_top.u_history_store'
+   13 | reg [127:0] rd_data;
+      |             ^~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_mmio_csr.v:5:19: Bits of signal are not used: 'mmio_wdata'[31:16]
+                                                    : ... note: In instance 'adaptive_aero_control_top.u_mmio_csr'
+    5 |     input  [31:0] mmio_wdata,
+      |                   ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_safety_bounding.v:13:18: Signal is not used: 'reference_tilt_cmd'
+                                                            : ... note: In instance 'adaptive_aero_control_top.u_safety'
+   13 |     input  [7:0] reference_tilt_cmd,
+      |                  ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_safety_bounding.v:14:18: Signal is not used: 'reference_deflection_cmd'
+                                                            : ... note: In instance 'adaptive_aero_control_top.u_safety'
+   14 |     input  [7:0] reference_deflection_cmd,
+      |                  ^~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_surrogate_reference.v:5:18: Signal is not used: 'cfg_mode_select'
+                                                               : ... note: In instance 'adaptive_aero_control_top.u_surrogate_reference'
+    5 |     input  [1:0] cfg_mode_select,
+      |                  ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_surrogate_reference.v:9:20: Bits of signal are not used: 'response_data'[127:64]
+                                                               : ... note: In instance 'adaptive_aero_control_top.u_surrogate_reference'
+    9 |     input  [127:0] response_data,
+      |                    ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_surrogate_reference.v:27:11: Signal is not used: 'delta_tilt'
+                                                                : ... note: In instance 'adaptive_aero_control_top.u_surrogate_reference'
+   27 | reg [7:0] delta_tilt;
+      |           ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_surrogate_reference.v:28:11: Signal is not used: 'delta_defl'
+                                                                : ... note: In instance 'adaptive_aero_control_top.u_surrogate_reference'
+   28 | reg [7:0] delta_defl;
+      |           ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_transport.v:5:19: Signal is not used: 'cfg_surrogate_select'
+                                                     : ... note: In instance 'adaptive_aero_control_top.u_transport'
+    5 |     input         cfg_surrogate_select,
+      |                   ^~~~~~~~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

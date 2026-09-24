@@ -1,2 +1,0 @@
-Digital Spec Agent final contract repair failure:
-Spec contract validation failed: Every feature_contracts entry must compile to an executable checker. memory_wrapper_exposes_bulk_storage: Requirement lacks an explicit, fully bound expected signal map. Unresolved bindings: feature_full, feature_push_data, feature_write_en, history_full, history_push_data, history_write_en.

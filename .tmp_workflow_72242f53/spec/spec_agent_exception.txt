@@ -1,1 +1,0 @@
-ValueError('Spec contract validation failed: Feature contracts must contain behavior-discriminating checkers; full-domain min/max expectations accept every possible output and provide no verification coverage. Use exact expected values or a strict subrange derived from the feature scenario. Vacuous contracts: model_request_transport_direction: model_req_data')

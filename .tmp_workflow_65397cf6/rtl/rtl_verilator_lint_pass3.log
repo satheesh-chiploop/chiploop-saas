@@ -1,0 +1,83 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.167 MB sources in 7 modules, into 0.043 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.021 s (elab=0.003, cvt=0.010, bld=0.000); cpu 0.021 s on 1 threads; allocated 32.352 MB
+
+=== STDERR ===
+%Warning-WIDTHEXPAND: pass3/adaptive_aero_history_store.v:27:22: Operator ASSIGNDLY expects 128 bits on the Assign RHS, but Assign RHS's REPLICATE generates 121 bits.
+                                                               : ... note: In instance 'adaptive_aero_control_top.u_history_store'
+   27 |         mem[wr_addr] <= {88'd0, cfg_history_base, cfg_payload_base, 16'd0};
+      |                      ^~
+                      ... For warning description see https://verilator.org/warn/WIDTHEXPAND?v=5.047
+                      ... Use "/* verilator lint_off WIDTHEXPAND */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:137:6: Input port connection 'surrogate_tilt_cmd' expects 8 bits on the pin connection, but pin connection's REPLICATE generates 15 bits.
+                                                            : ... note: In instance 'adaptive_aero_control_top'
+  137 |     .surrogate_tilt_cmd({7'd0, surrogate_tilt_cmd}),
+      |      ^~~~~~~~~~~~~~~~~~
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:138:6: Input port connection 'surrogate_deflection_cmd' expects 8 bits on the pin connection, but pin connection's REPLICATE generates 15 bits.
+                                                            : ... note: In instance 'adaptive_aero_control_top'
+  138 |     .surrogate_deflection_cmd({7'd0, surrogate_deflection_cmd}),
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:139:6: Input port connection 'reference_tilt_cmd' expects 8 bits on the pin connection, but pin connection's REPLICATE generates 15 bits.
+                                                            : ... note: In instance 'adaptive_aero_control_top'
+  139 |     .reference_tilt_cmd({7'd0, reference_tilt_cmd}),
+      |      ^~~~~~~~~~~~~~~~~~
+%Warning-WIDTHTRUNC: pass3/adaptive_aero_control_top.v:140:6: Input port connection 'reference_deflection_cmd' expects 8 bits on the pin connection, but pin connection's REPLICATE generates 15 bits.
+                                                            : ... note: In instance 'adaptive_aero_control_top'
+  140 |     .reference_deflection_cmd({7'd0, reference_deflection_cmd}),
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:27:13: Signal is not used: 'cfg_timeout_cycles'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   27 | wire [15:0] cfg_timeout_cycles;
+      |             ^~~~~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:28:13: Signal is not used: 'cfg_stale_limit_cycles'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   28 | wire [15:0] cfg_stale_limit_cycles;
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:54:6: Signal is not used: 'history_busy'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   54 | wire history_busy;
+      |      ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:55:6: Signal is not used: 'payload_busy'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   55 | wire payload_busy;
+      |      ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_history_store.v:13:13: Signal is not used: 'rd_data'
+                                                                : ... note: In instance 'adaptive_aero_control_top.u_history_store'
+   13 | reg [127:0] rd_data;
+      |             ^~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_mmio_csr.v:5:19: Bits of signal are not used: 'mmio_wdata'[31:16]
+                                                          : ... note: In instance 'adaptive_aero_control_top.u_mmio_csr'
+    5 |     input  [31:0] mmio_wdata,
+      |                   ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_mmio_csr.v:30:12: Signal is not used: 'rd_mux'
+                                                           : ... note: In instance 'adaptive_aero_control_top.u_mmio_csr'
+   30 | reg [31:0] rd_mux;
+      |            ^~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_surrogate_reference.v:5:18: Signal is not used: 'cfg_mode_select'
+                                                                     : ... note: In instance 'adaptive_aero_control_top.u_surrogate_reference'
+    5 |     input  [1:0] cfg_mode_select,
+      |                  ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_surrogate_reference.v:9:20: Bits of signal are not used: 'response_data'[127:64]
+                                                                     : ... note: In instance 'adaptive_aero_control_top.u_surrogate_reference'
+    9 |     input  [127:0] response_data,
+      |                    ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_surrogate_reference.v:27:11: Signal is not used: 'delta_tilt'
+                                                                      : ... note: In instance 'adaptive_aero_control_top.u_surrogate_reference'
+   27 | reg [7:0] delta_tilt;
+      |           ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_surrogate_reference.v:28:11: Signal is not used: 'delta_defl'
+                                                                      : ... note: In instance 'adaptive_aero_control_top.u_surrogate_reference'
+   28 | reg [7:0] delta_defl;
+      |           ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_transport.v:5:19: Signal is not used: 'cfg_surrogate_select'
+                                                           : ... note: In instance 'adaptive_aero_control_top.u_transport'
+    5 |     input         cfg_surrogate_select,
+      |                   ^~~~~~~~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0
