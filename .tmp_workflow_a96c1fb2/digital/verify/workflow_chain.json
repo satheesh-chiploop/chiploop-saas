@@ -1,0 +1,12 @@
+{
+  "source_arch2rtl_workflow_id": "be5e6e0b-4031-4771-9a71-9f52ec3cd5e9",
+  "parent_workflow_id": "7705f889-717f-4743-81f6-edd601113435",
+  "current_workflow_id": "a96c1fb2-556e-49a1-8bc2-a104b03e332e",
+  "current_run_id": "4ee4f3b9-8eb7-4282-9e8e-365d9691ceb5",
+  "current_app": "verify",
+  "upstream_workflows": {
+    "arch2rtl": "be5e6e0b-4031-4771-9a71-9f52ec3cd5e9",
+    "dqa": "7705f889-717f-4743-81f6-edd601113435",
+    "verify": "a96c1fb2-556e-49a1-8bc2-a104b03e332e"
+  }
+}

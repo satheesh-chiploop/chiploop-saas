@@ -1,0 +1,43 @@
+Digital Functional Coverage Agent Log
+[2026-09-24T18:02:06.611405] [INFO] Starting Digital Functional Coverage Agent...
+[2026-09-24T18:02:06.611807] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/a96c1fb2-556e-49a1-8bc2-a104b03e332e/spec/pwm_controller_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 1,
+  "top_module": "pwm_controller",
+  "soc_mode": false
+}
+[2026-09-24T18:02:06.612223] [INFO] resolved_mode=digital
+[2026-09-24T18:02:06.612322] [INFO] spec_path=/root/chiploop-backend/backend/workflows/a96c1fb2-556e-49a1-8bc2-a104b03e332e/spec/pwm_controller_spec.json
+[2026-09-24T18:02:06.612408] [INFO] top_module=pwm_controller
+[2026-09-24T18:02:06.612494] [INFO] rtl_file_count=1
+[2026-09-24T18:02:06.612574] [INFO] port_source=spec
+[2026-09-24T18:02:06.612724] [INFO] clock_candidates=[
+  "clk"
+]
+[2026-09-24T18:02:06.612824] [INFO] reset_candidates=[
+  {
+    "name": "reset_n",
+    "active_low": true,
+    "async": false
+  }
+]
+[2026-09-24T18:02:06.612930] [INFO] coverage_points={
+  "output_points": [
+    "pwm_out",
+    "counter_value"
+  ],
+  "input_points": [
+    "clk",
+    "reset_n",
+    "enable",
+    "duty_cycle",
+    "period"
+  ],
+  "user_coverage_plan_points": []
+}
+[2026-09-24T18:02:06.613815] [INFO] Generated coverage_model.py
+[2026-09-24T18:02:06.613905] [INFO] Generated coverage_spec.json
+[2026-09-24T18:02:06.613987] [INFO] Generated COVERAGE.md
