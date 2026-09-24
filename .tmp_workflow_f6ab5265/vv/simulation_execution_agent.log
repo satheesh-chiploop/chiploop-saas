@@ -1,0 +1,27 @@
+Digital Simulation Execution Agent Log
+[2026-09-24T17:29:40.393813] [INFO] Starting Digital Simulation Execution Agent...
+[2026-09-24T17:29:40.394061] [INFO] manifest_path=backend/workflows/f6ab5265-4956-47cc-9dfc-68aed6b614a4/vv/tb/simulation_manifest.json
+[2026-09-24T17:29:40.394450] [INFO] tests=[
+  "smoke_test",
+  "feature_contract_directed",
+  "application_spec_boundary_directed"
+]
+[2026-09-24T17:29:40.394537] [INFO] seeds=[
+  1,
+  2,
+  3,
+  4
+]
+[2026-09-24T17:29:40.394637] [INFO] simulation_test_timeout_sec=180
+[2026-09-24T17:29:40.394732] [INFO] Running testcase=smoke_test seed=1
+[2026-09-24T17:29:45.107412] [INFO] Running testcase=smoke_test seed=2
+[2026-09-24T17:29:47.484330] [INFO] Running testcase=smoke_test seed=3
+[2026-09-24T17:29:49.898309] [INFO] Running testcase=smoke_test seed=4
+[2026-09-24T17:29:52.378415] [INFO] Running testcase=feature_contract_directed seed=1
+[2026-09-24T17:29:54.835697] [INFO] Running testcase=feature_contract_directed seed=2
+[2026-09-24T17:29:57.141690] [INFO] Running testcase=feature_contract_directed seed=3
+[2026-09-24T17:29:59.492803] [INFO] Running testcase=feature_contract_directed seed=4
+[2026-09-24T17:30:02.639775] [INFO] Running testcase=application_spec_boundary_directed seed=1
+[2026-09-24T17:30:05.706986] [INFO] Running testcase=application_spec_boundary_directed seed=2
+[2026-09-24T17:30:08.649290] [INFO] Running testcase=application_spec_boundary_directed seed=3
+[2026-09-24T17:30:11.715901] [INFO] Running testcase=application_spec_boundary_directed seed=4

@@ -1,0 +1,86 @@
+{
+  "type": "functional_coverage_summary",
+  "top_module": "pwm_controller",
+  "outputs": {
+    "counter_value": {
+      "samples": 104,
+      "seen_values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "hit_bins": 2,
+      "total_bins": 2
+    },
+    "pwm_out": {
+      "samples": 104,
+      "seen_values": [
+        0,
+        1
+      ],
+      "hit_bins": 2,
+      "total_bins": 2
+    }
+  },
+  "inputs": {
+    "clk": {
+      "samples": 104,
+      "seen_values": [
+        1
+      ],
+      "hit_bins": 1,
+      "total_bins": 2
+    },
+    "duty_cycle": {
+      "samples": 104,
+      "seen_values": [
+        0,
+        1,
+        85,
+        127,
+        128,
+        255
+      ],
+      "hit_bins": 2,
+      "total_bins": 2
+    },
+    "enable": {
+      "samples": 104,
+      "seen_values": [
+        0,
+        1
+      ],
+      "hit_bins": 2,
+      "total_bins": 2
+    },
+    "period": {
+      "samples": 104,
+      "seen_values": [
+        0,
+        1,
+        85,
+        127,
+        128,
+        255
+      ],
+      "hit_bins": 2,
+      "total_bins": 2
+    },
+    "reset_n": {
+      "samples": 104,
+      "seen_values": [
+        1
+      ],
+      "hit_bins": 1,
+      "total_bins": 2
+    }
+  },
+  "bins_hit": 12,
+  "total_bins": 14,
+  "functional_coverage_pct": 85.71,
+  "aggregated_run_count": 12
+}

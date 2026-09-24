@@ -1,0 +1,23 @@
+{
+  "type": "vv_simulation_control_generation",
+  "version": "1.1",
+  "top_module": "pwm_controller",
+  "spec_path": "/root/chiploop-backend/backend/workflows/f6ab5265-4956-47cc-9dfc-68aed6b614a4/spec/pwm_controller_spec.json",
+  "rtl_file_count": 1,
+  "default_tests": [
+    "smoke_test",
+    "feature_contract_directed",
+    "application_spec_boundary_directed"
+  ],
+  "simulation_manifest_json": "backend/workflows/f6ab5265-4956-47cc-9dfc-68aed6b614a4/vv/tb/simulation_manifest.json",
+  "tools_detected": {
+    "verilator": true,
+    "make": true
+  },
+  "artifacts": {
+    "simulation_manifest": "backend/workflows/f6ab5265-4956-47cc-9dfc-68aed6b614a4/vv/tb/simulation_manifest.json",
+    "runner_py": "backend/workflows/f6ab5265-4956-47cc-9dfc-68aed6b614a4/vv/tb/run_regression.py",
+    "sim_readme": "backend/workflows/f6ab5265-4956-47cc-9dfc-68aed6b614a4/vv/tb/SIM_CONTROL.md",
+    "log": "backend/workflows/f6ab5265-4956-47cc-9dfc-68aed6b614a4/vv/simulation_control_agent.log"
+  }
+}

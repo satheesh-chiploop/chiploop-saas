@@ -1,0 +1,13 @@
+Digital Simulation Summary Coverage Agent Log
+[2026-09-24T17:30:17.629878] [INFO] Starting Digital Simulation Summary Coverage Agent...
+[2026-09-24T17:30:17.629980] [INFO] simulation_execution_summary_json=backend/workflows/f6ab5265-4956-47cc-9dfc-68aed6b614a4/vv/tb/reports/simulation_execution_summary.json
+[2026-09-24T17:30:17.630056] [INFO] functional_coverage_summary_json=backend/workflows/f6ab5265-4956-47cc-9dfc-68aed6b614a4/vv/tb/reports/functional_coverage_summary.json
+[2026-09-24T17:30:17.630125] [INFO] code_coverage_summary_json=backend/workflows/f6ab5265-4956-47cc-9dfc-68aed6b614a4/vv/tb/reports/code_coverage_summary.json
+[2026-09-24T17:30:17.632921] [INFO] sim_exists=true
+[2026-09-24T17:30:17.633026] [INFO] cov_exists=true
+[2026-09-24T17:30:17.633111] [INFO] code_cov_exists=true
+[2026-09-24T17:30:17.633214] [INFO] sim_loaded=true
+[2026-09-24T17:30:17.633330] [INFO] cov_loaded=true
+[2026-09-24T17:30:17.633465] [INFO] code_cov_loaded=true
+[2026-09-24T17:30:17.633563] [INFO] coverage_status="ok"
+[2026-09-24T17:30:17.633715] [INFO] code_coverage_status="ok"
