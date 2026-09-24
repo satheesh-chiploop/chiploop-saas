@@ -1,0 +1,446 @@
+{
+  "top_module": "pwm_controller",
+  "soc_mode": false,
+  "clock_names": [
+    "clk"
+  ],
+  "reset_signals": [
+    {
+      "name": "reset_n",
+      "active_low": true,
+      "async": false
+    }
+  ],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "reset_n",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "enable",
+      "direction": "input",
+      "width_expr": "1"
+    },
+    {
+      "name": "duty_cycle",
+      "direction": "input",
+      "width_expr": "8"
+    },
+    {
+      "name": "period",
+      "direction": "input",
+      "width_expr": "8"
+    },
+    {
+      "name": "pwm_out",
+      "direction": "output",
+      "width_expr": "1"
+    },
+    {
+      "name": "counter_value",
+      "direction": "output",
+      "width_expr": "8"
+    }
+  ],
+  "behavioral_obligations": [
+    {
+      "requirement_id": "REQ-001",
+      "checker_id": "a_req_001",
+      "owner_module": "pwm_controller",
+      "section": "responsibilities",
+      "requirement": "Maintain an 8-bit cycle counter for PWM timing.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "systemverilog_assertion",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_001",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-002",
+      "checker_id": "a_req_002",
+      "owner_module": "pwm_controller",
+      "section": "responsibilities",
+      "requirement": "Generate a pulse-width-modulated output based on counter_value versus duty_cycle.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "systemverilog_assertion",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_002",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-003",
+      "checker_id": "a_req_003",
+      "owner_module": "pwm_controller",
+      "section": "responsibilities",
+      "requirement": "Wrap the counter to zero when the terminal count equals period.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "systemverilog_assertion",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_003",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-004",
+      "checker_id": "a_req_004",
+      "owner_module": "pwm_controller",
+      "section": "responsibilities",
+      "requirement": "Expose the current counter state on counter_value.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "dynamic_simulation",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_004",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-005",
+      "checker_id": "a_req_005",
+      "owner_module": "pwm_controller",
+      "section": "responsibilities",
+      "requirement": "Apply synchronous active-low reset to all state-holding elements.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "dynamic_simulation",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_005",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-006",
+      "checker_id": "a_req_006",
+      "owner_module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "On every rising edge of clk, if reset_n is low, set counter_value to 0.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "dynamic_simulation",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_006",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-007",
+      "checker_id": "a_req_007",
+      "owner_module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "On every rising edge of clk, if reset_n is high and enable is low, hold counter_value unchanged.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "dynamic_simulation",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_007",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-008",
+      "checker_id": "a_req_008",
+      "owner_module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "On every rising edge of clk, if reset_n is high and enable is high and counter_value equals period, load counter_value with 0.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "dynamic_simulation",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_008",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-009",
+      "checker_id": "a_req_009",
+      "owner_module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "On every rising edge of clk, if reset_n is high and enable is high and counter_value is not equal to period, increment counter_value by 1.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "dynamic_simulation",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_009",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-010",
+      "checker_id": "a_req_010",
+      "owner_module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "pwm_out shall be combinationally high when counter_value is strictly less than duty_cycle, otherwise low.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "systemverilog_assertion",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_010",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-011",
+      "checker_id": "a_req_011",
+      "owner_module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "The comparison for pwm_out uses the current counter_value, not the next counter state.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "dynamic_simulation",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_011",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-012",
+      "checker_id": "a_req_012",
+      "owner_module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "The counter wrap condition has priority over simple increment when the active count reaches period.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "systemverilog_assertion",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_012",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    },
+    {
+      "requirement_id": "REQ-015",
+      "checker_id": "a_req_015",
+      "owner_module": "pwm_controller",
+      "section": "reset_behavior",
+      "requirement": "When reset_n is low, the internal counter is cleared to 8'h00 and pwm_out is driven low. Upon release of reset_n, operation resumes from zero on the next clock edge.",
+      "verification_method": "systemverilog_assertion",
+      "requirement_classification": "systemverilog_assertion",
+      "status": "generated_pending_execution",
+      "cover_id": "c_req_015",
+      "assertion_generated": true,
+      "nonvacuity_cover_generated": true
+    }
+  ],
+  "verification_targets": [
+    {
+      "module": "pwm_controller",
+      "assertion_module": "pwm_controller_assertions",
+      "clock_names": [
+        "clk"
+      ],
+      "reset_signals": [
+        {
+          "name": "reset_n",
+          "active_low": true,
+          "async": false
+        }
+      ],
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width_expr": "1"
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width_expr": "1"
+        },
+        {
+          "name": "enable",
+          "direction": "input",
+          "width_expr": "1"
+        },
+        {
+          "name": "duty_cycle",
+          "direction": "input",
+          "width_expr": "8"
+        },
+        {
+          "name": "period",
+          "direction": "input",
+          "width_expr": "8"
+        },
+        {
+          "name": "pwm_out",
+          "direction": "output",
+          "width_expr": "1"
+        },
+        {
+          "name": "counter_value",
+          "direction": "output",
+          "width_expr": "8"
+        }
+      ],
+      "behavioral_obligations": [
+        {
+          "requirement_id": "REQ-001",
+          "checker_id": "a_req_001",
+          "owner_module": "pwm_controller",
+          "section": "responsibilities",
+          "requirement": "Maintain an 8-bit cycle counter for PWM timing.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "systemverilog_assertion",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_001",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-002",
+          "checker_id": "a_req_002",
+          "owner_module": "pwm_controller",
+          "section": "responsibilities",
+          "requirement": "Generate a pulse-width-modulated output based on counter_value versus duty_cycle.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "systemverilog_assertion",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_002",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-003",
+          "checker_id": "a_req_003",
+          "owner_module": "pwm_controller",
+          "section": "responsibilities",
+          "requirement": "Wrap the counter to zero when the terminal count equals period.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "systemverilog_assertion",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_003",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-004",
+          "checker_id": "a_req_004",
+          "owner_module": "pwm_controller",
+          "section": "responsibilities",
+          "requirement": "Expose the current counter state on counter_value.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "dynamic_simulation",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_004",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-005",
+          "checker_id": "a_req_005",
+          "owner_module": "pwm_controller",
+          "section": "responsibilities",
+          "requirement": "Apply synchronous active-low reset to all state-holding elements.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "dynamic_simulation",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_005",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-006",
+          "checker_id": "a_req_006",
+          "owner_module": "pwm_controller",
+          "section": "behavior_rules",
+          "requirement": "On every rising edge of clk, if reset_n is low, set counter_value to 0.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "dynamic_simulation",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_006",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-007",
+          "checker_id": "a_req_007",
+          "owner_module": "pwm_controller",
+          "section": "behavior_rules",
+          "requirement": "On every rising edge of clk, if reset_n is high and enable is low, hold counter_value unchanged.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "dynamic_simulation",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_007",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-008",
+          "checker_id": "a_req_008",
+          "owner_module": "pwm_controller",
+          "section": "behavior_rules",
+          "requirement": "On every rising edge of clk, if reset_n is high and enable is high and counter_value equals period, load counter_value with 0.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "dynamic_simulation",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_008",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-009",
+          "checker_id": "a_req_009",
+          "owner_module": "pwm_controller",
+          "section": "behavior_rules",
+          "requirement": "On every rising edge of clk, if reset_n is high and enable is high and counter_value is not equal to period, increment counter_value by 1.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "dynamic_simulation",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_009",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-010",
+          "checker_id": "a_req_010",
+          "owner_module": "pwm_controller",
+          "section": "behavior_rules",
+          "requirement": "pwm_out shall be combinationally high when counter_value is strictly less than duty_cycle, otherwise low.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "systemverilog_assertion",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_010",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-011",
+          "checker_id": "a_req_011",
+          "owner_module": "pwm_controller",
+          "section": "behavior_rules",
+          "requirement": "The comparison for pwm_out uses the current counter_value, not the next counter state.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "dynamic_simulation",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_011",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-012",
+          "checker_id": "a_req_012",
+          "owner_module": "pwm_controller",
+          "section": "behavior_rules",
+          "requirement": "The counter wrap condition has priority over simple increment when the active count reaches period.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "systemverilog_assertion",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_012",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        },
+        {
+          "requirement_id": "REQ-015",
+          "checker_id": "a_req_015",
+          "owner_module": "pwm_controller",
+          "section": "reset_behavior",
+          "requirement": "When reset_n is low, the internal counter is cleared to 8'h00 and pwm_out is driven low. Upon release of reset_n, operation resumes from zero on the next clock edge.",
+          "verification_method": "systemverilog_assertion",
+          "requirement_classification": "systemverilog_assertion",
+          "status": "generated_pending_execution",
+          "cover_id": "c_req_015",
+          "assertion_generated": true,
+          "nonvacuity_cover_generated": true
+        }
+      ]
+    }
+  ]
+}
