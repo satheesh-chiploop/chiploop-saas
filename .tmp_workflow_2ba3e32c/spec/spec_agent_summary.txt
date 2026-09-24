@@ -1,4 +1,0 @@
-✅ Digital Spec Agent completed successfully.
-
-Spec mode: hierarchical
-Spec JSON: backend/workflows/2ba3e32c-6aa6-4f2b-91bc-f74878436468/spec/adaptive_aero_control_top_spec.json
