@@ -1,0 +1,54 @@
+The required synthesizable top module is adaptive_aero_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must implement the selected Physical AI application contract, external model request/response transport, validation, safety, timeout, and bounded actuator-command behavior.
+
+EXTERNAL MODEL TRANSPORT DIRECTION CONTRACT (mandatory; this takes precedence over ambiguous ingress/egress wording in upstream prose): the RTL emits model-request valid/data as outputs and receives model-request ready as an input. The RTL receives model-response valid/data as inputs and emits model-response ready as an output. Apply this rule by data flow even when application-specific ports use cmd_*, req_*, rsp_*, or response_* names. A top-level output must have a real RTL driver; never connect a required top-level output only to a child input.
+
+FIRMWARE CONTROL-PLANE CONTRACT (mandatory): this product journey requests generated firmware. The synthesizable top must expose a real firmware-visible CSR/MMIO interface with address, write-data, read-data, transaction-valid/write-enable, and response/ready semantics. DIGITAL_SPEC_JSON.register_contract must describe the implemented registers and fields. Every declared register must be reachable through RTL decode; do not label inaccessible internal state as software-visible. The streaming transport may coexist with, but cannot replace, this interface.
+Module: adaptive_aero_control_top
+Purpose: FPGA synthesizable control shell for an external automotive aerodynamics surrogate worker. The module shall not implement NVIDIA DoMINO inference. It shall manage compact request/response transport, validation, stale-data detection, timeout handling, actuator clamping, and safe fallback for active-aerodynamics control.
+
+Interface requirements:
+1) Provide a 64-bit memory-mapped CSR interface with addr[7:0], wdata[63:0], rdata[63:0], we, re, valid, ready. The CSR window shall control operating mode, timeout threshold, stale threshold, actuator clamp limits, sequence numbers, and fault clear.
+2) Optionally provide a bounded streaming sideband using 64-bit data with valid/ready for request and response metadata only. The interface shall never expose geometry arrays, pressure fields, or flow fields as wide top-level payloads.
+3) Provide compact actuator outputs. Final actuator command encoding shall be a fixed-width packed representation not exceeding 32 bits unless a specific board contract requires otherwise.
+4) Provide safe_fallback_active and fault_code outputs.
+
+Functional requirements:
+1) On reset, enter SAFE_FALLBACK state, deassert actuator_cmd_valid, and load conservative fallback actuator values from CSR defaults.
+2) Accept new control input only when the host has provided a fresh request token and the current state is not latched fault.
+3) Each request shall include a monotonically increasing sequence number and an age/timeout budget. The parser shall reject out-of-order, duplicated, or malformed responses.
+4) The watchdog shall compare the local cycle counter against the configured timeout threshold. If expired, the module shall assert safe_fallback_active, record a timeout fault_code, and stop issuing normal commands until a fresh valid transaction and explicit clear are observed.
+5) Command outputs shall be clamped against programmable minimum and maximum bounds for each actuator channel before reaching actuator_cmd.
+6) The module shall support a transparent reference mode in which compact status words report operating point, freshness, fault reason, and last accepted sequence number.
+7) The design shall not assume surrogate inference is available in hardware; the host/software is responsible for running DoMINO and returning compact control decisions.
+8) All state machines shall be one-hot or encoded for synthesizability, with synchronous reset and no inferred latches.
+9) All storage beyond small CSR/state elements shall use FPGA-approved BRAM abstractions if a board integration later requires buffering; no Sky130 macro or ASIC memory construct shall be used in the FPGA path.
+10) Throughput shall be sufficient for supervisory control updates at a rate configured by the host; the RTL shall prioritize safety over low latency.
+
+CSR map requirement:
+- 0x00 control: enable, mode, clear_fault, request_seq_seed
+- 0x08 status: ready, safe_fallback_active, fault_present, last_seq, timeout_active
+- 0x10 timeout_limit
+- 0x18 stale_limit
+- 0x20 actuator_min
+- 0x28 actuator_max
+- 0x30 last_command
+- 0x38 fault_code and diagnostic flags
+
+Timing and handshake requirements:
+- csr_ready shall assert when a CSR transaction is accepted.
+- stream_out_valid shall remain asserted until stream_out_ready or until a timeout aborts the request.
+- stream_in_ready shall only assert when the parser can accept a complete compact response word.
+- No top-level interface may exceed 128 bits on a streaming port or 64 bits on a register-mapped port.
+
+Safety behavior:
+- If stream_in_valid is absent beyond timeout_limit, or if response sequence does not match the expected token, force fallback.
+- If command bounds are violated, clamp and flag a non-fatal saturation event; repeated saturation may be escalated to a fault per CSR policy.
+- If any malformed packet is observed, invalidate the request, ignore the packet, and set fault_code accordingly.
+
+Implementation notes:
+- Use enumerated FSM states: IDLE, ISSUE_REQ, WAIT_RESP, VALIDATE, APPLY_CMD, SAFE_FALLBACK, FAULT_LATCH.
+- Use unsigned counters for watchdog and staleness tracking.
+- Use registered outputs for all external command pins.
+- Keep scalar-equivalent I/O count below 256.
+FPGA MEMORY CONTRACT (mandatory): describe bulk payload/history/FIFO storage through a technology-neutral memory wrapper that the FPGA flow can map to native block RAM; do not flatten it into registers.
+NO COMMAND FALLBACK CONTRACT (mandatory; overrides conflicting generated prose): do not create a fallback command, fallback register, fallback status, fallback controller, substitute command, or fallback-on-reset behavior. On invalid, stale, timeout, reset, or fault conditions, inhibit/deassert actuator output validity and latch the fault for software handling. Do not silently replace the requested command.

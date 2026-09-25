@@ -1,0 +1,67 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.134 MB sources in 6 modules, into 0.043 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.022 s (elab=0.003, cvt=0.010, bld=0.000); cpu 0.021 s on 1 threads; allocated 32.363 MB
+
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: pass4/adaptive_aero_control_top.v:134:10: Instance pin connected by name with empty reference: 'fault_present'
+  134 |         .fault_present(),
+      |          ^~~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: pass4/adaptive_aero_control_top.v:153:10: Instance pin connected by name with empty reference: 'buf_dout'
+  153 |         .buf_dout(),
+      |          ^~~~~~~~
+%Warning-PINCONNECTEMPTY: pass4/adaptive_aero_control_top.v:167:10: Instance pin connected by name with empty reference: 'dout'
+  167 |         .dout()
+      |          ^~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:62:13: Signal is not driven, nor used: 'sram_dout'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   62 | wire [63:0] sram_dout;
+      |             ^~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:63:13: Signal is not driven, nor used: 'buf_dout_observe'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   63 | wire [63:0] buf_dout_observe;
+      |             ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_buffer_controller.v:6:18: Bits of signal are not used: 'buf_addr'[7:6]
+                                                                   : ... note: In instance 'adaptive_aero_control_top.u_buffer_controller'
+    6 |     input  [7:0] buf_addr,
+      |                  ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_buffer_controller.v:20:16: Signal is not used: 'buf_shadow_mem'
+                                                                    : ... note: In instance 'adaptive_aero_control_top.u_buffer_controller'
+   20 |     reg [63:0] buf_shadow_mem [0:63];
+      |                ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_csr_mmio.v:5:19: Bits of signal are not used: 'csr_wdata'[63:32]
+                                                          : ... note: In instance 'adaptive_aero_control_top.u_csr_mmio'
+    5 |     input  [63:0] csr_wdata,
+      |                   ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_csr_mmio.v:27:12: Signal is not used: 'fault_clear_ack'
+                                                           : ... note: In instance 'adaptive_aero_control_top.u_csr_mmio'
+   27 |     input  fault_clear_ack
+      |            ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_transport_supervisor.v:18:19: Bits of signal are not used: 'rsp_data'[63:32]
+                                                                       : ... note: In instance 'adaptive_aero_control_top.u_transport_supervisor'
+   18 |     input  [63:0] rsp_data,
+      |                   ^~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_transport_supervisor.v:53:16: Signal is not used: 'candidate_cmd_r'
+                                                                       : ... note: In instance 'adaptive_aero_control_top.u_transport_supervisor'
+   53 |     reg [31:0] candidate_cmd_r;
+      |                ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_transport_supervisor.v:56:16: Signal is not used: 'req_word_r'
+                                                                       : ... note: In instance 'adaptive_aero_control_top.u_transport_supervisor'
+   56 |     reg [63:0] req_word_r;
+      |                ^~~~~~~~~~
+%Warning-SYNCASYNCNET: pass4/adaptive_aero_control_top.v:3:12: Signal flopped as both synchronous and async: 'reset_n'
+                       pass4/adaptive_aero_transport_supervisor.v:102:14: ... Location of async usage
+  102 |         if (!reset_n) begin
+      |              ^~~~~~~
+                       pass4/adaptive_aero_csr_mmio.v:53:14: ... Location of sync usage
+   53 |         if (!reset_n) begin
+      |              ^~~~~~~
+                       ... For warning description see https://verilator.org/warn/SYNCASYNCNET?v=5.047
+                       ... Use "/* verilator lint_off SYNCASYNCNET */" and lint_on around source to disable this message.
+
+=== RETURN CODE ===
+0

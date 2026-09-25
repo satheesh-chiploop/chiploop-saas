@@ -1,0 +1,40 @@
+Digital Testbench Generator Agent Log
+[2026-09-24T20:33:42.423628] [INFO] Starting Digital Testbench Generator Agent...
+[2026-09-24T20:33:42.424020] [INFO] resolved_contract={
+  "mode": "digital",
+  "spec_path": "/root/chiploop-backend/backend/workflows/e72ec751-4732-43f4-8b84-d164b71d7ce7/spec/pwm_controller_spec.json",
+  "spec_source": "state",
+  "rtl_source": "state.rtl_files",
+  "rtl_file_count": 1,
+  "top_module": "pwm_controller",
+  "soc_mode": false
+}
+[2026-09-24T20:33:42.428521] [INFO] resolved_mode=digital
+[2026-09-24T20:33:42.428715] [INFO] spec_path=/root/chiploop-backend/backend/workflows/e72ec751-4732-43f4-8b84-d164b71d7ce7/spec/pwm_controller_spec.json
+[2026-09-24T20:33:42.428817] [INFO] top_module=pwm_controller
+[2026-09-24T20:33:42.428921] [INFO] rtl_file_count=1
+[2026-09-24T20:33:42.429016] [INFO] port_source=spec
+[2026-09-24T20:33:42.429155] [INFO] clock_candidates=[
+  "clk"
+]
+[2026-09-24T20:33:42.429272] [INFO] reset_candidates=[
+  {
+    "name": "reset_n",
+    "active_low": true,
+    "async": false
+  }
+]
+[2026-09-24T20:33:42.727558] [INFO] verification_files=[
+  "backend/workflows/e72ec751-4732-43f4-8b84-d164b71d7ce7/vv/tb/pwm_controller_assertions.sv",
+  "backend/workflows/e72ec751-4732-43f4-8b84-d164b71d7ce7/vv/tb/pwm_controller_assertions_bind.sv"
+]
+[2026-09-24T20:33:42.729182] [INFO] Generated testbench: vv/tb/test_pwm_controller.py
+[2026-09-24T20:33:42.729304] [INFO] Generated Makefile
+[2026-09-24T20:33:42.729387] [INFO] Generated rtl_sources.mk
+[2026-09-24T20:33:42.729460] [INFO] Generated testcases.json
+[2026-09-24T20:33:42.729532] [INFO] Generated tb_contract.json
+[2026-09-24T20:33:42.729704] [INFO] generated_testcases=[
+  "smoke_test",
+  "feature_contract_directed",
+  "application_spec_boundary_directed"
+]

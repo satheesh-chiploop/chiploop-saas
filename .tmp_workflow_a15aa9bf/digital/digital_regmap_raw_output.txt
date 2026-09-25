@@ -1,0 +1,233 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 64,
+    "registers": [
+      {
+        "name": "CONTROL",
+        "offset": "0x00",
+        "access": "RW",
+        "description": "Operational control register. Firmware uses this register to enable the supervisor, select mode, explicitly clear fault state, and seed the compact request sequence token space.",
+        "fields": [
+          {
+            "name": "ENABLE",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RW",
+            "reset": 0,
+            "description": "Operational enable. When 0, request issuance and actuator command validity are inhibited."
+          },
+          {
+            "name": "MODE",
+            "lsb": 1,
+            "msb": 2,
+            "access": "RW",
+            "reset": 0,
+            "description": "Operating mode selector. Mode semantics are implementation-defined within the documented supervisory contract and may be used for transparent reference or policy variation."
+          },
+          {
+            "name": "CLEAR_FAULT",
+            "lsb": 3,
+            "msb": 3,
+            "access": "W1P",
+            "reset": 0,
+            "description": "Write-one-to-pulse explicit fault clear request. The pulse is consumed by the transport/safety supervisor."
+          },
+          {
+            "name": "REQUEST_SEQ_SEED",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Seed for the compact request sequence token generator. Monotonically increasing sequence behavior is enforced by the supervisor."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x08",
+        "access": "RO",
+        "description": "Live supervisory status register. Reports readiness, fault state, last accepted sequence, and timeout activity.",
+        "fields": [
+          {
+            "name": "READY",
+            "lsb": 0,
+            "msb": 0,
+            "access": "RO",
+            "reset": 0,
+            "description": "Supervisor readiness. Indicates the transport/safety logic is able to accept a valid transaction when enabled and not fault-latched."
+          },
+          {
+            "name": "SAFE_FALLBACK_ACTIVE",
+            "lsb": 1,
+            "msb": 1,
+            "access": "RO",
+            "reset": 1,
+            "description": "Inhibited/safe state indicator. Asserted when commands are inhibited due to reset, fault, stale data, timeout, or invalid response conditions."
+          },
+          {
+            "name": "FAULT_PRESENT",
+            "lsb": 2,
+            "msb": 2,
+            "access": "RO",
+            "reset": 1,
+            "description": "Latched fault presence indicator."
+          },
+          {
+            "name": "LAST_SEQ",
+            "lsb": 16,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Last accepted compact sequence number."
+          },
+          {
+            "name": "TIMEOUT_ACTIVE",
+            "lsb": 32,
+            "msb": 32,
+            "access": "RO",
+            "reset": 0,
+            "description": "Watchdog timeout indicator for the outstanding request transaction."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_LIMIT",
+        "offset": "0x10",
+        "access": "RW",
+        "description": "Programmable watchdog timeout threshold in cycles.",
+        "fields": [
+          {
+            "name": "TIMEOUT_LIMIT",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 1000,
+            "description": "Cycle count threshold used by the watchdog to detect overdue response absence."
+          }
+        ]
+      },
+      {
+        "name": "STALE_LIMIT",
+        "offset": "0x18",
+        "access": "RW",
+        "description": "Programmable staleness threshold in cycles.",
+        "fields": [
+          {
+            "name": "STALE_LIMIT",
+            "lsb": 0,
+            "msb": 15,
+            "access": "RW",
+            "reset": 1000,
+            "description": "Maximum permitted response age budget before the compact response is considered stale."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MIN",
+        "offset": "0x20",
+        "access": "RW",
+        "description": "Lower bound for the packed actuator command.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MIN",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 0,
+            "description": "Minimum allowed actuator command value before output clamping."
+          }
+        ]
+      },
+      {
+        "name": "ACTUATOR_MAX",
+        "offset": "0x28",
+        "access": "RW",
+        "description": "Upper bound for the packed actuator command.",
+        "fields": [
+          {
+            "name": "ACTUATOR_MAX",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RW",
+            "reset": 4294967295,
+            "description": "Maximum allowed actuator command value before output clamping."
+          }
+        ]
+      },
+      {
+        "name": "LAST_COMMAND",
+        "offset": "0x30",
+        "access": "RO",
+        "description": "Last accepted and clamped actuator command.",
+        "fields": [
+          {
+            "name": "LAST_COMMAND",
+            "lsb": 0,
+            "msb": 31,
+            "access": "RO",
+            "reset": 0,
+            "description": "Last bounded actuator command value accepted by the supervisor."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_CODE_DIAG",
+        "offset": "0x38",
+        "access": "RO",
+        "description": "Latched fault code and diagnostic flags.",
+        "fields": [
+          {
+            "name": "FAULT_CODE",
+            "lsb": 0,
+            "msb": 7,
+            "access": "RO",
+            "reset": 0,
+            "description": "Latched fault code. 0 indicates no fault; nonzero codes identify timeout, malformed packet, stale data, or sequence mismatch conditions."
+          },
+          {
+            "name": "DIAG_FLAGS",
+            "lsb": 8,
+            "msb": 15,
+            "access": "RO",
+            "reset": 0,
+            "description": "Diagnostic flags including saturation, malformed-packet observation, and other supervisory status bits."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Hold reset_n low, then release synchronous reset.",
+      "Program TIMEOUT_LIMIT and STALE_LIMIT to supervisory policy values.",
+      "Program ACTUATOR_MIN and ACTUATOR_MAX to the desired clamp window.",
+      "Write CONTROL.REQUEST_SEQ_SEED with the initial sequence token seed.",
+      "Set CONTROL.CLEAR_FAULT with a write-one pulse if a previous fault must be cleared.",
+      "Set CONTROL.MODE as required by the operating policy.",
+      "Set CONTROL.ENABLE to 1 to allow request issuance and accepted command generation."
+    ],
+    "polling_sequence": [
+      "Poll STATUS.READY and STATUS.FAULT_PRESENT.",
+      "Poll STATUS.SAFE_FALLBACK_ACTIVE and STATUS.TIMEOUT_ACTIVE during operation.",
+      "Read STATUS.LAST_SEQ after accepted response transactions.",
+      "Read LAST_COMMAND to observe the last clamped actuator command.",
+      "Read FAULT_CODE_DIAG to diagnose timeout, malformed packet, stale data, or sequence mismatch events."
+    ],
+    "irq_sequence": []
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map is firmware-visible and reachable through the documented 64-bit custom CSR/MMIO interface.",
+    "No new hierarchy, ports, buses, or non-specified control planes are introduced.",
+    "The top-level remains adaptive_aero_control_top and the streaming transport coexists with, but does not replace, the CSR/MMIO interface.",
+    "The register semantics preserve safety inhibition rather than silent command substitution on invalid, stale, timeout, reset, or fault conditions."
+  ]
+}

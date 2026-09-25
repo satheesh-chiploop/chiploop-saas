@@ -1,0 +1,64 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.133 MB sources in 6 modules, into 0.051 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.021 s (elab=0.002, cvt=0.009, bld=0.000); cpu 0.020 s on 1 threads; allocated 32.355 MB
+
+=== STDERR ===
+%Warning-PINCONNECTEMPTY: adaptive_aero_control_top.v:133:10: Instance pin connected by name with empty reference: 'fault_present'
+  133 |         .fault_present(),
+      |          ^~~~~~~~~~~~~
+                          ... For warning description see https://verilator.org/warn/PINCONNECTEMPTY?v=5.047
+                          ... Use "/* verilator lint_off PINCONNECTEMPTY */" and lint_on around source to disable this message.
+%Warning-PINCONNECTEMPTY: adaptive_aero_control_top.v:152:10: Instance pin connected by name with empty reference: 'buf_dout'
+  152 |         .buf_dout(),
+      |          ^~~~~~~~
+%Warning-PINCONNECTEMPTY: adaptive_aero_control_top.v:166:10: Instance pin connected by name with empty reference: 'dout'
+  166 |         .dout()
+      |          ^~~~
+%Warning-WIDTHTRUNC: adaptive_aero_transport_supervisor.v:85:28: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 82 bits.
+                                                               : ... note: In instance 'adaptive_aero_control_top.u_transport_supervisor'
+   85 |                 req_data_r = {16'hA55A, cfg_request_seq_seed, cfg_request_seq_current, cfg_mode, cfg_timeout_limit, cfg_stale_limit, 8'hC3};
+      |                            ^
+                     ... For warning description see https://verilator.org/warn/WIDTHTRUNC?v=5.047
+                     ... Use "/* verilator lint_off WIDTHTRUNC */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: adaptive_aero_transport_supervisor.v:90:28: Operator ASSIGN expects 64 bits on the Assign RHS, but Assign RHS's REPLICATE generates 82 bits.
+                                                               : ... note: In instance 'adaptive_aero_control_top.u_transport_supervisor'
+   90 |                 req_data_r = {16'hA55A, cfg_request_seq_seed, cfg_request_seq_current, cfg_mode, cfg_timeout_limit, cfg_stale_limit, 8'hC3};
+      |                            ^
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:40:10: Signal is not driven, nor used: 'req_ready'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   40 |     wire req_ready;
+      |          ^~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:62:13: Signal is not driven, nor used: 'sram_dout'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   62 | wire [63:0] sram_dout;
+      |             ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_control_top.v:63:13: Signal is not driven, nor used: 'buf_dout_observe'
+                                                        : ... note: In instance 'adaptive_aero_control_top'
+   63 | wire [63:0] buf_dout_observe;
+      |             ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_buffer_controller.v:6:18: Bits of signal are not used: 'buf_addr'[7:6]
+                                                             : ... note: In instance 'adaptive_aero_control_top.u_buffer_controller'
+    6 |     input  [7:0] buf_addr,
+      |                  ^~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_csr_mmio.v:5:19: Bits of signal are not used: 'csr_wdata'[63:32]
+                                                    : ... note: In instance 'adaptive_aero_control_top.u_csr_mmio'
+    5 |     input  [63:0] csr_wdata,
+      |                   ^~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_csr_mmio.v:27:12: Signal is not used: 'fault_clear_ack'
+                                                     : ... note: In instance 'adaptive_aero_control_top.u_csr_mmio'
+   27 |     input  fault_clear_ack
+      |            ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_transport_supervisor.v:18:19: Bits of signal are not used: 'rsp_data'[63:32]
+                                                                 : ... note: In instance 'adaptive_aero_control_top.u_transport_supervisor'
+   18 |     input  [63:0] rsp_data,
+      |                   ^~~~~~~~
+%Warning-UNUSEDSIGNAL: adaptive_aero_transport_supervisor.v:54:16: Signal is not used: 'candidate_cmd_r'
+                                                                 : ... note: In instance 'adaptive_aero_control_top.u_transport_supervisor'
+   54 |     reg [31:0] candidate_cmd_r;
+      |                ^~~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

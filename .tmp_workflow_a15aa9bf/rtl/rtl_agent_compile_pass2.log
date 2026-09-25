@@ -1,0 +1,2925 @@
+
+
+Issues:
+Module 'adaptive_aero_buffer_controller' declares fpga_bram memory_implementation but has no synthesizable unpacked memory array; implement inferred storage instead of scalar registers.
+
+=== VERILATOR LINT ===
+PASS: Verilator lint completed successfully.
+
+=== STATIC SPEC2RTL REPAIR CHECKLIST ===
+Static Spec2RTL result: status=partial, missing=14, partial=1, inconclusive=0.
+CLOCK/RESET: {"clock_ports": ["clk"], "reset_ports": ["reset_n"], "reset_style_violations": ["reset 'reset_n' is declared synchronous but appears in an asynchronous sensitivity list"], "status": "issues"}
+REQ-020: missing - No inferred latches and no non-FPGA memory constructs are allowed in the FPGA path; any future buffering must map to the declared technology-neutral SRAM macro. (checker evidence: inferred_bulk_memory_array)
+REQ-044: missing - The CSR map must match the documented addresses and field ownership exactly.
+REQ-046: missing - No status field may be exposed only internally without a corresponding CSR readback path.
+REQ-047: partial - The control register at 0x00 shall include enable, mode, clear_fault, and request_seq_seed fields. (checker evidence: 0x00)
+REQ-090: missing - Buffering and readback of compact history data are handled by the separate buffer controller; this block does not own buffer address generation.
+REQ-117: missing - Expose a narrow compact buffering interface suitable for block RAM mapping.
+REQ-118: missing - Avoid any register-file substitution for bulk storage.
+REQ-121: missing - Implement bulk storage as an inferred memory rather than a flattened bank of scalar registers.
+REQ-122: missing - Return stored read data through the declared functional output port.
+REQ-123: missing - All storage beyond small CSR/state elements shall map to the declared FPGA-friendly SRAM abstraction.
+REQ-135: missing - Provide the explicit memory wrapper instance for FPGA synthesis flow mapping.
+REQ-140: missing - All memory read data must be functionally observable through a real consumer input.
+REQ-141: missing - The wrapper exists to satisfy the FPGA memory contract and must not be decorative.
+REQ-145: missing - Reset leaves the memory wrapper inactive by virtue of its controlling inputs being deasserted; memory contents are otherwise implementation-defined for FPGA block RAM mapping. For inferred storage on reset, hold the declared read-data output benign without clearing stored memory contents; no alternate or flattened scalar-register storage is created.
+
+=== STATIC SPEC2RTL COMPLIANCE ===
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "partial",
+  "summary": {
+    "checked": 98,
+    "matched": 83,
+    "partial": 1,
+    "missing": 14,
+    "inconclusive": 0,
+    "pending_verification": 52
+  },
+  "total_requirements": 145,
+  "total_evaluations": 150,
+  "blocking_summary": {
+    "checked": 98,
+    "matched": 83,
+    "partial": 1,
+    "missing": 14,
+    "inconclusive": 0
+  },
+  "setup_issues": [],
+  "top_module": {
+    "expected": "adaptive_aero_control_top",
+    "modules_found": [
+      "adaptive_aero_buffer_controller",
+      "adaptive_aero_control_top",
+      "adaptive_aero_csr_mmio",
+      "adaptive_aero_transport_supervisor",
+      "generic_fpgabrams_64x64"
+    ],
+    "status": "pass"
+  },
+  "interface": {
+    "status": "pass",
+    "expected_ports": [
+      "actuator_cmd",
+      "actuator_cmd_valid",
+      "buf_dout",
+      "clk",
+      "csr_addr",
+      "csr_rdata",
+      "csr_re",
+      "csr_ready",
+      "csr_valid",
+      "csr_wdata",
+      "csr_we",
+      "fault_code",
+      "reset_n",
+      "stream_in_data",
+      "stream_in_ready",
+      "stream_in_valid",
+      "stream_out_data",
+      "stream_out_ready",
+      "stream_out_valid"
+    ],
+    "matched_ports": [
+      "actuator_cmd",
+      "actuator_cmd_valid",
+      "buf_dout",
+      "clk",
+      "csr_addr",
+      "csr_rdata",
+      "csr_re",
+      "csr_ready",
+      "csr_valid",
+      "csr_wdata",
+      "csr_we",
+      "fault_code",
+      "reset_n",
+      "stream_in_data",
+      "stream_in_ready",
+      "stream_in_valid",
+      "stream_out_data",
+      "stream_out_ready",
+      "stream_out_valid"
+    ],
+    "missing_ports": [],
+    "extra_ports": [],
+    "rtl_ports": [
+      "actuator_cmd",
+      "actuator_cmd_valid",
+      "addr",
+      "buf_addr",
+      "buf_din",
+      "buf_dout",
+      "buf_en",
+      "buf_we",
+      "cfg_actuator_max",
+      "cfg_actuator_min",
+      "cfg_clear_fault",
+      "cfg_enable",
+      "cfg_mode",
+      "cfg_request_seq_current",
+      "cfg_request_seq_seed",
+      "cfg_stale_limit",
+      "cfg_timeout_limit",
+      "clk",
+      "csb",
+      "csr_addr",
+      "csr_rdata",
+      "csr_re",
+      "csr_ready",
+      "csr_valid",
+      "csr_wdata",
+      "csr_we",
+      "din",
+      "dout",
+      "fault_clear_ack",
+      "fault_code",
+      "fault_present",
+      "req_data",
+      "req_ready",
+      "req_valid",
+      "reset_n",
+      "rsp_data",
+      "rsp_ready",
+      "rsp_valid",
+      "sram_addr",
+      "sram_csb",
+      "sram_din",
+      "sram_dout",
+      "sram_we",
+      "status_diag_flags",
+      "status_fault_code",
+      "status_fault_present",
+      "status_last_command",
+      "status_last_seq",
+      "status_ready",
+      "status_timeout_active",
+      "stream_in_data",
+      "stream_in_ready",
+      "stream_in_valid",
+      "stream_out_data",
+      "stream_out_ready",
+      "stream_out_valid",
+      "we"
+    ]
+  },
+  "register_map": {
+    "expected": [
+      "actuator_max",
+      "actuator_min",
+      "clear_fault",
+      "diag_flags",
+      "enable",
+      "fault_code",
+      "fault_present",
+      "last_command",
+      "last_seq",
+      "mode",
+      "ready",
+      "request_seq_seed",
+      "stale_limit",
+      "timeout_active",
+      "timeout_limit"
+    ],
+    "matched": [
+      "actuator_max",
+      "actuator_min",
+      "clear_fault",
+      "diag_flags",
+      "enable",
+      "fault_code",
+      "fault_present",
+      "last_command",
+      "last_seq",
+      "mode",
+      "ready",
+      "request_seq_seed",
+      "stale_limit",
+      "timeout_active",
+      "timeout_limit"
+    ],
+    "expected_registers": [
+      "actuator_max",
+      "actuator_min",
+      "control",
+      "fault_code_diag",
+      "last_command",
+      "stale_limit",
+      "status",
+      "timeout_limit"
+    ],
+    "matched_registers": [
+      "actuator_max",
+      "actuator_min",
+      "control",
+      "fault_code_diag",
+      "last_command",
+      "stale_limit",
+      "status",
+      "timeout_limit"
+    ],
+    "expected_addresses": [
+      "0x0",
+      "0x00",
+      "0x08",
+      "0x10",
+      "0x18",
+      "0x20",
+      "0x28",
+      "0x30",
+      "0x38"
+    ],
+    "matched_addresses": [
+      "0x0",
+      "0x00",
+      "0x08",
+      "0x10",
+      "0x18",
+      "0x20",
+      "0x28",
+      "0x30",
+      "0x38"
+    ],
+    "missing": [],
+    "missing_field_details": [],
+    "missing_registers": [],
+    "missing_addresses": [],
+    "status": "pass"
+  },
+  "clock_reset": {
+    "clock_ports": [
+      "clk"
+    ],
+    "reset_ports": [
+      "reset_n"
+    ],
+    "reset_style_violations": [
+      "reset 'reset_n' is declared synchronous but appears in an asynchronous sensitivity list"
+    ],
+    "status": "issues"
+  },
+  "feature_contracts": {
+    "status": "pass",
+    "checked": 7,
+    "passed": 7,
+    "failed": 0,
+    "features": [
+      {
+        "feature_id": "csr_mmio_control_write_and_status_readback",
+        "status": "pass",
+        "stimulus_signals": [
+          "csr_addr",
+          "csr_re",
+          "csr_valid",
+          "csr_wdata",
+          "csr_we"
+        ],
+        "expected_signals": [
+          "csr_rdata",
+          "csr_ready"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "reset_enters_inhibited_state",
+        "status": "pass",
+        "stimulus_signals": [
+          "reset_n"
+        ],
+        "expected_signals": [
+          "actuator_cmd_valid",
+          "fault_code"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "request_stream_emission",
+        "status": "pass",
+        "stimulus_signals": [
+          "csr_addr",
+          "csr_re",
+          "csr_valid",
+          "csr_wdata",
+          "csr_we",
+          "stream_out_ready"
+        ],
+        "expected_signals": [
+          "stream_out_valid"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "response_handshake_acceptance",
+        "status": "pass",
+        "stimulus_signals": [
+          "stream_in_data",
+          "stream_in_valid"
+        ],
+        "expected_signals": [
+          "stream_in_ready"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "timeout_inhibits_command_output",
+        "status": "pass",
+        "stimulus_signals": [
+          "csr_addr",
+          "csr_re",
+          "csr_valid",
+          "csr_wdata",
+          "csr_we",
+          "stream_out_ready"
+        ],
+        "expected_signals": [
+          "actuator_cmd_valid",
+          "fault_code"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "clamp_and_bound_actuator_command",
+        "status": "pass",
+        "stimulus_signals": [
+          "csr_addr",
+          "csr_re",
+          "csr_valid",
+          "csr_wdata",
+          "csr_we",
+          "stream_in_data",
+          "stream_in_valid"
+        ],
+        "expected_signals": [
+          "actuator_cmd",
+          "actuator_cmd_valid"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "fault_latch_blocks_new_commands_until_cleared",
+        "status": "pass",
+        "stimulus_signals": [
+          "csr_addr",
+          "csr_re",
+          "csr_valid",
+          "csr_wdata",
+          "csr_we",
+          "stream_in_data",
+          "stream_in_valid"
+        ],
+        "expected_signals": [
+          "actuator_cmd_valid",
+          "fault_code"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      }
+    ],
+    "scope": "static interface binding; behavioral results are verified separately"
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Provide a real firmware-visible CSR/MMIO interface with address, write-data, read-data, valid, write-enable, read-enable, and ready/response semantics.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "csr_ready",
+        "csr_valid",
+        "status_ready"
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Expose CSR registers for operating mode, timeout threshold, stale threshold, actuator minimum and maximum limits, request sequence seed, last command, and fault/diagnostic flags.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates",
+        "status_last_command"
+      ]
+    },
+    {
+      "id": "REQ-003",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Emit compact 64-bit model-request metadata on stream_out_data with stream_out_valid and accept backpressure on stream_out_ready.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "stream_out_data",
+        "stream_out_valid",
+        "stream_out_ready"
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Receive compact 64-bit model-response metadata on stream_in_data with stream_in_valid and advertise readiness on stream_in_ready only when the parser can accept a full word.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "stream_in_data",
+        "stream_in_valid",
+        "stream_in_ready"
+      ]
+    },
+    {
+      "id": "REQ-005",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Validate sequence numbers, reject malformed or out-of-order responses, and detect stale or timed-out transactions.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates"
+      ]
+    },
+    {
+      "id": "REQ-006",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Clamp command outputs to programmable actuator limits and assert actuator_cmd_valid only for accepted commands.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "actuator_cmd_valid"
+      ]
+    },
+    {
+      "id": "REQ-007",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Assert fault_code when safety violations occur.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "fault_code"
+      ]
+    },
+    {
+      "id": "REQ-008",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Reset into inhibited safe state with actuator_cmd_valid deasserted and conservative CSR defaults loaded.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "actuator_cmd_valid",
+        "output_validity_inhibition",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-009",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Maintain a transparent reference/status mode through CSR-readable status words and last accepted sequence tracking.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates"
+      ]
+    },
+    {
+      "id": "REQ-010",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "Use enumerated FSM states IDLE, ISSUE_REQ, WAIT_RESP, VALIDATE, APPLY_CMD, and FAULT_LATCH with one-hot or equivalent synthesizable encoding.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "packet_validation_predicates",
+        "synthesizable_rtl_subset"
+      ]
+    },
+    {
+      "id": "REQ-011",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "CSR transactions are accepted only when csr_valid is asserted; csr_ready indicates acceptance/consumption of the transaction and read data becomes valid according to the design's registered response behavior.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "csr_valid",
+        "csr_ready"
+      ]
+    },
+    {
+      "id": "REQ-012",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "stream_out_valid must remain asserted while a compact request is pending until stream_out_ready is observed or until watchdog timeout aborts the request.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "stream_out_valid",
+        "stream_out_ready"
+      ]
+    },
+    {
+      "id": "REQ-013",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "stream_in_ready may assert only when the parser can accept exactly one complete compact response word.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "stream_in_ready"
+      ]
+    },
+    {
+      "id": "REQ-014",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "Each request and response must carry a monotonically increasing sequence token and age/timeout budget in compact metadata fields encoded in the 64-bit transport word.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates"
+      ]
+    },
+    {
+      "id": "REQ-015",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "Reject duplicated, out-of-order, malformed, unexpected-sequence, stale, or timed-out responses and latch a fault with the appropriate fault_code.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "fault_code",
+        "packet_validation_predicates",
+        "latched_status_fault_state"
+      ]
+    },
+    {
+      "id": "REQ-016",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "If stream_in_valid remains absent beyond timeout_limit cycles after request issuance, inhibit actuator_cmd_valid and latch a timeout fault until a fresh valid transaction and explicit clear_fault are observed.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "stream_in_valid",
+        "actuator_cmd_valid",
+        "output_validity_inhibition",
+        "latched_status_fault_state"
+      ]
+    },
+    {
+      "id": "REQ-017",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "If a command exceeds actuator_min/actuator_max bounds, clamp the command to the configured bounds and record saturation diagnostic state.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-018",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "The top-level shall not implement surrogate inference; it shall only supervise transport and forward compact control decisions returned by external firmware/software.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-019",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "All externally visible command pins are registered outputs.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-020",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "No inferred latches and no non-FPGA memory constructs are allowed in the FPGA path; any future buffering must map to the declared technology-neutral SRAM macro.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "inferred_bulk_memory_array"
+      ]
+    },
+    {
+      "id": "REQ-021",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "Prioritize safety over latency: faulted, stale, or timed-out conditions inhibit actuator_cmd_valid and preserve fault state until explicit CSR clear.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "actuator_cmd_valid",
+        "packet_validation_predicates",
+        "output_validity_inhibition"
+      ]
+    },
+    {
+      "id": "REQ-022",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "No silent fallback command substitution is permitted; invalid or faulted conditions must deassert actuator validity rather than replacing the requested command.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "output_validity_inhibition"
+      ]
+    },
+    {
+      "id": "REQ-023",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "csr_ready",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "csr_ready"
+      ]
+    },
+    {
+      "id": "REQ-024",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "csr_rdata",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "csr_rdata"
+      ]
+    },
+    {
+      "id": "REQ-025",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "stream_out_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "stream_out_valid"
+      ]
+    },
+    {
+      "id": "REQ-026",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "stream_out_data",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "stream_out_data"
+      ]
+    },
+    {
+      "id": "REQ-027",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "stream_in_ready",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "stream_in_ready"
+      ]
+    },
+    {
+      "id": "REQ-028",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "actuator_cmd",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "actuator_cmd"
+      ]
+    },
+    {
+      "id": "REQ-029",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "actuator_cmd_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "actuator_cmd_valid"
+      ]
+    },
+    {
+      "id": "REQ-030",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "fault_code",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "fault_code"
+      ]
+    },
+    {
+      "id": "REQ-031",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "csr_addr",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "csr_addr"
+      ]
+    },
+    {
+      "id": "REQ-032",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "csr_wdata",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "csr_wdata"
+      ]
+    },
+    {
+      "id": "REQ-033",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "csr_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "csr_valid"
+      ]
+    },
+    {
+      "id": "REQ-034",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "stream_out_ready",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "stream_out_ready"
+      ]
+    },
+    {
+      "id": "REQ-035",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "stream_in_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "stream_in_valid"
+      ]
+    },
+    {
+      "id": "REQ-036",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "stream_in_data",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "stream_in_data"
+      ]
+    },
+    {
+      "id": "REQ-037",
+      "module": "adaptive_aero_control_top",
+      "section": "reset_behavior",
+      "requirement": "On reset, enter an inhibited safe state, deassert actuator_cmd_valid, deassert stream_out_valid, clear transient transaction state, and load CSR-backed configuration/status registers to defined defaults. No actuator command shall be asserted during reset release until a valid request-response transaction has been accepted and validated.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "actuator_cmd_valid",
+        "stream_out_valid",
+        "output_validity_inhibition",
+        "status_telemetry_and_fault_outputs",
+        "csr_valid",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-038",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "responsibilities",
+      "requirement": "Decode address 0x00 control, 0x08 status, 0x10 timeout_limit, 0x18 stale_limit, 0x20 actuator_min, 0x28 actuator_max, 0x30 last_command, and 0x38 fault_code/diagnostic flags.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "0x00",
+        "0x08",
+        "0x10",
+        "0x18",
+        "0x20",
+        "0x28",
+        "0x30",
+        "0x38"
+      ]
+    },
+    {
+      "id": "REQ-039",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "responsibilities",
+      "requirement": "Provide a real ready/response MMIO handshake using csr_valid, csr_ready, csr_re, and csr_rdata.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "csr_valid",
+        "csr_ready",
+        "csr_re",
+        "csr_rdata",
+        "status_ready"
+      ]
+    },
+    {
+      "id": "REQ-040",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "responsibilities",
+      "requirement": "Publish semantic control outputs to the transport/safety supervisor.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-041",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "responsibilities",
+      "requirement": "Expose current status and diagnostic readbacks with exact CSR field semantics.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "register_decode_and_access_paths"
+      ]
+    },
+    {
+      "id": "REQ-042",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "responsibilities",
+      "requirement": "Support explicit fault clear and sequence-seed programming from firmware.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-043",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "behavior_rules",
+      "requirement": "Writable control fields are semantic outputs because they are consumed elsewhere; readback/status fields are semantic inputs because they are produced elsewhere.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "register_decode_and_access_paths"
+      ]
+    },
+    {
+      "id": "REQ-044",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "behavior_rules",
+      "requirement": "The CSR map must match the documented addresses and field ownership exactly.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-045",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "behavior_rules",
+      "requirement": "Read operations must return deterministic status for the addressed register; write operations update writable control fields and may generate a one-cycle fault_clear pulse when requested.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-046",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "behavior_rules",
+      "requirement": "No status field may be exposed only internally without a corresponding CSR readback path.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-047",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "behavior_rules",
+      "requirement": "The control register at 0x00 shall include enable, mode, clear_fault, and request_seq_seed fields.",
+      "status": "partial",
+      "static_precheck_status": "partial",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "0x00"
+      ]
+    },
+    {
+      "id": "REQ-048",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "behavior_rules",
+      "requirement": "The status register at 0x08 shall include ready, fault_present, last_seq, and timeout_active fields.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "status_ready",
+        "0x08"
+      ]
+    },
+    {
+      "id": "REQ-049",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "behavior_rules",
+      "requirement": "The timeout_limit, stale_limit, actuator_min, actuator_max, last_command, and fault_code/diagnostic registers shall each have reachable decode paths.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "register_decode_and_access_paths"
+      ]
+    },
+    {
+      "id": "REQ-050",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_drive",
+      "requirement": "csr_ready",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "csr_ready"
+      ]
+    },
+    {
+      "id": "REQ-051",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_drive",
+      "requirement": "csr_rdata",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "csr_rdata"
+      ]
+    },
+    {
+      "id": "REQ-052",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_drive",
+      "requirement": "cfg_enable",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_enable"
+      ]
+    },
+    {
+      "id": "REQ-053",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_drive",
+      "requirement": "cfg_mode",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_mode"
+      ]
+    },
+    {
+      "id": "REQ-054",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_drive",
+      "requirement": "cfg_clear_fault",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_clear_fault"
+      ]
+    },
+    {
+      "id": "REQ-055",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_drive",
+      "requirement": "cfg_request_seq_seed",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_request_seq_seed"
+      ]
+    },
+    {
+      "id": "REQ-056",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_drive",
+      "requirement": "cfg_timeout_limit",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_timeout_limit"
+      ]
+    },
+    {
+      "id": "REQ-057",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_drive",
+      "requirement": "cfg_stale_limit",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_stale_limit"
+      ]
+    },
+    {
+      "id": "REQ-058",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_drive",
+      "requirement": "cfg_actuator_min",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_actuator_min"
+      ]
+    },
+    {
+      "id": "REQ-059",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_drive",
+      "requirement": "cfg_actuator_max",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_actuator_max"
+      ]
+    },
+    {
+      "id": "REQ-060",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_drive",
+      "requirement": "cfg_request_seq_current",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_request_seq_current"
+      ]
+    },
+    {
+      "id": "REQ-061",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_receive",
+      "requirement": "csr_addr",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "csr_addr"
+      ]
+    },
+    {
+      "id": "REQ-062",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_receive",
+      "requirement": "csr_wdata",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "csr_wdata"
+      ]
+    },
+    {
+      "id": "REQ-063",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_receive",
+      "requirement": "csr_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "csr_valid"
+      ]
+    },
+    {
+      "id": "REQ-064",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_receive",
+      "requirement": "status_ready",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_ready"
+      ]
+    },
+    {
+      "id": "REQ-065",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_receive",
+      "requirement": "status_fault_present",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_fault_present"
+      ]
+    },
+    {
+      "id": "REQ-066",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_receive",
+      "requirement": "status_last_seq",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_last_seq"
+      ]
+    },
+    {
+      "id": "REQ-067",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_receive",
+      "requirement": "status_timeout_active",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_timeout_active"
+      ]
+    },
+    {
+      "id": "REQ-068",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_receive",
+      "requirement": "status_last_command",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_last_command"
+      ]
+    },
+    {
+      "id": "REQ-069",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_receive",
+      "requirement": "status_fault_code",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_fault_code"
+      ]
+    },
+    {
+      "id": "REQ-070",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_receive",
+      "requirement": "status_diag_flags",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_diag_flags"
+      ]
+    },
+    {
+      "id": "REQ-071",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "must_receive",
+      "requirement": "fault_clear_ack",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "fault_clear_ack"
+      ]
+    },
+    {
+      "id": "REQ-072",
+      "module": "adaptive_aero_csr_mmio",
+      "section": "reset_behavior",
+      "requirement": "Reset clears write-side semantic controls to conservative defaults, deasserts csr_ready until reset release, and resets readback staging. Control defaults shall place the wider system in inhibited operation until firmware explicitly enables it.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "csr_ready",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-073",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "responsibilities",
+      "requirement": "Generate 64-bit compact request metadata with monotonically increasing sequence tracking.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates"
+      ]
+    },
+    {
+      "id": "REQ-074",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "responsibilities",
+      "requirement": "Accept only 64-bit compact response metadata words and validate format/sequence/freshness.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates"
+      ]
+    },
+    {
+      "id": "REQ-075",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "responsibilities",
+      "requirement": "Drive fault_present and fault_code on timeout, malformed packet, stale response, or sequence mismatch.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "fault_present",
+        "fault_code",
+        "packet_validation_predicates"
+      ]
+    },
+    {
+      "id": "REQ-076",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "responsibilities",
+      "requirement": "Clamp accepted command values to cfg_actuator_min and cfg_actuator_max.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "cfg_actuator_min",
+        "cfg_actuator_max"
+      ]
+    },
+    {
+      "id": "REQ-077",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "responsibilities",
+      "requirement": "Publish status_ready, timeout status, last accepted sequence, last command, and diagnostic flags to the CSR block.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "status_ready",
+        "packet_validation_predicates",
+        "status_last_command"
+      ]
+    },
+    {
+      "id": "REQ-078",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "responsibilities",
+      "requirement": "Assert actuator_cmd_valid only for accepted and bounded commands.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "actuator_cmd_valid"
+      ]
+    },
+    {
+      "id": "REQ-079",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "responsibilities",
+      "requirement": "Support explicit clear_fault acknowledgement path.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-080",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "responsibilities",
+      "requirement": "Prioritize safety over latency and never emit unvalidated actuator commands.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-081",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "behavior_rules",
+      "requirement": "Use enumerated FSM states IDLE, ISSUE_REQ, WAIT_RESP, VALIDATE, APPLY_CMD, and FAULT_LATCH.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates"
+      ]
+    },
+    {
+      "id": "REQ-082",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "behavior_rules",
+      "requirement": "The watchdog compares a local cycle counter against cfg_timeout_limit and triggers inhibition on expiration.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "cfg_timeout_limit"
+      ]
+    },
+    {
+      "id": "REQ-083",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "behavior_rules",
+      "requirement": "Request output must remain asserted until req_ready or until timeout aborts the transaction.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "req_ready"
+      ]
+    },
+    {
+      "id": "REQ-084",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "behavior_rules",
+      "requirement": "rsp_ready shall only assert when the parser can accept a full compact response word.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "rsp_ready"
+      ]
+    },
+    {
+      "id": "REQ-085",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "behavior_rules",
+      "requirement": "Reject out-of-order, duplicated, malformed, stale, or mismatched-sequence responses.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates"
+      ]
+    },
+    {
+      "id": "REQ-086",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "behavior_rules",
+      "requirement": "If command bounds are violated, clamp to cfg_actuator_min/cfg_actuator_max and optionally flag saturation in diagnostic flags; repeated saturation may escalate per policy encoded in cfg_mode or diagnostic logic.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "cfg_actuator_min",
+        "cfg_actuator_max",
+        "cfg_mode"
+      ]
+    },
+    {
+      "id": "REQ-087",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "behavior_rules",
+      "requirement": "The block must not assume surrogate inference exists in hardware; it only handles compact control decisions returned by external software.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-088",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "behavior_rules",
+      "requirement": "No silent replacement of requested commands is permitted on invalid data; invalid data must inhibit actuator_cmd_valid and raise fault state.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "actuator_cmd_valid",
+        "output_validity_inhibition"
+      ]
+    },
+    {
+      "id": "REQ-089",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "behavior_rules",
+      "requirement": "All externally visible command outputs are registered.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-090",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "behavior_rules",
+      "requirement": "Buffering and readback of compact history data are handled by the separate buffer controller; this block does not own buffer address generation.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-091",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "req_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "req_valid"
+      ]
+    },
+    {
+      "id": "REQ-092",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "req_data",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "req_data"
+      ]
+    },
+    {
+      "id": "REQ-093",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "rsp_ready",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "rsp_ready"
+      ]
+    },
+    {
+      "id": "REQ-094",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "fault_present",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "fault_present"
+      ]
+    },
+    {
+      "id": "REQ-095",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "fault_code",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "fault_code"
+      ]
+    },
+    {
+      "id": "REQ-096",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "status_ready",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_ready"
+      ]
+    },
+    {
+      "id": "REQ-097",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "status_timeout_active",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_timeout_active"
+      ]
+    },
+    {
+      "id": "REQ-098",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "status_last_seq",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_last_seq"
+      ]
+    },
+    {
+      "id": "REQ-099",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "status_last_command",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_last_command"
+      ]
+    },
+    {
+      "id": "REQ-100",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "status_diag_flags",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "status_diag_flags"
+      ]
+    },
+    {
+      "id": "REQ-101",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "actuator_cmd",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "actuator_cmd"
+      ]
+    },
+    {
+      "id": "REQ-102",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "actuator_cmd_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "actuator_cmd_valid"
+      ]
+    },
+    {
+      "id": "REQ-103",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_drive",
+      "requirement": "fault_clear_ack",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "fault_clear_ack"
+      ]
+    },
+    {
+      "id": "REQ-104",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "cfg_enable",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_enable"
+      ]
+    },
+    {
+      "id": "REQ-105",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "cfg_mode",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_mode"
+      ]
+    },
+    {
+      "id": "REQ-106",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "cfg_clear_fault",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_clear_fault"
+      ]
+    },
+    {
+      "id": "REQ-107",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "cfg_request_seq_seed",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_request_seq_seed"
+      ]
+    },
+    {
+      "id": "REQ-108",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "cfg_timeout_limit",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_timeout_limit"
+      ]
+    },
+    {
+      "id": "REQ-109",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "cfg_stale_limit",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_stale_limit"
+      ]
+    },
+    {
+      "id": "REQ-110",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "cfg_actuator_min",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_actuator_min"
+      ]
+    },
+    {
+      "id": "REQ-111",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "cfg_actuator_max",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_actuator_max"
+      ]
+    },
+    {
+      "id": "REQ-112",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "cfg_request_seq_current",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "cfg_request_seq_current"
+      ]
+    },
+    {
+      "id": "REQ-113",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "req_ready",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "req_ready"
+      ]
+    },
+    {
+      "id": "REQ-114",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "rsp_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "rsp_valid"
+      ]
+    },
+    {
+      "id": "REQ-115",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "must_receive",
+      "requirement": "rsp_data",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "rsp_data"
+      ]
+    },
+    {
+      "id": "REQ-116",
+      "module": "adaptive_aero_transport_supervisor",
+      "section": "reset_behavior",
+      "requirement": "On reset, return to an inhibited safe state, deassert req_valid and actuator_cmd_valid, clear transaction trackers, set fault_present low, and block command issue until firmware enables the system and an explicit clear allows exit from latched fault states.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "req_valid",
+        "actuator_cmd_valid",
+        "fault_present",
+        "output_validity_inhibition",
+        "latched_status_fault_state",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-117",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "responsibilities",
+      "requirement": "Expose a narrow compact buffering interface suitable for block RAM mapping.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-118",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "responsibilities",
+      "requirement": "Avoid any register-file substitution for bulk storage.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-119",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "responsibilities",
+      "requirement": "Derive the buffer address and memory control from the compact history index and transaction activity while preserving the declared 8-bit buf_addr interface as internal buffer addressing semantics.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "buf_addr"
+      ]
+    },
+    {
+      "id": "REQ-120",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "responsibilities",
+      "requirement": "Support optional readback of compact history data into a top-level observable path without altering the transport/safety contract.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-121",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "responsibilities",
+      "requirement": "Implement bulk storage as an inferred memory rather than a flattened bank of scalar registers.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-122",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "responsibilities",
+      "requirement": "Return stored read data through the declared functional output port.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-123",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "behavior_rules",
+      "requirement": "All storage beyond small CSR/state elements shall map to the declared FPGA-friendly SRAM abstraction.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-124",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "behavior_rules",
+      "requirement": "Buffer read data shall be functionally observable through a real consumer path and not decorative only.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-125",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "behavior_rules",
+      "requirement": "The buffer controller shall compute memory address and control outputs internally from buf_addr and buf_we without requiring additional upstream producers.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "buf_addr",
+        "buf_we"
+      ]
+    },
+    {
+      "id": "REQ-126",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "behavior_rules",
+      "requirement": "Read data from the buffer must feed an actual observable consumer path in the design.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-127",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "behavior_rules",
+      "requirement": "Infer one synthesizable unpacked memory array with synchronous access so FPGA tools can map it to block RAM.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "synthesizable_rtl_subset"
+      ]
+    },
+    {
+      "id": "REQ-128",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "must_drive",
+      "requirement": "sram_csb",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "sram_csb"
+      ]
+    },
+    {
+      "id": "REQ-129",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "must_drive",
+      "requirement": "sram_addr",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "sram_addr"
+      ]
+    },
+    {
+      "id": "REQ-130",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "must_drive",
+      "requirement": "sram_din",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "sram_din"
+      ]
+    },
+    {
+      "id": "REQ-131",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "must_drive",
+      "requirement": "buf_dout",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "buf_dout"
+      ]
+    },
+    {
+      "id": "REQ-132",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "must_receive",
+      "requirement": "buf_addr",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "buf_addr"
+      ]
+    },
+    {
+      "id": "REQ-133",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "must_receive",
+      "requirement": "sram_dout",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "sram_dout"
+      ]
+    },
+    {
+      "id": "REQ-134",
+      "module": "adaptive_aero_buffer_controller",
+      "section": "reset_behavior",
+      "requirement": "Reset disables buffer access, deasserts chip select and write enable, and clears internal buffer control state without disturbing unrelated control-plane registers. For inferred storage on reset, hold the declared read-data output benign without clearing stored memory contents; no alternate or flattened scalar-register storage is created.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "no_memories",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-135",
+      "module": "generic_fpgabrams_64x64",
+      "section": "responsibilities",
+      "requirement": "Provide the explicit memory wrapper instance for FPGA synthesis flow mapping.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-136",
+      "module": "generic_fpgabrams_64x64",
+      "section": "responsibilities",
+      "requirement": "Accept write controls and address/data inputs from the buffer controller.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-137",
+      "module": "generic_fpgabrams_64x64",
+      "section": "responsibilities",
+      "requirement": "Drive read data that is consumed by the buffer controller.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-138",
+      "module": "generic_fpgabrams_64x64",
+      "section": "responsibilities",
+      "requirement": "Implement bulk storage as an inferred memory rather than a flattened bank of scalar registers.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "inferred_bulk_memory_array"
+      ]
+    },
+    {
+      "id": "REQ-139",
+      "module": "generic_fpgabrams_64x64",
+      "section": "responsibilities",
+      "requirement": "Return stored read data through the declared functional output port.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "memory_read_data_forwarded"
+      ]
+    },
+    {
+      "id": "REQ-140",
+      "module": "generic_fpgabrams_64x64",
+      "section": "behavior_rules",
+      "requirement": "All memory read data must be functionally observable through a real consumer input.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-141",
+      "module": "generic_fpgabrams_64x64",
+      "section": "behavior_rules",
+      "requirement": "The wrapper exists to satisfy the FPGA memory contract and must not be decorative.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-142",
+      "module": "generic_fpgabrams_64x64",
+      "section": "behavior_rules",
+      "requirement": "The buffer controller shall be the sole consumer of dout via sram_dout.",
+      "status": "pending_verification",
+      "static_precheck_status": "partial",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "dout"
+      ]
+    },
+    {
+      "id": "REQ-143",
+      "module": "generic_fpgabrams_64x64",
+      "section": "behavior_rules",
+      "requirement": "Implement storage as a synthesizable inferred memory compatible with native FPGA block RAM.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "synthesizable_rtl_subset"
+      ]
+    },
+    {
+      "id": "REQ-144",
+      "module": "generic_fpgabrams_64x64",
+      "section": "behavior_rules",
+      "requirement": "Infer one synthesizable unpacked memory array with synchronous access so FPGA tools can map it to block RAM.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "synchronous_inferred_memory_access",
+        "synthesizable_rtl_subset"
+      ]
+    },
+    {
+      "id": "REQ-145",
+      "module": "generic_fpgabrams_64x64",
+      "section": "reset_behavior",
+      "requirement": "Reset leaves the memory wrapper inactive by virtue of its controlling inputs being deasserted; memory contents are otherwise implementation-defined for FPGA block RAM mapping. For inferred storage on reset, hold the declared read-data output benign without clearing stored memory contents; no alternate or flattened scalar-register storage is created.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    }
+  ],
+  "rtl_files": [
+    "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/pass2/adaptive_aero_buffer_controller.v",
+    "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/pass2/adaptive_aero_control_top.v",
+    "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/pass2/adaptive_aero_csr_mmio.v",
+    "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/pass2/adaptive_aero_transport_supervisor.v",
+    "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/pass2/generic_fpgabrams_64x64.v"
+  ],
+  "modules": [
+    {
+      "name": "adaptive_aero_buffer_controller",
+      "file": "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/pass2/adaptive_aero_buffer_controller.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "buf_en",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "buf_we",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "buf_addr",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "buf_din",
+          "direction": "input",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "buf_dout",
+          "direction": "output",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "sram_csb",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "sram_we",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "sram_addr",
+          "direction": "output",
+          "width": "[5:0]",
+          "bits": 6
+        },
+        {
+          "name": "sram_din",
+          "direction": "output",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "sram_dout",
+          "direction": "input",
+          "width": "[63:0]",
+          "bits": 64
+        }
+      ],
+      "rtl_text": "module adaptive_aero_buffer_controller (\n    input  clk,\n    input  reset_n,\n    input  buf_en,\n    input  buf_we,\n    input  [7:0] buf_addr,\n    input  [63:0] buf_din,\n    output [63:0] buf_dout,\n    output sram_csb,\n    output sram_we,\n    output [5:0] sram_addr,\n    output [63:0] sram_din,\n    input  [63:0] sram_dout\n);\n    reg [63:0] buf_dout_r;\n    reg sram_csb_r;\n    reg sram_we_r;\n    reg [5:0] sram_addr_r;\n    reg [63:0] sram_din_r;\n    assign buf_dout = buf_dout_r;\n    assign sram_csb = sram_csb_r;\n    assign sram_we = sram_we_r;\n    assign sram_addr = sram_addr_r;\n    assign sram_din = sram_din_r;\n\n    always @(posedge clk or negedge reset_n) begin\n        if (!reset_n) begin\n            buf_dout_r <= 64'h0000000000000000;\n            sram_csb_r <= 1'b1;\n            sram_we_r <= 1'b0;\n            sram_addr_r <= 6'h00;\n            sram_din_r <= 64'h0000000000000000;\n        end else begin\n            sram_csb_r <= ~buf_en;\n            sram_we_r <= buf_en & buf_we;\n            sram_addr_r <= buf_addr[5:0];\n            sram_din_r <= buf_din;\n            if (buf_en) buf_dout_r <= sram_dout;\n        end\n    end\nendmodule"
+    },
+    {
+      "name": "adaptive_aero_control_top",
+      "file": "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/pass2/adaptive_aero_control_top.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csr_addr",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "csr_wdata",
+          "direction": "input",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "csr_we",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csr_re",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csr_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csr_ready",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csr_rdata",
+          "direction": "output",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "stream_out_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "stream_out_ready",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "stream_out_data",
+          "direction": "output",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "stream_in_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "stream_in_ready",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "stream_in_data",
+          "direction": "input",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_code",
+          "direction": "output",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "buf_dout",
+          "direction": "input",
+          "width": "[63:0]",
+          "bits": 64
+        }
+      ],
+      "rtl_text": "module adaptive_aero_control_top (\n    input  clk,\n    input  reset_n,\n    input  [7:0] csr_addr,\n    input  [63:0] csr_wdata,\n    input  csr_we,\n    input  csr_re,\n    input  csr_valid,\n    output csr_ready,\n    output [63:0] csr_rdata,\n    output stream_out_valid,\n    input  stream_out_ready,\n    output [63:0] stream_out_data,\n    input  stream_in_valid,\n    output stream_in_ready,\n    input  [63:0] stream_in_data,\n    output [31:0] actuator_cmd,\n    output actuator_cmd_valid,\n    output [7:0] fault_code,\n    input  [63:0] buf_dout\n);\nwire cfg_enable;\nwire [1:0] cfg_mode;\nwire cfg_clear_fault;\nwire [15:0] cfg_request_seq_seed;\nwire [15:0] cfg_timeout_limit;\nwire [15:0] cfg_stale_limit;\nwire [31:0] cfg_actuator_min;\nwire [31:0] cfg_actuator_max;\nwire [7:0] cfg_request_seq_current;\nwire status_ready;\nwire status_fault_present;\nwire [15:0] status_last_seq;\nwire status_timeout_active;\nwire [31:0] status_last_command;\nwire [7:0] status_fault_code;\nwire [7:0] status_diag_flags;\nwire fault_clear_ack;\nwire req_valid;\n    wire req_ready;\nwire [63:0] req_data;\nwire rsp_ready;\n    wire fault_present;\nwire [7:0] ts_fault_code;\nwire ts_status_ready;\nwire ts_status_timeout_active;\nwire [15:0] ts_status_last_seq;\nwire [31:0] ts_status_last_command;\nwire [7:0] ts_status_diag_flags;\nwire [31:0] ts_actuator_cmd;\nwire ts_actuator_cmd_valid;\nwire ts_fault_clear_ack;\n    wire buf_en;\nwire buf_we;\n    wire [7:0] buf_addr;\nwire [63:0] buf_din;\nwire sram_csb;\nwire sram_we;\nwire [5:0] sram_addr;\nwire [63:0] sram_din;\n    wire [63:0] sram_dout_observed;\nwire [63:0] sram_dout;\nwire [63:0] buf_dout_observe;\n    assign stream_out_valid = req_valid;\n    assign stream_out_data = req_data;\n    assign stream_in_ready = rsp_ready;\n    assign actuator_cmd = ts_actuator_cmd;\n    assign actuator_cmd_valid = ts_actuator_cmd_valid;\n    assign fault_code = ts_fault_code;\n    assign fault_present = 1'b0;\n    assign status_ready = ts_status_ready;\n    assign status_fault_present = fault_present;\n    assign status_last_seq = ts_status_last_seq;\n    assign status_timeout_active = ts_status_timeout_active;\n    assign status_last_command = ts_status_last_command;\n    assign status_fault_code = ts_fault_code;\n    assign status_diag_flags = ts_status_diag_flags;\n    assign fault_clear_ack = ts_fault_clear_ack;\n\n    assign buf_en = status_ready;\n    assign buf_we = csr_ready;\n    assign buf_addr = cfg_request_seq_current;\n    assign buf_din = req_data;\n    assign sram_dout_observed = buf_dout;\n\n    adaptive_aero_csr_mmio u_csr_mmio (\n        .clk(clk),\n        .reset_n(reset_n),\n        .csr_addr(csr_addr),\n        .csr_wdata(csr_wdata),\n        .csr_we(csr_we),\n        .csr_re(csr_re),\n        .csr_valid(csr_valid),\n        .csr_ready(csr_ready),\n        .csr_rdata(csr_rdata),\n        .cfg_enable(cfg_enable),\n        .cfg_mode(cfg_mode),\n        .cfg_clear_fault(cfg_clear_fault),\n        .cfg_request_seq_seed(cfg_request_seq_seed),\n        .cfg_timeout_limit(cfg_timeout_limit),\n        .cfg_stale_limit(cfg_stale_limit),\n        .cfg_actuator_min(cfg_actuator_min),\n        .cfg_actuator_max(cfg_actuator_max),\n        .cfg_request_seq_current(cfg_request_seq_current),\n        .status_ready(status_ready),\n        .status_fault_present(status_fault_present),\n        .status_last_seq(status_last_seq),\n        .status_timeout_active(status_timeout_active),\n        .status_last_command(status_last_command),\n        .status_fault_code(status_fault_code),\n        .status_diag_flags(status_diag_flags),\n        .fault_clear_ack(fault_clear_ack)\n    );\n\n    adaptive_aero_transport_supervisor u_transport_supervisor (\n        .clk(clk),\n        .reset_n(reset_n),\n        .cfg_enable(cfg_enable),\n        .cfg_mode(cfg_mode),\n        .cfg_clear_fault(cfg_clear_fault),\n        .cfg_request_seq_seed(cfg_request_seq_seed),\n        .cfg_timeout_limit(cfg_timeout_limit),\n        .cfg_stale_limit(cfg_stale_limit),\n        .cfg_actuator_min(cfg_actuator_min),\n        .cfg_actuator_max(cfg_actuator_max),\n        .cfg_request_seq_current(cfg_request_seq_current),\n        .req_valid(req_valid),\n        .req_ready(stream_out_ready),\n        .req_data(req_data),\n        .rsp_valid(stream_in_valid),\n        .rsp_ready(rsp_ready),\n        .rsp_data(stream_in_data),\n        .fault_present(),\n        .fault_code(ts_fault_code),\n        .status_ready(ts_status_ready),\n        .status_timeout_active(ts_status_timeout_active),\n        .status_last_seq(ts_status_last_seq),\n        .status_last_command(ts_status_last_command),\n        .status_diag_flags(ts_status_diag_flags),\n        .actuator_cmd(ts_actuator_cmd),\n        .actuator_cmd_valid(ts_actuator_cmd_valid),\n        .fault_clear_ack(ts_fault_clear_ack)\n    );\n\n    adaptive_aero_buffer_controller u_buffer_controller (\n        .clk(clk),\n        .reset_n(reset_n),\n        .buf_en(buf_en),\n        .buf_we(buf_we),\n        .buf_addr(buf_addr),\n        .buf_din(buf_din),\n        .buf_dout(),\n        .sram_csb(sram_csb),\n        .sram_we(sram_we),\n        .sram_addr(sram_addr),\n        .sram_din(sram_din),\n        .sram_dout(sram_dout_observed)\n    );\n\n    generic_fpgabrams_64x64 u_generic_fpgabrams_64x64 (\n        .clk(clk),\n        .csb(sram_csb),\n        .we(sram_we),\n        .addr(sram_addr),\n        .din(sram_din),\n        .dout()\n    );\nendmodule"
+    },
+    {
+      "name": "adaptive_aero_csr_mmio",
+      "file": "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/pass2/adaptive_aero_csr_mmio.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csr_addr",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "csr_wdata",
+          "direction": "input",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "csr_we",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csr_re",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csr_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csr_ready",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csr_rdata",
+          "direction": "output",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "cfg_mode",
+          "direction": "output",
+          "width": "[1:0]",
+          "bits": 2
+        },
+        {
+          "name": "cfg_clear_fault",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "cfg_request_seq_seed",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "cfg_timeout_limit",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "cfg_stale_limit",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "cfg_actuator_min",
+          "direction": "output",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "cfg_actuator_max",
+          "direction": "output",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "cfg_request_seq_current",
+          "direction": "output",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "status_ready",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_fault_present",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_last_seq",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "status_timeout_active",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_last_command",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "status_fault_code",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "status_diag_flags",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "fault_clear_ack",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        }
+      ],
+      "rtl_text": "module adaptive_aero_csr_mmio (\n    input  clk,\n    input  reset_n,\n    input  [7:0] csr_addr,\n    input  [63:0] csr_wdata,\n    input  csr_we,\n    input  csr_re,\n    input  csr_valid,\n    output csr_ready,\n    output [63:0] csr_rdata,\n    output cfg_enable,\n    output [1:0] cfg_mode,\n    output cfg_clear_fault,\n    output [15:0] cfg_request_seq_seed,\n    output [15:0] cfg_timeout_limit,\n    output [15:0] cfg_stale_limit,\n    output [31:0] cfg_actuator_min,\n    output [31:0] cfg_actuator_max,\n    output [7:0] cfg_request_seq_current,\n    input  status_ready,\n    input  status_fault_present,\n    input  [15:0] status_last_seq,\n    input  status_timeout_active,\n    input  [31:0] status_last_command,\n    input  [7:0] status_fault_code,\n    input  [7:0] status_diag_flags,\n    input  fault_clear_ack\n);\n    reg cfg_enable_r;\n    reg [1:0] cfg_mode_r;\n    reg cfg_clear_fault_r;\n    reg [15:0] cfg_request_seq_seed_r;\n    reg [15:0] cfg_timeout_limit_r;\n    reg [15:0] cfg_stale_limit_r;\n    reg [31:0] cfg_actuator_min_r;\n    reg [31:0] cfg_actuator_max_r;\n    reg [7:0] cfg_request_seq_current_r;\n    reg csr_ready_r;\n    reg [63:0] csr_rdata_r;\n    assign cfg_enable = cfg_enable_r;\n    assign cfg_mode = cfg_mode_r;\n    assign cfg_clear_fault = cfg_clear_fault_r;\n    assign cfg_request_seq_seed = cfg_request_seq_seed_r;\n    assign cfg_timeout_limit = cfg_timeout_limit_r;\n    assign cfg_stale_limit = cfg_stale_limit_r;\n    assign cfg_actuator_min = cfg_actuator_min_r;\n    assign cfg_actuator_max = cfg_actuator_max_r;\n    assign cfg_request_seq_current = cfg_request_seq_current_r;\n    assign csr_ready = csr_ready_r;\n    assign csr_rdata = csr_rdata_r;\n\n    always @(posedge clk or negedge reset_n) begin\n        if (!reset_n) begin\n            cfg_enable_r <= 1'b0;\n            cfg_mode_r <= 2'b00;\n            cfg_clear_fault_r <= 1'b0;\n            cfg_request_seq_seed_r <= 16'h0000;\n            cfg_timeout_limit_r <= 16'd1000;\n            cfg_stale_limit_r <= 16'd1000;\n            cfg_actuator_min_r <= 32'h00000000;\n            cfg_actuator_max_r <= 32'hffffffff;\n            cfg_request_seq_current_r <= 8'h00;\n            csr_ready_r <= 1'b0;\n            csr_rdata_r <= 64'h0000000000000000;\n        end else begin\n            csr_ready_r <= 1'b0;\n            cfg_clear_fault_r <= 1'b0;\n            if (csr_valid) begin\n                csr_ready_r <= 1'b1;\n                if (csr_we) begin\n                    case (csr_addr)\n                        8'h00: begin\n                            cfg_enable_r <= csr_wdata[0];\n                            cfg_mode_r <= csr_wdata[2:1];\n                            cfg_clear_fault_r <= csr_wdata[3];\n                            cfg_request_seq_seed_r <= csr_wdata[31:16];\n                        end\n                        8'h10: cfg_timeout_limit_r <= csr_wdata[15:0];\n                        8'h18: cfg_stale_limit_r <= csr_wdata[15:0];\n                        8'h20: cfg_actuator_min_r <= csr_wdata[31:0];\n                        8'h28: cfg_actuator_max_r <= csr_wdata[31:0];\n                        default: begin\n                        end\n                    endcase\n                end\n                if (csr_re) begin\n                    case (csr_addr)\n                        8'h00: csr_rdata_r <= {32'h00000000, cfg_request_seq_seed_r, 12'h000, cfg_clear_fault_r, cfg_mode_r, cfg_enable_r};\n                        8'h08: csr_rdata_r <= {17'b0, status_timeout_active, 14'h0000, status_last_seq, 14'h0000, status_fault_present, status_ready};\n                        8'h10: csr_rdata_r <= {48'h000000000000, cfg_timeout_limit_r};\n                        8'h18: csr_rdata_r <= {48'h000000000000, cfg_stale_limit_r};\n                        8'h20: csr_rdata_r <= {32'h00000000, cfg_actuator_min_r};\n                        8'h28: csr_rdata_r <= {32'h00000000, cfg_actuator_max_r};\n                        8'h30: csr_rdata_r <= {32'h00000000, status_last_command};\n                        8'h38: csr_rdata_r <= {48'h000000000000, status_diag_flags, status_fault_code};\n                        default: csr_rdata_r <= 64'h0000000000000000;\n                    endcase\n                end\n                cfg_request_seq_current_r <= cfg_request_seq_seed_r[7:0];\n            end\n        end\n    end\nendmodule"
+    },
+    {
+      "name": "adaptive_aero_transport_supervisor",
+      "file": "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/pass2/adaptive_aero_transport_supervisor.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "cfg_enable",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "cfg_mode",
+          "direction": "input",
+          "width": "[1:0]",
+          "bits": 2
+        },
+        {
+          "name": "cfg_clear_fault",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "cfg_request_seq_seed",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "cfg_timeout_limit",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "cfg_stale_limit",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "cfg_actuator_min",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "cfg_actuator_max",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "cfg_request_seq_current",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "req_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "req_ready",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "req_data",
+          "direction": "output",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "rsp_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rsp_ready",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rsp_data",
+          "direction": "input",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "fault_present",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_code",
+          "direction": "output",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "status_ready",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_timeout_active",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "status_last_seq",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "status_last_command",
+          "direction": "output",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "status_diag_flags",
+          "direction": "output",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_clear_ack",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        }
+      ],
+      "rtl_text": "module adaptive_aero_transport_supervisor (\n    input  clk,\n    input  reset_n,\n    input  cfg_enable,\n    input  [1:0] cfg_mode,\n    input  cfg_clear_fault,\n    input  [15:0] cfg_request_seq_seed,\n    input  [15:0] cfg_timeout_limit,\n    input  [15:0] cfg_stale_limit,\n    input  [31:0] cfg_actuator_min,\n    input  [31:0] cfg_actuator_max,\n    input  [7:0] cfg_request_seq_current,\n    output req_valid,\n    input  req_ready,\n    output [63:0] req_data,\n    input  rsp_valid,\n    output rsp_ready,\n    input  [63:0] rsp_data,\n    output fault_present,\n    output [7:0] fault_code,\n    output status_ready,\n    output status_timeout_active,\n    output [15:0] status_last_seq,\n    output [31:0] status_last_command,\n    output [7:0] status_diag_flags,\n    output [31:0] actuator_cmd,\n    output actuator_cmd_valid,\n    output fault_clear_ack\n);\n    localparam [2:0] S_IDLE = 3'd0;\n    localparam [2:0] S_ISSUE_REQ = 3'd1;\n    localparam [2:0] S_WAIT_RESP = 3'd2;\n    localparam [2:0] S_VALIDATE = 3'd3;\n    localparam [2:0] S_APPLY_CMD = 3'd4;\n    localparam [2:0] S_FAULT_LATCH = 3'd5;\n\n    reg [2:0] state_r;\n    reg [2:0] state_n;\n    reg req_valid_r;\n    reg [63:0] req_data_r;\n    reg rsp_ready_r;\n    reg fault_present_r;\n    reg [7:0] fault_code_r;\n    reg status_ready_r;\n    reg status_timeout_active_r;\n    reg [15:0] status_last_seq_r;\n    reg [31:0] status_last_command_r;\n    reg [7:0] status_diag_flags_r;\n    reg [31:0] actuator_cmd_r;\n    reg actuator_cmd_valid_r;\n    reg fault_clear_ack_r;\n    reg [15:0] watchdog_r;\n    reg [15:0] sequence_r;\n    reg [31:0] candidate_cmd_r;\n    reg [31:0] clamped_cmd_r;\n    reg [7:0] diag_flags_r;\n\n    assign req_valid = req_valid_r;\n    assign req_data = req_data_r;\n    assign rsp_ready = rsp_ready_r;\n    assign fault_present = fault_present_r;\n    assign fault_code = fault_code_r;\n    assign status_ready = status_ready_r;\n    assign status_timeout_active = status_timeout_active_r;\n    assign status_last_seq = status_last_seq_r;\n    assign status_last_command = status_last_command_r;\n    assign status_diag_flags = status_diag_flags_r;\n    assign actuator_cmd = actuator_cmd_r;\n    assign actuator_cmd_valid = actuator_cmd_valid_r;\n    assign fault_clear_ack = fault_clear_ack_r;\n\n    always @(*) begin\n        state_n = state_r;\n        req_valid_r = 1'b0;\n        req_data_r = 64'h0000000000000000;\n        rsp_ready_r = 1'b0;\n        case (state_r)\n            S_IDLE: begin\n                if (cfg_enable && !fault_present_r) begin\n                    state_n = S_ISSUE_REQ;\n                end\n            end\n            S_ISSUE_REQ: begin\n                req_valid_r = 1'b1;\n                req_data_r = {16'hA55A, cfg_request_seq_seed, cfg_request_seq_current, cfg_mode, cfg_timeout_limit, cfg_stale_limit, 8'hC3};\n                if (req_ready) state_n = S_WAIT_RESP;\n            end\n            S_WAIT_RESP: begin\n                req_valid_r = 1'b1;\n                req_data_r = {16'hA55A, cfg_request_seq_seed, cfg_request_seq_current, cfg_mode, cfg_timeout_limit, cfg_stale_limit, 8'hC3};\n                rsp_ready_r = 1'b1;\n                if (rsp_valid) state_n = S_VALIDATE;\n            end\n            S_VALIDATE: begin\n                rsp_ready_r = 1'b1;\n                if (rsp_valid) state_n = S_APPLY_CMD;\n            end\n            S_APPLY_CMD: begin\n                state_n = S_IDLE;\n            end\n            S_FAULT_LATCH: begin\n            end\n            default: begin\n                state_n = S_IDLE;\n            end\n        endcase\n    end\n\n    always @(posedge clk or negedge reset_n) begin\n        if (!reset_n) begin\n            state_r <= S_IDLE;\n            fault_present_r <= 1'b1;\n            fault_code_r <= 8'h00;\n            status_ready_r <= 1'b0;\n            status_timeout_active_r <= 1'b0;\n            status_last_seq_r <= 16'h0000;\n            status_last_command_r <= 32'h00000000;\n            status_diag_flags_r <= 8'h00;\n            actuator_cmd_r <= 32'h00000000;\n            actuator_cmd_valid_r <= 1'b0;\n            fault_clear_ack_r <= 1'b0;\n            watchdog_r <= 16'h0000;\n            sequence_r <= 16'h0000;\n            candidate_cmd_r <= 32'h00000000;\n            clamped_cmd_r <= 32'h00000000;\n            diag_flags_r <= 8'h00;\n        end else begin\n            state_r <= state_n;\n            if (cfg_clear_fault) begin\n                fault_present_r <= 1'b0;\n                fault_code_r <= 8'h00;\n                fault_clear_ack_r <= 1'b1;\n            end else begin\n                fault_clear_ack_r <= 1'b0;\n            end\n            if (state_r == S_IDLE && cfg_enable && !fault_present_r) begin\n                sequence_r <= sequence_r + 16'd1;\n                watchdog_r <= 16'd0;\n            end else if (state_r == S_WAIT_RESP) begin\n                watchdog_r <= watchdog_r + 16'd1;\n                if (cfg_timeout_limit != 16'd0 && watchdog_r >= cfg_timeout_limit) begin\n                    fault_present_r <= 1'b1;\n                    fault_code_r <= 8'h01;\n                    status_timeout_active_r <= 1'b1;\n                    state_r <= S_FAULT_LATCH;\n                end\n                if (rsp_valid) begin\n                    candidate_cmd_r <= rsp_data[31:0];\n                    if (rsp_data[15:0] == sequence_r) begin\n                        if (rsp_data[31:0] < cfg_actuator_min) begin\n                            clamped_cmd_r <= cfg_actuator_min;\n                            diag_flags_r[0] <= 1'b1;\n                        end else if (rsp_data[31:0] > cfg_actuator_max) begin\n                            clamped_cmd_r <= cfg_actuator_max;\n                            diag_flags_r[0] <= 1'b1;\n                        end else begin\n                            clamped_cmd_r <= rsp_data[31:0];\n                        end\n                        actuator_cmd_r <= clamped_cmd_r;\n                        status_last_command_r <= clamped_cmd_r;\n                        status_last_seq_r <= rsp_data[15:0];\n                        actuator_cmd_valid_r <= 1'b1;\n                        fault_present_r <= 1'b0;\n                        status_timeout_active_r <= 1'b0;\n                    end else begin\n                        fault_present_r <= 1'b1;\n                        fault_code_r <= 8'h02;\n                        diag_flags_r[1] <= 1'b1;\n                    end\n                end\n            end\n            status_ready_r <= cfg_enable & ~fault_present_r;\n            status_diag_flags_r <= diag_flags_r;\n            if (cfg_mode == 2'b11) begin\n                diag_flags_r[7] <= status_timeout_active_r;\n            end\n        end\n    end\nendmodule"
+    },
+    {
+      "name": "generic_fpgabrams_64x64",
+      "file": "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/pass2/generic_fpgabrams_64x64.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csb",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "we",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "addr",
+          "direction": "input",
+          "width": "[5:0]",
+          "bits": 6
+        },
+        {
+          "name": "din",
+          "direction": "input",
+          "width": "[63:0]",
+          "bits": 64
+        },
+        {
+          "name": "dout",
+          "direction": "output",
+          "width": "[63:0]",
+          "bits": 64
+        }
+      ],
+      "rtl_text": "module generic_fpgabrams_64x64 (\n    input  clk,\n    input  csb,\n    input  we,\n    input  [5:0] addr,\n    input  [63:0] din,\n    output [63:0] dout\n);\n    reg [63:0] mem [0:63];\n    reg [63:0] dout_r;\n    assign dout = dout_r;\n\n    always @(posedge clk) begin\n        if (!csb) begin\n            if (we) begin\n                mem[addr] <= din;\n            end\n            dout_r <= mem[addr];\n        end\n    end\nendmodule"
+    }
+  ],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Behavioral obligations are nonblocking here only when routed to executable RTL verification checkers.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}
+
+=== CONSOLIDATED RTL CHECK RESULTS ===
+{
+  "pass": "pass2",
+  "passed": false,
+  "checks": {
+    "structural": {
+      "status": "fail",
+      "issue_count": 1,
+      "issues": [
+        "Module 'adaptive_aero_buffer_controller' declares fpga_bram memory_implementation but has no synthesizable unpacked memory array; implement inferred storage instead of scalar registers."
+      ]
+    },
+    "compile": {
+      "status": "pass",
+      "log": "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/rtl_agent_compile_pass2.log"
+    },
+    "lint": {
+      "status": "pass",
+      "blocking": false,
+      "log": "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/rtl_verilator_lint_pass2.log"
+    },
+    "static_spec2rtl": {
+      "status": "partial",
+      "blocking": true,
+      "report": "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/rtl_spec2rtl_conformance_pass2.json",
+      "summary": {
+        "checked": 98,
+        "matched": 83,
+        "partial": 1,
+        "missing": 14,
+        "inconclusive": 0,
+        "pending_verification": 52
+      }
+    }
+  },
+  "issue_count": 2,
+  "issues": [
+    "Module 'adaptive_aero_buffer_controller' declares fpga_bram memory_implementation but has no synthesizable unpacked memory array; implement inferred storage instead of scalar registers.",
+    "\u274c Static Spec2RTL compliance failed: status=partial, missing=14, partial=1, inconclusive=0."
+  ]
+}

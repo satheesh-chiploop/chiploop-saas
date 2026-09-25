@@ -1,0 +1,215 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "implementation_style": "Single-clock synchronous top-level control shell that instantiates and wires the CSR/MMIO block, transport supervisor, and optional FPGA BRAM-backed buffer path. The top-level remains the synthesizable design top and exports the required firmware, streaming, actuator, and fault ports directly.",
+      "control_strategy": "Use the CSR/MMIO block as the firmware-visible control-plane source, feed its semantic control outputs into the transport supervisor, and route supervisory status back for CSR readback. The top-level does not perform inference; it only supervises request/response transport, validates response metadata, and preserves safety inhibition on reset, timeout, malformed data, stale data, or fault latch conditions. External transport follows the mandated direction contract by data flow: request valid/data are driven out, request ready is received, response valid/data are received, and response ready is driven out.",
+      "state_strategy": "Rely on the transport supervisor\u2019s enumerated FSM intent (IDLE, ISSUE_REQ, WAIT_RESP, VALIDATE, APPLY_CMD, FAULT_LATCH) with synchronous reset and registered outputs. The top-level itself only coordinates submodule connectivity and exposes the externally observable inhibited/safe behavior; it does not introduce additional complex state beyond glue-level handoff and observation paths.",
+      "output_strategy": "Drive csr_ready/csr_rdata from the CSR block, stream_out_valid/stream_out_data from the transport supervisor, stream_in_ready from the transport supervisor, and actuator_cmd/actuator_cmd_valid/fault_code from the transport supervisor. Maintain the top-level buf_dout as a functionally observable buffer readback path while ensuring no required output is sourced only from a child input. Keep command outputs registered and inhibit validity rather than substituting fallback commands on invalid or faulted conditions.",
+      "ownership_notes": [
+        "Owns the full top-level contract for firmware control, compact external transport supervision, bounded actuator command visibility, and fault-safe inhibition.",
+        "Does not rename the module, ports, or filename; adaptive_aero_control_top remains the synthesizable top.",
+        "Does not implement surrogate inference; it only supervises the external compact worker and enforces safety policy.",
+        "Does not replace the mandatory CSR/MMIO control-plane with streaming-only behavior."
+      ]
+    },
+    {
+      "name": "adaptive_aero_csr_mmio",
+      "implementation_style": "A deterministic firmware-visible CSR/MMIO register block with 64-bit data path, 8-bit address decode, and ready/response semantics. The block is the sole software-facing configuration and status source.",
+      "control_strategy": "Decode the documented register map exactly, accept writes to control/timeout/stale/clamp/sequence-seed fields, and return deterministic readback for status, last command, and fault/diagnostic registers. Writable fields are semantic outputs consumed by the transport supervisor; read-only fields are semantic inputs provided by the supervisor for CSR readback.",
+      "state_strategy": "Use small synchronous register storage for control fields, readback staging, and one-cycle clear-fault pulse generation if needed. No hidden software-visible state is introduced beyond the declared CSR contract.",
+      "output_strategy": "Drive csr_ready and csr_rdata as real MMIO handshake outputs. Drive cfg_enable, cfg_mode, cfg_clear_fault, cfg_request_seq_seed, cfg_timeout_limit, cfg_stale_limit, cfg_actuator_min, cfg_actuator_max, and cfg_request_seq_current toward the supervisor/buffering logic. Present readable status fields only through decode at 0x08/0x30/0x38.",
+      "ownership_notes": [
+        "Owns the implemented register contract and all firmware-visible control/status semantics.",
+        "Every declared register address in the CSR map must be reachable through RTL decode.",
+        "Does not own actuator outputs or transport sequencing directly; it only publishes/consumes semantic control and status.",
+        "Must preserve deterministic readback and explicit fault-clear behavior without exposing inaccessible internal state."
+      ]
+    },
+    {
+      "name": "adaptive_aero_transport_supervisor",
+      "implementation_style": "A compact enumerated transport-and-safety supervisor that issues 64-bit request metadata, accepts 64-bit response metadata, validates sequence/freshness, clamps commands, and latches faults on supervision violations.",
+      "control_strategy": "Gate request emission on cfg_enable and fault state, hold stream_out_valid until accepted or aborted by timeout, and only assert stream_in_ready when a full compact response word can be parsed. Compare response sequence and age/timeout budget against the expected token and configured thresholds, then either accept the control decision, clamp it, or inhibit actuator validity and latch a fault. Use explicit clear-fault acknowledgement to exit latched fault behavior when policy allows.",
+      "state_strategy": "Use the enumerated FSM intent IDLE, ISSUE_REQ, WAIT_RESP, VALIDATE, APPLY_CMD, and FAULT_LATCH with synchronous reset and one-hot or equivalent synthesizable encoding. Keep watchdog and staleness counters as unsigned synchronous counters. No inferred latches or hidden asynchronous behavior.",
+      "output_strategy": "Drive req_valid/req_data to the external worker, accept req_ready as backpressure, receive rsp_valid/rsp_data, and drive rsp_ready only when parsing can safely accept a full response. Register actuator_cmd and actuator_cmd_valid; clamp accepted command values between cfg_actuator_min and cfg_actuator_max. Drive fault_present, fault_code, status_ready, status_timeout_active, status_last_seq, status_last_command, status_diag_flags, and fault_clear_ack as supervisory outputs.",
+      "ownership_notes": [
+        "Owns request/response supervision, sequence checking, timeout/stale tracking, saturation diagnostics, and fault-latched inhibition behavior.",
+        "Does not perform inference; it only supervises external compact control decisions returned by software.",
+        "Must not silently substitute commands on invalid data; invalid or faulted conditions inhibit actuator_cmd_valid.",
+        "Externally visible command outputs are registered and safety takes priority over latency."
+      ]
+    },
+    {
+      "name": "adaptive_aero_buffer_controller",
+      "implementation_style": "A technology-neutral FPGA-friendly buffer controller that maps compact history or diagnostics storage onto block RAM through an inferred memory abstraction.",
+      "control_strategy": "Use buf_en/buf_we/buf_addr/buf_din to control narrow buffer access and return read data on buf_dout. The controller can observe compact request activity for optional history capture but does not alter control-plane or transport behavior.",
+      "state_strategy": "Use only compact synchronous control state for address steering, read/write enable sequencing, and optional readback timing. The storage itself is an inferred memory suitable for native FPGA block RAM mapping, not a flattened register bank.",
+      "output_strategy": "Drive sram_csb, sram_we, sram_addr, and sram_din toward the memory wrapper and return buf_dout from the wrapper\u2019s read data path. Preserve buf_dout as a real observable path without replacing firmware-visible CSR registers.",
+      "ownership_notes": [
+        "Owns optional bulk history/diagnostic buffering only.",
+        "Must satisfy the FPGA memory contract via technology-neutral inferred memory.",
+        "Does not provide software-visible configuration or actuator control.",
+        "Does not use ASIC-specific memory constructs or flatten storage into registers."
+      ]
+    },
+    {
+      "name": "generic_fpgabrams_64x64",
+      "implementation_style": "A technology-neutral inferred FPGA block RAM wrapper with native BRAM-style ports and synchronous access semantics.",
+      "control_strategy": "Pass chip-select, write-enable, address, and data from the buffer controller into an inferred memory construct and return read data on dout.",
+      "state_strategy": "The memory contents are implementation-defined under FPGA mapping; the wrapper itself is only the storage primitive and does not add architectural control state.",
+      "output_strategy": "Drive dout as the real memory readback consumed by the buffer controller via sram_dout.",
+      "ownership_notes": [
+        "Owns the declared memory-facing wrapper used for optional buffering.",
+        "Exists to satisfy the FPGA memory contract and must remain functionally consumed.",
+        "Does not participate in CSR/MMIO decode, transport supervision, or actuator control."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "module": "adaptive_aero_transport_supervisor",
+      "present": true,
+      "description": "A simple enumerated FSM supervises request issuance, waiting, validation, command application, and fault latch behavior. The FSM is synchronous, safety-first, and does not imply any hidden complex protocol beyond the compact request/response exchange.",
+      "states": [
+        "IDLE",
+        "ISSUE_REQ",
+        "WAIT_RESP",
+        "VALIDATE",
+        "APPLY_CMD",
+        "FAULT_LATCH"
+      ]
+    }
+  ],
+  "datapath_intent": [
+    {
+      "module": "adaptive_aero_control_top",
+      "inputs": [
+        "clk",
+        "reset_n",
+        "csr_addr",
+        "csr_wdata",
+        "csr_we",
+        "csr_re",
+        "csr_valid",
+        "stream_out_ready",
+        "stream_in_valid",
+        "stream_in_data"
+      ],
+      "internal_storage": [
+        "CSR-visible control/status registers in adaptive_aero_csr_mmio",
+        "compact supervision counters/state in adaptive_aero_transport_supervisor",
+        "optional inferred BRAM-backed history storage in adaptive_aero_buffer_controller / generic_fpgabrams_64x64"
+      ],
+      "output_mapping": [
+        "csr_ready and csr_rdata from adaptive_aero_csr_mmio",
+        "stream_out_valid and stream_out_data from adaptive_aero_transport_supervisor",
+        "stream_in_ready from adaptive_aero_transport_supervisor",
+        "actuator_cmd, actuator_cmd_valid, and fault_code from adaptive_aero_transport_supervisor",
+        "buf_dout as the observable buffer readback path"
+      ]
+    },
+    {
+      "module": "adaptive_aero_csr_mmio",
+      "inputs": [
+        "csr_addr",
+        "csr_wdata",
+        "csr_we",
+        "csr_re",
+        "csr_valid",
+        "status_ready",
+        "status_fault_present",
+        "status_last_seq",
+        "status_timeout_active",
+        "status_last_command",
+        "status_fault_code",
+        "status_diag_flags",
+        "fault_clear_ack"
+      ],
+      "internal_storage": [
+        "control register bits",
+        "timeout/stale/clamp configuration registers",
+        "readback staging for status and diagnostics"
+      ],
+      "output_mapping": [
+        "csr_ready/csr_rdata as MMIO handshake outputs",
+        "cfg_enable/cfg_mode/cfg_clear_fault/cfg_request_seq_seed/cfg_timeout_limit/cfg_stale_limit/cfg_actuator_min/cfg_actuator_max/cfg_request_seq_current as semantic control outputs"
+      ]
+    },
+    {
+      "module": "adaptive_aero_transport_supervisor",
+      "inputs": [
+        "cfg_enable",
+        "cfg_mode",
+        "cfg_clear_fault",
+        "cfg_request_seq_seed",
+        "cfg_timeout_limit",
+        "cfg_stale_limit",
+        "cfg_actuator_min",
+        "cfg_actuator_max",
+        "cfg_request_seq_current",
+        "req_ready",
+        "rsp_valid",
+        "rsp_data"
+      ],
+      "internal_storage": [
+        "request token / sequence tracking",
+        "cycle watchdog counter",
+        "staleness counter",
+        "latched fault state",
+        "last accepted command and sequence",
+        "diagnostic/saturation flags"
+      ],
+      "output_mapping": [
+        "req_valid/req_data to the external worker",
+        "rsp_ready back to the external worker",
+        "actuator_cmd/actuator_cmd_valid as registered actuator outputs",
+        "fault_present/fault_code/status_ready/status_timeout_active/status_last_seq/status_last_command/status_diag_flags/fault_clear_ack as supervisory feedback"
+      ]
+    },
+    {
+      "module": "adaptive_aero_buffer_controller",
+      "inputs": [
+        "buf_en",
+        "buf_we",
+        "buf_addr",
+        "buf_din",
+        "sram_dout"
+      ],
+      "internal_storage": [
+        "narrow address/control state",
+        "inferred memory backing store mapped to FPGA BRAM"
+      ],
+      "output_mapping": [
+        "sram_csb/sram_we/sram_addr/sram_din to the memory wrapper",
+        "buf_dout from memory readback"
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "Firmware programs control, timeout, stale, clamp, and sequence-seed fields through the CSR/MMIO window before enabling operation.",
+    "The transport supervisor emits compact request metadata and keeps stream_out_valid asserted until accepted or timeout-aborted.",
+    "Responses are only accepted when the parser can consume a complete 64-bit compact word and the sequence/freshness checks pass.",
+    "Accepted commands are clamped to the configured actuator range before actuator_cmd_valid is asserted.",
+    "Invalid, stale, duplicate, out-of-order, malformed, reset, timeout, or faulted conditions inhibit actuator validity and latch fault state for software handling.",
+    "Optional buffering may capture compact request/history data without changing the control-plane or command contract."
+  ],
+  "timing_notes": [
+    "All sequential logic is synchronous to clk.",
+    "reset_n is active-low and synchronous.",
+    "Externally visible command pins are registered outputs.",
+    "csr_ready indicates acceptance/consumption of a CSR transaction and csr_rdata returns deterministic read data for the addressed register.",
+    "stream_out_valid remains asserted while a request is pending until stream_out_ready or timeout abort.",
+    "stream_in_ready only asserts when a full compact response word can be accepted.",
+    "The design prioritizes safety over latency; inhibition is preferred over speculative command emission.",
+    "No top-level streaming port exceeds 128 bits and no register-mapped port exceeds 64 bits."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json.",
+    "The top module remains adaptive_aero_control_top and is not substituted by a status, telemetry, register-bank, or leaf module.",
+    "DIGITAL_SPEC_JSON is the single source of truth; this description preserves the specified control-plane, transport direction, CSR register contract, and safety behavior without redefining the architecture."
+  ]
+}

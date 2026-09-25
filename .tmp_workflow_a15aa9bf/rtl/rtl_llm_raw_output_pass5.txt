@@ -1,0 +1,548 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    input  clk,
+    input  reset_n,
+    input  [7:0] csr_addr,
+    input  [63:0] csr_wdata,
+    input  csr_we,
+    input  csr_re,
+    input  csr_valid,
+    output csr_ready,
+    output [63:0] csr_rdata,
+    output stream_out_valid,
+    input  stream_out_ready,
+    output [63:0] stream_out_data,
+    input  stream_in_valid,
+    output stream_in_ready,
+    input  [63:0] stream_in_data,
+    output [31:0] actuator_cmd,
+    output actuator_cmd_valid,
+    output [7:0] fault_code,
+    input  [63:0] buf_dout
+);
+    wire cfg_enable;
+    wire [1:0] cfg_mode;
+    wire cfg_clear_fault;
+    wire [15:0] cfg_request_seq_seed;
+    wire [15:0] cfg_timeout_limit;
+    wire [15:0] cfg_stale_limit;
+    wire [31:0] cfg_actuator_min;
+    wire [31:0] cfg_actuator_max;
+    wire [7:0] cfg_request_seq_current;
+
+    wire status_ready;
+    wire status_fault_present;
+    wire [15:0] status_last_seq;
+    wire status_timeout_active;
+    wire [31:0] status_last_command;
+    wire [7:0] status_fault_code;
+    wire [7:0] status_diag_flags;
+    wire fault_clear_ack;
+
+    wire req_valid;
+    wire req_ready;
+    wire [63:0] req_data;
+    wire rsp_ready;
+    wire fault_present;
+    wire [7:0] ts_fault_code;
+    wire ts_status_ready;
+    wire ts_status_timeout_active;
+    wire [15:0] ts_status_last_seq;
+    wire [31:0] ts_status_last_command;
+    wire [7:0] ts_status_diag_flags;
+    wire [31:0] ts_actuator_cmd;
+    wire ts_actuator_cmd_valid;
+    wire ts_fault_clear_ack;
+
+    wire buf_en;
+    wire buf_we;
+    wire [7:0] buf_addr;
+    wire [63:0] buf_din;
+    wire sram_csb;
+    wire sram_we;
+    wire [5:0] sram_addr;
+    wire [63:0] sram_din;
+    wire [63:0] sram_dout_observed;
+
+    assign stream_out_valid = req_valid;
+    assign stream_out_data = req_data;
+    assign req_ready = stream_out_ready;
+    assign stream_in_ready = rsp_ready;
+    assign actuator_cmd = ts_actuator_cmd;
+    assign actuator_cmd_valid = ts_actuator_cmd_valid;
+    assign fault_code = ts_fault_code;
+    assign fault_present = 1'b0;
+    assign status_ready = ts_status_ready;
+    assign status_fault_present = fault_present;
+    assign status_last_seq = ts_status_last_seq;
+    assign status_timeout_active = ts_status_timeout_active;
+    assign status_last_command = ts_status_last_command;
+    assign status_fault_code = ts_fault_code;
+    assign status_diag_flags = ts_status_diag_flags;
+    assign fault_clear_ack = ts_fault_clear_ack;
+
+    assign buf_en = status_ready;
+    assign buf_we = csr_ready;
+    assign buf_addr = cfg_request_seq_current;
+    assign buf_din = req_data;
+    assign sram_dout_observed = buf_dout;
+
+    adaptive_aero_csr_mmio u_csr_mmio (
+        .clk(clk),
+        .reset_n(reset_n),
+        .csr_addr(csr_addr),
+        .csr_wdata(csr_wdata),
+        .csr_we(csr_we),
+        .csr_re(csr_re),
+        .csr_valid(csr_valid),
+        .csr_ready(csr_ready),
+        .csr_rdata(csr_rdata),
+        .cfg_enable(cfg_enable),
+        .cfg_mode(cfg_mode),
+        .cfg_clear_fault(cfg_clear_fault),
+        .cfg_request_seq_seed(cfg_request_seq_seed),
+        .cfg_timeout_limit(cfg_timeout_limit),
+        .cfg_stale_limit(cfg_stale_limit),
+        .cfg_actuator_min(cfg_actuator_min),
+        .cfg_actuator_max(cfg_actuator_max),
+        .cfg_request_seq_current(cfg_request_seq_current),
+        .status_ready(status_ready),
+        .status_fault_present(status_fault_present),
+        .status_last_seq(status_last_seq),
+        .status_timeout_active(status_timeout_active),
+        .status_last_command(status_last_command),
+        .status_fault_code(status_fault_code),
+        .status_diag_flags(status_diag_flags),
+        .fault_clear_ack(fault_clear_ack)
+    );
+
+    adaptive_aero_transport_supervisor u_transport_supervisor (
+        .clk(clk),
+        .reset_n(reset_n),
+        .cfg_enable(cfg_enable),
+        .cfg_mode(cfg_mode),
+        .cfg_clear_fault(cfg_clear_fault),
+        .cfg_request_seq_seed(cfg_request_seq_seed),
+        .cfg_timeout_limit(cfg_timeout_limit),
+        .cfg_stale_limit(cfg_stale_limit),
+        .cfg_actuator_min(cfg_actuator_min),
+        .cfg_actuator_max(cfg_actuator_max),
+        .cfg_request_seq_current(cfg_request_seq_current),
+        .req_valid(req_valid),
+        .req_ready(req_ready),
+        .req_data(req_data),
+        .rsp_valid(stream_in_valid),
+        .rsp_ready(rsp_ready),
+        .rsp_data(stream_in_data),
+        .fault_present(),
+        .fault_code(ts_fault_code),
+        .status_ready(ts_status_ready),
+        .status_timeout_active(ts_status_timeout_active),
+        .status_last_seq(ts_status_last_seq),
+        .status_last_command(ts_status_last_command),
+        .status_diag_flags(ts_status_diag_flags),
+        .actuator_cmd(ts_actuator_cmd),
+        .actuator_cmd_valid(ts_actuator_cmd_valid),
+        .fault_clear_ack(ts_fault_clear_ack)
+    );
+
+    adaptive_aero_buffer_controller u_buffer_controller (
+        .clk(clk),
+        .reset_n(reset_n),
+        .buf_en(buf_en),
+        .buf_we(buf_we),
+        .buf_addr(buf_addr),
+        .buf_din(buf_din),
+        .buf_dout(),
+        .sram_csb(sram_csb),
+        .sram_we(sram_we),
+        .sram_addr(sram_addr),
+        .sram_din(sram_din),
+        .sram_dout(sram_dout_observed)
+    );
+
+    generic_fpgabrams_64x64 u_generic_fpgabrams_64x64 (
+        .clk(clk),
+        .csb(sram_csb),
+        .we(sram_we),
+        .addr(sram_addr),
+        .din(sram_din),
+        .dout()
+    );
+endmodule
+---END adaptive_aero_control_top.v---
+---BEGIN adaptive_aero_csr_mmio.v---
+module adaptive_aero_csr_mmio (
+    input  clk,
+    input  reset_n,
+    input  [7:0] csr_addr,
+    input  [63:0] csr_wdata,
+    input  csr_we,
+    input  csr_re,
+    input  csr_valid,
+    output csr_ready,
+    output [63:0] csr_rdata,
+    output cfg_enable,
+    output [1:0] cfg_mode,
+    output cfg_clear_fault,
+    output [15:0] cfg_request_seq_seed,
+    output [15:0] cfg_timeout_limit,
+    output [15:0] cfg_stale_limit,
+    output [31:0] cfg_actuator_min,
+    output [31:0] cfg_actuator_max,
+    output [7:0] cfg_request_seq_current,
+    input  status_ready,
+    input  status_fault_present,
+    input  [15:0] status_last_seq,
+    input  status_timeout_active,
+    input  [31:0] status_last_command,
+    input  [7:0] status_fault_code,
+    input  [7:0] status_diag_flags,
+    input  fault_clear_ack
+);
+    reg cfg_enable_r;
+    reg [1:0] cfg_mode_r;
+    reg cfg_clear_fault_r;
+    reg [15:0] cfg_request_seq_seed_r;
+    reg [15:0] cfg_timeout_limit_r;
+    reg [15:0] cfg_stale_limit_r;
+    reg [31:0] cfg_actuator_min_r;
+    reg [31:0] cfg_actuator_max_r;
+    reg [7:0] cfg_request_seq_current_r;
+    reg csr_ready_r;
+    reg [63:0] csr_rdata_r;
+
+    assign cfg_enable = cfg_enable_r;
+    assign cfg_mode = cfg_mode_r;
+    assign cfg_clear_fault = cfg_clear_fault_r;
+    assign cfg_request_seq_seed = cfg_request_seq_seed_r;
+    assign cfg_timeout_limit = cfg_timeout_limit_r;
+    assign cfg_stale_limit = cfg_stale_limit_r;
+    assign cfg_actuator_min = cfg_actuator_min_r;
+    assign cfg_actuator_max = cfg_actuator_max_r;
+    assign cfg_request_seq_current = cfg_request_seq_current_r;
+    assign csr_ready = csr_ready_r;
+    assign csr_rdata = csr_rdata_r;
+
+    always @(posedge clk) begin
+        if (!reset_n) begin
+            cfg_enable_r <= 1'b0;
+            cfg_mode_r <= 2'b00;
+            cfg_clear_fault_r <= 1'b0;
+            cfg_request_seq_seed_r <= 16'h0000;
+            cfg_timeout_limit_r <= 16'd1000;
+            cfg_stale_limit_r <= 16'd1000;
+            cfg_actuator_min_r <= 32'h00000000;
+            cfg_actuator_max_r <= 32'hffffffff;
+            cfg_request_seq_current_r <= 8'h00;
+            csr_ready_r <= 1'b0;
+            csr_rdata_r <= 64'h0000000000000000;
+        end else begin
+            csr_ready_r <= 1'b0;
+            cfg_clear_fault_r <= 1'b0;
+            if (csr_valid) begin
+                csr_ready_r <= 1'b1;
+                if (csr_we) begin
+                    case (csr_addr)
+                        8'h00: begin
+                            cfg_enable_r <= csr_wdata[0];
+                            cfg_mode_r <= csr_wdata[2:1];
+                            cfg_clear_fault_r <= csr_wdata[3];
+                            cfg_request_seq_seed_r <= csr_wdata[31:16];
+                        end
+                        8'h10: cfg_timeout_limit_r <= csr_wdata[15:0];
+                        8'h18: cfg_stale_limit_r <= csr_wdata[15:0];
+                        8'h20: cfg_actuator_min_r <= csr_wdata[31:0];
+                        8'h28: cfg_actuator_max_r <= csr_wdata[31:0];
+                        default: begin
+                        end
+                    endcase
+                end
+                if (csr_re) begin
+                    case (csr_addr)
+                        8'h00: csr_rdata_r <= {32'h00000000, cfg_request_seq_seed_r, 12'h000, cfg_clear_fault_r, cfg_mode_r, cfg_enable_r};
+                        8'h08: csr_rdata_r <= {47'h0000000000000, status_timeout_active, status_last_seq, status_fault_present, status_ready};
+                        8'h10: csr_rdata_r <= {48'h000000000000, cfg_timeout_limit_r};
+                        8'h18: csr_rdata_r <= {48'h000000000000, cfg_stale_limit_r};
+                        8'h20: csr_rdata_r <= {32'h00000000, cfg_actuator_min_r};
+                        8'h28: csr_rdata_r <= {32'h00000000, cfg_actuator_max_r};
+                        8'h30: csr_rdata_r <= {32'h00000000, status_last_command};
+                        8'h38: csr_rdata_r <= {48'h000000000000, status_diag_flags, status_fault_code};
+                        default: csr_rdata_r <= 64'h0000000000000000;
+                    endcase
+                end
+                cfg_request_seq_current_r <= cfg_request_seq_seed_r[7:0];
+            end
+        end
+    end
+endmodule
+---END adaptive_aero_csr_mmio.v---
+---BEGIN adaptive_aero_transport_supervisor.v---
+module adaptive_aero_transport_supervisor (
+    input  clk,
+    input  reset_n,
+    input  cfg_enable,
+    input  [1:0] cfg_mode,
+    input  cfg_clear_fault,
+    input  [15:0] cfg_request_seq_seed,
+    input  [15:0] cfg_timeout_limit,
+    input  [15:0] cfg_stale_limit,
+    input  [31:0] cfg_actuator_min,
+    input  [31:0] cfg_actuator_max,
+    input  [7:0] cfg_request_seq_current,
+    output req_valid,
+    input  req_ready,
+    output [63:0] req_data,
+    input  rsp_valid,
+    output rsp_ready,
+    input  [63:0] rsp_data,
+    output fault_present,
+    output [7:0] fault_code,
+    output status_ready,
+    output status_timeout_active,
+    output [15:0] status_last_seq,
+    output [31:0] status_last_command,
+    output [7:0] status_diag_flags,
+    output [31:0] actuator_cmd,
+    output actuator_cmd_valid,
+    output fault_clear_ack
+);
+    localparam [2:0] S_IDLE = 3'd0;
+    localparam [2:0] S_ISSUE_REQ = 3'd1;
+    localparam [2:0] S_WAIT_RESP = 3'd2;
+    localparam [2:0] S_VALIDATE = 3'd3;
+    localparam [2:0] S_APPLY_CMD = 3'd4;
+    localparam [2:0] S_FAULT_LATCH = 3'd5;
+
+    reg [2:0] state_r, state_n;
+    reg req_valid_r;
+    reg [63:0] req_data_r;
+    reg rsp_ready_r;
+    reg fault_present_r;
+    reg [7:0] fault_code_r;
+    reg status_ready_r;
+    reg status_timeout_active_r;
+    reg [15:0] status_last_seq_r;
+    reg [31:0] status_last_command_r;
+    reg [7:0] status_diag_flags_r;
+    reg [31:0] actuator_cmd_r;
+    reg actuator_cmd_valid_r;
+    reg fault_clear_ack_r;
+    reg [15:0] watchdog_r;
+    reg [15:0] sequence_r;
+    reg [31:0] candidate_cmd_r;
+    reg [31:0] clamped_cmd_r;
+    reg [7:0] diag_flags_r;
+    reg [63:0] req_word_r;
+
+    assign req_valid = req_valid_r;
+    assign req_data = req_data_r;
+    assign rsp_ready = rsp_ready_r;
+    assign fault_present = fault_present_r;
+    assign fault_code = fault_code_r;
+    assign status_ready = status_ready_r;
+    assign status_timeout_active = status_timeout_active_r;
+    assign status_last_seq = status_last_seq_r;
+    assign status_last_command = status_last_command_r;
+    assign status_diag_flags = status_diag_flags_r;
+    assign actuator_cmd = actuator_cmd_r;
+    assign actuator_cmd_valid = actuator_cmd_valid_r;
+    assign fault_clear_ack = fault_clear_ack_r;
+
+    always @(*) begin
+        state_n = state_r;
+        req_valid_r = 1'b0;
+        req_data_r = 64'h0000000000000000;
+        rsp_ready_r = 1'b0;
+        status_ready_r = 1'b0;
+        status_timeout_active_r = status_timeout_active_r;
+        actuator_cmd_valid_r = 1'b0;
+        fault_clear_ack_r = 1'b0;
+        req_word_r = {cfg_request_seq_seed, cfg_request_seq_current, cfg_mode, cfg_timeout_limit, cfg_stale_limit, 14'h0000};
+        case (state_r)
+            S_IDLE: begin
+                status_ready_r = cfg_enable & ~fault_present_r;
+                if (cfg_enable && !fault_present_r) begin
+                    state_n = S_ISSUE_REQ;
+                end
+            end
+            S_ISSUE_REQ: begin
+                req_valid_r = 1'b1;
+                req_data_r = req_word_r;
+                if (req_ready) state_n = S_WAIT_RESP;
+            end
+            S_WAIT_RESP: begin
+                req_valid_r = 1'b1;
+                req_data_r = req_word_r;
+                rsp_ready_r = 1'b1;
+                if (rsp_valid) state_n = S_VALIDATE;
+            end
+            S_VALIDATE: begin
+                rsp_ready_r = 1'b1;
+                if (rsp_valid) state_n = S_APPLY_CMD;
+            end
+            S_APPLY_CMD: begin
+                actuator_cmd_valid_r = 1'b1;
+                state_n = S_IDLE;
+            end
+            S_FAULT_LATCH: begin
+                if (cfg_clear_fault) fault_clear_ack_r = 1'b1;
+            end
+            default: begin
+                state_n = S_IDLE;
+            end
+        endcase
+    end
+
+    always @(posedge clk or negedge reset_n) begin
+        if (!reset_n) begin
+            state_r <= S_IDLE;
+            req_data_r <= 64'h0000000000000000;
+            rsp_ready_r <= 1'b0;
+            fault_present_r <= 1'b0;
+            fault_code_r <= 8'h00;
+            status_ready_r <= 1'b0;
+            status_timeout_active_r <= 1'b0;
+            status_last_seq_r <= 16'h0000;
+            status_last_command_r <= 32'h00000000;
+            status_diag_flags_r <= 8'h00;
+            actuator_cmd_r <= 32'h00000000;
+            actuator_cmd_valid_r <= 1'b0;
+            fault_clear_ack_r <= 1'b0;
+            watchdog_r <= 16'h0000;
+            sequence_r <= 16'h0000;
+            candidate_cmd_r <= 32'h00000000;
+            clamped_cmd_r <= 32'h00000000;
+            diag_flags_r <= 8'h00;
+            req_valid_r <= 1'b0;
+        end else begin
+            state_r <= state_n;
+            req_valid_r <= req_valid_r;
+            req_data_r <= req_data_r;
+            rsp_ready_r <= rsp_ready_r;
+            if (cfg_clear_fault) begin
+                fault_present_r <= 1'b0;
+                fault_code_r <= 8'h00;
+                fault_clear_ack_r <= 1'b1;
+            end else begin
+                fault_clear_ack_r <= 1'b0;
+            end
+            if (state_r == S_IDLE && cfg_enable && !fault_present_r) begin
+                sequence_r <= sequence_r + 16'd1;
+                watchdog_r <= 16'd0;
+            end else if (state_r == S_WAIT_RESP) begin
+                watchdog_r <= watchdog_r + 16'd1;
+                if (cfg_timeout_limit != 16'd0 && watchdog_r >= cfg_timeout_limit) begin
+                    fault_present_r <= 1'b1;
+                    fault_code_r <= 8'h01;
+                    status_timeout_active_r <= 1'b1;
+                    state_r <= S_FAULT_LATCH;
+                end
+                if (rsp_valid) begin
+                    candidate_cmd_r <= rsp_data[31:0];
+                    if (rsp_data[15:0] == sequence_r) begin
+                        if (rsp_data[31:0] < cfg_actuator_min) begin
+                            clamped_cmd_r <= cfg_actuator_min;
+                            diag_flags_r[0] <= 1'b1;
+                        end else if (rsp_data[31:0] > cfg_actuator_max) begin
+                            clamped_cmd_r <= cfg_actuator_max;
+                            diag_flags_r[0] <= 1'b1;
+                        end else begin
+                            clamped_cmd_r <= rsp_data[31:0];
+                        end
+                        actuator_cmd_r <= clamped_cmd_r;
+                        status_last_command_r <= clamped_cmd_r;
+                        status_last_seq_r <= rsp_data[15:0];
+                        actuator_cmd_valid_r <= 1'b1;
+                        fault_present_r <= 1'b0;
+                        status_timeout_active_r <= 1'b0;
+                    end else begin
+                        fault_present_r <= 1'b1;
+                        fault_code_r <= 8'h02;
+                        diag_flags_r[1] <= 1'b1;
+                    end
+                end
+            end
+            status_ready_r <= cfg_enable & ~fault_present_r;
+            status_diag_flags_r <= diag_flags_r;
+            if (cfg_mode == 2'b11) begin
+                diag_flags_r[7] <= status_timeout_active_r;
+            end
+        end
+    end
+endmodule
+---END adaptive_aero_transport_supervisor.v---
+---BEGIN adaptive_aero_buffer_controller.v---
+module adaptive_aero_buffer_controller (
+    input  clk,
+    input  reset_n,
+    input  buf_en,
+    input  buf_we,
+    input  [7:0] buf_addr,
+    input  [63:0] buf_din,
+    output [63:0] buf_dout,
+    output sram_csb,
+    output sram_we,
+    output [5:0] sram_addr,
+    output [63:0] sram_din,
+    input  [63:0] sram_dout
+);
+    reg [63:0] buf_dout_r;
+    reg sram_csb_r;
+    reg sram_we_r;
+    reg [5:0] sram_addr_r;
+    reg [63:0] sram_din_r;
+    reg [63:0] buf_shadow_mem [0:63];
+
+    assign buf_dout = buf_dout_r;
+    assign sram_csb = sram_csb_r;
+    assign sram_we = sram_we_r;
+    assign sram_addr = sram_addr_r;
+    assign sram_din = sram_din_r;
+
+    always @(posedge clk) begin
+        if (!reset_n) begin
+            buf_dout_r <= 64'h0000000000000000;
+            sram_csb_r <= 1'b1;
+            sram_we_r <= 1'b0;
+            sram_addr_r <= 6'h00;
+            sram_din_r <= 64'h0000000000000000;
+        end else begin
+            sram_csb_r <= ~buf_en;
+            sram_we_r <= buf_en & buf_we;
+            sram_addr_r <= buf_addr[5:0];
+            sram_din_r <= buf_din;
+            if (buf_en) begin
+                buf_dout_r <= sram_dout;
+                if (buf_we) begin
+                    buf_shadow_mem[buf_addr[5:0]] <= buf_din;
+                end
+            end
+        end
+    end
+endmodule
+---END adaptive_aero_buffer_controller.v---
+---BEGIN generic_fpgabrams_64x64.v---
+module generic_fpgabrams_64x64 (
+    input  clk,
+    input  csb,
+    input  we,
+    input  [5:0] addr,
+    input  [63:0] din,
+    output [63:0] dout
+);
+    reg [63:0] mem [0:63];
+    reg [63:0] dout_r;
+
+    assign dout = dout_r;
+
+    always @(posedge clk) begin
+        if (!csb) begin
+            if (we) begin
+                mem[addr] <= din;
+            end
+            dout_r <= mem[addr];
+        end
+    end
+endmodule
+---END generic_fpgabrams_64x64.v---

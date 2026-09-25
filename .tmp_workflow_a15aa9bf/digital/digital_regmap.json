@@ -1,0 +1,235 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "hierarchical",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 64,
+    "registers": [
+      {
+        "address": "0x00",
+        "name": "control",
+        "access": "rw",
+        "width": 64,
+        "fields": [
+          {
+            "name": "enable",
+            "lsb": 0,
+            "msb": 0,
+            "access": "rw",
+            "reset": 0,
+            "description": "Operational enable."
+          },
+          {
+            "name": "mode",
+            "lsb": 1,
+            "msb": 2,
+            "access": "rw",
+            "reset": 0,
+            "description": "Operating mode selector."
+          },
+          {
+            "name": "clear_fault",
+            "lsb": 3,
+            "msb": 3,
+            "access": "w1p",
+            "reset": 0,
+            "description": "Explicit fault clear pulse."
+          },
+          {
+            "name": "request_seq_seed",
+            "lsb": 16,
+            "msb": 31,
+            "access": "rw",
+            "reset": 0,
+            "description": "Sequence seed for request token generation."
+          }
+        ],
+        "offset": "0x0"
+      },
+      {
+        "address": "0x08",
+        "name": "status",
+        "access": "ro",
+        "width": 64,
+        "fields": [
+          {
+            "name": "ready",
+            "lsb": 0,
+            "msb": 0,
+            "access": "ro",
+            "reset": 0,
+            "description": "Transport/supervisor ready status."
+          },
+          {
+            "name": "fault_present",
+            "lsb": 1,
+            "msb": 1,
+            "access": "ro",
+            "reset": 1,
+            "description": "Fault presence indicator."
+          },
+          {
+            "name": "last_seq",
+            "lsb": 16,
+            "msb": 31,
+            "access": "ro",
+            "reset": 0,
+            "description": "Last accepted sequence number."
+          },
+          {
+            "name": "timeout_active",
+            "lsb": 32,
+            "msb": 32,
+            "access": "ro",
+            "reset": 0,
+            "description": "Timeout active indicator."
+          }
+        ],
+        "offset": "0x0"
+      },
+      {
+        "address": "0x10",
+        "name": "timeout_limit",
+        "access": "rw",
+        "width": 64,
+        "fields": [
+          {
+            "name": "timeout_limit",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 1000,
+            "description": "Watchdog timeout threshold in cycles."
+          }
+        ],
+        "offset": "0x0"
+      },
+      {
+        "address": "0x18",
+        "name": "stale_limit",
+        "access": "rw",
+        "width": 64,
+        "fields": [
+          {
+            "name": "stale_limit",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 1000,
+            "description": "Maximum allowed response age in cycles."
+          }
+        ],
+        "offset": "0x0"
+      },
+      {
+        "address": "0x20",
+        "name": "actuator_min",
+        "access": "rw",
+        "width": 64,
+        "fields": [
+          {
+            "name": "actuator_min",
+            "lsb": 0,
+            "msb": 31,
+            "access": "rw",
+            "reset": 0,
+            "description": "Lower actuator clamp."
+          }
+        ],
+        "offset": "0x0"
+      },
+      {
+        "address": "0x28",
+        "name": "actuator_max",
+        "access": "rw",
+        "width": 64,
+        "fields": [
+          {
+            "name": "actuator_max",
+            "lsb": 0,
+            "msb": 31,
+            "access": "rw",
+            "reset": 4294967295,
+            "description": "Upper actuator clamp."
+          }
+        ],
+        "offset": "0x0"
+      },
+      {
+        "address": "0x30",
+        "name": "last_command",
+        "access": "ro",
+        "width": 64,
+        "fields": [
+          {
+            "name": "last_command",
+            "lsb": 0,
+            "msb": 31,
+            "access": "ro",
+            "reset": 0,
+            "description": "Last accepted command after clamping."
+          }
+        ],
+        "offset": "0x0"
+      },
+      {
+        "address": "0x38",
+        "name": "fault_code_diag",
+        "access": "ro",
+        "width": 64,
+        "fields": [
+          {
+            "name": "fault_code",
+            "lsb": 0,
+            "msb": 7,
+            "access": "ro",
+            "reset": 0,
+            "description": "Latched fault code."
+          },
+          {
+            "name": "diag_flags",
+            "lsb": 8,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Diagnostic flags including saturation and malformed-packet indicators."
+          }
+        ],
+        "offset": "0x0"
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": []
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Hold reset_n low, then release synchronous reset.",
+      "Program TIMEOUT_LIMIT and STALE_LIMIT to supervisory policy values.",
+      "Program ACTUATOR_MIN and ACTUATOR_MAX to the desired clamp window.",
+      "Write CONTROL.REQUEST_SEQ_SEED with the initial sequence token seed.",
+      "Set CONTROL.CLEAR_FAULT with a write-one pulse if a previous fault must be cleared.",
+      "Set CONTROL.MODE as required by the operating policy.",
+      "Set CONTROL.ENABLE to 1 to allow request issuance and accepted command generation."
+    ],
+    "polling_sequence": [
+      "Poll STATUS.READY and STATUS.FAULT_PRESENT.",
+      "Poll STATUS.SAFE_FALLBACK_ACTIVE and STATUS.TIMEOUT_ACTIVE during operation.",
+      "Read STATUS.LAST_SEQ after accepted response transactions.",
+      "Read LAST_COMMAND to observe the last clamped actuator command.",
+      "Read FAULT_CODE_DIAG to diagnose timeout, malformed packet, stale data, or sequence mismatch events."
+    ],
+    "irq_sequence": []
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map is firmware-visible and reachable through the documented 64-bit custom CSR/MMIO interface.",
+    "No new hierarchy, ports, buses, or non-specified control planes are introduced.",
+    "The top-level remains adaptive_aero_control_top and the streaming transport coexists with, but does not replace, the CSR/MMIO interface.",
+    "The register semantics preserve safety inhibition rather than silent command substitution on invalid, stale, timeout, reset, or fault conditions.",
+    "Register names, addresses, fields, access, and bit ranges are enforced from DIGITAL_SPEC_JSON.register_contract."
+  ],
+  "register_map_required": true
+}

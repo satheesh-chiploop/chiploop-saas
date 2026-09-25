@@ -1,0 +1,40 @@
+{
+  "pass": "pass5",
+  "passed": false,
+  "checks": {
+    "structural": {
+      "status": "fail",
+      "issue_count": 1,
+      "issues": [
+        "Module 'adaptive_aero_buffer_controller' declares a writable fpga_bram memory_implementation but its memory array has no detectable indexed write path."
+      ]
+    },
+    "compile": {
+      "status": "pass",
+      "log": "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/rtl_agent_compile_pass5.log"
+    },
+    "lint": {
+      "status": "pass",
+      "blocking": false,
+      "log": "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/rtl_verilator_lint_pass5.log"
+    },
+    "static_spec2rtl": {
+      "status": "partial",
+      "blocking": true,
+      "report": "backend/workflows/a15aa9bf-95d3-49a6-9582-85d12c088088/rtl/rtl_spec2rtl_conformance_pass5.json",
+      "summary": {
+        "checked": 98,
+        "matched": 85,
+        "partial": 1,
+        "missing": 12,
+        "inconclusive": 0,
+        "pending_verification": 52
+      }
+    }
+  },
+  "issue_count": 2,
+  "issues": [
+    "Module 'adaptive_aero_buffer_controller' declares a writable fpga_bram memory_implementation but its memory array has no detectable indexed write path.",
+    "\u274c Static Spec2RTL compliance failed: status=partial, missing=12, partial=1, inconclusive=0."
+  ]
+}
