@@ -2528,7 +2528,7 @@ def test_contract_rejects_required_child_input_without_structural_source():
         "hierarchy": {
             "top_module": {
                 **_module("top"), "rtl_output_file": "top.v",
-                "ports": [_port("clk", "input")],
+                "ports": [_port("clk", "input"), _port("result_out", "output")],
             },
             "modules": [{
                 **_module("consumer"), "rtl_output_file": "consumer.v",
@@ -2538,7 +2538,7 @@ def test_contract_rejects_required_child_input_without_structural_source():
         },
         "top_level_connections": [{"top_port": "clk", "connected_to": ["top.clk"]}],
         "inter_module_signals": [{
-            "name": "result", "width": 1, "source": "consumer.result", "destinations": ["top.clk"]
+            "name": "result", "width": 1, "source": "consumer.result", "destinations": ["top.result_out"]
         }],
         "signal_ownership": [{"signal": "result", "owner": "consumer.result"}],
     }
@@ -2551,7 +2551,8 @@ def test_contract_reports_all_required_child_inputs_without_sources():
     spec = {
         "hierarchy": {
             "top_module": {
-                **_module("top"), "rtl_output_file": "top.v", "ports": [_port("clk", "input")],
+                **_module("top"), "rtl_output_file": "top.v",
+                "ports": [_port("clk", "input"), _port("result_out", "output")],
             },
             "modules": [{
                 **_module("consumer"),
@@ -2568,7 +2569,7 @@ def test_contract_reports_all_required_child_inputs_without_sources():
         },
         "top_level_connections": [{"top_port": "clk", "connected_to": ["top.clk"]}],
         "inter_module_signals": [{
-            "name": "result", "width": 1, "source": "consumer.result", "destinations": ["top.clk"],
+            "name": "result", "width": 1, "source": "consumer.result", "destinations": ["top.result_out"],
         }],
         "signal_ownership": [{"signal": "result", "owner": "consumer.result"}],
     }
@@ -3034,6 +3035,26 @@ def test_feature_strength_recognizes_spaced_reference_to_snake_case_state():
         "statement": "PWM is low when the counter value is not less than the duty cycle.",
         "stimulus_cycles": 1,
         "expected": {"pwm_out": 0},
+    }]
+    with pytest.raises(ValueError, match="counter_value"):
+        spec_agent._validate_feature_contract_strength(ports, contracts)
+
+
+def test_feature_strength_rejects_multicycle_state_dependent_output_without_state_check():
+    ports = [
+        {"name": "counter_value", "direction": "output", "width": 8},
+        {"name": "pwm_out", "direction": "output", "width": 1},
+        {"name": "enable", "direction": "input", "width": 1},
+        {"name": "duty_cycle", "direction": "input", "width": 8},
+    ]
+    contracts = [{
+        "feature_id": "pwm_hold_when_disabled",
+        "statement": (
+            "When enable is low, counter_value holds its state and pwm_out remains determined "
+            "by the held count versus duty_cycle."
+        ),
+        "stimulus_cycles": 2,
+        "expected": {"pwm_out": {"eq": 0}},
     }]
     with pytest.raises(ValueError, match="counter_value"):
         spec_agent._validate_feature_contract_strength(ports, contracts)

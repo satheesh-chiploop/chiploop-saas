@@ -1,0 +1,219 @@
+{
+  "spec_mode": "flat",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "design_summary": {
+    "purpose": "Synthesizable FPGA supervisory controller for an intelligent active-aerodynamics application. The RTL provides compact 128-bit request/response transport, firmware-visible MMIO control/status registers, response validation, stale/timeout rejection, command limiting, and actuator output validity control. It does not implement the external DoMINO surrogate model or any physics solver; inference remains outside RTL.",
+    "operating_model": "Single synchronous clock domain on clk with active-low synchronous reset rst_n. The top-level exposes a valid/ready streaming ingress for host request packets, a valid/ready streaming egress for response packets, a compact MMIO CSR interface for firmware control/status, and actuator output/data plus fault reporting. The architecture accepts request metadata, tracks one outstanding request context, validates returned response metadata, clamps accepted command recommendations to configured limits, and inhibits actuator validity whenever reset, malformed data, stale data, timeout, or other fault conditions are present.",
+    "external_interfaces": [
+      {
+        "name": "host_stream_in_valid",
+        "direction": "input",
+        "width": 1,
+        "purpose": "Streaming request packet valid"
+      },
+      {
+        "name": "host_stream_in_ready",
+        "direction": "output",
+        "width": 1,
+        "purpose": "Streaming request packet ready"
+      },
+      {
+        "name": "host_stream_in_data",
+        "direction": "input",
+        "width": 128,
+        "purpose": "Compact request packet payload"
+      },
+      {
+        "name": "host_stream_out_valid",
+        "direction": "output",
+        "width": 1,
+        "purpose": "Streaming response packet valid"
+      },
+      {
+        "name": "host_stream_out_ready",
+        "direction": "input",
+        "width": 1,
+        "purpose": "Streaming response packet ready"
+      },
+      {
+        "name": "host_stream_out_data",
+        "direction": "output",
+        "width": 128,
+        "purpose": "Compact response packet payload"
+      },
+      {
+        "name": "mmio_valid",
+        "direction": "input",
+        "width": 1,
+        "purpose": "Firmware transaction qualifier"
+      },
+      {
+        "name": "mmio_write",
+        "direction": "input",
+        "width": 1,
+        "purpose": "Firmware transaction write enable"
+      },
+      {
+        "name": "mmio_addr",
+        "direction": "input",
+        "width": 16,
+        "purpose": "Firmware CSR address"
+      },
+      {
+        "name": "mmio_wdata",
+        "direction": "input",
+        "width": 32,
+        "purpose": "Firmware write data"
+      },
+      {
+        "name": "mmio_rdata",
+        "direction": "output",
+        "width": 32,
+        "purpose": "Firmware read data"
+      },
+      {
+        "name": "mmio_ready",
+        "direction": "output",
+        "width": 1,
+        "purpose": "Firmware transaction response/ready"
+      },
+      {
+        "name": "actuator_cmd",
+        "direction": "output",
+        "width": 16,
+        "purpose": "Registered actuator command output"
+      },
+      {
+        "name": "actuator_cmd_valid",
+        "direction": "output",
+        "width": 1,
+        "purpose": "Actuator command validity qualifier"
+      },
+      {
+        "name": "fault_status",
+        "direction": "output",
+        "width": 8,
+        "purpose": "Top-level latched fault summary"
+      }
+    ]
+  },
+  "module_architecture": {
+    "name": "adaptive_aero_control_top",
+    "role": "Single synthesizable top-level supervisory controller for external-model-aided active aerodynamics.",
+    "responsibilities": [
+      "Decode incoming 128-bit host request packets into compact semantic metadata fields including sequence_id, request_id, flow-condition summary, geometry reference identifier, and control bits.",
+      "Generate bounded request transport metadata for the external inference service through the streaming/MMIO bridge without performing any ML computation.",
+      "Expose a real firmware-visible MMIO register bank with read/write semantics and reachable decode for all declared control and status registers.",
+      "Track the current outstanding request sequence and request ID, along with request-pending state and sequence counters.",
+      "Validate returned response packets for format correctness, matching sequence_id, freshness versus the outstanding request, and timeout compliance.",
+      "Reject malformed, stale, duplicated, out-of-order, or timed-out responses and latch fault indicators for software handling.",
+      "Clamp accepted command recommendations to configured min/max limits and apply optional slew-rate limiting relative to the previous accepted command.",
+      "Register and present only validated commands to the actuator interface while deasserting actuator command validity whenever the controller is not in an accepted state.",
+      "Maintain compact counters and status telemetry for software inspection, including request_pending, response_valid, stale_fault, timeout_fault, clamp_active, fallback_active, and sequence counters.",
+      "Use only synthesizable fixed-width counters, FSM state, and small metadata buffering suitable for FPGA block RAM mapping if needed."
+    ],
+    "interface_notes": [
+      "The 128-bit streaming ingress is the request transport boundary; valid/ready handshake controls acceptance of request packets.",
+      "The 128-bit streaming egress is the response transport boundary; valid/ready handshake controls emission of response metadata toward the external service/software path.",
+      "The MMIO interface is authoritative for firmware-visible configuration and status; every register named in DIGITAL_SPEC_JSON.register_contract is expected to be reachable by address decode.",
+      "The top-level actuator outputs are driven by internal registered control logic and must never be sourced only from child inputs.",
+      "The fault_status port aggregates latched fault summary bits for external supervision.",
+      "Streaming payloads remain capped at 128 bits and no tensor/geometry-array/flow-field buses appear at the top level."
+    ],
+    "ownership_notes": [
+      "No hierarchy is redefined in this description.",
+      "No module names, port names, or filenames are altered.",
+      "The architecture remains descriptive and contract-derived only.",
+      "If a bounded metadata FIFO is implemented, it is technology-neutral and intended for FPGA-mappable block RAM rather than flattened registers.",
+      "The selected external model runs outside RTL; the RTL owns only transport, validation, timeout supervision, command limiting, and actuator validity control."
+    ]
+  },
+  "data_flow_summary": [
+    {
+      "from": "host_stream_in_data/valid",
+      "to": "internal request decoder and request metadata tracker",
+      "signals": [
+        "host_stream_in_data",
+        "host_stream_in_valid",
+        "host_stream_in_ready"
+      ],
+      "intent": "Accept compact request packets, extract request metadata, and mark the current outstanding request context."
+    },
+    {
+      "from": "internal request formatter",
+      "to": "host_stream_out_data/valid",
+      "signals": [
+        "host_stream_out_data",
+        "host_stream_out_valid",
+        "host_stream_out_ready"
+      ],
+      "intent": "Emit bounded request/response transport metadata suitable for external software/GPU inference service exchange."
+    },
+    {
+      "from": "MMIO CSR bus",
+      "to": "register bank and control FSM",
+      "signals": [
+        "mmio_valid",
+        "mmio_write",
+        "mmio_addr",
+        "mmio_wdata",
+        "mmio_rdata",
+        "mmio_ready"
+      ],
+      "intent": "Provide firmware-controlled configuration, status readback, and fault-clear behavior through reachable address decode."
+    },
+    {
+      "from": "response parser and stale-data checker",
+      "to": "validation and acceptance logic",
+      "signals": [
+        "response metadata fields",
+        "sequence_id",
+        "request_id",
+        "valid flag",
+        "command recommendation"
+      ],
+      "intent": "Accept only valid, fresh, in-order responses that match the outstanding request context and satisfy timeout and packet-integrity rules."
+    },
+    {
+      "from": "command limiter",
+      "to": "actuator output controller",
+      "signals": [
+        "clamped command",
+        "optional slew-limited command",
+        "previous accepted command"
+      ],
+      "intent": "Bound any accepted recommendation to configured min/max and optional slew limits before presentation at the actuator interface."
+    },
+    {
+      "from": "fault logic and timeout supervisor",
+      "to": "actuator validity control and fault_status",
+      "signals": [
+        "sticky fault latches",
+        "timeout fault",
+        "stale fault",
+        "invalid packet fault",
+        "sequence mismatch"
+      ],
+      "intent": "Inhibit actuator_cmd_valid on any reset or fault condition and expose fault summary for software handling."
+    }
+  ],
+  "clock_reset_summary": {
+    "clocking": "Single synchronous clock domain on clk at the specified operating point. All stateful request tracking, MMIO registers, counters, timeout supervision, and actuator-control registers are updated synchronously.",
+    "reset_behavior": "rst_n is active-low and synchronous. On reset, the controller enters SAFE/IDLE control state, clears outstanding request tracking, clears transient handshakes, initializes configuration registers to conservative safe values, deasserts actuator_cmd_valid, and initializes fault/status state per the register contract. In accordance with the no-command-fallback constraint, reset and any invalid/stale/timeout/fault condition inhibit actuator output validity rather than substitute a command. Sticky fault behavior is software-visible and cleared only by the documented MMIO policy."
+  },
+  "integration_notes": [
+    "Firmware must use the MMIO register contract as the authoritative control plane for configuration and status access.",
+    "The external inference service is outside RTL; the top only transports compact request/response metadata and validates returned responses.",
+    "The design is FPGA-oriented; any small metadata buffer should be implemented as technology-neutral inferred block RAM if needed.",
+    "The architecture should maintain conservative defaults on reset and require a fresh validated response before asserting actuator_cmd_valid.",
+    "No large payload memory, tensor storage, or flow-field buffering is permitted in the RTL top-level contract."
+  ],
+  "consistency_notes": [
+    "This document is descriptive only.",
+    "Hierarchy, ports, and filenames are inherited from digital_spec_json.",
+    "The selected top module is adaptive_aero_control_top and is not substituted by a status, telemetry, register-bank, or leaf module.",
+    "The description follows the explicit external model transport direction contract and the firmware MMIO contract from the provided specification.",
+    "The no-command-fallback contract takes precedence for behavior description: invalid, stale, timeout, reset, or fault conditions inhibit actuator validity and latch faults rather than silently replacing the requested command."
+  ]
+}

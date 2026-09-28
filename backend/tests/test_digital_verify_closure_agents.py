@@ -857,3 +857,28 @@ a_req_014: assert property(p14);
     issues = sva_agent._checker_quality_issues(sva, spec)
     assert any("combinational output pwm_out" in item["issue"] for item in issues)
     assert any("until-condition enable" in item["issue"] for item in issues)
+
+
+def test_sva_quality_rejects_reset_checker_that_leaks_into_deasserted_cycle():
+    spec = {"behavioral_obligations": [
+        {"requirement_id": "REQ-002", "checker_id": "a_req_002",
+         "requirement": "pwm_out is high whenever counter_value < duty_cycle and low otherwise."},
+        {"requirement_id": "REQ-004", "checker_id": "a_req_004",
+         "requirement": "Honor active-low reset: outputs are zero when reset_n is low."},
+        {"requirement_id": "REQ-014", "checker_id": "a_req_014",
+         "requirement": (
+             "When reset_n is low, state is zero; after reset deassertion, pwm_out evaluates "
+             "from counter_value and duty_cycle."
+         )},
+    ]}
+    sva = """
+property p2; @(posedge clk) pwm_out == (counter_value < duty_cycle); endproperty
+a_req_002: assert property(p2);
+property p4; @(posedge clk) !reset_n |=> (counter_value == 0 && pwm_out == 0); endproperty
+a_req_004: assert property(p4);
+property p14; @(posedge clk) !reset_n |=> (counter_value == 0 && pwm_out == (counter_value < duty_cycle)); endproperty
+a_req_014: assert property(p14);
+"""
+    issues = sva_agent._checker_quality_issues(sva, spec)
+    assert any("level-sensitive reset checker" in item["issue"] for item in issues)
+    assert any("multi-phase reset checker" in item["issue"] for item in issues)

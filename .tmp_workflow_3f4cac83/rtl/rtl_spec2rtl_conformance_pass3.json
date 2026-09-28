@@ -1,0 +1,1076 @@
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "partial",
+  "summary": {
+    "checked": 25,
+    "matched": 20,
+    "partial": 0,
+    "missing": 5,
+    "inconclusive": 0,
+    "pending_verification": 17
+  },
+  "total_requirements": 37,
+  "total_evaluations": 42,
+  "blocking_summary": {
+    "checked": 25,
+    "matched": 20,
+    "partial": 0,
+    "missing": 5,
+    "inconclusive": 0
+  },
+  "setup_issues": [],
+  "top_module": {
+    "expected": "adaptive_aero_control_top",
+    "modules_found": [
+      "adaptive_aero_control_top",
+      "fpga_bram_meta_fifo"
+    ],
+    "status": "pass"
+  },
+  "interface": {
+    "status": "pass",
+    "expected_ports": [
+      "actuator_cmd",
+      "actuator_cmd_valid",
+      "clk",
+      "fault_status",
+      "host_stream_in_data",
+      "host_stream_in_ready",
+      "host_stream_in_valid",
+      "host_stream_out_data",
+      "host_stream_out_ready",
+      "host_stream_out_valid",
+      "mmio_addr",
+      "mmio_rdata",
+      "mmio_ready",
+      "mmio_valid",
+      "mmio_wdata",
+      "mmio_write",
+      "rst_n"
+    ],
+    "matched_ports": [
+      "actuator_cmd",
+      "actuator_cmd_valid",
+      "clk",
+      "fault_status",
+      "host_stream_in_data",
+      "host_stream_in_ready",
+      "host_stream_in_valid",
+      "host_stream_out_data",
+      "host_stream_out_ready",
+      "host_stream_out_valid",
+      "mmio_addr",
+      "mmio_rdata",
+      "mmio_ready",
+      "mmio_valid",
+      "mmio_wdata",
+      "mmio_write",
+      "rst_n"
+    ],
+    "missing_ports": [],
+    "extra_ports": [],
+    "rtl_ports": [
+      "actuator_cmd",
+      "actuator_cmd_valid",
+      "addr",
+      "clk",
+      "csb",
+      "din",
+      "dout",
+      "fault_status",
+      "host_stream_in_data",
+      "host_stream_in_ready",
+      "host_stream_in_valid",
+      "host_stream_out_data",
+      "host_stream_out_ready",
+      "host_stream_out_valid",
+      "mmio_addr",
+      "mmio_rdata",
+      "mmio_ready",
+      "mmio_valid",
+      "mmio_wdata",
+      "mmio_write",
+      "rst_n",
+      "we"
+    ]
+  },
+  "register_map": {
+    "expected": [
+      "clamp_active",
+      "cmd_max",
+      "cmd_min",
+      "current_request_id",
+      "current_request_seq",
+      "enable",
+      "fault_clear",
+      "fault_latched",
+      "fault_status",
+      "last_accepted_cmd",
+      "request_count",
+      "request_pending",
+      "response_accept_enable",
+      "response_count",
+      "response_valid",
+      "seq_counter",
+      "slew_enable",
+      "slew_limit",
+      "stale_fault",
+      "timeout_fault",
+      "timeout_limit"
+    ],
+    "matched": [
+      "clamp_active",
+      "cmd_max",
+      "cmd_min",
+      "fault_latched",
+      "fault_status",
+      "request_count",
+      "request_pending",
+      "response_count",
+      "response_valid",
+      "slew_limit",
+      "stale_fault",
+      "timeout_fault",
+      "timeout_limit"
+    ],
+    "expected_registers": [
+      "CMD_LAST",
+      "CMD_MAX",
+      "CMD_MIN",
+      "CTRL",
+      "FAULT_STATUS",
+      "REQUEST_COUNT",
+      "REQUEST_ID",
+      "REQUEST_SEQ",
+      "RESPONSE_COUNT",
+      "SEQ_COUNT",
+      "SLEW_LIMIT",
+      "STATUS",
+      "TIMEOUT_THR"
+    ],
+    "matched_registers": [
+      "CMD_LAST",
+      "CMD_MAX",
+      "CMD_MIN",
+      "CTRL",
+      "FAULT_STATUS",
+      "REQUEST_COUNT",
+      "REQUEST_ID",
+      "REQUEST_SEQ",
+      "RESPONSE_COUNT",
+      "SEQ_COUNT",
+      "SLEW_LIMIT",
+      "STATUS",
+      "TIMEOUT_THR"
+    ],
+    "expected_addresses": [
+      "0x0",
+      "0x10",
+      "0x18",
+      "0x1c",
+      "0x20",
+      "0x24",
+      "0x28",
+      "0x2c",
+      "0x30",
+      "0x34",
+      "0x4",
+      "0x8",
+      "0xc"
+    ],
+    "matched_addresses": [
+      "0x0",
+      "0x10",
+      "0x18",
+      "0x1c",
+      "0x20",
+      "0x24",
+      "0x28",
+      "0x2c",
+      "0x30",
+      "0x34",
+      "0x4",
+      "0x8",
+      "0xc"
+    ],
+    "missing": [
+      "current_request_id",
+      "current_request_seq",
+      "enable",
+      "fault_clear",
+      "last_accepted_cmd",
+      "response_accept_enable",
+      "seq_counter",
+      "slew_enable"
+    ],
+    "missing_field_details": [
+      {
+        "field": "current_request_id",
+        "address": "0x1c",
+        "lsb": 0,
+        "msb": 15,
+        "access": "RO"
+      },
+      {
+        "field": "current_request_seq",
+        "address": "0x18",
+        "lsb": 0,
+        "msb": 15,
+        "access": "RO"
+      },
+      {
+        "field": "enable",
+        "address": "0x0",
+        "lsb": 0,
+        "msb": 0,
+        "access": "RW"
+      },
+      {
+        "field": "fault_clear",
+        "address": "0x0",
+        "lsb": 3,
+        "msb": 3,
+        "access": "RW"
+      },
+      {
+        "field": "last_accepted_cmd",
+        "address": "0x30",
+        "lsb": 0,
+        "msb": 15,
+        "access": "RO"
+      },
+      {
+        "field": "response_accept_enable",
+        "address": "0x0",
+        "lsb": 2,
+        "msb": 2,
+        "access": "RW"
+      },
+      {
+        "field": "seq_counter",
+        "address": "0x24",
+        "lsb": 0,
+        "msb": 15,
+        "access": "RO"
+      },
+      {
+        "field": "slew_enable",
+        "address": "0x0",
+        "lsb": 1,
+        "msb": 1,
+        "access": "RW"
+      }
+    ],
+    "missing_registers": [],
+    "missing_addresses": [],
+    "status": "issues"
+  },
+  "clock_reset": {
+    "clock_ports": [
+      "clk"
+    ],
+    "reset_ports": [
+      "rst_n"
+    ],
+    "reset_style_violations": [
+      "reset 'rst_n' is declared synchronous but appears in an asynchronous sensitivity list"
+    ],
+    "status": "issues"
+  },
+  "feature_contracts": {
+    "status": "pass",
+    "checked": 6,
+    "passed": 6,
+    "failed": 0,
+    "features": [
+      {
+        "feature_id": "reset_inhibits_actuator_valid",
+        "status": "pass",
+        "stimulus_signals": [
+          "host_stream_in_valid",
+          "host_stream_out_ready",
+          "mmio_addr",
+          "mmio_valid",
+          "mmio_wdata",
+          "mmio_write",
+          "rst_n"
+        ],
+        "expected_signals": [
+          "actuator_cmd_valid"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "mmio_readback_reaches_status_registers",
+        "status": "pass",
+        "stimulus_signals": [
+          "host_stream_in_valid",
+          "host_stream_out_ready",
+          "mmio_addr",
+          "mmio_valid",
+          "mmio_wdata",
+          "mmio_write",
+          "rst_n"
+        ],
+        "expected_signals": [
+          "mmio_ready"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "request_handshake_accepts_stream_in",
+        "status": "pass",
+        "stimulus_signals": [
+          "host_stream_in_valid",
+          "host_stream_out_ready",
+          "mmio_addr",
+          "mmio_valid",
+          "mmio_wdata",
+          "mmio_write",
+          "rst_n"
+        ],
+        "expected_signals": [
+          "host_stream_in_ready"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "response_rejection_keeps_actuator_invalid_on_stale_or_faulty_data",
+        "status": "pass",
+        "stimulus_signals": [
+          "host_stream_in_valid",
+          "host_stream_out_ready",
+          "mmio_addr",
+          "mmio_valid",
+          "mmio_wdata",
+          "mmio_write",
+          "rst_n"
+        ],
+        "expected_signals": [
+          "actuator_cmd_valid"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "timeout_fault_latches_without_response",
+        "status": "pass",
+        "stimulus_signals": [
+          "host_stream_in_valid",
+          "host_stream_out_ready",
+          "mmio_addr",
+          "mmio_valid",
+          "mmio_wdata",
+          "mmio_write",
+          "rst_n"
+        ],
+        "expected_signals": [
+          "actuator_cmd_valid"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "command_clamping_does_not_exceed_configured_limits",
+        "status": "pass",
+        "stimulus_signals": [
+          "host_stream_in_valid",
+          "host_stream_out_ready",
+          "mmio_addr",
+          "mmio_valid",
+          "mmio_wdata",
+          "mmio_write",
+          "rst_n"
+        ],
+        "expected_signals": [
+          "actuator_cmd_valid"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      }
+    ],
+    "scope": "static interface binding; behavioral results are verified separately"
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Decode incoming 128-bit host request packets into semantic request metadata.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-002",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Generate bounded transport packets for the external model evaluation service.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-003",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Implement firmware-visible MMIO CSR decode with read/write semantics and explicit register reachability.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "firmware_visible_csr_mmio_interface",
+        "mmio_write"
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Track outstanding request sequence and request IDs.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates"
+      ]
+    },
+    {
+      "id": "REQ-005",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Validate response metadata and reject malformed, stale, duplicated, or timed-out responses.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates"
+      ]
+    },
+    {
+      "id": "REQ-006",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Clamp accepted command recommendations to configured min/max and optional slew-rate limits.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "programmable_min_max_clamp"
+      ]
+    },
+    {
+      "id": "REQ-007",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Register and present only validated commands to the actuator interface.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-008",
+      "module": "adaptive_aero_control_top",
+      "section": "responsibilities",
+      "requirement": "Latch fault indicators for software handling and maintain conservative safe behavior after reset or fault.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "latched_status_fault_state",
+        "fault_status",
+        "next_fault_status"
+      ]
+    },
+    {
+      "id": "REQ-009",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "host_stream_in_valid and host_stream_in_ready implement a standard valid/ready input handshake for request metadata ingress.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "host_stream_in_valid",
+        "host_stream_in_ready"
+      ]
+    },
+    {
+      "id": "REQ-010",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "host_stream_out_valid and host_stream_out_ready implement a standard valid/ready output handshake for response metadata egress toward the external service/software path.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "host_stream_out_valid",
+        "host_stream_out_ready",
+        "next_response_valid"
+      ]
+    },
+    {
+      "id": "REQ-011",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "The 128-bit request packet shall be internally decoded into semantic fields that include sequence_id, request_id, flow-condition summary, geometry reference identifier, and control fields; no packet width shall exceed 128 bits.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-012",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "The MMIO interface is authoritative for firmware-visible control and status. Each declared register must be reachable through address decode and produce readback when applicable.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "mmio_write"
+      ]
+    },
+    {
+      "id": "REQ-013",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "Writable configuration registers include timeout threshold, actuator min/max limits, optional slew-rate limit, and enable bits controlling validation and limiter behavior.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-014",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "Read-only status registers include current outstanding sequence, request-pending indication, latched fault summary, command-valid state, and telemetry counters.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates",
+        "latched_status_fault_state",
+        "fault_status",
+        "next_fault_latched",
+        "next_fault_status",
+        "next_request_pending"
+      ]
+    },
+    {
+      "id": "REQ-015",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "A response is accepted only if packet format is valid, sequence_id matches the current outstanding request, the response is not stale/duplicate/older than the configured window, and it arrives before timeout expiry.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates",
+        "next_response_valid",
+        "request_packet_valid",
+        "response_packet_valid"
+      ]
+    },
+    {
+      "id": "REQ-016",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "If any validation fails, actuator_cmd_valid is deasserted and the corresponding fault bit is latched.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "actuator_cmd_valid",
+        "latched_status_fault_state",
+        "fault_status",
+        "next_fault_latched",
+        "next_fault_status",
+        "reset_low_actuator_cmd_valid"
+      ]
+    },
+    {
+      "id": "REQ-017",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "Command limiting shall apply saturation to the configured min/max range and, when enabled, rate-of-change limiting relative to the previous accepted command value.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-018",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "No silent substitute command may be generated under any condition; invalid operation inhibits output validity only.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "output_validity_inhibition"
+      ]
+    },
+    {
+      "id": "REQ-019",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "Sequence counters, request counters, and response counters are maintained in fixed-width saturating or wrapping arithmetic as described in the register contract.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "packet_validation_predicates",
+        "wrap_logic",
+        "internal_state_contract"
+      ]
+    },
+    {
+      "id": "REQ-020",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "If the optional metadata FIFO is implemented, it stores only bounded header/metadata words and never large tensors or flow fields.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-021",
+      "module": "adaptive_aero_control_top",
+      "section": "behavior_rules",
+      "requirement": "The memory macro, if instantiated, is FPGA-appropriate block RAM and is technology-neutral in the contract; no Sky130-specific macro is implied.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "inferred_bulk_memory_array"
+      ]
+    },
+    {
+      "id": "REQ-022",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "host_stream_in_ready",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "host_stream_in_ready"
+      ]
+    },
+    {
+      "id": "REQ-023",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "host_stream_out_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "host_stream_out_valid"
+      ]
+    },
+    {
+      "id": "REQ-024",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "host_stream_out_data",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "host_stream_out_data"
+      ]
+    },
+    {
+      "id": "REQ-025",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "mmio_rdata",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "mmio_rdata"
+      ]
+    },
+    {
+      "id": "REQ-026",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "mmio_ready",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "mmio_ready"
+      ]
+    },
+    {
+      "id": "REQ-027",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "actuator_cmd",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "actuator_cmd"
+      ]
+    },
+    {
+      "id": "REQ-028",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "actuator_cmd_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "actuator_cmd_valid"
+      ]
+    },
+    {
+      "id": "REQ-029",
+      "module": "adaptive_aero_control_top",
+      "section": "must_drive",
+      "requirement": "fault_status",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "fault_status"
+      ]
+    },
+    {
+      "id": "REQ-030",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "host_stream_in_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "host_stream_in_valid"
+      ]
+    },
+    {
+      "id": "REQ-031",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "host_stream_in_data",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "host_stream_in_data"
+      ]
+    },
+    {
+      "id": "REQ-032",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "host_stream_out_ready",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "host_stream_out_ready"
+      ]
+    },
+    {
+      "id": "REQ-033",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "mmio_valid",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "mmio_valid"
+      ]
+    },
+    {
+      "id": "REQ-034",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "mmio_write",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "mmio_write"
+      ]
+    },
+    {
+      "id": "REQ-035",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "mmio_addr",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "mmio_addr"
+      ]
+    },
+    {
+      "id": "REQ-036",
+      "module": "adaptive_aero_control_top",
+      "section": "must_receive",
+      "requirement": "mmio_wdata",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "mmio_wdata"
+      ]
+    },
+    {
+      "id": "REQ-037",
+      "module": "adaptive_aero_control_top",
+      "section": "reset_behavior",
+      "requirement": "On rst_n deassertion, the module enters SAFE/IDLE control state, clears outstanding request tracking, clears MMIO read-data side effects, initializes configuration registers to conservative safe values, clears transient handshakes, deasserts actuator_cmd_valid, drives a deterministic actuator_cmd register value, and clears sticky fault latches only if explicitly permitted by the reset policy encoded in MMIO. The design does not substitute or apply a fallback command; it inhibits command validity until a fresh validated response is accepted.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "rst_n",
+        "actuator_cmd_valid",
+        "actuator_cmd",
+        "output_validity_inhibition",
+        "latched_status_fault_state",
+        "fault_status",
+        "mmio_write",
+        "next_fault_status"
+      ]
+    }
+  ],
+  "rtl_files": [
+    "backend/workflows/3f4cac83-a993-4307-ab26-db887897d255/rtl/pass3/adaptive_aero_control_top.v",
+    "backend/workflows/3f4cac83-a993-4307-ab26-db887897d255/rtl/pass3/fpga_bram_meta_fifo.v"
+  ],
+  "modules": [
+    {
+      "name": "adaptive_aero_control_top",
+      "file": "backend/workflows/3f4cac83-a993-4307-ab26-db887897d255/rtl/pass3/adaptive_aero_control_top.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "host_stream_in_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "host_stream_in_ready",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "host_stream_in_data",
+          "direction": "input",
+          "width": "[127:0]",
+          "bits": 128
+        },
+        {
+          "name": "host_stream_out_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "host_stream_out_ready",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "host_stream_out_data",
+          "direction": "output",
+          "width": "[127:0]",
+          "bits": 128
+        },
+        {
+          "name": "mmio_valid",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "mmio_write",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "mmio_addr",
+          "direction": "input",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "mmio_wdata",
+          "direction": "input",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "mmio_rdata",
+          "direction": "output",
+          "width": "[31:0]",
+          "bits": 32
+        },
+        {
+          "name": "mmio_ready",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "actuator_cmd",
+          "direction": "output",
+          "width": "[15:0]",
+          "bits": 16
+        },
+        {
+          "name": "actuator_cmd_valid",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "fault_status",
+          "direction": "output",
+          "width": "[7:0]",
+          "bits": 8
+        }
+      ],
+      "rtl_text": "module adaptive_aero_control_top (\n    clk,\n    rst_n,\n    host_stream_in_valid,\n    host_stream_in_ready,\n    host_stream_in_data,\n    host_stream_out_valid,\n    host_stream_out_ready,\n    host_stream_out_data,\n    mmio_valid,\n    mmio_write,\n    mmio_addr,\n    mmio_wdata,\n    mmio_rdata,\n    mmio_ready,\n    actuator_cmd,\n    actuator_cmd_valid,\n    fault_status\n);\n\ninput clk;\ninput rst_n;\ninput host_stream_in_valid;\noutput host_stream_in_ready;\ninput [127:0] host_stream_in_data;\noutput host_stream_out_valid;\ninput host_stream_out_ready;\noutput [127:0] host_stream_out_data;\ninput mmio_valid;\ninput mmio_write;\ninput [15:0] mmio_addr;\ninput [31:0] mmio_wdata;\noutput [31:0] mmio_rdata;\noutput mmio_ready;\noutput [15:0] actuator_cmd;\noutput actuator_cmd_valid;\noutput [7:0] fault_status;\nreg host_stream_in_ready_r;\nreg host_stream_out_valid_r;\nreg [127:0] host_stream_out_data_r;\nreg [31:0] mmio_rdata_r;\nreg mmio_ready_r;\nreg [15:0] actuator_cmd_r;\nreg actuator_cmd_valid_r;\nreg [7:0] fault_status_r;\nreg [3:0] ctrl_reg;\nreg [15:0] timeout_thr_reg;\nreg [15:0] cmd_min_reg;\nreg [15:0] cmd_max_reg;\nreg [15:0] slew_limit_reg;\nreg [15:0] request_seq_reg;\nreg [15:0] request_id_reg;\nreg [15:0] seq_count_reg;\nreg [15:0] request_count_reg;\nreg [15:0] response_count_reg;\nreg [15:0] cmd_last_reg;\n\nreg request_pending_reg;\nreg response_valid_reg;\nreg stale_fault_reg;\nreg timeout_fault_reg;\nreg clamp_active_reg;\nreg fault_latched_reg;\n\nreg [15:0] outstanding_age_reg;\nreg [15:0] outstanding_seq_reg;\nreg [15:0] outstanding_id_reg;\nreg [15:0] pending_cmd_reg;\nreg [15:0] candidate_cmd_reg;\nreg [127:0] meta_fifo_mem [0:15];\nreg [3:0] meta_wr_ptr_reg;\nreg [3:0] meta_rd_ptr_reg;\nreg [4:0] meta_count_reg;\nreg [3:0] meta_last_ptr_reg;\nreg [15:0] meta_header_reg;\nreg [15:0] parsed_seq_reg;\nreg [15:0] parsed_req_id_reg;\nreg [15:0] parsed_cmd_reg;\nreg [15:0] parsed_aux_reg;\n\nreg [15:0] next_request_seq;\nreg [15:0] next_request_id;\nreg [15:0] next_seq_count;\nreg [15:0] next_request_count;\nreg [15:0] next_response_count;\nreg [15:0] next_cmd_last;\nreg [15:0] next_outstanding_age;\nreg [15:0] next_outstanding_seq;\nreg [15:0] next_outstanding_id;\nreg [15:0] next_pending_cmd;\nreg [15:0] next_candidate_cmd;\nreg [7:0] next_fault_status;\nreg next_request_pending;\nreg next_response_valid;\nreg next_stale_fault;\nreg next_timeout_fault;\nreg next_clamp_active;\nreg next_fault_latched;\nreg next_host_stream_in_ready;\nreg next_host_stream_out_valid;\nreg [127:0] next_host_stream_out_data;\nreg next_mmio_ready;\nreg [31:0] next_mmio_rdata;\nreg next_actuator_cmd_valid;\nreg [15:0] next_actuator_cmd;\n\nwire [15:0] req_seq_in;\nwire [15:0] req_id_in;\nwire [15:0] req_cmd_in;\nwire [15:0] req_aux_in;\nwire [15:0] rsp_seq_in;\nwire [15:0] rsp_id_in;\nwire [15:0] rsp_cmd_in;\nwire [15:0] rsp_aux_in;\nwire [15:0] clamp_min_eff;\nwire [15:0] clamp_max_eff;\nwire [15:0] slew_prev;\nwire [15:0] slew_delta;\nwire [15:0] slew_upper;\nwire [15:0] slew_lower;\nwire [15:0] clamped_cmd;\nwire [15:0] slewed_cmd;\nwire [15:0] accepted_cmd;\nwire [15:0] timeout_limit_eff;\nwire response_packet_valid;\nwire request_packet_valid;\nwire packet_parity_ok;\n\nassign host_stream_in_ready = host_stream_in_ready_r;\nassign host_stream_out_valid = host_stream_out_valid_r;\nassign host_stream_out_data = host_stream_out_data_r;\nassign mmio_rdata = mmio_rdata_r;\nassign mmio_ready = mmio_ready_r;\nassign actuator_cmd = actuator_cmd_r;\nassign actuator_cmd_valid = actuator_cmd_valid_r;\nassign fault_status = fault_status_r;\n\nassign req_seq_in = host_stream_in_data[15:0];\nassign req_id_in = host_stream_in_data[31:16];\nassign req_cmd_in = host_stream_in_data[47:32];\nassign req_aux_in = host_stream_in_data[63:48];\nassign rsp_seq_in = host_stream_out_data_r[15:0];\nassign rsp_id_in = host_stream_out_data_r[31:16];\nassign rsp_cmd_in = host_stream_out_data_r[47:32];\nassign rsp_aux_in = host_stream_out_data_r[63:48];\nassign clamp_min_eff = cmd_min_reg;\nassign clamp_max_eff = cmd_max_reg;\nassign slew_prev = cmd_last_reg;\nassign timeout_limit_eff = timeout_thr_reg;\n\nassign packet_parity_ok = host_stream_in_data[127] ^ host_stream_in_data[126] ^ host_stream_in_data[125] ^ host_stream_in_data[124];\nassign request_packet_valid = host_stream_in_valid & packet_parity_ok;\nassign response_packet_valid = host_stream_out_valid_r;\n\nassign clamped_cmd = (parsed_cmd_reg < clamp_min_eff) ? clamp_min_eff : ((parsed_cmd_reg > clamp_max_eff) ? clamp_max_eff : parsed_cmd_reg);\nassign slew_upper = slew_prev + slew_limit_reg;\nassign slew_lower = (slew_prev > slew_limit_reg) ? (slew_prev - slew_limit_reg) : 16'h0000;\nassign slewed_cmd = (clamped_cmd > slew_upper) ? slew_upper : ((clamped_cmd < slew_lower) ? slew_lower : clamped_cmd);\nassign accepted_cmd = (ctrl_reg[1] && ctrl_reg[2]) ? slewed_cmd : clamped_cmd;\n\nalways @(posedge clk or negedge rst_n) begin\n    if (!rst_n) begin\n        ctrl_reg <= 4'b0100;\n        timeout_thr_reg <= 16'd64;\n        cmd_min_reg <= 16'd0;\n        cmd_max_reg <= 16'd1023;\n        slew_limit_reg <= 16'd16;\n        request_seq_reg <= 16'd0;\n        request_id_reg <= 16'd0;\n        seq_count_reg <= 16'd0;\n        request_count_reg <= 16'd0;\n        response_count_reg <= 16'd0;\n        cmd_last_reg <= 16'd0;\n        request_pending_reg <= 1'b0;\n        response_valid_reg <= 1'b0;\n        stale_fault_reg <= 1'b0;\n        timeout_fault_reg <= 1'b0;\n        clamp_active_reg <= 1'b0;\n        fault_latched_reg <= 1'b0;\n        outstanding_age_reg <= 16'd0;\n        outstanding_seq_reg <= 16'd0;\n        outstanding_id_reg <= 16'd0;\n        pending_cmd_reg <= 16'd0;\n        candidate_cmd_reg <= 16'd0;\n        meta_wr_ptr_reg <= 4'd0;\n        meta_rd_ptr_reg <= 4'd0;\n        meta_count_reg <= 5'd0;\n        meta_last_ptr_reg <= 4'd0;\n        meta_header_reg <= 16'd0;\n        parsed_seq_reg <= 16'd0;\n        parsed_req_id_reg <= 16'd0;\n        parsed_cmd_reg <= 16'd0;\n        parsed_aux_reg <= 16'd0;\n        host_stream_in_ready_r <= 1'b0;\n        host_stream_out_valid_r <= 1'b0;\n        host_stream_out_data_r <= 128'd0;\n        mmio_ready_r <= 1'b0;\n        mmio_rdata_r <= 32'd0;\n        actuator_cmd_r <= 16'd0;\n        actuator_cmd_valid_r <= 1'b0;\n        fault_status_r <= 8'd0;\n    end else begin\n        host_stream_in_ready_r <= 1'b0;\n        mmio_ready_r <= 1'b0;\n        actuator_cmd_valid_r <= 1'b0;\n        clamp_active_reg <= 1'b0;\n        response_valid_reg <= 1'b0;\n\n        if (ctrl_reg[3]) begin\n            stale_fault_reg <= 1'b0;\n            timeout_fault_reg <= 1'b0;\n            fault_latched_reg <= 1'b0;\n        end\n\n        if (mmio_valid) begin\n            mmio_ready_r <= 1'b1;\n            if (mmio_write) begin\n                case (mmio_addr[7:0])\n                    8'h00: begin\n                        ctrl_reg[0] <= mmio_wdata[0];\n                        ctrl_reg[1] <= mmio_wdata[1];\n                        ctrl_reg[2] <= mmio_wdata[2];\n                        ctrl_reg[3] <= mmio_wdata[3];\n                    end\n                    8'h04: timeout_thr_reg <= mmio_wdata[15:0];\n                    8'h08: cmd_min_reg <= mmio_wdata[15:0];\n                    8'h0c: cmd_max_reg <= mmio_wdata[15:0];\n                    8'h10: slew_limit_reg <= mmio_wdata[15:0];\n                    default: begin\n                    end\n                endcase\n            end else begin\n                case (mmio_addr[7:0])\n                    8'h00: mmio_rdata_r <= {28'd0, ctrl_reg};\n                    8'h04: mmio_rdata_r <= {16'd0, timeout_thr_reg};\n                    8'h08: mmio_rdata_r <= {16'd0, cmd_min_reg};\n                    8'h0c: mmio_rdata_r <= {16'd0, cmd_max_reg};\n                    8'h10: mmio_rdata_r <= {16'd0, slew_limit_reg};\n                    8'h18: mmio_rdata_r <= {16'd0, request_seq_reg};\n                    8'h1c: mmio_rdata_r <= {16'd0, request_id_reg};\n                    8'h20: mmio_rdata_r <= {26'd0, fault_latched_reg, clamp_active_reg, timeout_fault_reg, stale_fault_reg, response_valid_reg, request_pending_reg};\n                    8'h24: mmio_rdata_r <= {16'd0, seq_count_reg};\n                    8'h28: mmio_rdata_r <= {16'd0, request_count_reg};\n                    8'h2c: mmio_rdata_r <= {16'd0, response_count_reg};\n                    8'h30: mmio_rdata_r <= {16'd0, cmd_last_reg};\n                    8'h34: mmio_rdata_r <= {24'd0, fault_status_r};\n                    default: mmio_rdata_r <= 32'd0;\n                endcase\n            end\n        end\n\n        if (request_packet_valid && ctrl_reg[0]) begin\n            host_stream_in_ready_r <= 1'b1;\n            request_pending_reg <= 1'b1;\n            outstanding_seq_reg <= req_seq_in;\n            outstanding_id_reg <= req_id_in;\n            parsed_seq_reg <= req_seq_in;\n            parsed_req_id_reg <= req_id_in;\n            parsed_cmd_reg <= req_cmd_in;\n            parsed_aux_reg <= req_aux_in;\n            request_seq_reg <= req_seq_in;\n            request_id_reg <= req_id_in;\n            seq_count_reg <= seq_count_reg + 16'd1;\n            request_count_reg <= request_count_reg + 16'd1;\n            outstanding_age_reg <= 16'd0;\n            meta_wr_ptr_reg <= meta_wr_ptr_reg + 4'd1;\n            meta_count_reg <= meta_count_reg + 5'd1;\n            meta_last_ptr_reg <= meta_wr_ptr_reg;\n            meta_header_reg <= req_seq_in;\n            host_stream_out_data_r <= host_stream_in_data;\n            host_stream_out_valid_r <= 1'b1;\n        end\n\n        if (host_stream_out_valid_r && host_stream_out_ready) begin\n            host_stream_out_valid_r <= 1'b0;\n            meta_rd_ptr_reg <= meta_rd_ptr_reg + 4'd1;\n            if (meta_count_reg != 5'd0) begin\n                meta_count_reg <= meta_count_reg - 5'd1;\n            end\n        end\n\n        if (request_pending_reg) begin\n            outstanding_age_reg <= outstanding_age_reg + 16'd1;\n            if (outstanding_age_reg >= timeout_limit_eff) begin\n                timeout_fault_reg <= 1'b1;\n                fault_latched_reg <= 1'b1;\n                request_pending_reg <= 1'b0;\n            end\n            if (ctrl_reg[2] && response_packet_valid && host_stream_out_ready) begin\n                if ((rsp_seq_in == outstanding_seq_reg) && (rsp_id_in == outstanding_id_reg) && (rsp_seq_in == request_seq_reg)) begin\n                    if ((rsp_cmd_in == 16'h0000) && (rsp_aux_in == 16'h0000)) begin\n                        stale_fault_reg <= 1'b1;\n                        fault_latched_reg <= 1'b1;\n                    end else begin\n                        pending_cmd_reg <= rsp_cmd_in;\n                        candidate_cmd_reg <= accepted_cmd;\n                        cmd_last_reg <= accepted_cmd;\n                        actuator_cmd_r <= accepted_cmd;\n                        actuator_cmd_valid_r <= 1'b1;\n                        response_valid_reg <= 1'b1;\n                        response_count_reg <= response_count_reg + 16'd1;\n                        request_pending_reg <= 1'b0;\n                        if ((accepted_cmd != rsp_cmd_in) || (accepted_cmd != clamped_cmd)) begin\n                            clamp_active_reg <= 1'b1;\n                        end\n                    end\n                end else begin\n                    stale_fault_reg <= 1'b1;\n                    fault_latched_reg <= 1'b1;\n                end\n            end\n        end\n\n        if (fault_latched_reg || stale_fault_reg || timeout_fault_reg) begin\n            actuator_cmd_valid_r <= 1'b0;\n        end\n\n        fault_status_r <= {timeout_fault_reg, stale_fault_reg, fault_latched_reg, request_pending_reg, response_valid_reg, clamp_active_reg, ctrl_reg[2], ctrl_reg[0]};\n    end\nend\n\nendmodule"
+    },
+    {
+      "name": "fpga_bram_meta_fifo",
+      "file": "backend/workflows/3f4cac83-a993-4307-ab26-db887897d255/rtl/pass3/fpga_bram_meta_fifo.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "csb",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "we",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "addr",
+          "direction": "input",
+          "width": "[3:0]",
+          "bits": 4
+        },
+        {
+          "name": "din",
+          "direction": "input",
+          "width": "[127:0]",
+          "bits": 128
+        },
+        {
+          "name": "dout",
+          "direction": "output",
+          "width": "[127:0]",
+          "bits": 128
+        }
+      ],
+      "rtl_text": "module fpga_bram_meta_fifo (\n    input clk,\n    input csb,\n    input we,\n    input [3:0] addr,\n    input [127:0] din,\n    output reg [127:0] dout\n);\n    reg [127:0] mem [0:15];\n    always @(posedge clk) begin\n        if (!csb) begin\n            if (we)\n                mem[addr] <= din;\n            dout <= mem[addr];\n        end\n    end\nendmodule"
+    }
+  ],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Behavioral obligations are nonblocking here only when routed to executable RTL verification checkers.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}

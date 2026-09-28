@@ -760,6 +760,71 @@ def _match_score(
         labels = [re.findall(r"\b\d+'h[0-9a-f]+\s*:", block, re.I) for block in case_blocks]
         if labels and all(len(items) == len(set(item.lower() for item in items)) for items in labels):
             evidence.append("unique_register_address_case_items")
+    if re.search(r"\bregister\w*\b.*\bvalidated\b.*\b(?:command|actuator)\b", req_lower):
+        actuator_aliases = [
+            (output_name, state_name)
+            for output_name, state_name in re.findall(
+                r"\bassign\s+([A-Za-z_]\w*)\s*=\s*([A-Za-z_]\w*)\s*;",
+                rtl_without_comments,
+                re.I,
+            )
+            if re.search(r"actuator|command|cmd", output_name, re.I)
+        ]
+        registered_aliases = [
+            (output_name, state_name) for output_name, state_name in actuator_aliases
+            if re.search(rf"\b{re.escape(state_name)}\s*<=", rtl_without_comments, re.I)
+        ]
+        guarded_registered_aliases = [
+            (output_name, state_name)
+            for output_name, state_name in registered_aliases
+            if re.search(
+                rf"\bif\s*\([^)]*\b(?:valid\w*|accept\w*|\w*_ok)\b[^)]*\)"
+                rf".{{0,4000}}?\b{re.escape(state_name)}\s*<=",
+                rtl_without_comments,
+                re.I | re.S,
+            )
+        ]
+        if guarded_registered_aliases:
+            evidence.append("registered_validated_command_output")
+    packet_decode = re.search(
+        r"\b(\d+)\s*-?\s*bit\s+(?:request\s+)?packet\b.*\bdecoded\b.*\bsemantic\s+fields\b",
+        requirement,
+        re.I | re.S,
+    )
+    if packet_decode:
+        packet_limit = int(packet_decode.group(1))
+        slice_decodes = re.findall(
+            r"\b([A-Za-z_]\w*)\s*<=\s*([A-Za-z_]\w*(?:packet|data|word)\w*)"
+            r"\s*\[\s*\d+\s*:\s*\d+\s*\]",
+            rtl_without_comments,
+            re.I,
+        )
+        packet_widths = [
+            abs(int(msb) - int(lsb)) + 1
+            for msb, lsb, name in re.findall(
+                r"\[\s*(\d+)\s*:\s*(\d+)\s*\]\s*([A-Za-z_]\w*(?:packet|data|word)\w*)",
+                rtl_without_comments,
+                re.I,
+            )
+        ]
+        if len({lhs.lower() for lhs, _ in slice_decodes}) >= 3 and (
+            not packet_widths or max(packet_widths) <= packet_limit
+        ):
+            evidence.append("bounded_semantic_packet_field_decode")
+    if re.search(r"\bmetadata\s+fifo\b.*\b(?:bounded|header|metadata)\b", req_lower):
+        macros = [
+            macro for macro in structural_context.get("memory_macros") or []
+            if isinstance(macro, dict)
+        ]
+        bounded_metadata_macros = [
+            macro for macro in macros
+            if re.search(r"(?:meta|header).*fifo|fifo.*(?:meta|header)", str(macro.get("name") or ""), re.I)
+            and int(macro.get("depth") or 0) > 0
+            and int(macro.get("data_width") or 0) > 0
+            and not re.search(r"tensor|flow.?field", str(macro.get("name") or ""), re.I)
+        ]
+        if bounded_metadata_macros:
+            evidence.append("bounded_metadata_fifo_contract")
     if re.search(r"top-level outputs?.*real rtl drivers|may not be tied only to child inputs", req_lower):
         driven = True
         for output_name in structural_context.get("output_ports") or []:
@@ -1524,6 +1589,9 @@ def _match_score(
         "memory_interface_isolated_from_actuator_control",
         "no_internal_input_port_drivers",
         "observable_current_state_output_driven",
+        "registered_validated_command_output",
+        "bounded_semantic_packet_field_decode",
+        "bounded_metadata_fifo_contract",
     }
     if (
         re.search(r"\bsynchronous(?:ly)?\b", req_lower)
@@ -2143,6 +2211,7 @@ def run_agent(state: Dict[str, Any]) -> Dict[str, Any]:
             for module in modules
         ),
         "design_module_count": len(modules),
+        "memory_macros": spec_obj.get("memory_macros", []) if isinstance(spec_obj, dict) else [],
     }
 
     requirements = _structured_requirements(spec_obj, spec)

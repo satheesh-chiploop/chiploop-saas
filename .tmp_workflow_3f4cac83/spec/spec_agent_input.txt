@@ -1,0 +1,62 @@
+The required synthesizable top module is adaptive_aero_control_top. Do not substitute a status, telemetry, register-bank, or leaf module as the design top. The top must implement the selected Physical AI application contract, external model request/response transport, validation, safety, timeout, and bounded actuator-command behavior.
+
+EXTERNAL MODEL TRANSPORT DIRECTION CONTRACT (mandatory; this takes precedence over ambiguous ingress/egress wording in upstream prose): the RTL emits model-request valid/data as outputs and receives model-request ready as an input. The RTL receives model-response valid/data as inputs and emits model-response ready as an output. Apply this rule by data flow even when application-specific ports use cmd_*, req_*, rsp_*, or response_* names. A top-level output must have a real RTL driver; never connect a required top-level output only to a child input.
+
+FIRMWARE CONTROL-PLANE CONTRACT (mandatory): this product journey requests generated firmware. The synthesizable top must expose a real firmware-visible CSR/MMIO interface with address, write-data, read-data, transaction-valid/write-enable, and response/ready semantics. DIGITAL_SPEC_JSON.register_contract must describe the implemented registers and fields. Every declared register must be reachable through RTL decode; do not label inaccessible internal state as software-visible. The streaming transport may coexist with, but cannot replace, this interface.
+Module: adaptive_aero_control_top
+
+Purpose:
+Implement a synthesizable FPGA supervisory digital-IP block for an intelligent active-aerodynamics controller. The block shall not implement the NVIDIA DoMINO surrogate model or any physics solver. Instead, it shall accept compact request packets, validate returned inference metadata from an external software/GPU service, reject stale or invalid responses, clamp actuator commands, and drive a safe fallback state when required.
+
+Top-level interface requirements:
+1) The RTL top shall be a compact implementation-friendly interface with no more than 128 bits per streaming payload bus.
+2) Preferred interface: a single valid/ready streaming request input and a single valid/ready streaming response output, each 128 bits wide.
+3) Additional top-level signals shall be limited to clk, rst_n, actuator command output(s), actuator command valid, and fault status. Scalar-equivalent I/O shall remain below 256.
+4) No top-level tensor ports, geometry arrays, flow fields, or surrogate payload buses are permitted.
+
+Functional behavior:
+1) On reset, the block shall enter SAFE state and hold fallback actuator commands until a valid, fresh response has been accepted.
+2) Incoming host_stream_in packets shall be framed using sequence_id, request_id, flow_condition summary, geometry reference identifier, and control fields. The exact bit allocation may be implementation-defined, but the total packet width shall not exceed 128 bits.
+3) The request_formatter shall generate bounded outgoing request metadata suitable for forwarding to the external inference service through the host interface or system software. The RTL may provide only the transport/control data required to request a model evaluation; it shall not attempt any ML computation.
+4) The response_parser shall accept host_stream_out packets or equivalent returned status words containing a matching sequence_id, valid flag, and command recommendation fields. If the packet is malformed, the response shall be rejected.
+5) The stale_data_checker shall compare response sequence_id against the current outstanding request and shall reject responses that are out-of-order, duplicated, or older than a programmable timeout window.
+6) The timeout_supervisor shall start a timer when a request is issued and shall assert a timeout fault if no valid response arrives before the configured limit. The timer shall be implemented with synthesizable counters and FSM state only.
+7) The command_limiter shall clamp any accepted actuator recommendation to configured min/max values and, if enabled, to a rate-of-change limit relative to the previous command.
+8) The safe_fallback_manager shall output a deterministic safe command state when any fault is active, including timeout, stale data, invalid packet, or reset. The fallback state shall be configurable via small control registers and shall be applied immediately on fault entry or after hold-off as defined by the design.
+9) The actuator_output_controller shall register and present the approved command on actuator_cmd and assert actuator_cmd_valid for one cycle or until acknowledged by the downstream protocol, depending on implementation choice. The design shall ensure that only validated, non-stale, clamped commands can reach this stage.
+10) status_telemetry shall report at least: request_pending, response_valid, stale_fault, timeout_fault, clamp_active, fallback_active, and sequence counters.
+
+Control/status registers:
+1) Implement small synthesizable registers for timeout threshold, actuator min/max limits, optional slew-rate limit, fallback command value, and enable bits.
+2) Registers may be memory-mapped through the chosen compact host interface; no bulk payload memory is required in RTL.
+3) Register reset values shall place the controller into a conservative safe configuration.
+
+Storage and buffering:
+1) Only small control/status registers, counters, and FSM state may be stored as flip-flops.
+2) If a small bounded message buffer is implemented, it shall be limited to headers/metadata only and shall not store large tensors or flow fields.
+3) For FPGA implementation, use FPGA-appropriate BRAM only if needed for small metadata buffering; do not instantiate Sky130 macros in FPGA synthesis.
+
+Clocking and reset:
+1) Single synchronous clock domain is preferred.
+2) rst_n shall force SAFE state, clear outstanding request state, clear fault latches as defined by the reset policy, and initialize sequence counters.
+
+Safety and error handling:
+1) Any invalid handshake, malformed packet, checksum/parity error if present, timeout expiry, or sequence mismatch shall cause rejection and fallback.
+2) Faults shall be sticky until cleared by software register write or until a valid recovery policy is satisfied; the exact policy shall be documented in RTL comments and registers.
+3) The design shall never issue an unclamped command to the actuator output.
+4) The design shall expose explicit fault_status for external supervision.
+
+Synthesis constraints:
+1) RTL shall be synthesizable for FPGA implementation.
+2) No unsynthesizable constructs, no DPI, no file I/O, no behavioral ML inference, and no unbounded dynamic data structures.
+3) All arithmetic shall use fixed-width unsigned/signed logic with explicit saturation where needed.
+
+Model integration boundary:
+1) The selected DoMINO model runs externally in software/GPU and is not part of this RTL.
+2) The RTL shall only support request/response transport, buffering, validation, safety, timeout handling, and actuator command handling.
+3) Because inference_status is not_executed, no model outputs or performance numbers are assumed by the RTL architecture.
+
+Implementation note:
+The top module name shall be adaptive_aero_control_top and shall be a valid Verilog identifier.
+FPGA MEMORY CONTRACT (mandatory): describe bulk payload/history/FIFO storage through a technology-neutral memory wrapper that the FPGA flow can map to native block RAM; do not flatten it into registers.
+NO COMMAND FALLBACK CONTRACT (mandatory; overrides conflicting generated prose): do not create a fallback command, fallback register, fallback status, fallback controller, substitute command, or fallback-on-reset behavior. On invalid, stale, timeout, reset, or fault conditions, inhibit/deassert actuator output validity and latch the fault for software handling. Do not silently replace the requested command.

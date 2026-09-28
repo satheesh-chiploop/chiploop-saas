@@ -1,0 +1,317 @@
+{
+  "derived_from_spec_only": true,
+  "spec_mode": "flat",
+  "regmap": {
+    "bus": "minimal",
+    "base_address": "0x00",
+    "addr_width": 8,
+    "data_width": 32,
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": "0x0",
+        "access": "rw",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "enable",
+            "lsb": 0,
+            "msb": 0,
+            "access": "rw",
+            "reset": 0,
+            "description": "Global controller enable. When 0, request issuance and actuator command validity are inhibited."
+          },
+          {
+            "name": "slew_enable",
+            "lsb": 1,
+            "msb": 1,
+            "access": "rw",
+            "reset": 0,
+            "description": "Enables slew-rate limiting on accepted actuator commands."
+          },
+          {
+            "name": "response_accept_enable",
+            "lsb": 2,
+            "msb": 2,
+            "access": "rw",
+            "reset": 1,
+            "description": "Enables acceptance of validated response packets."
+          },
+          {
+            "name": "fault_clear",
+            "lsb": 3,
+            "msb": 3,
+            "access": "rw",
+            "reset": 0,
+            "description": "Write-1-to-clear sticky fault latches that are software-clearable."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THR",
+        "offset": "0x4",
+        "access": "rw",
+        "reset": 64,
+        "fields": [
+          {
+            "name": "timeout_limit",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 64,
+            "description": "Maximum response latency in clock cycles before timeout fault is asserted."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MIN",
+        "offset": "0x8",
+        "access": "rw",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "cmd_min",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 0,
+            "description": "Minimum allowed actuator command after clamping."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MAX",
+        "offset": "0xc",
+        "access": "rw",
+        "reset": 1023,
+        "fields": [
+          {
+            "name": "cmd_max",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 1023,
+            "description": "Maximum allowed actuator command after clamping."
+          }
+        ]
+      },
+      {
+        "name": "SLEW_LIMIT",
+        "offset": "0x10",
+        "access": "rw",
+        "reset": 16,
+        "fields": [
+          {
+            "name": "slew_limit",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 16,
+            "description": "Maximum absolute command delta per accepted update when slew_enable is set."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_SEQ",
+        "offset": "0x18",
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "current_request_seq",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Current outstanding request sequence identifier."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_ID",
+        "offset": "0x1c",
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "current_request_id",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Current outstanding request identifier."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": "0x20",
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "request_pending",
+            "lsb": 0,
+            "msb": 0,
+            "access": "ro",
+            "reset": 0,
+            "description": "Indicates an outstanding request is waiting for validation."
+          },
+          {
+            "name": "response_valid",
+            "lsb": 1,
+            "msb": 1,
+            "access": "ro",
+            "reset": 0,
+            "description": "Indicates a validated response was accepted in the last update."
+          },
+          {
+            "name": "stale_fault",
+            "lsb": 2,
+            "msb": 2,
+            "access": "ro",
+            "reset": 0,
+            "description": "Latched stale or sequence-mismatch fault."
+          },
+          {
+            "name": "timeout_fault",
+            "lsb": 3,
+            "msb": 3,
+            "access": "ro",
+            "reset": 0,
+            "description": "Latched timeout fault."
+          },
+          {
+            "name": "clamp_active",
+            "lsb": 4,
+            "msb": 4,
+            "access": "ro",
+            "reset": 0,
+            "description": "Indicates the accepted command was clamped in the last update."
+          },
+          {
+            "name": "fault_latched",
+            "lsb": 5,
+            "msb": 5,
+            "access": "ro",
+            "reset": 0,
+            "description": "Aggregate latched fault indication."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_COUNT",
+        "offset": "0x24",
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "seq_counter",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Monotonic or wrapping sequence counter used for request generation and validation."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_COUNT",
+        "offset": "0x28",
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "request_count",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Count of issued requests."
+          }
+        ]
+      },
+      {
+        "name": "RESPONSE_COUNT",
+        "offset": "0x2c",
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "response_count",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Count of accepted responses."
+          }
+        ]
+      },
+      {
+        "name": "CMD_LAST",
+        "offset": "0x30",
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "last_accepted_cmd",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Most recently accepted and limited actuator command."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_STATUS",
+        "offset": "0x34",
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "fault_status",
+            "lsb": 0,
+            "msb": 7,
+            "access": "ro",
+            "reset": 0,
+            "description": "Bit-encoded fault summary exposed on the top-level fault_status port."
+          }
+        ]
+      }
+    ]
+  },
+  "interrupts": {
+    "sources": [
+      {
+        "name": "FAULT_IRQ",
+        "description": "Optional software-notification source implied by latched fault status. Not a required top-level port."
+      }
+    ]
+  },
+  "software_driver_intent": {
+    "init_sequence": [
+      "Hold rst_n low, then release high.",
+      "Write CTRL with ENABLE=0, SLEW_ENABLE=0, RESPONSE_ACCEPT_ENABLE=1, FAULT_CLEAR=0 to establish conservative defaults.",
+      "Program TIMEOUT_THR, CMD_MIN, CMD_MAX, and SLEW_LIMIT as required by the application.",
+      "Write CTRL with ENABLE=1 when the system is ready to issue requests."
+    ],
+    "polling_sequence": [
+      "Poll STATUS for REQUEST_PENDING, RESPONSE_VALID, STALE_FAULT, TIMEOUT_FAULT, CLAMP_ACTIVE, FAULT_LATCHED, and FALLBACK_ACTIVE.",
+      "Read REQUEST_SEQ, REQUEST_ID, SEQ_COUNT, REQUEST_COUNT, RESPONSE_COUNT, CMD_LAST, and FAULT_STATUS for telemetry.",
+      "If FAULT_LATCHED is set, write CTRL.FAULT_CLEAR=1 to clear software-clearable sticky faults, then re-read STATUS."
+    ],
+    "irq_sequence": [
+      "If fault notification is implemented in the system integration, service the fault event by reading STATUS and FAULT_STATUS.",
+      "If the fault is software-clearable, write CTRL.FAULT_CLEAR=1 and confirm the fault bits are deasserted before re-enabling operation."
+    ]
+  },
+  "consistency_notes": [
+    "All assumptions remain compatible with DIGITAL_SPEC_JSON.",
+    "The register map is firmware-visible through the declared MMIO control interface with mmio_valid, mmio_write, mmio_addr, mmio_wdata, mmio_rdata, and mmio_ready.",
+    "No incompatible hierarchy, bus protocol, or top-level ports are invented.",
+    "No fallback command or substitute actuator output is defined; invalid, stale, timeout, reset, or fault conditions inhibit actuator validity and latch faults for software handling.",
+    "Register names, addresses, fields, access, and bit ranges are enforced from DIGITAL_SPEC_JSON.register_contract."
+  ],
+  "register_map_required": true
+}

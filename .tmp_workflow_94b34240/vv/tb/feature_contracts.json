@@ -1,0 +1,244 @@
+{
+  "type": "application_feature_contracts",
+  "top_module": "pwm_controller",
+  "source": "resolved_application_spec",
+  "contracts": [
+    {
+      "feature_id": "pwm_reset_clears_outputs",
+      "statement": "Active-low reset clears counter_value and pwm_out state to zero.",
+      "stimulus": {
+        "reset_n": 0,
+        "enable": 1,
+        "duty_cycle": 128,
+        "period": 10
+      },
+      "stimulus_steps": [
+        {
+          "signals": {
+            "reset_n": 0,
+            "enable": 1,
+            "duty_cycle": 128,
+            "period": 10
+          },
+          "cycles": 1
+        }
+      ],
+      "expected": {
+        "counter_value": 0,
+        "pwm_out": 0
+      },
+      "stimulus_cycles": 1,
+      "deadline_cycles": 1,
+      "wait_cycles": 0,
+      "monitors": [
+        "counter_value",
+        "pwm_out"
+      ],
+      "registers": [],
+      "coverage_bins": [
+        "pwm_reset_clears_outputs.stimulus_applied",
+        "pwm_reset_clears_outputs.expected_observed"
+      ],
+      "executable": true,
+      "status": "executable",
+      "non_executable_reason": null,
+      "unresolved_bindings": []
+    },
+    {
+      "feature_id": "pwm_increment_when_enabled",
+      "statement": "With reset deasserted and enable high, counter_value increments on each clock until rollover.",
+      "stimulus": {},
+      "stimulus_steps": [
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 1,
+            "duty_cycle": 200,
+            "period": 3
+          },
+          "cycles": 1
+        },
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 1,
+            "duty_cycle": 200,
+            "period": 3
+          },
+          "cycles": 1
+        }
+      ],
+      "expected": {
+        "counter_value": {
+          "min": 1,
+          "max": 2
+        },
+        "pwm_out": 1
+      },
+      "stimulus_cycles": 2,
+      "deadline_cycles": 2,
+      "wait_cycles": 0,
+      "monitors": [
+        "counter_value",
+        "pwm_out",
+        "enable"
+      ],
+      "registers": [],
+      "coverage_bins": [
+        "pwm_increment_when_enabled.stimulus_applied",
+        "pwm_increment_when_enabled.expected_observed"
+      ],
+      "executable": true,
+      "status": "executable",
+      "non_executable_reason": null,
+      "unresolved_bindings": []
+    },
+    {
+      "feature_id": "pwm_rollover_at_period",
+      "statement": "Counter rolls over to zero when the current value reaches the programmed period on an enabled clock.",
+      "stimulus": {},
+      "stimulus_steps": [
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 1,
+            "duty_cycle": 5,
+            "period": 2
+          },
+          "cycles": 1
+        },
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 1,
+            "duty_cycle": 5,
+            "period": 2
+          },
+          "cycles": 1
+        },
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 1,
+            "duty_cycle": 5,
+            "period": 2
+          },
+          "cycles": 1
+        }
+      ],
+      "expected": {
+        "counter_value": 0,
+        "pwm_out": 1
+      },
+      "stimulus_cycles": 3,
+      "deadline_cycles": 3,
+      "wait_cycles": 0,
+      "monitors": [
+        "counter_value",
+        "pwm_out",
+        "period"
+      ],
+      "registers": [],
+      "coverage_bins": [
+        "pwm_rollover_at_period.stimulus_applied",
+        "pwm_rollover_at_period.expected_observed"
+      ],
+      "executable": true,
+      "status": "executable",
+      "non_executable_reason": null,
+      "unresolved_bindings": []
+    },
+    {
+      "feature_id": "pwm_output_tracks_duty_cycle",
+      "statement": "PWM output reflects the registered counter_value being less than duty_cycle.",
+      "stimulus": {
+        "reset_n": 1,
+        "enable": 0,
+        "duty_cycle": 4,
+        "period": 9
+      },
+      "stimulus_steps": [
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 0,
+            "duty_cycle": 4,
+            "period": 9
+          },
+          "cycles": 1
+        }
+      ],
+      "expected": {
+        "counter_value": 0,
+        "pwm_out": 1
+      },
+      "stimulus_cycles": 1,
+      "deadline_cycles": 1,
+      "wait_cycles": 0,
+      "monitors": [
+        "counter_value",
+        "pwm_out",
+        "duty_cycle"
+      ],
+      "registers": [],
+      "coverage_bins": [
+        "pwm_output_tracks_duty_cycle.stimulus_applied",
+        "pwm_output_tracks_duty_cycle.expected_observed"
+      ],
+      "executable": true,
+      "status": "executable",
+      "non_executable_reason": null,
+      "unresolved_bindings": []
+    },
+    {
+      "feature_id": "pwm_hold_when_disabled",
+      "statement": "When enable is low, counter_value holds its state and pwm_out remains determined by the held count versus duty_cycle.",
+      "stimulus": {},
+      "stimulus_steps": [
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 1,
+            "duty_cycle": 2,
+            "period": 7
+          },
+          "cycles": 1
+        },
+        {
+          "signals": {
+            "reset_n": 1,
+            "enable": 0,
+            "duty_cycle": 2,
+            "period": 7
+          },
+          "cycles": 1
+        }
+      ],
+      "expected": {
+        "pwm_out": {
+          "eq": 0
+        }
+      },
+      "stimulus_cycles": 2,
+      "deadline_cycles": 2,
+      "wait_cycles": 0,
+      "monitors": [
+        "pwm_out",
+        "enable",
+        "duty_cycle",
+        "counter_value"
+      ],
+      "registers": [],
+      "coverage_bins": [
+        "pwm_hold_when_disabled.stimulus_applied",
+        "pwm_hold_when_disabled.expected_observed"
+      ],
+      "executable": true,
+      "status": "executable",
+      "non_executable_reason": null,
+      "unresolved_bindings": []
+    }
+  ],
+  "executable_count": 5,
+  "trace_only_count": 0
+}

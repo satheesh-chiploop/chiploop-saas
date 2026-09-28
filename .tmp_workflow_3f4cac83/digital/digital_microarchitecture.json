@@ -1,0 +1,84 @@
+{
+  "spec_mode": "hierarchical",
+  "derived_from_spec_only": true,
+  "top_module": "adaptive_aero_control_top",
+  "module_microarchitecture": [
+    {
+      "name": "adaptive_aero_control_top",
+      "implementation_style": "Single synthesizable FPGA supervisory top with compact 128-bit valid/ready streaming ingress/egress plus a real firmware-visible MMIO CSR block and a small metadata buffer inferred as FPGA BRAM only if needed.",
+      "control_strategy": "Accept request metadata, decode and store one outstanding request context, issue bounded transport metadata for the external inference service, validate returned response metadata against sequence/timeout/freshness rules, clamp any accepted actuator recommendation, and deassert actuator_cmd_valid on reset or any fault condition while latching faults for software handling.",
+      "state_strategy": "Use only fixed-width synchronous state: configuration CSRs, one outstanding request record, counters, timeout counter, sticky fault bits, last accepted command, and optional bounded metadata FIFO state mapped to technology-neutral inferred memory. No large payload storage, no ML state, and no physics state are implemented.",
+      "output_strategy": "Drive host_stream_in_ready, host_stream_out_valid, host_stream_out_data, mmio_rdata, mmio_ready, actuator_cmd, actuator_cmd_valid, and fault_status from internal registered logic. Actuator_cmd is only presented when a response is accepted and limited; otherwise actuator_cmd_valid remains deasserted. On reset or any invalid/stale/timeout/fault condition, output validity is inhibited rather than substituting a fallback command.",
+      "ownership_notes": [
+        "Top-level ownership remains in adaptive_aero_control_top only; no subordinate module names are introduced.",
+        "The MMIO register bank is firmware-visible and all registers in DIGITAL_SPEC_JSON.register_contract are intended to be reachable by decode.",
+        "Any optional metadata FIFO is technology-neutral and FPGA-mappable; it stores only bounded request/response metadata, not tensors or large histories.",
+        "External model execution remains outside RTL; the block only transports, validates, times out, limits, and supervises commands."
+      ]
+    }
+  ],
+  "fsm_intent": [
+    {
+      "present": true,
+      "description": "A small synchronous control sequencer is sufficient: idle/accept request tracking, wait-for-response, validate-and-clamp, and fault-latch/hold behavior. The design should avoid a complex FSM and use simple state bits plus counters where possible.",
+      "states": [
+        "RESET_SAFE",
+        "IDLE_WAIT_REQUEST",
+        "REQUEST_LATCHED",
+        "WAIT_RESPONSE",
+        "ACCEPT_RESPONSE",
+        "FAULT_HOLD"
+      ]
+    }
+  ],
+  "datapath_intent": [
+    {
+      "inputs": [
+        "host_stream_in_valid",
+        "host_stream_in_data",
+        "host_stream_out_ready",
+        "mmio_valid",
+        "mmio_write",
+        "mmio_addr",
+        "mmio_wdata"
+      ],
+      "internal_storage": [
+        "MMIO control/status registers",
+        "outstanding request sequence and request_id",
+        "timeout counter and sequence counters",
+        "sticky fault latches",
+        "last accepted actuator command",
+        "optional bounded metadata FIFO via inferred FPGA BRAM"
+      ],
+      "output_mapping": [
+        "host_stream_in_ready asserted when request ingress can be accepted",
+        "host_stream_out_valid/data driven with bounded transport metadata for the external service/software path",
+        "mmio_rdata/mmio_ready driven from CSR decode and read response logic",
+        "actuator_cmd driven from the registered, clamped accepted command value",
+        "actuator_cmd_valid asserted only for a validated, fresh, in-range accepted command",
+        "fault_status driven from latched fault summary bits"
+      ]
+    }
+  ],
+  "sequencing_notes": [
+    "On reset, clear outstanding request tracking, clear transient handshakes, initialize control registers to conservative safe defaults, and deassert actuator_cmd_valid.",
+    "A request is accepted only when the ingress handshake completes; the current sequence/request identifiers are captured and the timeout counter starts.",
+    "A response is accepted only if it is well-formed, matches the outstanding sequence context, and arrives before timeout expiry.",
+    "If validation passes, apply min/max clamping and optional slew limiting before registering the command output and asserting actuator_cmd_valid.",
+    "If validation fails or timeout expires, latch the relevant fault and keep actuator_cmd_valid deasserted until software clears the sticky fault per MMIO policy.",
+    "MMIO writes update configuration and may clear software-clearable faults; MMIO reads return current status and counters through the declared CSR map."
+  ],
+  "timing_notes": [
+    "All state updates are synchronous to clk.",
+    "host_stream_in_ready should be generated combinationally from current acceptance capacity but only for the single clock domain.",
+    "host_stream_out_valid and mmio_ready should reflect registered control intent and transaction completion without introducing extra clock domains.",
+    "Timeout supervision uses a synthesizable counter and does not require a complex timer machine.",
+    "If slew limiting is enabled, compare the newly accepted command against the previously accepted command in the same clocked update path."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "No hierarchy, ports, or filenames may differ from digital_spec_json.",
+    "The implementation intent follows the explicit external model transport direction contract and the firmware MMIO contract in DIGITAL_SPEC_JSON.",
+    "No substitute command or fallback-on-reset behavior is described; invalid, stale, timeout, reset, or fault conditions inhibit actuator validity and latch faults for software handling."
+  ]
+}

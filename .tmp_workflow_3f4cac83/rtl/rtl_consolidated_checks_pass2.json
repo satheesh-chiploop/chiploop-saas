@@ -1,0 +1,42 @@
+{
+  "pass": "pass2",
+  "passed": false,
+  "checks": {
+    "structural": {
+      "status": "fail",
+      "issue_count": 1,
+      "issues": [
+        "\u274c Required memory 'fpga_bram_meta_fifo u_meta_fifo' is functionally unreachable: read output 'dout' connects to unconsumed signal 'meta_fifo_dout_unused_from_u_meta_fifo_dout'. Implement a legal input-driven read/write transaction and make read data observable; do not preserve the instance with constant tie-offs or an unused output."
+      ]
+    },
+    "compile": {
+      "status": "fail",
+      "log": "backend/workflows/3f4cac83-a993-4307-ab26-db887897d255/rtl/rtl_agent_compile_pass2.log"
+    },
+    "lint": {
+      "status": "fatal",
+      "blocking": true,
+      "log": "backend/workflows/3f4cac83-a993-4307-ab26-db887897d255/rtl/rtl_verilator_lint_pass2.log"
+    },
+    "static_spec2rtl": {
+      "status": "partial",
+      "blocking": true,
+      "report": "backend/workflows/3f4cac83-a993-4307-ab26-db887897d255/rtl/rtl_spec2rtl_conformance_pass2.json",
+      "summary": {
+        "checked": 25,
+        "matched": 20,
+        "partial": 0,
+        "missing": 5,
+        "inconclusive": 0,
+        "pending_verification": 17
+      }
+    }
+  },
+  "issue_count": 4,
+  "issues": [
+    "\u274c Required memory 'fpga_bram_meta_fifo u_meta_fifo' is functionally unreachable: read output 'dout' connects to unconsumed signal 'meta_fifo_dout_unused_from_u_meta_fifo_dout'. Implement a legal input-driven read/write transaction and make read data observable; do not preserve the instance with constant tie-offs or an unused output.",
+    "\u274c Icarus Verilog compile failed.",
+    "\u274c Verilator lint failed.",
+    "\u274c Static Spec2RTL compliance failed: status=partial, missing=5, partial=0, inconclusive=0."
+  ]
+}

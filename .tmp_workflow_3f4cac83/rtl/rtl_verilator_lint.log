@@ -1,0 +1,64 @@
+=== STDERR ===
+%Error: adaptive_aero_control_top.v:320:25: syntax error, unexpected else
+  320 |                     end else begin
+      |                         ^~~~
+        ... See the manual at https://verilator.org/verilator_doc.html?v=5.047 for more assistance.
+%Error: adaptive_aero_control_top.v:341:1: syntax error, unexpected end
+  341 | end
+      | ^~~
+%Error: adaptive_aero_control_top.v:373:36: syntax error, unexpected '=', expecting '('
+  373 |             8'h00: next_mmio_rdata = {28'd0, ctrl_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:374:36: syntax error, unexpected '=', expecting '('
+  374 |             8'h04: next_mmio_rdata = {16'd0, timeout_thr_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:375:36: syntax error, unexpected '=', expecting '('
+  375 |             8'h08: next_mmio_rdata = {16'd0, cmd_min_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:376:36: syntax error, unexpected '=', expecting '('
+  376 |             8'h0c: next_mmio_rdata = {16'd0, cmd_max_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:377:36: syntax error, unexpected '=', expecting '('
+  377 |             8'h10: next_mmio_rdata = {16'd0, slew_limit_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:378:36: syntax error, unexpected '=', expecting '('
+  378 |             8'h18: next_mmio_rdata = {16'd0, request_seq_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:379:36: syntax error, unexpected '=', expecting '('
+  379 |             8'h1c: next_mmio_rdata = {16'd0, request_id_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:380:36: syntax error, unexpected '=', expecting '('
+  380 |             8'h20: next_mmio_rdata = {26'd0, fault_latched_reg, clamp_active_reg, timeout_fault_reg, stale_fault_reg, response_valid_reg, request_pending_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:381:36: syntax error, unexpected '=', expecting '('
+  381 |             8'h24: next_mmio_rdata = {16'd0, seq_count_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:382:36: syntax error, unexpected '=', expecting '('
+  382 |             8'h28: next_mmio_rdata = {16'd0, request_count_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:383:36: syntax error, unexpected '=', expecting '('
+  383 |             8'h2c: next_mmio_rdata = {16'd0, response_count_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:384:36: syntax error, unexpected '=', expecting '('
+  384 |             8'h30: next_mmio_rdata = {16'd0, cmd_last_reg};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:385:36: syntax error, unexpected '=', expecting '('
+  385 |             8'h34: next_mmio_rdata = {24'd0, fault_status_r};
+      |                                    ^
+%Error: adaptive_aero_control_top.v:386:38: syntax error, unexpected '=', expecting '('
+  386 |             default: next_mmio_rdata = 32'd0;
+      |                                      ^
+%Error: adaptive_aero_control_top.v:388:25: syntax error, unexpected '=', expecting '('
+  388 |         next_mmio_ready = 1'b1;
+      |                         ^
+%Error: adaptive_aero_control_top.v:390:25: syntax error, unexpected '=', expecting '('
+  390 |         next_mmio_ready = 1'b1;
+      |                         ^
+%Error: adaptive_aero_control_top.v:392:23: syntax error, unexpected '=', expecting '('
+  392 |     next_fault_status = {timeout_fault_reg, stale_fault_reg, fault_latched_reg, request_pending_reg, response_valid_reg, clamp_active_reg, ctrl_reg[2], ctrl_reg[0]};
+      |                       ^
+%Error: Cannot continue
+        ... This fatal error may be caused by the earlier error(s); resolve those first.
+
+=== RETURN CODE ===
+1

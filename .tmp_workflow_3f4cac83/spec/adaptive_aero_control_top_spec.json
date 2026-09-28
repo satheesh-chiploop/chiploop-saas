@@ -1,0 +1,666 @@
+{
+  "name": "adaptive_aero_control_top",
+  "description": "Synthesizable FPGA supervisory controller for an intelligent active-aerodynamics application. The RTL implements compact request/response transport, firmware-visible MMIO control/status registers, response validation, stale/timeout rejection, command limiting, and safe inhibition of actuator validity on reset or any fault. No on-chip ML inference or physics solver is implemented; the external software/GPU service is assumed to generate the command recommendation. The top-level architecture is a single module with an internal MMIO/streaming bridge and a bounded metadata buffer implemented as FPGA-mappable block RAM if needed.",
+  "operating_constraints": {
+    "clock_domains": [
+      {
+        "name": "clk",
+        "frequency_mhz": 50.0,
+        "period_ns": 20.0
+      }
+    ],
+    "reset_signals": [
+      {
+        "name": "rst_n",
+        "active_low": true,
+        "async": false
+      }
+    ],
+    "fixed_assumptions": [
+      "Single synchronous clock domain.",
+      "Streaming payloads are capped at 128 bits.",
+      "Firmware interacts through a real memory-mapped CSR interface exposed at the top level.",
+      "On reset and on any invalid/stale/timeout condition, actuator_cmd_valid is deasserted and faults are latched for software handling; no substitute command is generated.",
+      "External inference service is outside RTL; the RTL only transports request/response metadata and validates returned data."
+    ]
+  },
+  "implementation_requirements": [],
+  "verification_requirements": [],
+  "feature_contracts": [
+    {
+      "id": "reset_inhibits_actuator_valid",
+      "description": "After reset, the controller must inhibit actuator command validity and report a fault-safe status until a fresh validated response is accepted.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 0,
+              "host_stream_in_valid": 0,
+              "host_stream_out_ready": 0,
+              "mmio_valid": 0,
+              "mmio_write": 0,
+              "mmio_addr": 0,
+              "mmio_wdata": 0
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "rst_n": 1,
+              "host_stream_in_valid": 0,
+              "host_stream_out_ready": 0,
+              "mmio_valid": 0,
+              "mmio_write": 0,
+              "mmio_addr": 0,
+              "mmio_wdata": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "actuator_cmd_valid": 0
+      },
+      "within_cycles": 2
+    },
+    {
+      "id": "mmio_readback_reaches_status_registers",
+      "description": "A firmware MMIO read to the STATUS register must return a valid read response and expose software-visible status bits through mmio_rdata with mmio_ready asserted.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 1,
+              "mmio_valid": 1,
+              "mmio_write": 0,
+              "mmio_addr": 32,
+              "mmio_wdata": 0,
+              "host_stream_in_valid": 0,
+              "host_stream_out_ready": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "mmio_ready": 1
+      },
+      "within_cycles": 1
+    },
+    {
+      "id": "request_handshake_accepts_stream_in",
+      "description": "A valid host request packet presented with ready-high conditions shall be accepted and the input ready indication shall be asserted to allow transport of a request packet.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 1,
+              "host_stream_in_valid": 1,
+              "host_stream_out_ready": 0,
+              "mmio_valid": 1,
+              "mmio_write": 1,
+              "mmio_addr": 0,
+              "mmio_wdata": 1
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "host_stream_in_ready": 1
+      },
+      "within_cycles": 1
+    },
+    {
+      "id": "response_rejection_keeps_actuator_invalid_on_stale_or_faulty_data",
+      "description": "If no valid response has been accepted for the outstanding request, actuator validity remains deasserted and the module does not substitute a command.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 1,
+              "host_stream_in_valid": 1,
+              "host_stream_out_ready": 1,
+              "mmio_valid": 1,
+              "mmio_write": 1,
+              "mmio_addr": 0,
+              "mmio_wdata": 1
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "rst_n": 1,
+              "host_stream_in_valid": 0,
+              "host_stream_out_ready": 1,
+              "mmio_valid": 0,
+              "mmio_write": 0,
+              "mmio_addr": 0,
+              "mmio_wdata": 0
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "actuator_cmd_valid": 0
+      },
+      "within_cycles": 2
+    },
+    {
+      "id": "timeout_fault_latches_without_response",
+      "description": "If a request remains pending past the configured timeout window without a valid response, the design asserts a timeout fault through the status path and inhibits actuator validity.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 1,
+              "mmio_valid": 1,
+              "mmio_write": 1,
+              "mmio_addr": 4,
+              "mmio_wdata": 1,
+              "host_stream_in_valid": 1,
+              "host_stream_out_ready": 0
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "rst_n": 1,
+              "mmio_valid": 0,
+              "mmio_write": 0,
+              "mmio_addr": 0,
+              "mmio_wdata": 0,
+              "host_stream_in_valid": 0,
+              "host_stream_out_ready": 0
+            },
+            "cycles": 2
+          }
+        ]
+      },
+      "expected": {
+        "actuator_cmd_valid": 0
+      },
+      "within_cycles": 3
+    },
+    {
+      "id": "command_clamping_does_not_exceed_configured_limits",
+      "description": "An accepted command recommendation must be clamped to the configured min/max range before being driven to the actuator output.",
+      "stimulus": {
+        "steps": [
+          {
+            "signals": {
+              "rst_n": 1,
+              "mmio_valid": 1,
+              "mmio_write": 1,
+              "mmio_addr": 8,
+              "mmio_wdata": 10,
+              "host_stream_in_valid": 1,
+              "host_stream_out_ready": 1
+            },
+            "cycles": 1
+          },
+          {
+            "signals": {
+              "rst_n": 1,
+              "mmio_valid": 0,
+              "mmio_write": 0,
+              "mmio_addr": 0,
+              "mmio_wdata": 0,
+              "host_stream_in_valid": 0,
+              "host_stream_out_ready": 1
+            },
+            "cycles": 1
+          }
+        ]
+      },
+      "expected": {
+        "actuator_cmd_valid": 1
+      },
+      "within_cycles": 2
+    }
+  ],
+  "memory_macros": [
+    {
+      "name": "fpga_bram_meta_fifo",
+      "kind": "fpga_bram",
+      "depth": 16,
+      "data_width": 128,
+      "addr_width": 4,
+      "instance_name": "u_meta_fifo",
+      "ports": {
+        "clk": "clk",
+        "csb": "csb",
+        "we": "we",
+        "addr": "addr",
+        "din": "din",
+        "dout": "dout"
+      },
+      "requires_mbist": false,
+      "technology_binding": "technology_neutral_inferred_memory"
+    }
+  ],
+  "ports": [
+    {
+      "name": "clk",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "rst_n",
+      "direction": "input",
+      "width": 1,
+      "active_low": true
+    },
+    {
+      "name": "host_stream_in_valid",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "host_stream_in_ready",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "host_stream_in_data",
+      "direction": "input",
+      "width": 128
+    },
+    {
+      "name": "host_stream_out_valid",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "host_stream_out_ready",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "host_stream_out_data",
+      "direction": "output",
+      "width": 128
+    },
+    {
+      "name": "mmio_valid",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "mmio_write",
+      "direction": "input",
+      "width": 1
+    },
+    {
+      "name": "mmio_addr",
+      "direction": "input",
+      "width": 16
+    },
+    {
+      "name": "mmio_wdata",
+      "direction": "input",
+      "width": 32
+    },
+    {
+      "name": "mmio_rdata",
+      "direction": "output",
+      "width": 32
+    },
+    {
+      "name": "mmio_ready",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "actuator_cmd",
+      "direction": "output",
+      "width": 16
+    },
+    {
+      "name": "actuator_cmd_valid",
+      "direction": "output",
+      "width": 1
+    },
+    {
+      "name": "fault_status",
+      "direction": "output",
+      "width": 8
+    }
+  ],
+  "functionality": "The module accepts compact host request packets containing sequence_id, request_id, flow-condition summary, geometry reference identifier, and control bits. It decodes these into semantic request fields, stores the current outstanding request metadata, and emits a bounded response/transport packet toward the external inference service. The module exposes a firmware-visible MMIO register bank for configuration and status. Returned response packets are parsed and validated for packet integrity, matching sequence_id, freshness versus the outstanding request, timeout compliance, and command range compliance. Accepted command recommendations are clamped to configured limits and optional slew-rate limits before being presented to actuator_cmd with actuator_cmd_valid asserted. If any fault occurs, including reset, malformed packet, stale/duplicate/old response, or timeout, the design inhibits actuator validity and latches the fault until software clears it through MMIO. The design does not generate a fallback or substitute command; it only inhibits output validity and preserves safe software-visible state.",
+  "responsibilities": [
+    "Decode incoming 128-bit host request packets into semantic request metadata.",
+    "Generate bounded transport packets for the external model evaluation service.",
+    "Implement firmware-visible MMIO CSR decode with read/write semantics and explicit register reachability.",
+    "Track outstanding request sequence and request IDs.",
+    "Validate response metadata and reject malformed, stale, duplicated, or timed-out responses.",
+    "Clamp accepted command recommendations to configured min/max and optional slew-rate limits.",
+    "Register and present only validated commands to the actuator interface.",
+    "Latch fault indicators for software handling and maintain conservative safe behavior after reset or fault."
+  ],
+  "must_drive": [
+    "host_stream_in_ready",
+    "host_stream_out_valid",
+    "host_stream_out_data",
+    "mmio_rdata",
+    "mmio_ready",
+    "actuator_cmd",
+    "actuator_cmd_valid",
+    "fault_status"
+  ],
+  "must_receive": [
+    "clk",
+    "rst_n",
+    "host_stream_in_valid",
+    "host_stream_in_data",
+    "host_stream_out_ready",
+    "mmio_valid",
+    "mmio_write",
+    "mmio_addr",
+    "mmio_wdata"
+  ],
+  "must_not_drive": [
+    "host_stream_in_valid",
+    "host_stream_in_data",
+    "host_stream_out_ready",
+    "mmio_valid",
+    "mmio_write",
+    "mmio_addr",
+    "mmio_wdata"
+  ],
+  "reset_behavior": "On rst_n deassertion, the module enters SAFE/IDLE control state, clears outstanding request tracking, clears MMIO read-data side effects, initializes configuration registers to conservative safe values, clears transient handshakes, deasserts actuator_cmd_valid, drives a deterministic actuator_cmd register value, and clears sticky fault latches only if explicitly permitted by the reset policy encoded in MMIO. The design does not substitute or apply a fallback command; it inhibits command validity until a fresh validated response is accepted.",
+  "behavior_rules": [
+    "host_stream_in_valid and host_stream_in_ready implement a standard valid/ready input handshake for request metadata ingress.",
+    "host_stream_out_valid and host_stream_out_ready implement a standard valid/ready output handshake for response metadata egress toward the external service/software path.",
+    "The 128-bit request packet shall be internally decoded into semantic fields that include sequence_id, request_id, flow-condition summary, geometry reference identifier, and control fields; no packet width shall exceed 128 bits.",
+    "The MMIO interface is authoritative for firmware-visible control and status. Each declared register must be reachable through address decode and produce readback when applicable.",
+    "Writable configuration registers include timeout threshold, actuator min/max limits, optional slew-rate limit, and enable bits controlling validation and limiter behavior.",
+    "Read-only status registers include current outstanding sequence, request-pending indication, latched fault summary, command-valid state, and telemetry counters.",
+    "A response is accepted only if packet format is valid, sequence_id matches the current outstanding request, the response is not stale/duplicate/older than the configured window, and it arrives before timeout expiry.",
+    "If any validation fails, actuator_cmd_valid is deasserted and the corresponding fault bit is latched.",
+    "Command limiting shall apply saturation to the configured min/max range and, when enabled, rate-of-change limiting relative to the previous accepted command value.",
+    "No silent substitute command may be generated under any condition; invalid operation inhibits output validity only.",
+    "Sequence counters, request counters, and response counters are maintained in fixed-width saturating or wrapping arithmetic as described in the register contract.",
+    "If the optional metadata FIFO is implemented, it stores only bounded header/metadata words and never large tensors or flow fields.",
+    "The memory macro, if instantiated, is FPGA-appropriate block RAM and is technology-neutral in the contract; no Sky130-specific macro is implied."
+  ],
+  "rtl_output_file": "adaptive_aero_control_top.v",
+  "register_contract": {
+    "bus_type": "minimal",
+    "registers": [
+      {
+        "name": "CTRL",
+        "offset": 0,
+        "access": "rw",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "enable",
+            "lsb": 0,
+            "msb": 0,
+            "access": "rw",
+            "reset": 0,
+            "description": "Global controller enable. When 0, request issuance and actuator command validity are inhibited."
+          },
+          {
+            "name": "slew_enable",
+            "lsb": 1,
+            "msb": 1,
+            "access": "rw",
+            "reset": 0,
+            "description": "Enables slew-rate limiting on accepted actuator commands."
+          },
+          {
+            "name": "response_accept_enable",
+            "lsb": 2,
+            "msb": 2,
+            "access": "rw",
+            "reset": 1,
+            "description": "Enables acceptance of validated response packets."
+          },
+          {
+            "name": "fault_clear",
+            "lsb": 3,
+            "msb": 3,
+            "access": "rw",
+            "reset": 0,
+            "description": "Write-1-to-clear sticky fault latches that are software-clearable."
+          }
+        ]
+      },
+      {
+        "name": "TIMEOUT_THR",
+        "offset": 4,
+        "access": "rw",
+        "reset": 64,
+        "fields": [
+          {
+            "name": "timeout_limit",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 64,
+            "description": "Maximum response latency in clock cycles before timeout fault is asserted."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MIN",
+        "offset": 8,
+        "access": "rw",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "cmd_min",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 0,
+            "description": "Minimum allowed actuator command after clamping."
+          }
+        ]
+      },
+      {
+        "name": "CMD_MAX",
+        "offset": 12,
+        "access": "rw",
+        "reset": 1023,
+        "fields": [
+          {
+            "name": "cmd_max",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 1023,
+            "description": "Maximum allowed actuator command after clamping."
+          }
+        ]
+      },
+      {
+        "name": "SLEW_LIMIT",
+        "offset": 16,
+        "access": "rw",
+        "reset": 16,
+        "fields": [
+          {
+            "name": "slew_limit",
+            "lsb": 0,
+            "msb": 15,
+            "access": "rw",
+            "reset": 16,
+            "description": "Maximum absolute command delta per accepted update when slew_enable is set."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_SEQ",
+        "offset": 24,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "current_request_seq",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Current outstanding request sequence identifier."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_ID",
+        "offset": 28,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "current_request_id",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Current outstanding request identifier."
+          }
+        ]
+      },
+      {
+        "name": "STATUS",
+        "offset": 32,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "request_pending",
+            "lsb": 0,
+            "msb": 0,
+            "access": "ro",
+            "reset": 0,
+            "description": "Indicates an outstanding request is waiting for validation."
+          },
+          {
+            "name": "response_valid",
+            "lsb": 1,
+            "msb": 1,
+            "access": "ro",
+            "reset": 0,
+            "description": "Indicates a validated response was accepted in the last update."
+          },
+          {
+            "name": "stale_fault",
+            "lsb": 2,
+            "msb": 2,
+            "access": "ro",
+            "reset": 0,
+            "description": "Latched stale or sequence-mismatch fault."
+          },
+          {
+            "name": "timeout_fault",
+            "lsb": 3,
+            "msb": 3,
+            "access": "ro",
+            "reset": 0,
+            "description": "Latched timeout fault."
+          },
+          {
+            "name": "clamp_active",
+            "lsb": 4,
+            "msb": 4,
+            "access": "ro",
+            "reset": 0,
+            "description": "Indicates the accepted command was clamped in the last update."
+          },
+          {
+            "name": "fault_latched",
+            "lsb": 5,
+            "msb": 5,
+            "access": "ro",
+            "reset": 0,
+            "description": "Aggregate latched fault indication."
+          }
+        ]
+      },
+      {
+        "name": "SEQ_COUNT",
+        "offset": 36,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "seq_counter",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Monotonic or wrapping sequence counter used for request generation and validation."
+          }
+        ]
+      },
+      {
+        "name": "REQUEST_COUNT",
+        "offset": 40,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "request_count",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Count of issued requests."
+          }
+        ]
+      },
+      {
+        "name": "RESPONSE_COUNT",
+        "offset": 44,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "response_count",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Count of accepted responses."
+          }
+        ]
+      },
+      {
+        "name": "CMD_LAST",
+        "offset": 48,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "last_accepted_cmd",
+            "lsb": 0,
+            "msb": 15,
+            "access": "ro",
+            "reset": 0,
+            "description": "Most recently accepted and limited actuator command."
+          }
+        ]
+      },
+      {
+        "name": "FAULT_STATUS",
+        "offset": 52,
+        "access": "ro",
+        "reset": 0,
+        "fields": [
+          {
+            "name": "fault_status",
+            "lsb": 0,
+            "msb": 7,
+            "access": "ro",
+            "reset": 0,
+            "description": "Bit-encoded fault summary exposed on the top-level fault_status port."
+          }
+        ]
+      }
+    ]
+  }
+}

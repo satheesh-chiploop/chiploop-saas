@@ -673,7 +673,7 @@ def _validate_hierarchical_endpoint_coverage(spec_json: dict) -> None:
         if smod != top_name and sport not in module_ports[smod]:
             raise ValueError(f"inter_module_signals[{i}] source port '{smod}.{sport}' is not present in module ports.")
         src_dir = (module_dirs.get(smod) or {}).get(sport)
-        if smod == top_name and src_dir not in {"input", "inout"}:
+        if smod == top_name and src_dir is not None and src_dir not in {"input", "inout"}:
             raise ValueError(
                 f"inter_module_signals[{i}] top source '{smod}.{sport}' must be an external input/inout, "
                 f"got '{src_dir}'."
@@ -692,7 +692,7 @@ def _validate_hierarchical_endpoint_coverage(spec_json: dict) -> None:
             if dmod != top_name and dport not in module_ports[dmod]:
                 raise ValueError(f"inter_module_signals[{i}] destination port '{dmod}.{dport}' is not present in module ports.")
             dst_dir = (module_dirs.get(dmod) or {}).get(dport)
-            if dmod == top_name and dst_dir not in {"output", "inout"}:
+            if dmod == top_name and dst_dir is not None and dst_dir not in {"output", "inout"}:
                 raise ValueError(
                     f"inter_module_signals[{i}] top destination '{dmod}.{dport}' must be an external output/inout, "
                     f"got '{dst_dir}'."
@@ -926,11 +926,11 @@ def _validate_feature_contract_strength(feature_ports: list, contracts: list) ->
             statement,
             re.I,
         ))
-        if conditional and mentioned_state and int(contract.get("stimulus_cycles") or 0) <= 1:
+        if conditional and mentioned_state:
             underconstrained.append(
                 f"{contract.get('feature_id')}: condition depends on observable state "
                 + ", ".join(sorted(mentioned_state))
-                + " but the one-cycle scenario neither establishes nor checks that state"
+                + " but the scenario does not check that state at the expectation point"
             )
     if vacuous:
         raise ValueError(

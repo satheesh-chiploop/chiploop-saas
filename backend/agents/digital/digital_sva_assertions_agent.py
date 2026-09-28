@@ -852,6 +852,49 @@ def _checker_quality_issues(sva: str, sva_spec: Dict[str, Any]) -> List[Dict[str
                             f"sequential-state reset checker incorrectly includes combinational output {signal}"
                         ),
                     })
+        reset_name_match = re.search(r"\b(reset_n|rst_n|reset|rst)\b", requirement, re.I)
+        if reset_name_match and "|=>" in body:
+            reset_name = reset_name_match.group(1)
+            body_reset_mentions = len(re.findall(rf"\b{re.escape(reset_name)}\b", body, re.I))
+            level_reset_requirement = bool(re.search(
+                rf"\b(?:when|while)\s+{re.escape(reset_name)}\s+is\s+(?:low|high|asserted)\b",
+                requirement,
+                re.I,
+            )) or bool(re.search(
+                r"\bactive[- ]low\s+reset\b.*\b(?:clear|zero|force|drive)\w*\b.*\boutputs?\b",
+                requirement,
+                re.I | re.S,
+            ))
+            checked_combinational_outputs = [
+                signal for signal in combinational_outputs
+                if re.search(rf"\b{re.escape(signal)}\b", body, re.I)
+            ]
+            if level_reset_requirement and checked_combinational_outputs and body_reset_mentions < 2:
+                issues.append({
+                    "requirement_id": str(obligation.get("requirement_id") or ""),
+                    "checker_id": str(obligation.get("checker_id") or ""),
+                    "issue": (
+                        "level-sensitive reset checker extends combinational output constraints into the next "
+                        "cycle without requiring reset to remain asserted: "
+                        + ", ".join(sorted(checked_combinational_outputs))
+                    ),
+                })
+            reset_release_requirement = bool(re.search(
+                r"\bafter\s+reset\s+(?:deassertion|deasserts?|release|is\s+released)\b",
+                requirement,
+                re.I,
+            ))
+            if reset_release_requirement and body_reset_mentions < 2 and not re.search(
+                rf"\$(?:rose|fell)\s*\(\s*{re.escape(reset_name)}\s*\)", body, re.I
+            ):
+                issues.append({
+                    "requirement_id": str(obligation.get("requirement_id") or ""),
+                    "checker_id": str(obligation.get("checker_id") or ""),
+                    "issue": (
+                        "multi-phase reset checker does not distinguish the asserted-reset cycle from "
+                        "the reset-release behavior"
+                    ),
+                })
         sequential_transition = bool(re.search(
             r"\b(?:next\s+(?:rising\s+)?(?:edge|cycle)|holds?|advances?|increments?|wraps?|"
             r"synchronous(?:ly)?|on\s+(?:any\s+)?rising\s+edge)\b",

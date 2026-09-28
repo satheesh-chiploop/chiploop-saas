@@ -1,0 +1,155 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.066 MB sources in 3 modules, into 0.052 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.017 s (elab=0.001, cvt=0.008, bld=0.000); cpu 0.016 s on 1 threads; allocated 31.355 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:31:14: Bits of signal are not used: 'mmio_addr'[15:8]
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   31 | input [15:0] mmio_addr;
+      |              ^~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:32:14: Bits of signal are not used: 'mmio_wdata'[31:16]
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   32 | input [31:0] mmio_wdata;
+      |              ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:68:12: Signal is not used: 'pending_cmd_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   68 | reg [15:0] pending_cmd_reg;
+      |            ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:69:12: Signal is not used: 'candidate_cmd_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   69 | reg [15:0] candidate_cmd_reg;
+      |            ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:70:13: Signal is not driven, nor used: 'meta_fifo_mem'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   70 | reg [127:0] meta_fifo_mem [0:15];
+      |             ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:74:11: Signal is not used: 'meta_last_ptr_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   74 | reg [3:0] meta_last_ptr_reg;
+      |           ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:75:12: Signal is not used: 'meta_header_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   75 | reg [15:0] meta_header_reg;
+      |            ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:76:12: Signal is not used: 'parsed_seq_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   76 | reg [15:0] parsed_seq_reg;
+      |            ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:77:12: Signal is not used: 'parsed_req_id_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   77 | reg [15:0] parsed_req_id_reg;
+      |            ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:79:12: Signal is not used: 'parsed_aux_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   79 | reg [15:0] parsed_aux_reg;
+      |            ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:81:12: Signal is not driven, nor used: 'next_request_seq'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   81 | reg [15:0] next_request_seq;
+      |            ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:82:12: Signal is not driven, nor used: 'next_request_id'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   82 | reg [15:0] next_request_id;
+      |            ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:83:12: Signal is not driven, nor used: 'next_seq_count'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   83 | reg [15:0] next_seq_count;
+      |            ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:84:12: Signal is not driven, nor used: 'next_request_count'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   84 | reg [15:0] next_request_count;
+      |            ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:85:12: Signal is not driven, nor used: 'next_response_count'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   85 | reg [15:0] next_response_count;
+      |            ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:86:12: Signal is not driven, nor used: 'next_cmd_last'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   86 | reg [15:0] next_cmd_last;
+      |            ^~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:87:12: Signal is not driven, nor used: 'next_outstanding_age'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   87 | reg [15:0] next_outstanding_age;
+      |            ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:88:12: Signal is not driven, nor used: 'next_outstanding_seq'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   88 | reg [15:0] next_outstanding_seq;
+      |            ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:89:12: Signal is not driven, nor used: 'next_outstanding_id'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   89 | reg [15:0] next_outstanding_id;
+      |            ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:90:12: Signal is not driven, nor used: 'next_pending_cmd'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   90 | reg [15:0] next_pending_cmd;
+      |            ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:91:12: Signal is not driven, nor used: 'next_candidate_cmd'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   91 | reg [15:0] next_candidate_cmd;
+      |            ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:92:11: Signal is not driven, nor used: 'next_fault_status'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   92 | reg [7:0] next_fault_status;
+      |           ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:93:5: Signal is not driven, nor used: 'next_request_pending'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   93 | reg next_request_pending;
+      |     ^~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:94:5: Signal is not driven, nor used: 'next_response_valid'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   94 | reg next_response_valid;
+      |     ^~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:95:5: Signal is not driven, nor used: 'next_stale_fault'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   95 | reg next_stale_fault;
+      |     ^~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:96:5: Signal is not driven, nor used: 'next_timeout_fault'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   96 | reg next_timeout_fault;
+      |     ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:97:5: Signal is not driven, nor used: 'next_clamp_active'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   97 | reg next_clamp_active;
+      |     ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:98:5: Signal is not driven, nor used: 'next_fault_latched'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   98 | reg next_fault_latched;
+      |     ^~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:99:5: Signal is not driven, nor used: 'next_host_stream_in_ready'
+                                                             : ... note: In instance 'adaptive_aero_control_top'
+   99 | reg next_host_stream_in_ready;
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:100:5: Signal is not driven, nor used: 'next_host_stream_out_valid'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+  100 | reg next_host_stream_out_valid;
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:101:13: Signal is not driven, nor used: 'next_host_stream_out_data'
+                                                               : ... note: In instance 'adaptive_aero_control_top'
+  101 | reg [127:0] next_host_stream_out_data;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:102:5: Signal is not driven, nor used: 'next_mmio_ready'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+  102 | reg next_mmio_ready;
+      |     ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:103:12: Signal is not driven, nor used: 'next_mmio_rdata'
+                                                               : ... note: In instance 'adaptive_aero_control_top'
+  103 | reg [31:0] next_mmio_rdata;
+      |            ^~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:104:5: Signal is not driven, nor used: 'next_actuator_cmd_valid'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+  104 | reg next_actuator_cmd_valid;
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:105:12: Signal is not driven, nor used: 'next_actuator_cmd'
+                                                               : ... note: In instance 'adaptive_aero_control_top'
+  105 | reg [15:0] next_actuator_cmd;
+      |            ^~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass3/adaptive_aero_control_top.v:118:13: Signal is not driven, nor used: 'slew_delta'
+                                                               : ... note: In instance 'adaptive_aero_control_top'
+  118 | wire [15:0] slew_delta;
+      |             ^~~~~~~~~~
+
+=== RETURN CODE ===
+0

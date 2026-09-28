@@ -1,0 +1,71 @@
+=== STDOUT ===
+- V e r i l a t i o n   R e p o r t: Verilator 5.047 devel rev v5.046-161-g24918b83b
+- Verilator: Built from 0.064 MB sources in 3 modules, into 0.053 MB in 3 C++ files needing 0.000 MB
+- Verilator: Walltime 0.018 s (elab=0.002, cvt=0.009, bld=0.000); cpu 0.018 s on 1 threads; allocated 31.363 MB
+
+=== STDERR ===
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:31:14: Bits of signal are not used: 'mmio_addr'[15:8]
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   31 | input [15:0] mmio_addr;
+      |              ^~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/UNUSEDSIGNAL?v=5.047
+                       ... Use "/* verilator lint_off UNUSEDSIGNAL */" and lint_on around source to disable this message.
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:32:14: Bits of signal are not used: 'mmio_wdata'[31:16]
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   32 | input [31:0] mmio_wdata;
+      |              ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:68:13: Signal is not used: 'host_stream_in_data_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   68 | reg [127:0] host_stream_in_data_reg;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:69:12: Signal is not used: 'req_seq_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   69 | reg [15:0] req_seq_reg;
+      |            ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:70:12: Signal is not used: 'req_id_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   70 | reg [15:0] req_id_reg;
+      |            ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:72:12: Signal is not used: 'req_flow_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   72 | reg [15:0] req_flow_reg;
+      |            ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:73:12: Signal is not used: 'req_geom_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   73 | reg [15:0] req_geom_reg;
+      |            ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:74:12: Signal is not used: 'req_ctrl_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   74 | reg [15:0] req_ctrl_reg;
+      |            ^~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:75:12: Signal is not used: 'rsp_seq_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   75 | reg [15:0] rsp_seq_reg;
+      |            ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:76:12: Signal is not used: 'rsp_id_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   76 | reg [15:0] rsp_id_reg;
+      |            ^~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:77:12: Signal is not used: 'rsp_cmd_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   77 | reg [15:0] rsp_cmd_reg;
+      |            ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:78:12: Signal is not used: 'rsp_aux_reg'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   78 | reg [15:0] rsp_aux_reg;
+      |            ^~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:79:14: Signal is not used: 'meta_fifo_dout'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   79 | wire [127:0] meta_fifo_dout;
+      |              ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:97:13: Signal is not driven, nor used: 'mmio_rdata_mux'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   97 | wire [31:0] mmio_rdata_mux;
+      |             ^~~~~~~~~~~~~~
+%Warning-UNUSEDSIGNAL: pass4/adaptive_aero_control_top.v:98:12: Signal is not driven, nor used: 'fault_status_next'
+                                                              : ... note: In instance 'adaptive_aero_control_top'
+   98 | wire [7:0] fault_status_next;
+      |            ^~~~~~~~~~~~~~~~~
+
+=== RETURN CODE ===
+0

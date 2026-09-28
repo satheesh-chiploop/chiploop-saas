@@ -1,4 +1,5 @@
 import os
+import re
 
 import pytest
 
@@ -1395,3 +1396,56 @@ def test_match_score_uses_complete_register_contract_for_map_ownership_requireme
     for requirement in requirements:
         status, evidence = agent._match_score(requirement, rtl, {"csr_addr", "csr_rdata"}, context)
         assert status == "matched", (requirement, evidence)
+
+
+def test_match_score_recognizes_registered_validated_command_path_generically():
+    rtl = """
+assign command_out = command_out_r;
+assign response_accept_ok = response_valid && response_ready;
+always @(posedge clk) begin
+  if (response_accept_ok) command_out_r <= bounded_command;
+end
+"""
+    status, evidence = agent._match_score(
+        "Register and present only validated commands to the actuator interface.",
+        rtl,
+        {"command_out", "command_out_r", "response_accept_ok", "bounded_command"},
+    )
+    assert status == "matched"
+    assert "registered_validated_command_output" in evidence
+
+
+def test_match_score_recognizes_bounded_semantic_packet_slice_decode():
+    rtl = """
+input [127:0] request_data;
+always @(posedge clk) begin
+  sequence_reg <= request_data[15:0];
+  identifier_reg <= request_data[31:16];
+  flow_reg <= request_data[47:32];
+  geometry_reg <= request_data[63:48];
+  control_reg <= request_data[79:64];
+end
+"""
+    requirement = (
+        "The 128-bit request packet shall be internally decoded into semantic fields that include sequence_id, "
+        "request_id, flow-condition summary, geometry reference identifier, and control fields; "
+        "no packet width shall exceed 128 bits."
+    )
+    status, evidence = agent._match_score(requirement, rtl, set(re.findall(r"\b[A-Za-z_]\w*\b", rtl)))
+    assert status == "matched"
+    assert "bounded_semantic_packet_field_decode" in evidence
+
+
+def test_match_score_recognizes_declared_bounded_metadata_fifo_contract():
+    context = {"memory_macros": [{
+        "name": "request_metadata_fifo", "kind": "fpga_bram",
+        "depth": 16, "data_width": 128, "addr_width": 4,
+    }]}
+    status, evidence = agent._match_score(
+        "If the optional metadata FIFO is implemented, it stores only bounded header/metadata words and never large tensors or flow fields.",
+        "request_metadata_fifo u_fifo();",
+        {"request_metadata_fifo", "u_fifo"},
+        context,
+    )
+    assert status == "matched"
+    assert "bounded_metadata_fifo_contract" in evidence

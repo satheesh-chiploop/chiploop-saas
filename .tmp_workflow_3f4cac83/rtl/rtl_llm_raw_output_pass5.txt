@@ -1,0 +1,321 @@
+---BEGIN adaptive_aero_control_top.v---
+module adaptive_aero_control_top (
+    clk,
+    rst_n,
+    host_stream_in_valid,
+    host_stream_in_ready,
+    host_stream_in_data,
+    host_stream_out_valid,
+    host_stream_out_ready,
+    host_stream_out_data,
+    mmio_valid,
+    mmio_write,
+    mmio_addr,
+    mmio_wdata,
+    mmio_rdata,
+    mmio_ready,
+    actuator_cmd,
+    actuator_cmd_valid,
+    fault_status
+);
+
+input clk;
+input rst_n;
+input host_stream_in_valid;
+output host_stream_in_ready;
+input [127:0] host_stream_in_data;
+output host_stream_out_valid;
+input host_stream_out_ready;
+output [127:0] host_stream_out_data;
+input mmio_valid;
+input mmio_write;
+input [15:0] mmio_addr;
+input [31:0] mmio_wdata;
+output [31:0] mmio_rdata;
+output mmio_ready;
+output [15:0] actuator_cmd;
+output actuator_cmd_valid;
+output [7:0] fault_status;
+
+reg host_stream_in_ready_r;
+reg host_stream_out_valid_r;
+reg [127:0] host_stream_out_data_r;
+reg [31:0] mmio_rdata_r;
+reg mmio_ready_r;
+reg [15:0] actuator_cmd_r;
+reg actuator_cmd_valid_r;
+reg [7:0] fault_status_r;
+
+reg enable_reg;
+reg slew_enable_reg;
+reg response_accept_enable_reg;
+reg fault_clear_reg;
+
+reg [15:0] timeout_thr_reg;
+reg [15:0] cmd_min_reg;
+reg [15:0] cmd_max_reg;
+reg [15:0] slew_limit_reg;
+reg [15:0] current_request_seq_reg;
+reg [15:0] current_request_id_reg;
+reg [15:0] seq_counter_reg;
+reg [15:0] last_accepted_cmd_reg;
+reg [15:0] request_count_reg;
+reg [15:0] response_count_reg;
+
+reg request_pending_reg;
+reg stale_fault_reg;
+reg timeout_fault_reg;
+reg fault_latched_reg;
+reg clamp_active_reg;
+reg response_valid_reg;
+
+reg [15:0] outstanding_age_reg;
+reg [127:0] host_stream_in_data_reg;
+reg [15:0] req_seq_reg;
+reg [15:0] req_id_reg;
+reg [15:0] req_cmd_reg;
+reg [15:0] req_flow_reg;
+reg [15:0] req_geom_reg;
+reg [15:0] req_ctrl_reg;
+reg [15:0] rsp_seq_reg;
+reg [15:0] rsp_id_reg;
+reg [15:0] rsp_cmd_reg;
+reg [15:0] rsp_aux_reg;
+
+reg [127:0] meta_fifo_dout;
+reg [127:0] meta_fifo_din;
+reg meta_fifo_csb;
+reg meta_fifo_we;
+reg [3:0] meta_fifo_addr;
+reg meta_fifo_dout_seen_reg;
+
+wire [15:0] clamp_min_eff;
+wire [15:0] clamp_max_eff;
+wire [15:0] clamped_cmd;
+wire [15:0] slew_prev;
+wire [15:0] slew_upper;
+wire [15:0] slew_lower;
+wire [15:0] slewed_cmd;
+wire [15:0] accepted_cmd;
+wire [15:0] timeout_limit_eff;
+wire request_packet_valid;
+wire response_packet_valid;
+wire packet_parity_ok;
+wire host_request_accept;
+wire response_accept_ok;
+wire [15:0] fifo_rsp_seq;
+wire [15:0] fifo_rsp_id;
+wire [15:0] fifo_rsp_cmd;
+
+assign host_stream_in_ready = host_stream_in_ready_r;
+assign host_stream_out_valid = host_stream_out_valid_r;
+assign host_stream_out_data = host_stream_out_data_r;
+assign mmio_rdata = mmio_rdata_r;
+assign mmio_ready = mmio_ready_r;
+assign actuator_cmd = actuator_cmd_r;
+assign actuator_cmd_valid = actuator_cmd_valid_r;
+assign fault_status = fault_status_r;
+
+assign clamp_min_eff = cmd_min_reg;
+assign clamp_max_eff = cmd_max_reg;
+assign slew_prev = last_accepted_cmd_reg;
+assign timeout_limit_eff = timeout_thr_reg;
+
+assign packet_parity_ok = ^host_stream_in_data;
+assign request_packet_valid = host_stream_in_valid & packet_parity_ok;
+assign response_packet_valid = host_stream_out_valid_r;
+assign host_request_accept = request_packet_valid & enable_reg & !request_pending_reg & !fault_latched_reg;
+assign response_accept_ok = response_accept_enable_reg & host_stream_out_ready & response_packet_valid;
+
+assign clamped_cmd = (req_cmd_reg < clamp_min_eff) ? clamp_min_eff : ((req_cmd_reg > clamp_max_eff) ? clamp_max_eff : req_cmd_reg);
+assign slew_upper = slew_prev + slew_limit_reg;
+assign slew_lower = (slew_prev > slew_limit_reg) ? (slew_prev - slew_limit_reg) : 16'd0;
+assign slewed_cmd = (clamped_cmd > slew_upper) ? slew_upper : ((clamped_cmd < slew_lower) ? slew_lower : clamped_cmd);
+assign accepted_cmd = slew_enable_reg ? slewed_cmd : clamped_cmd;
+
+assign fifo_rsp_seq = meta_fifo_dout[15:0];
+assign fifo_rsp_id  = meta_fifo_dout[31:16];
+assign fifo_rsp_cmd = meta_fifo_dout[47:32];
+
+always @(posedge clk) begin
+    if (!rst_n) begin
+        enable_reg <= 1'b0;
+        slew_enable_reg <= 1'b0;
+        response_accept_enable_reg <= 1'b0;
+        fault_clear_reg <= 1'b0;
+        timeout_thr_reg <= 16'd64;
+        cmd_min_reg <= 16'd0;
+        cmd_max_reg <= 16'd1023;
+        slew_limit_reg <= 16'd16;
+        current_request_seq_reg <= 16'd0;
+        current_request_id_reg <= 16'd0;
+        seq_counter_reg <= 16'd0;
+        last_accepted_cmd_reg <= 16'd0;
+        request_count_reg <= 16'd0;
+        response_count_reg <= 16'd0;
+        request_pending_reg <= 1'b0;
+        stale_fault_reg <= 1'b0;
+        timeout_fault_reg <= 1'b0;
+        fault_latched_reg <= 1'b0;
+        clamp_active_reg <= 1'b0;
+        response_valid_reg <= 1'b0;
+        outstanding_age_reg <= 16'd0;
+        host_stream_in_data_reg <= 128'd0;
+        req_seq_reg <= 16'd0;
+        req_id_reg <= 16'd0;
+        req_cmd_reg <= 16'd0;
+        req_flow_reg <= 16'd0;
+        req_geom_reg <= 16'd0;
+        req_ctrl_reg <= 16'd0;
+        rsp_seq_reg <= 16'd0;
+        rsp_id_reg <= 16'd0;
+        rsp_cmd_reg <= 16'd0;
+        rsp_aux_reg <= 16'd0;
+        host_stream_in_ready_r <= 1'b0;
+        host_stream_out_valid_r <= 1'b0;
+        host_stream_out_data_r <= 128'd0;
+        mmio_rdata_r <= 32'd0;
+        mmio_ready_r <= 1'b0;
+        actuator_cmd_r <= 16'd0;
+        actuator_cmd_valid_r <= 1'b0;
+        fault_status_r <= 8'd0;
+        meta_fifo_csb <= 1'b1;
+        meta_fifo_we <= 1'b0;
+        meta_fifo_addr <= 4'd0;
+        meta_fifo_din <= 128'd0;
+        meta_fifo_dout_seen_reg <= 1'b0;
+    end else begin
+        host_stream_in_ready_r <= 1'b0;
+        host_stream_out_valid_r <= host_stream_out_valid_r;
+        mmio_ready_r <= 1'b0;
+        actuator_cmd_valid_r <= 1'b0;
+        response_valid_reg <= 1'b0;
+        clamp_active_reg <= 1'b0;
+        meta_fifo_csb <= 1'b1;
+        meta_fifo_we <= 1'b0;
+        meta_fifo_addr <= 4'd0;
+        meta_fifo_din <= 128'd0;
+
+        if (fault_clear_reg) begin
+            stale_fault_reg <= 1'b0;
+            timeout_fault_reg <= 1'b0;
+            fault_latched_reg <= 1'b0;
+            fault_clear_reg <= 1'b0;
+        end
+
+        if (mmio_valid) begin
+            mmio_ready_r <= 1'b1;
+            if (mmio_write) begin
+                case (mmio_addr[7:0])
+                    8'h00: begin
+                        enable_reg <= mmio_wdata[0];
+                        slew_enable_reg <= mmio_wdata[1];
+                        response_accept_enable_reg <= mmio_wdata[2];
+                        fault_clear_reg <= mmio_wdata[3];
+                    end
+                    8'h04: timeout_thr_reg <= mmio_wdata[15:0];
+                    8'h08: cmd_min_reg <= mmio_wdata[15:0];
+                    8'h0C: cmd_max_reg <= mmio_wdata[15:0];
+                    8'h10: slew_limit_reg <= mmio_wdata[15:0];
+                    default: begin
+                    end
+                endcase
+            end else begin
+                case (mmio_addr[7:0])
+                    8'h00: mmio_rdata_r <= {28'd0, fault_clear_reg, response_accept_enable_reg, slew_enable_reg, enable_reg};
+                    8'h04: mmio_rdata_r <= {16'd0, timeout_thr_reg};
+                    8'h08: mmio_rdata_r <= {16'd0, cmd_min_reg};
+                    8'h0C: mmio_rdata_r <= {16'd0, cmd_max_reg};
+                    8'h10: mmio_rdata_r <= {16'd0, slew_limit_reg};
+                    8'h18: mmio_rdata_r <= {16'd0, current_request_seq_reg};
+                    8'h1C: mmio_rdata_r <= {16'd0, current_request_id_reg};
+                    8'h20: mmio_rdata_r <= {24'd0, fault_status_r};
+                    8'h24: mmio_rdata_r <= {16'd0, seq_counter_reg};
+                    8'h28: mmio_rdata_r <= {16'd0, request_count_reg};
+                    8'h2C: mmio_rdata_r <= {16'd0, response_count_reg};
+                    8'h30: mmio_rdata_r <= {16'd0, last_accepted_cmd_reg};
+                    8'h34: mmio_rdata_r <= {24'd0, meta_fifo_dout[7:0]};
+                    default: mmio_rdata_r <= 32'd0;
+                endcase
+            end
+        end
+
+        if (host_request_accept) begin
+            host_stream_in_ready_r <= 1'b1;
+            host_stream_in_data_reg <= host_stream_in_data;
+            req_seq_reg <= host_stream_in_data[15:0];
+            req_id_reg <= host_stream_in_data[31:16];
+            req_cmd_reg <= host_stream_in_data[47:32];
+            req_flow_reg <= host_stream_in_data[63:48];
+            req_geom_reg <= host_stream_in_data[79:64];
+            req_ctrl_reg <= host_stream_in_data[95:80];
+            current_request_seq_reg <= host_stream_in_data[15:0];
+            current_request_id_reg <= host_stream_in_data[31:16];
+            seq_counter_reg <= seq_counter_reg + 16'd1;
+            request_count_reg <= request_count_reg + 16'd1;
+            request_pending_reg <= 1'b1;
+            outstanding_age_reg <= 16'd0;
+            meta_fifo_csb <= 1'b0;
+            meta_fifo_we <= 1'b1;
+            meta_fifo_addr <= seq_counter_reg[3:0];
+            meta_fifo_din <= host_stream_in_data;
+            host_stream_out_data_r <= host_stream_in_data;
+            host_stream_out_valid_r <= 1'b1;
+        end
+
+        if (host_stream_out_valid_r && host_stream_out_ready) begin
+            host_stream_out_valid_r <= 1'b0;
+        end
+
+        if (request_pending_reg) begin
+            outstanding_age_reg <= outstanding_age_reg + 16'd1;
+            if (outstanding_age_reg >= timeout_limit_eff) begin
+                timeout_fault_reg <= 1'b1;
+                fault_latched_reg <= 1'b1;
+                request_pending_reg <= 1'b0;
+            end
+            if (response_accept_ok) begin
+                rsp_seq_reg <= fifo_rsp_seq;
+                rsp_id_reg <= fifo_rsp_id;
+                rsp_cmd_reg <= fifo_rsp_cmd;
+                rsp_aux_reg <= meta_fifo_dout[63:48];
+                if ((fifo_rsp_seq == current_request_seq_reg) && (fifo_rsp_id == current_request_id_reg) && (fifo_rsp_cmd != 16'd0)) begin
+                    actuator_cmd_r <= accepted_cmd;
+                    actuator_cmd_valid_r <= 1'b1;
+                    last_accepted_cmd_reg <= accepted_cmd;
+                    response_valid_reg <= 1'b1;
+                    response_count_reg <= response_count_reg + 16'd1;
+                    request_pending_reg <= 1'b0;
+                    if (accepted_cmd != req_cmd_reg) begin
+                        clamp_active_reg <= 1'b1;
+                    end
+                end else begin
+                    stale_fault_reg <= 1'b1;
+                    fault_latched_reg <= 1'b1;
+                end
+            end
+        end
+
+        if (request_pending_reg || host_request_accept) begin
+            meta_fifo_dout_seen_reg <= 1'b1;
+        end
+
+        if (fault_latched_reg || stale_fault_reg || timeout_fault_reg) begin
+            actuator_cmd_valid_r <= 1'b0;
+        end
+
+        fault_status_r <= {timeout_fault_reg, stale_fault_reg, fault_latched_reg, request_pending_reg, response_valid_reg, clamp_active_reg, response_accept_enable_reg, enable_reg};
+    end
+end
+
+fpga_bram_meta_fifo u_meta_fifo (
+    .clk(clk),
+    .csb(meta_fifo_csb),
+    .we(meta_fifo_we),
+    .addr(meta_fifo_addr),
+    .din(meta_fifo_din),
+    .dout(meta_fifo_dout)
+);
+
+endmodule
+---END adaptive_aero_control_top.v---

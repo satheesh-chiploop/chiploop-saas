@@ -1,0 +1,37 @@
+Digital Simulation Execution Agent Log
+[2026-09-27T17:38:32.276207] [INFO] Starting Digital Simulation Execution Agent...
+[2026-09-27T17:38:32.276289] [INFO] manifest_path=backend/workflows/4499d622-a9ae-4121-9812-1638023fe437/vv/tb/simulation_manifest.json
+[2026-09-27T17:38:32.276633] [INFO] tests=[
+  "smoke_test",
+  "feature_contract_directed",
+  "application_spec_boundary_directed"
+]
+[2026-09-27T17:38:32.276718] [INFO] seeds=[
+  1,
+  2,
+  3,
+  4
+]
+[2026-09-27T17:38:32.276786] [INFO] simulation_test_timeout_sec=180
+[2026-09-27T17:38:32.276851] [INFO] Running testcase=smoke_test seed=1
+[2026-09-27T17:38:33.636736] [INFO] Running testcase=smoke_test seed=2
+[2026-09-27T17:38:36.028902] [INFO] Running testcase=smoke_test seed=3
+[2026-09-27T17:38:37.339328] [INFO] Running testcase=smoke_test seed=2
+[2026-09-27T17:38:38.480708] [INFO] Running testcase=smoke_test seed=4
+[2026-09-27T17:38:39.891936] [INFO] Running testcase=smoke_test seed=3
+[2026-09-27T17:38:41.063726] [INFO] Running testcase=feature_contract_directed seed=1
+[2026-09-27T17:38:42.344206] [INFO] Running testcase=smoke_test seed=4
+[2026-09-27T17:38:43.511857] [INFO] Running testcase=feature_contract_directed seed=2
+[2026-09-27T17:38:44.672831] [INFO] Running testcase=feature_contract_directed seed=1
+[2026-09-27T17:38:45.835810] [INFO] Running testcase=feature_contract_directed seed=3
+[2026-09-27T17:38:47.024414] [INFO] Running testcase=feature_contract_directed seed=2
+[2026-09-27T17:38:48.203950] [INFO] Running testcase=feature_contract_directed seed=4
+[2026-09-27T17:38:49.439676] [INFO] Running testcase=feature_contract_directed seed=3
+[2026-09-27T17:38:50.572481] [INFO] Running testcase=application_spec_boundary_directed seed=1
+[2026-09-27T17:38:51.850249] [INFO] Running testcase=feature_contract_directed seed=4
+[2026-09-27T17:38:52.918244] [INFO] Running testcase=application_spec_boundary_directed seed=2
+[2026-09-27T17:38:54.241009] [INFO] Running testcase=application_spec_boundary_directed seed=1
+[2026-09-27T17:38:55.258280] [INFO] Running testcase=application_spec_boundary_directed seed=3
+[2026-09-27T17:38:56.567058] [INFO] Running testcase=application_spec_boundary_directed seed=2
+[2026-09-27T17:38:57.541529] [INFO] Running testcase=application_spec_boundary_directed seed=4
+[2026-09-27T17:38:58.887142] [INFO] Running testcase=application_spec_boundary_directed seed=3
