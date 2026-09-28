@@ -1803,4 +1803,26 @@ def test_early_rtl_repair_passes_route_semantic_only_failures_to_semantic_prompt
     pass3_region = source.split('if _semantic_only_failure(pass2):', 1)[1].split('_stage("starting_llm_call_pass3")', 1)[0]
     assert "_build_semantic_conformance_prompt" in pass2_region
     assert "_build_semantic_conformance_prompt" in pass3_region
+
+
+def test_generation_prompt_requires_reset_sensitivity_from_contract():
+    spec = {
+        "name": "pwm_controller",
+        "rtl_output_file": "pwm_controller.v",
+        "ports": [
+            {"name": "clk", "direction": "input", "width": 1},
+            {"name": "reset_n", "direction": "input", "width": 1},
+        ],
+        "reset_behavior": "reset_n is active-low and synchronous.",
+    }
+    clock_reset = {
+        "clocks": [{"name": "clk", "edge": "posedge"}],
+        "resets": [{"name": "reset_n", "polarity": "active_low", "style": "synchronous"}],
+    }
+
+    prompt = agent._build_generation_prompt(spec, "flat", None, clock_reset, None)
+
+    assert "A synchronous reset must NOT appear in an always-block sensitivity list" in prompt
+    assert "Do not infer asynchronous reset behavior from signal names" in prompt
+    assert "only when the reset contract explicitly declares an asynchronous active-low reset" in prompt
 from pathlib import Path

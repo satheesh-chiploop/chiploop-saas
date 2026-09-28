@@ -1,0 +1,55 @@
+{
+  "spec_mode": "flat",
+  "derived_from_spec_only": true,
+  "module_name": "pwm_controller",
+  "microarchitecture_summary": {
+    "implementation_style": "Single-module synthesizable RTL with one 8-bit synchronous state register and simple combinational compare logic; no hierarchy, no memories, and no inferred latches.",
+    "control_strategy": "On each rising edge of clk, the counter state is synchronously cleared when reset_n is low, held when enable is low, incremented when enabled and below period, and wrapped to zero when the terminal period condition is met.",
+    "state_strategy": "Maintain one 8-bit register for the counter value; expose that register directly on counter_value. The programmed period and duty_cycle inputs are treated as runtime control values and are not stored internally.",
+    "output_strategy": "Drive pwm_out purely combinationally as counter_value < duty_cycle, so the output reflects the current counter state without an additional pipeline stage."
+  },
+  "fsm_intent": {
+    "present": false,
+    "description": "No explicit FSM is required; the design is a counter-plus-comparator implementation with synchronous enable and reset behavior.",
+    "states": []
+  },
+  "datapath_intent": {
+    "inputs": [
+      "clk",
+      "reset_n",
+      "enable",
+      "duty_cycle[7:0]",
+      "period[7:0]"
+    ],
+    "internal_storage": [
+      "8-bit counter register holding the current count value"
+    ],
+    "output_mapping": [
+      "counter_value is driven from the internal counter register",
+      "pwm_out is the combinational result of counter_value < duty_cycle"
+    ]
+  },
+  "sequencing_notes": [
+    "All state changes occur on the rising edge of clk.",
+    "reset_n is synchronous and active-low; when low, the counter is cleared to zero on the next clock edge.",
+    "When reset_n is high and enable is low, the counter holds its current value.",
+    "When reset_n is high and enable is high, the counter compares against period and increments or wraps to zero accordingly.",
+    "pwm_out is not registered and therefore changes combinationally with counter_value and duty_cycle."
+  ],
+  "timing_notes": [
+    "Single-clock-domain design intended for 50.0 MHz operation with a 20.0 ns period constraint.",
+    "The only sequential path is the counter register updated by clk.",
+    "The pwm_out path is a simple combinational compare from counter_value and duty_cycle and should be treated as a short output path.",
+    "No multi-cycle, generated-clock, or asynchronous-reset timing intent is implied."
+  ],
+  "ownership_notes": [
+    "The module owns the counter state and its synchronous update policy.",
+    "The module owns the PWM comparison logic and output polarity.",
+    "The module does not own upstream programming policy for enable, duty_cycle, or period; these are external runtime inputs.",
+    "No hidden interfaces, submodules, or memory macros are part of the implementation intent."
+  ],
+  "consistency_notes": [
+    "Microarchitecture is descriptive only.",
+    "Interfaces remain exactly as defined in digital_spec_json."
+  ]
+}

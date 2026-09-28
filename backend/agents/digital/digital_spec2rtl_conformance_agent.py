@@ -908,12 +908,12 @@ def _match_score(
     # Negative structural requirements are commonly emitted as coordinated
     # lists (for example, "no memories, buses, or submodules").  Recognize the
     # individual nouns instead of depending on one exact sentence template.
-    structure_noun = r"(?:memor(?:y|ies)|ram|rom|storage\s+arrays?|bus(?:es)?|interconnects?|submodules?|child\s+modules?|hierarchy|component\s+instances?)"
+    structure_noun = r"(?:memor(?:y|ies)|ram|rom|storage\s+arrays?|mmio|bus(?:es)?|interconnects?|submodules?|child\s+modules?|hierarchy|component\s+instances?)"
     has_negative_structure_clause = bool(
         re.search(rf"\b(?:no|without)\b[^.\n]*\b{structure_noun}\b", req_lower)
         or re.search(rf"\bfree\s+of\b[^.\n]*\b{structure_noun}\b", req_lower)
         or re.search(rf"\bneither\b[^.\n]*\b{structure_noun}\b", req_lower)
-        or re.search(r"\b(?:does|do|shall|must)\s+not\s+(?:contain|include|instantiate|use)\b", req_lower)
+        or re.search(r"\b(?:does|do|shall|must)\s+not\s+(?:contain|include|instantiate|use|require)\b", req_lower)
     )
     no_hierarchy_required = bool(
         "no internal hierarchy" in req_lower
@@ -929,6 +929,7 @@ def _match_score(
     no_memory_required = bool(
         re.search(r"\bno\s+(?:internal\s+)?memory\s+macros?\b", req_lower)
         or re.search(r"\bdoes\s+not\s+contain\b.*\bmemory\s+macros?\b", req_lower)
+        or re.search(r"\b(?:shall|must)\s+not\s+require\b[^.\n]*\bmemory\s+macros?\b", req_lower)
         or (has_negative_structure_clause and re.search(
             r"\b(?:memor(?:y|ies)|ram|rom|storage\s+arrays?)\b", req_lower
         ))
@@ -944,7 +945,7 @@ def _match_score(
     ):
         evidence.append("no_memories")
     no_bus_required = bool(
-        has_negative_structure_clause and re.search(r"\b(?:bus(?:es)?|interconnects?)\b", req_lower)
+        has_negative_structure_clause and re.search(r"\b(?:mmio|bus(?:es)?|interconnects?)\b", req_lower)
     )
     rtl_identifiers = {
         item.lower() for item in re.findall(r"\b[A-Za-z_][A-Za-z0-9_$]*\b", rtl_without_comments)

@@ -94,6 +94,29 @@ endmodule
     assert "no_internal_hierarchy" in evidence
 
 
+def test_match_score_proves_not_required_memory_mmio_or_submodules():
+    rtl = """
+module pwm_controller(input clk, input reset_n, output pwm_out);
+  reg state_q;
+  always @(posedge clk) begin
+    if (!reset_n) state_q <= 1'b0;
+    else state_q <= ~state_q;
+  end
+  assign pwm_out = state_q;
+endmodule
+"""
+
+    status, evidence = agent._match_score(
+        "The design shall not require memory macros, MMIO, or hierarchical submodules.",
+        rtl,
+        {"clk", "reset_n", "state_q", "pwm_out"},
+        structural_context={"design_module_count": 1},
+    )
+
+    assert status == "matched"
+    assert {"no_memories", "no_bus_interfaces", "no_internal_hierarchy"}.issubset(evidence)
+
+
 def test_match_score_rejects_negative_structure_list_when_memory_exists():
     rtl = """
 module queue(input clk, input [2:0] addr, output [7:0] data);

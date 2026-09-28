@@ -2778,12 +2778,19 @@ The generated RTL must pass both:
 
 These rules override stylistic preferences.
 
+RESET SEMANTICS (MANDATORY)
+- Derive every sequential block's reset sensitivity and polarity from DIGITAL_SPEC_JSON and CLOCK_RESET_ARCH_JSON.
+- A synchronous reset must NOT appear in an always-block sensitivity list; use only the declared clock edge and test reset inside the block.
+- An asynchronous reset must use its declared assertion edge in the sensitivity list.
+- Do not infer asynchronous reset behavior from signal names such as rst_n or reset_n.
+- If examples below use a particular reset style, they illustrate ownership only and never override the supplied reset contract.
+
 A. SINGLE LEGAL OWNER PER SIGNAL (MANDATORY)
 Every signal must have exactly one legal owner and exactly one legal driving style.
 
 Allowed ownership styles:
 - sequential register/state/output:
-  assigned only with nonblocking <= in exactly one clocked always @(posedge clk or negedge rst_n) block
+  assigned only with nonblocking <= in exactly one clocked block whose sensitivity follows the supplied clock/reset contract
 - combinational signal/output:
   assigned only with blocking = in exactly one always @(*) block with full default assignments
 - structural wire:
@@ -2842,9 +2849,9 @@ always @(*) begin
   irq = fault;
 end
 
-GOOD:
+GOOD (synchronous active-low reset example; use the supplied reset contract):
 reg irq;
-always @(posedge clk or negedge rst_n) begin
+always @(posedge clk) begin
   if (!rst_n) irq <= 1'b0;
   else irq <= (done | fault);
 end
@@ -2871,9 +2878,9 @@ always @(posedge clk or negedge rst_n) begin
   else if (ana_fault) status_reg <= 8'h02;
 end
 
-GOOD:
+GOOD (synchronous active-low reset example; use the supplied reset contract):
 reg [7:0] status_reg;
-always @(posedge clk or negedge rst_n) begin
+always @(posedge clk) begin
   if (!rst_n) status_reg <= 8'h00;
   else begin
     status_reg[0] <= adc_done;
@@ -2928,7 +2935,8 @@ Every combinational always @(*) block must:
   - localparam
   - assign
   - always @(*)
-  - always @(posedge clk or negedge rst_n)
+  - always @(posedge clk) for synchronous-reset logic
+  - always @(posedge clk or negedge rst_n) only when the reset contract explicitly declares an asynchronous active-low reset
 - If SPEC MODE is flat, generate exactly one module file only.
 - If SPEC MODE is hierarchical, generate every required module file from spec.
 - Each file must contain the module declared in its rtl_output_file mapping.
@@ -3089,12 +3097,12 @@ reg    [11:0] adc_data_reg;
 
 // adc_data declared but never captured
 
-GOOD:
+GOOD (synchronous active-low reset example; use the supplied reset contract):
 input  [11:0] adc_data;
 input         adc_done;
 reg    [11:0] adc_data_reg;
 
-always @(posedge clk or negedge rst_n) begin
+always @(posedge clk) begin
   if (!rst_n)
     adc_data_reg <= 12'h000;
   else if (adc_done)
@@ -3259,7 +3267,7 @@ and must be owned by the producing submodule, not by the top module.
 1. FSM coding rules
 - For every FSM, use a standard 2-process style:
   a) one sequential always block for state registers:
-     always @(posedge clk or negedge rst_n)
+     use the declared clock edge, adding a reset edge only when the reset contract explicitly declares asynchronous reset
   b) one combinational always @(*) block for next_state and combinational outputs
 - In every combinational always @(*) block, assign safe default values at the top BEFORE the case statement:
   - next_state must get a default assignment
@@ -3613,12 +3621,15 @@ If Verilator reports:
 
 GOOD/BAD REPAIR EXAMPLES
 
+The clocked examples below use a synchronous active-low reset. Adapt clock edge,
+reset polarity, and reset sensitivity to DIGITAL_SPEC_JSON and CLOCK_RESET_ARCH_JSON.
+
 BAD REPAIR:
 always @(posedge clk or negedge rst_n) irq <= done;
 always @(*) irq = fault;
 
 GOOD REPAIR:
-always @(posedge clk or negedge rst_n) begin
+always @(posedge clk) begin
   if (!rst_n) irq <= 1'b0;
   else irq <= (done | fault);
 end
@@ -3635,7 +3646,7 @@ always @(posedge clk or negedge rst_n) status_reg <= next_status_a;
 always @(posedge clk or negedge rst_n) status_reg <= next_status_b;
 
 GOOD REPAIR:
-always @(posedge clk or negedge rst_n) begin
+always @(posedge clk) begin
   if (!rst_n) status_reg <= RESET_VALUE;
   else status_reg <= merged_next_status;
 end

@@ -1,0 +1,496 @@
+{
+  "agent": "Digital Spec2RTL Conformance Agent",
+  "status": "partial",
+  "summary": {
+    "checked": 11,
+    "matched": 9,
+    "partial": 0,
+    "missing": 2,
+    "inconclusive": 0,
+    "pending_verification": 9
+  },
+  "total_requirements": 16,
+  "total_evaluations": 20,
+  "blocking_summary": {
+    "checked": 11,
+    "matched": 9,
+    "partial": 0,
+    "missing": 2,
+    "inconclusive": 0
+  },
+  "setup_issues": [],
+  "top_module": {
+    "expected": "pwm_controller",
+    "modules_found": [
+      "pwm_controller"
+    ],
+    "status": "pass"
+  },
+  "interface": {
+    "status": "pass",
+    "expected_ports": [
+      "clk",
+      "counter_value",
+      "duty_cycle",
+      "enable",
+      "period",
+      "pwm_out",
+      "reset_n"
+    ],
+    "matched_ports": [
+      "clk",
+      "counter_value",
+      "duty_cycle",
+      "enable",
+      "period",
+      "pwm_out",
+      "reset_n"
+    ],
+    "missing_ports": [],
+    "extra_ports": [],
+    "rtl_ports": [
+      "clk",
+      "counter_value",
+      "duty_cycle",
+      "enable",
+      "period",
+      "pwm_out",
+      "reset_n"
+    ]
+  },
+  "register_map": {
+    "expected": [],
+    "matched": [],
+    "expected_registers": [],
+    "matched_registers": [],
+    "expected_addresses": [],
+    "matched_addresses": [],
+    "missing": [],
+    "missing_field_details": [],
+    "missing_registers": [],
+    "missing_addresses": [],
+    "status": "not_applicable"
+  },
+  "clock_reset": {
+    "clock_ports": [
+      "clk"
+    ],
+    "reset_ports": [
+      "reset_n"
+    ],
+    "reset_style_violations": [
+      "reset 'reset_n' is declared synchronous but appears in an asynchronous sensitivity list"
+    ],
+    "status": "issues"
+  },
+  "feature_contracts": {
+    "status": "pass",
+    "checked": 6,
+    "passed": 6,
+    "failed": 0,
+    "features": [
+      {
+        "feature_id": "reset_clears_counter_and_pwm_low",
+        "status": "pass",
+        "stimulus_signals": [
+          "duty_cycle",
+          "enable",
+          "period",
+          "reset_n"
+        ],
+        "expected_signals": [
+          "counter_value",
+          "pwm_out"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "counter_increments_when_enabled",
+        "status": "pass",
+        "stimulus_signals": [
+          "duty_cycle",
+          "enable",
+          "period",
+          "reset_n"
+        ],
+        "expected_signals": [
+          "counter_value"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "counter_holds_when_disabled",
+        "status": "pass",
+        "stimulus_signals": [
+          "duty_cycle",
+          "enable",
+          "period",
+          "reset_n"
+        ],
+        "expected_signals": [
+          "counter_value"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "pwm_high_below_duty_threshold",
+        "status": "pass",
+        "stimulus_signals": [
+          "duty_cycle",
+          "enable",
+          "period",
+          "reset_n"
+        ],
+        "expected_signals": [
+          "counter_value",
+          "pwm_out"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "pwm_low_at_or_above_duty_threshold",
+        "status": "pass",
+        "stimulus_signals": [
+          "duty_cycle",
+          "enable",
+          "period",
+          "reset_n"
+        ],
+        "expected_signals": [
+          "counter_value",
+          "pwm_out"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      },
+      {
+        "feature_id": "wraps_to_zero_at_period_terminal_count",
+        "status": "pass",
+        "stimulus_signals": [
+          "duty_cycle",
+          "enable",
+          "period",
+          "reset_n"
+        ],
+        "expected_signals": [
+          "counter_value"
+        ],
+        "missing_stimulus_signals": [],
+        "missing_expected_signals": [],
+        "wrong_stimulus_directions": [],
+        "wrong_expected_directions": [],
+        "unresolved_bindings": []
+      }
+    ],
+    "scope": "static interface binding; behavioral results are verified separately"
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "module": "pwm_controller",
+      "section": "responsibilities",
+      "requirement": "Maintain an 8-bit synchronous counter exposed on counter_value.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "counter_value"
+      ]
+    },
+    {
+      "id": "REQ-002",
+      "module": "pwm_controller",
+      "section": "responsibilities",
+      "requirement": "Accept runtime duty cycle and period programming through input ports.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "period",
+        "duty_cycle"
+      ]
+    },
+    {
+      "id": "REQ-003",
+      "module": "pwm_controller",
+      "section": "responsibilities",
+      "requirement": "Generate a PWM waveform with duty proportional to duty_cycle and repetition interval controlled by period.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "duty_cycle",
+        "period"
+      ]
+    },
+    {
+      "id": "REQ-004",
+      "module": "pwm_controller",
+      "section": "responsibilities",
+      "requirement": "Honor synchronous enable gating and active-low reset behavior.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "asynchronous_reset_sensitivity_conflicts_with_synchronous_requirement"
+      ]
+    },
+    {
+      "id": "REQ-005",
+      "module": "pwm_controller",
+      "section": "responsibilities",
+      "requirement": "Provide a deterministic, synthesizable implementation suitable for standard-cell ASIC integration.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "synthesizable_rtl_subset"
+      ]
+    },
+    {
+      "id": "REQ-006",
+      "module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "On every rising edge of clk with reset_n high and enable high, compare the present counter_value against period.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "clk",
+        "reset_n",
+        "enable",
+        "counter_value",
+        "period",
+        "sequential_updates_on_posedge_clk",
+        "reset_zero",
+        "period_rollover_logic"
+      ]
+    },
+    {
+      "id": "REQ-007",
+      "module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "If counter_value is less than period, increment counter_value by one.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "counter_value",
+        "period",
+        "increment_logic",
+        "period_rollover_logic"
+      ]
+    },
+    {
+      "id": "REQ-008",
+      "module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "If counter_value is equal to or greater than period, load counter_value with zero on the next clock edge.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "counter_value",
+        "period",
+        "period_rollover_logic"
+      ]
+    },
+    {
+      "id": "REQ-009",
+      "module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "If enable is low and reset_n is high, hold counter_value unchanged.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "dynamic_simulation",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "enable",
+        "reset_n",
+        "counter_value",
+        "reset_zero"
+      ]
+    },
+    {
+      "id": "REQ-010",
+      "module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "pwm_out shall be high exactly when counter_value is strictly less than duty_cycle.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "pwm_out",
+        "counter_value",
+        "duty_cycle"
+      ]
+    },
+    {
+      "id": "REQ-011",
+      "module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "pwm_out shall be low when counter_value is greater than or equal to duty_cycle.",
+      "status": "pending_verification",
+      "static_precheck_status": "matched",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "pwm_out",
+        "counter_value",
+        "duty_cycle"
+      ]
+    },
+    {
+      "id": "REQ-012",
+      "module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "All logic shall be synthesizable SystemVerilog with no inferred latches.",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "synthesizable_rtl_subset",
+        "no_combinational_latch_sites"
+      ]
+    },
+    {
+      "id": "REQ-013",
+      "module": "pwm_controller",
+      "section": "behavior_rules",
+      "requirement": "The design shall not require memory macros, MMIO, or hierarchical submodules.",
+      "status": "missing",
+      "static_precheck_status": "missing",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": []
+    },
+    {
+      "id": "REQ-014",
+      "module": "pwm_controller",
+      "section": "must_drive",
+      "requirement": "counter_value",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "counter_value"
+      ]
+    },
+    {
+      "id": "REQ-015",
+      "module": "pwm_controller",
+      "section": "must_receive",
+      "requirement": "duty_cycle",
+      "status": "matched",
+      "static_precheck_status": "matched",
+      "verification_method": "static_structural",
+      "blocks_rtl_generation": true,
+      "evidence_tokens": [
+        "duty_cycle"
+      ]
+    },
+    {
+      "id": "REQ-016",
+      "module": "pwm_controller",
+      "section": "reset_behavior",
+      "requirement": "When reset_n is low, all internal registers including the counter are synchronously cleared to zero on the next active clock edge. During reset, counter_value shall read as zero and pwm_out shall evaluate low because counter_value equals zero. Upon deassertion of reset_n, counting resumes from zero on subsequent enabled clock edges.",
+      "status": "pending_verification",
+      "static_precheck_status": "missing",
+      "verification_method": "systemverilog_assertion",
+      "blocks_rtl_generation": false,
+      "evidence_tokens": [
+        "asynchronous_reset_sensitivity_conflicts_with_synchronous_requirement"
+      ]
+    }
+  ],
+  "rtl_files": [
+    "backend/workflows/3482a7b2-1fd3-4e90-ae52-4fd0d24f5d46/rtl/pwm_controller.v"
+  ],
+  "modules": [
+    {
+      "name": "pwm_controller",
+      "file": "backend/workflows/3482a7b2-1fd3-4e90-ae52-4fd0d24f5d46/rtl/pwm_controller.v",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "reset_n",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "enable",
+          "direction": "input",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "duty_cycle",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "period",
+          "direction": "input",
+          "width": "[7:0]",
+          "bits": 8
+        },
+        {
+          "name": "pwm_out",
+          "direction": "output",
+          "width": "1",
+          "bits": 1
+        },
+        {
+          "name": "counter_value",
+          "direction": "output",
+          "width": "[7:0]",
+          "bits": 8
+        }
+      ],
+      "rtl_text": "module pwm_controller (\n    clk,\n    reset_n,\n    enable,\n    duty_cycle,\n    period,\n    pwm_out,\n    counter_value\n);\n    input clk;\n    input reset_n;\n    input enable;\n    input [7:0] duty_cycle;\n    input [7:0] period;\n    output pwm_out;\n    output [7:0] counter_value;\n    reg [7:0] counter_value_r;\n    assign counter_value = counter_value_r;\n    assign pwm_out = (counter_value_r < duty_cycle) ? 1'b1 : 1'b0;\n\n    always @(posedge clk or negedge reset_n) begin\n        if (!reset_n) begin\n            counter_value_r <= 8'h00;\n        end else if (enable) begin\n            if (counter_value_r >= period) begin\n                counter_value_r <= 8'h00;\n            end else begin\n                counter_value_r <= counter_value_r + 8'h01;\n            end\n        end\n    end\nendmodule"
+    }
+  ],
+  "notes": [
+    "This is a conformance analysis, not a formal proof.",
+    "Missing or partial items should be reviewed and turned into executable assertions/tests where needed.",
+    "Behavioral obligations are nonblocking here only when routed to executable RTL verification checkers.",
+    "Inconclusive is preserved when the checker lacks enough evidence; no fake pass is reported."
+  ]
+}
